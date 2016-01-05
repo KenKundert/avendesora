@@ -22,7 +22,7 @@ setup(
     long_description=readme,
     url='https://github.com/kenkundert/avendesora',
     include_package_data=True,
-    license='MIT',
+    license='GPLv3',
     zip_safe=False,
     keywords=[
         'avendesora',
