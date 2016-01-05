@@ -34,7 +34,7 @@ setup(
     ],
     install_requires=[
         'docopt',
-        'gnupg',
+        'python-gnupg',
     ],
     entry_points = {
         'console_scripts': ['avendesora=avendesora.cli:main'],
