@@ -4,14 +4,14 @@
 
 from __future__ import print_function
 from scripts import exists, extension, fopen, join, mkdir, ScriptError
-from messenger import display, error, narrate
+from messenger import display, error, narrate, debug
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
     DEFAULT_ARCHIVE_FILENAME
 )
 
 class AccountFile:
-    def __init__(self, path, gpg, init=None, contents=''):
+    def __init__(self, path, gpg, generator, init=None, contents=''):
         try:
             mkdir(join(SETTINGS_DIR))
             if init and exists(path):
@@ -59,6 +59,8 @@ class AccountFile:
         contents = {}
         compiled = compile(code, path, 'exec')
         exec(compiled, contents)
+        if 'master_password' in contents:
+            generator.add_missing_master(contents['master_password'])
         self.contents = contents
 
     def __getattr__(self, name):
