@@ -1,0 +1,18 @@
+language: python
+python:
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "nightly"
+install:
+  - pip install .
+script: 
+  - py.test tests
+deploy:
+    provider: pypi
+    user: avendesora
+    on:
+        tags: true
+
+
