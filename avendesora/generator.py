@@ -5,7 +5,7 @@ from .preferences import (
 from .files import AccountFile
 from .gpg import GPG
 from .dictionary import DICTIONARY
-from .accounts import Account
+from .account import Account
 from messenger import Error, debug, terminate_if_errors
 from scripts import join, script_prefs
 script_prefs(exit_upon_error=False, expanduser=True)
@@ -19,6 +19,7 @@ class PasswordGenerator:
         self.config = AccountFile(
             join(SETTINGS_DIR, CONFIG_FILENAME),
             self.gpg,
+            self,
             init,
             CONFIG_FILE_INITIAL_CONTENTS,
         )
@@ -28,6 +29,7 @@ class PasswordGenerator:
             AccountFile(
                 join(SETTINGS_DIR, filename),
                 self.gpg,
+                self,
                 init,
                 ACCOUNTS_FILE_INITIAL_CONTENTS,
             )
@@ -70,3 +72,7 @@ class PasswordGenerator:
                 accounts.append(each)
         return accounts
 
+    def add_missing_master(self, master):
+        for each in Account.all_accounts():
+            if not hasattr(each, 'master'):
+                each.master = master

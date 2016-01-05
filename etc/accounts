@@ -20,12 +20,12 @@ from avendesora.charsets import (
 from avendesora.utilities import (
     gethostname, getusername, RecognizeURL, Autotype, Hidden
 )
-from avendesora.accounts import Account
+from avendesora.account import Account
 from avendesora.secrets import (
     Password, Passphrase, PIN, BirthDate, SecurityQuestions
 )
 
-default_master_password = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+master_password = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
 ken = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
 
 # Accounts
@@ -60,7 +60,6 @@ class AlertSCC(Account):
 # MMM {{{1
 class MyBank(Account):                                                                                                 
     aliases = ['mb']
-    master = ken
     username = 'jitterman'
     email = 'jitterman@shalmirane.com'
     url = 'https://mb.com'

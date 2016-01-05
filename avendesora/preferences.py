@@ -179,7 +179,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
     )
     from avendesora.utilities import gethostname, getusername
-    from avendesora.accounts import Account
+    from avendesora.account import Account
     from avendesora.secrets import Secret, Hidden
 
     master_password = Hidden("""{master_password}""")
