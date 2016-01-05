@@ -32,9 +32,10 @@ setup(
     packages=[
         'avendesora',
     ],
-    install_requires=[
-        'docopt',
-        'python-gnupg',
+    install_requires=[      # Be careful.  There's a package called 'gnupg'
+        'docopt',           # that's an incompatible fork of 'python-gnupg'.  
+        'python-gnupg',     # If both are installed, the user will probably 
+                            # have compatibility issues.
     ],
     entry_points = {
         'console_scripts': ['avendesora=avendesora.cli:main'],
