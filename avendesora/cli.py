@@ -45,6 +45,7 @@ from .gpg import GPG
 from .preferences import SETTINGS_DIR, DEFAULT_LOG_FILENAME, SEARCH_FIELDS
 from .utilities import Hidden
 from messenger import Messenger, Error, output, terminate, debug
+from shlib import Path
 
 import docopt
 import sys
@@ -79,7 +80,7 @@ def main():
 
     gpg = GPG()
     messenger = Messenger(
-        logfile=gpg.open([SETTINGS_DIR, DEFAULT_LOG_FILENAME]),
+        logfile=gpg.open(Path(SETTINGS_DIR, DEFAULT_LOG_FILENAME).expanduser()),
         termination_callback=teardown
     )
     try:

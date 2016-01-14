@@ -2,8 +2,6 @@ from __future__ import print_function
 from messenger import log
 from .preferences import SEARCH_FIELDS
 
-ken = "Ken's master password"
-
 class Account(type):
     def __init__(self):
         raise NotImplementedError
@@ -70,7 +68,7 @@ class Account(type):
                 except AttributeError:
                     try:
                         for i, each in enumerate(value):
-                            name = 'ken[%s]' % i
+                            name = 'key[%s]' % i
                             each._initiate(name, cls)
                     except AttributeError:
                         pass

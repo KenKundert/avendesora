@@ -7,8 +7,7 @@ from .gpg import GPG
 from .dictionary import DICTIONARY
 from .account import Account
 from messenger import Error, debug, terminate_if_errors
-from scripts import join, script_prefs
-script_prefs(exit_upon_error=False, expanduser=True)
+from shlib import Path
 
 class PasswordGenerator:
     def __init__(self, init=False, gpg_id=None):
@@ -17,7 +16,7 @@ class PasswordGenerator:
 
         # First open the config file
         self.config = AccountFile(
-            join(SETTINGS_DIR, CONFIG_FILENAME),
+            Path(SETTINGS_DIR, CONFIG_FILENAME),
             self.gpg,
             self,
             init,
@@ -27,7 +26,7 @@ class PasswordGenerator:
         # Now open any accounts files found
         for filename in self.config.accounts_files:
             AccountFile(
-                join(SETTINGS_DIR, filename),
+                Path(SETTINGS_DIR, filename),
                 self.gpg,
                 self,
                 init,

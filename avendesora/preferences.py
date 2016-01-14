@@ -1,6 +1,6 @@
 # Avendesora Password Generator Preferences
 #
-# Copyright (C) 2015 Kenneth S. Kundert
+# Copyright (C) 2016 Kenneth S. Kundert
 
 # License {{{1
 # This program is free software: you can redistribute it and/or modify

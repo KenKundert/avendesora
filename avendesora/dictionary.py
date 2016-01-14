@@ -20,8 +20,8 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports (folds)
-from scripts import join, head, isreadable, exists
 from .preferences import SETTINGS_DIR, DICTIONARY_FILENAME, CONFIG_FILENAME
+from shlib import Path, is_readable
 from messenger import display, error, os_error
 from textwrap import wrap
 import hashlib
@@ -30,8 +30,7 @@ import hashlib
 class Dictionary:
     """Read Dictionary"""
     def __init__(self, filename, settings_dir):
-        path = self._find_dictionary(filename, settings_dir)
-        self.path = path
+        self.path = self._find_dictionary(filename, settings_dir)
         contents = self._read_dictionary()
         self.hash = hashlib.sha1(contents.encode('utf-8')).hexdigest()
         self.words = contents.split()
@@ -43,28 +42,26 @@ class Dictionary:
         pass phrases. Initially looks in the settings directory, if not there
         look in install directory.
         """
-        path = join(settings_dir, filename)
-        #if not exists(path):
-        #    path = join(head(__file__), filename)
-        if not exists(path):
-            path = join(head(__file__), join('..', filename))
-        if not isreadable(path):
+        path = Path(settings_dir, filename).expanduser()
+        if not path.exists():
+            path = Path(__file__).with_name(filename)
+        if not is_readable(path):
             error("cannot open dictionary.", culprit=path)
         return path
 
     def _read_dictionary(self):
         """Read Dictionary"""
         try:
-            with open(self.path) as f:
+            with self.path.open() as f:
                 return f.read()
-        except IOError as err:
+        except OSError as err:
             error(os_error(err))
             return ''
 
     def validate(self, saved_hash):
         """Validate Dictionary"""
         if saved_hash != self.hash:
-            display("Warning: '%s' has changed." % self.path)
+            display("Warning: '%s' has changed." % str(self.path))
             display("    " + "\n    ".join(wrap(' '.join([
                 "This results in pass phrases that are inconsistent",
                 "with those created in the past.",

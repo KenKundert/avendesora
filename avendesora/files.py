@@ -3,8 +3,8 @@
 #
 
 from __future__ import print_function
-from scripts import exists, extension, fopen, join, mkdir, ScriptError
-from messenger import display, error, narrate, debug
+from shlib import Path, mkdir
+from messenger import display, error, narrate, debug, os_error
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
     DEFAULT_ARCHIVE_FILENAME
@@ -12,14 +12,15 @@ from .preferences import (
 
 class AccountFile:
     def __init__(self, path, gpg, generator, init=None, contents=''):
+        path = Path(path).expanduser()
         try:
-            mkdir(join(SETTINGS_DIR))
-            if init and exists(path):
+            mkdir(Path(SETTINGS_DIR).expanduser())
+            if init and path.exists():
                 display("%s: already exists." % path)
                 # file creation (init) requested, but file already exists
                 # don't overwrite the file, instead read it so the information 
                 # can be used to create any remaining files.
-            if init and not exists(path):
+            if init and not path.exists():
                 # create the file
                 code = contents.format(
                     dict_hash='not implemented yet',
@@ -35,29 +36,28 @@ class AccountFile:
                     master_password='not implemented yet',
                 )
                 display('%s: creating.' % path)
-                if extension(path) in ['.gpg', '.asc']:
+                if path.suffix in ['.gpg', '.asc']:
                     narrate('encrypting.', culprit=path)
                     # encrypt it
-                    gpg.save(path, code)
+                    gpg.save(Path(path), code)
                 else:
                     narrate('not encrypting.', culprit=path)
                     # file is not encrypted
-                    with fopen(path, 'w') as f:
+                    with path.open('w') as f:
                         f.write(code)
             else:
                 # read the file
-                if extension(path) in ['.gpg', '.asc']:
+                if path.suffix in ['.gpg', '.asc']:
                     # file is encrypted, decrypt it
-                    code = gpg.read(path)
+                    code = gpg.read(Path(path))
                 else:
                     # file is not encrypted
-                    with fopen(path) as f:
-                        code = f.read()
-        except ScriptError as exception:
-            error(str(exception))
+                    code = path.read_text()
+        except OSError as exception:
+            error(os_error(exception))
 
         contents = {}
-        compiled = compile(code, path, 'exec')
+        compiled = compile(code, str(path), 'exec')
         exec(compiled, contents)
         if 'master_password' in contents:
             generator.add_missing_master(contents['master_password'])
