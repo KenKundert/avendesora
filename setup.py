@@ -31,6 +31,9 @@ setup(
     install_requires=[
         'docopt',
         'python-gnupg',
+            # Be careful.  There's a package called 'gnupg' that's an 
+            # incompatible fork of 'python-gnupg'.  If both are installed, the 
+            # user will probably have compatibility issues.
         'messenger',
         'shlib',
     ],
