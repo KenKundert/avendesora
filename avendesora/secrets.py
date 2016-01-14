@@ -299,7 +299,7 @@ class Passphrase(Password):
     ):
         self.name = None
         self.length = length
-        self.alphabet = alphabet if alphabet else DICTIONARY.get_words()
+        self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
         self.version = version
         self.sep = sep
@@ -377,7 +377,7 @@ class SecurityQuestions(Passphrase):
     ):
         self.name = None
         self.length = length
-        self.alphabet = alphabet if alphabet else DICTIONARY.get_words()
+        self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
         self.version = version
         self.sep = sep

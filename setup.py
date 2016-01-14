@@ -35,7 +35,6 @@ setup(
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
         'messenger',
-        'shlib',
     ],
     entry_points = {
         'console_scripts': ['avendesora=avendesora.cli:main'],

@@ -7,7 +7,7 @@ from .gpg import GPG
 from .dictionary import DICTIONARY
 from .account import Account
 from messenger import Error, debug, terminate_if_errors
-from shlib import Path
+from pathlib import Path
 
 class PasswordGenerator:
     def __init__(self, init=False, gpg_id=None):

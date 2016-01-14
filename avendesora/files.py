@@ -3,7 +3,7 @@
 #
 
 from __future__ import print_function
-from shlib import Path, mkdir
+from pathlib import Path
 from messenger import display, error, narrate, debug, os_error
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
@@ -14,7 +14,7 @@ class AccountFile:
     def __init__(self, path, gpg, generator, init=None, contents=''):
         path = Path(path).expanduser()
         try:
-            mkdir(Path(SETTINGS_DIR).expanduser())
+            Path(SETTINGS_DIR).expanduser().mkdir(parents=True, exist_ok=True)
             if init and path.exists():
                 display("%s: already exists." % path)
                 # file creation (init) requested, but file already exists

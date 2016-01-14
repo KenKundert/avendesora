@@ -21,59 +21,51 @@
 
 # Imports (folds)
 from .preferences import SETTINGS_DIR, DICTIONARY_FILENAME, CONFIG_FILENAME
-from shlib import Path, is_readable
-from messenger import display, error, os_error
-from textwrap import wrap
+from pathlib import Path
+from messenger import codicil, error, warn, os_error
+from textwrap import dedent, wrap
 import hashlib
 
 
 class Dictionary:
     """Read Dictionary"""
     def __init__(self, filename, settings_dir):
-        self.path = self._find_dictionary(filename, settings_dir)
-        contents = self._read_dictionary()
-        self.hash = hashlib.sha1(contents.encode('utf-8')).hexdigest()
-        self.words = contents.split()
-
-    def _find_dictionary(self, filename, settings_dir):
-        """Find Dictionary
-
-        Finds the file that contains the dictionary of words used to construct
-        pass phrases. Initially looks in the settings directory, if not there
-        look in install directory.
-        """
+        # find the dictionary, initially look in the settings directory
         path = Path(settings_dir, filename).expanduser()
         if not path.exists():
+            # if not there look in install directory
             path = Path(__file__).with_name(filename)
-        if not is_readable(path):
-            error("cannot open dictionary.", culprit=path)
-        return path
+        self.path = path
 
-    def _read_dictionary(self):
-        """Read Dictionary"""
+        # read the dictionary
         try:
-            with self.path.open() as f:
-                return f.read()
+            contents= path.read_text()
+            self.hash = hashlib.sha1(contents.encode('utf-8')).hexdigest()
+            self.words = contents.split()
         except OSError as err:
             error(os_error(err))
-            return ''
+            self.hash = None
+            self.words = []
 
     def validate(self, saved_hash):
         """Validate Dictionary"""
         if saved_hash != self.hash:
-            display("Warning: '%s' has changed." % str(self.path))
-            display("    " + "\n    ".join(wrap(' '.join([
-                "This results in pass phrases that are inconsistent",
-                "with those created in the past.",
-                "Use 'abraxas --changed' to assure that nothing has changed",
-                "and then update 'dict_hash' in %s/%s to %s." % (
-                    SETTINGS_DIR, CONFIG_FILENAME, self.hash)
-            ]))))
-
-    # get_words
-    def get_words(self):
-        """Get the Words"""
-        return self.words
+            if not self.hash:
+                # there is no dictionary and the user has already been informed
+                return
+            warn("'%s' has changed." % str(self.path))
+            codicil(
+                *wrap(dedent("""\
+                    This results in pass phrases that are inconsistent
+                    with those created in the past.  Use 'avendesora --changed' 
+                    to assure that nothing has changed and then update 
+                    'dict_hash' in {settings}/{config} to {hash}.
+                """.format(
+                    settings=SETTINGS_DIR,
+                    config=CONFIG_FILENAME,
+                    hash=self.hash
+                ))), sep='\n'
+            )
 
 DICTIONARY = Dictionary(DICTIONARY_FILENAME, SETTINGS_DIR)
 # vim: set sw=4 sts=4 et:

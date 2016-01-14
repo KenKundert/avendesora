@@ -45,7 +45,7 @@ from .gpg import GPG
 from .preferences import SETTINGS_DIR, DEFAULT_LOG_FILENAME, SEARCH_FIELDS
 from .utilities import Hidden
 from messenger import Messenger, Error, output, terminate, debug
-from shlib import Path
+from pathlib import Path
 
 import docopt
 import sys
