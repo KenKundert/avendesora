@@ -5,6 +5,9 @@ python:
   - "3.4"
   - "3.5"
   - "nightly"
+before_install:
+  - mkdir -p ~/.config/avendesora
+  - cp etc/* ~/.config/avendesora
 install:
   - pip install .
 script: 
