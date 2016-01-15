@@ -30,7 +30,6 @@ setup(
     data_files=[('avendesora', ['avendesora/words'])],
     install_requires=[
         'docopt',
-        'hashlib',
         'messenger',
         'python-gnupg',
             # Be careful.  There's a package called 'gnupg' that's an 
