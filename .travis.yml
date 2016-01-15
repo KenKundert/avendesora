@@ -5,7 +5,7 @@ python:
 addons:
   apt:
     packages:
-      - gnupg2
+      - gnupg
 before_install:
   - mkdir -p ~/.config/avendesora
   - cp etc/* ~/.config/avendesora

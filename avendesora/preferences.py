@@ -64,7 +64,7 @@ CHARSETS_SHA1 = "dab48b2103ebde97f78cfebd15cc1e66d6af6ed0"
 DICTIONARY_SHA1 = "d9aa1c08e08d6cacdf82819eeb5832429eadb95a"
 
 # GPG Settings
-GPG_PATH = '/usr/bin/gpg2'
+GPG_PATH = '/usr/bin/gpg'
 GPG_HOME = '~/.gnupg'
 GPG_ARMOR = True
 
