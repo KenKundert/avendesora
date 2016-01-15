@@ -1,11 +1,11 @@
 language: python
 python:
-  - "3.4"
   - "3.5"
   - "nightly"
 before_install:
   - mkdir -p ~/.config/avendesora
   - cp etc/* ~/.config/avendesora
+  - cp avendesora/words ~/.config/avendesora
 install:
   - pip install .
 script: 
