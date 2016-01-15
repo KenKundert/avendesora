@@ -26,7 +26,7 @@ DICTIONARY_FILENAME = 'words'
 CONFIG_FILENAME = 'config'
     # config file must be unencrypted (it contains the gpg settings)
 DEFAULT_ACCOUNTS_FILENAME = 'accounts.gpg'
-DEFAULT_LOG_FILENAME = 'log.gpg'
+DEFAULT_LOG_FILENAME = 'log'
     # log file will be encrypted if you add .gpg or .asc extension
 DEFAULT_ARCHIVE_FILENAME = 'archive.gpg'
 
