@@ -1,4 +1,3 @@
-from __future__ import print_function
 from messenger import log
 from .preferences import SEARCH_FIELDS
 

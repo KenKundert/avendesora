@@ -30,11 +30,13 @@ setup(
     data_files=[('avendesora', ['avendesora/words'])],
     install_requires=[
         'docopt',
+        'hashlib',
+        'messenger',
         'python-gnupg',
             # Be careful.  There's a package called 'gnupg' that's an 
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
-        'messenger',
+        'six',
     ],
     entry_points = {
         'console_scripts': ['avendesora=avendesora.cli:main'],

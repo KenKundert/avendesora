@@ -1,4 +1,3 @@
-from __future__ import print_function
 from binascii import a2b_base64, b2a_base64, Error
 from messenger import error, is_str, log
 

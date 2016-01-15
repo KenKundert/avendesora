@@ -2,7 +2,6 @@
 # READ or WRITE POSSIBLY ENCRYPTED PYTHON CODE FILES
 #
 
-from __future__ import print_function
 from pathlib import Path
 from messenger import display, error, narrate, debug, os_error
 from .preferences import (
