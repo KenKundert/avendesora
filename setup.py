@@ -16,7 +16,6 @@ setup(
     description='An XKCD-style password generator.',
     long_description=readme,
     url='https://github.com/kenkundert/avendesora',
-    include_package_data=True,
     license='GPLv3+',
     zip_safe=False,
     packages=[
