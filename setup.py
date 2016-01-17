@@ -19,27 +19,27 @@ setup(
     include_package_data=True,
     license='GPLv3+',
     zip_safe=False,
-    keywords=[
-        'avendesora',
-        'password',
-        'XKCD',
-    ],
     packages=[
         'avendesora',
     ],
+    entry_points = {
+        'console_scripts': ['avendesora=avendesora.cli:main'],
+    },
     data_files=[('avendesora', ['avendesora/words'])],
     install_requires=[
         'docopt',
-        'messenger',
+        'inform',
         'python-gnupg',
             # Be careful.  There's a package called 'gnupg' that's an 
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
         'six',
     ],
-    entry_points = {
-        'console_scripts': ['avendesora=avendesora.cli:main'],
-    },
+    keywords=[
+        'avendesora',
+        'password',
+        'XKCD',
+    ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',

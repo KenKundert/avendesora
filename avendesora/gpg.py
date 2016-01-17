@@ -3,7 +3,7 @@
 #
 
 from .preferences import GPG_PATH, GPG_HOME, GPG_ARMOR
-from messenger import display, error, fatal, is_collection
+from inform import display, error, fatal, is_collection
 from pathlib import Path
 import gnupg
 import io

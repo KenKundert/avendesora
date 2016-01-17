@@ -3,7 +3,7 @@
 #
 
 from pathlib import Path
-from messenger import display, error, narrate, debug, os_error
+from inform import display, error, narrate, debug, os_error
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
     DEFAULT_ARCHIVE_FILENAME

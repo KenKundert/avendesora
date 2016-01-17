@@ -22,7 +22,7 @@
 # Imports (folds)
 from .preferences import SETTINGS_DIR, DICTIONARY_FILENAME, CONFIG_FILENAME
 from pathlib import Path
-from messenger import codicil, error, warn, os_error
+from inform import codicil, error, warn, os_error
 from textwrap import dedent, wrap
 import hashlib
 

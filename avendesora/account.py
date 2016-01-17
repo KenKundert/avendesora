@@ -1,4 +1,4 @@
-from messenger import log
+from inform import log
 from .preferences import SEARCH_FIELDS
 
 class Account(type):

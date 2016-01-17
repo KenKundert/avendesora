@@ -44,7 +44,7 @@ from .generator import PasswordGenerator
 from .gpg import GPG
 from .preferences import SETTINGS_DIR, DEFAULT_LOG_FILENAME, SEARCH_FIELDS
 from .utilities import Hidden
-from messenger import Messenger, Error, output, terminate, debug
+from inform import Inform, Error, output, terminate, debug
 from pathlib import Path
 
 import docopt
@@ -75,11 +75,11 @@ def main():
         terminate()
 
     def teardown():
-        messenger.disconnect()
+        inform.disconnect()
         gpg.close()
 
     gpg = GPG()
-    messenger = Messenger(
+    inform = Inform(
         logfile=gpg.open(Path(SETTINGS_DIR, DEFAULT_LOG_FILENAME).expanduser()),
         termination_callback=teardown
     )

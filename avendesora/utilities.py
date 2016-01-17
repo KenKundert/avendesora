@@ -1,5 +1,5 @@
 from binascii import a2b_base64, b2a_base64, Error
-from messenger import error, is_str, log
+from inform import error, is_str, log
 
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)

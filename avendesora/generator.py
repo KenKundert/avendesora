@@ -6,7 +6,7 @@ from .files import AccountFile
 from .gpg import GPG
 from .dictionary import DICTIONARY
 from .account import Account
-from messenger import Error, debug, terminate_if_errors
+from inform import Error, debug, terminate_if_errors
 from pathlib import Path
 
 class PasswordGenerator:
