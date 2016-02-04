@@ -15,16 +15,16 @@ setup(
     author_email='avendesora@nurdletech.com',
     description='An XKCD-style password generator.',
     long_description=readme,
-    url='https://github.com/kenkundert/avendesora',
+    url='http://nurdletech.com/linux-utilities/avendesora',
+    download_url='https://github.com/kenkundert/avendesora/tarball/master',
     license='GPLv3+',
-    zip_safe=False,
     packages=[
         'avendesora',
     ],
-    entry_points = {
+    package_data={'avendesora': ['words']},
+    entry_points={
         'console_scripts': ['avendesora=avendesora.cli:main'],
     },
-    data_files=[('avendesora', ['avendesora/words'])],
     install_requires=[
         'docopt',
         'inform',

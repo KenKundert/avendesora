@@ -19,9 +19,10 @@
 # Imports {{{1
 from textwrap import dedent
 import re
+from appdirs import user_config_dir
 
 # Filenames {{{1
-SETTINGS_DIR = '~/.config/avendesora'
+SETTINGS_DIR = user_config_dir('avendesora')
 DICTIONARY_FILENAME = 'words'
 CONFIG_FILENAME = 'config'
     # config file must be unencrypted (it contains the gpg settings)

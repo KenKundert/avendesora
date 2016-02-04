@@ -34,18 +34,18 @@ class Dictionary:
         path = Path(settings_dir, filename).expanduser()
         if not path.exists():
             # if not there look in install directory
-            path = Path(__file__).with_name(filename)
-        self.path = path
+            from pkg_resources import resource_filename
+            path = Path(resource_filename(__name__, 'words'))
 
-        # read the dictionary
+        # open the dictionary
         try:
             contents= path.read_text()
-            self.hash = hashlib.sha1(contents.encode('utf-8')).hexdigest()
-            self.words = contents.split()
         except OSError as err:
             error(os_error(err))
-            self.hash = None
-            self.words = []
+            contents = ''
+
+        self.hash = hashlib.sha1(contents.encode('utf-8')).hexdigest()
+        self.words = contents.split()
 
     def validate(self, saved_hash):
         """Validate Dictionary"""
@@ -53,7 +53,7 @@ class Dictionary:
             if not self.hash:
                 # there is no dictionary and the user has already been informed
                 return
-            warn("'%s' has changed." % str(self.path))
+            warn("dictionary has changed.")
             codicil(
                 *wrap(dedent("""\
                     This results in pass phrases that are inconsistent
