@@ -1,0 +1,90 @@
+# Account information
+#
+# Add information about each of your accounts to the accounts dictionary.
+#
+# You can use the dedent function to strip leading whitespace from
+# multi-line remarks.  You can use the character sets and exclude function
+# to create alphabets for you character-base passwords.
+#
+# Example:
+# To create an alphabet with all characters except tabs use either:
+#     'alphabet': exclude(PRINTABLE, '\t')
+# or:
+#     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
+
+from textwrap import dedent
+from avendesora.charsets import (
+    exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
+    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
+)
+from avendesora.utilities import (
+    gethostname, getusername, RecognizeURL, Autotype, Hidden
+)
+from avendesora.account import Account
+from avendesora.secrets import (
+    Password, Passphrase, PIN, BirthDate, SecurityQuestions
+)
+
+master_password = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+ken = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+
+# Accounts
+# AAA {{{1
+class AlertSCC(Account):                                                                                               
+    aliases = ['scc']
+    email = 'alertscc@shalmirane.com'
+    default = 'password'
+    master = ken
+    password = Password()
+    birtdate = BirthDate(2014, 25, 55)
+    #questions = SecurityQuestions([
+    #    'What city were you born in?',
+    #    'What street did you grow up on?',
+    #    'What was your childhood nickname?',
+    #])
+    plugins = [
+        RecognizeURL('https://alertscc.bbcportal.com/Entry'),
+        Autotype('{email}{tab}{password}{return}'),
+    ]
+# BBB {{{1
+# CCC {{{1
+# DDD {{{1
+# EEE {{{1
+# FFF {{{1
+# GGG {{{1
+# HHH {{{1
+# III {{{1
+# JJJ {{{1
+# KKK {{{1
+# LLL {{{1
+# MMM {{{1
+class MyBank(Account):                                                                                                 
+    aliases = ['mb']
+    username = 'jitterman'
+    email = 'jitterman@shalmirane.com'
+    url = 'https://mb.com'
+    passcode = Password()
+    pin = PIN()
+    #questions = SecurityQuestions([
+    #    'What city were you born in?',
+    #    'What street did you grow up on?',
+    #    'What was your childhood nickname?',
+    #])
+    checking_account = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+    savings_account = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+    customer_service = '1-866-229-6633'
+# NNN {{{1
+# OOO {{{1
+# PPP {{{1
+# QQQ {{{1
+# RRR {{{1
+# SSS {{{1
+# TTT {{{1
+# UUU {{{1
+# VVV {{{1
+# WWW {{{1
+# XXX {{{1
+# YYY {{{1
+# ZZZ {{{1
+
+# vim: filetype=python sw=4 sts=4 et ai ff=unix :
