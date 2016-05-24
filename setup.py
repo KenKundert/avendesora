@@ -23,6 +23,7 @@ setup(
         'console_scripts': ['avendesora=avendesora.cli:main'],
     },
     install_requires=[
+        'appdirs',
         'docopt',
         'inform',
         'python-gnupg',
