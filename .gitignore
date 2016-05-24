@@ -1,4 +1,8 @@
 install.out
+tests/home/.python-eggs
+tests/home/config/avendesora/log.gpg
+tests/home/gnupg/random_seed
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
