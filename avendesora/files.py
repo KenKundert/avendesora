@@ -30,7 +30,7 @@ class AccountFile:
                     archive_file=DEFAULT_ARCHIVE_FILENAME,
                     gpg_id=gpg.gpg_id,
                     gpg_home='~/.gnupg',
-                    gpg_path='/usr/bin/gpg2',
+                    gpg_path='/usr/bin/gpg',
                     section='{''{''{''1',
                     master_password='not implemented yet',
                 )
