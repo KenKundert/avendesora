@@ -6,12 +6,9 @@ addons:
   apt:
     packages:
       - gnupg
-before_install:
-  - mkdir -p ~/.config/avendesora
-  - cp etc/* ~/.config/avendesora
-  - cp avendesora/words ~/.config/avendesora
 install:
   - pip install .
+  - chmod -R go-rwx tests/home/gnupg
 script: 
   - cd tests; py.test
 deploy:
