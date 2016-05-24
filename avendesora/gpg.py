@@ -3,7 +3,7 @@
 #
 
 from .preferences import GPG_PATH, GPG_HOME, GPG_ARMOR
-from inform import display, fatal, is_collection
+from inform import debug, display, fatal, is_collection
 from pathlib import Path
 import gnupg
 import io

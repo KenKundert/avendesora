@@ -65,7 +65,7 @@ CHARSETS_SHA1 = "dab48b2103ebde97f78cfebd15cc1e66d6af6ed0"
 DICTIONARY_SHA1 = "d9aa1c08e08d6cacdf82819eeb5832429eadb95a"
 
 # GPG Settings
-GPG_PATH = '/usr/bin/gpg'
+GPG_PATH = '/usr/bin/gpg2'
 GPG_HOME = '~/.gnupg'
 GPG_ARMOR = True
 
@@ -179,9 +179,13 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
     )
-    from avendesora.utilities import gethostname, getusername
+    from avendesora.utilities import (
+        gethostname, getusername, RecognizeURL, Autotype, Hidden
+    )
     from avendesora.account import Account
-    from avendesora.secrets import Secret, Hidden
+    from avendesora.secrets import (
+        Password, Passphrase, PIN, BirthDate, SecurityQuestions
+    )
 
     master_password = Hidden("""{master_password}""")
 

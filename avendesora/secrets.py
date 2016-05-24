@@ -3,7 +3,7 @@
 Secrets
 
 Secret is a base class that can be used to easily generate various types of 
-secretes. Bascially, it gathers together a collection of strings (the arguments 
+secretes. Basically, it gathers together a collection of strings (the arguments 
 of the constructor and the _initiate function) that are joined together and 
 hashed. The 512 bit hash is then used to generate passwords, passphrases, and 
 other secrets.
@@ -225,11 +225,11 @@ class Secret():
 # Password {{{1
 class Password(Secret):
     """
-    A relatively high level method that is used to generate passwords and 
-    passphrases. For passwords, pass in a string containing all the 
-    characters available to the passwords as the alphabet and make sep an 
-    empty string.  For passphrases, pass in a list of words as the alphabet 
-    and make sep a space.
+    A relatively high level subclass of Secret that is used to generate 
+    passwords and passphrases. For passwords, pass in a string containing all 
+    the characters available to the passwords as the alphabet and make sep an 
+    empty string.  For passphrases, pass in a list of words as the alphabet and 
+    make sep a space.
 
     >>> class Account:
     ...     def get_value(self, name):
@@ -309,7 +309,7 @@ class Passphrase(Password):
 class PIN(Password):
     """
     Identical to Password() except with different default values that will by 
-    generate pass PINs rather than passwords.
+    default generate pass PINs rather than passwords.
 
     >>> class Account:
     ...     def get_value(self, name):

@@ -3,7 +3,7 @@
 #
 
 from pathlib import Path
-from inform import display, error, narrate, debug, os_error
+from inform import debug, display, fatal, narrate, os_error
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
     DEFAULT_ARCHIVE_FILENAME
@@ -53,7 +53,7 @@ class AccountFile:
                     # file is not encrypted
                     code = path.read_text()
         except OSError as exception:
-            error(os_error(exception))
+            fatal(os_error(exception))
 
         contents = {}
         compiled = compile(code, str(path), 'exec')

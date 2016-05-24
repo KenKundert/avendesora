@@ -17,6 +17,7 @@ options:
     -H <plain_text>, --hide <plain_text>
                             Encode plain_text using base64 as a way of hiding 
                             (but not encrypting) its value.
+    -I, --init              Create an initial accounts file
     -R <coded_text>, --reveal <coded_text>
                             Decode coded_text using base64.
     -s <text>, --search <text>
@@ -78,14 +79,15 @@ def main():
         inform.disconnect()
         gpg.close()
 
-    gpg = GPG()
+    gpg = GPG(gpg_id=cmdline['--gpgid'])
     inform = Inform(
         logfile=gpg.open(Path(SETTINGS_DIR, DEFAULT_LOG_FILENAME).expanduser()),
         termination_callback=teardown
     )
     try:
         generator = PasswordGenerator(
-            gpg_id = cmdline['--gpgid']
+            gpg_id = cmdline['--gpgid'],
+            init = cmdline['--init']
         )
         if cmdline['--find']:
             print_search_results(cmdline['--find'], generator.find_accounts)
@@ -97,7 +99,7 @@ def main():
 
         generator.activate_account(cmdline['<account>'])
         secret = generator.get_secret(cmdline['<secret>'])
-        print('%s = %s' % (cmdline['<secret>'], secret))
+        output('%s = %s' % (cmdline['<secret>'], secret))
     except KeyboardInterrupt:
         output('Terminated by user.')
     except Error as err:
