@@ -20,9 +20,10 @@
 
 # Imports {{{1
 from .preferences import (
-    SEARCH_FIELDS, DEFAULT_FIELD, DEFAULT_VECTOR_FIELD, LABEL_COLOR, INDENT
+    DEFAULT_FIELD, DEFAULT_VECTOR_FIELD, LABEL_COLOR, INDENT, TOOL_FIELDS
 )
 from .recognizers import Recognizer
+from .browsers import StandardBrowser
 from inform import Error, is_collection, log, output, Color
 from textwrap import indent, dedent
 import re
@@ -33,6 +34,17 @@ import sys
 VECTOR_PATTERN = re.compile(r'\A(\w+)\[(\w+)\]\Z')
 LabelColor = Color(LABEL_COLOR, enable=Color.isTTY())
 
+# Utilities {{{1
+# items {{{2
+# iterate through either a dictionary or an array
+def items(collection):
+    try:
+        iterator = collection.items()
+    except AttributeError:
+        iterator = enumerate(collection)
+    for key, value in iterator:
+        yield key, value
+
 # Account Class {{{1
 class Account:
     # all_accounts() {{{2
@@ -42,6 +54,12 @@ class Account:
             yield sub
             for sub in sub.all_accounts():
                 yield sub
+
+    @classmethod
+    def all_fields(cls):
+        for key, value in cls.__dict__.items():
+            if not key.startswith('_'):
+                yield key, value
 
     # get_name() {{{2
     @classmethod
@@ -68,11 +86,12 @@ class Account:
     # id_contains() {{{2
     @classmethod
     def id_contains(cls, target):
-        if target in cls.get_name():
+        target = target.lower()
+        if target in cls.get_name().lower():
             return True
         try:
             for alias in cls.aliases:
-                if target in alias:
+                if target in alias.lower():
                     return True
         except AttributeError:
             pass
@@ -83,21 +102,29 @@ class Account:
     def account_contains(cls, target):
         if cls.id_contains(target):
             return True
-        for field in SEARCH_FIELDS:
+        target = target.lower()
+        for key, value in cls.all_fields():
+            if key in TOOL_FIELDS:
+                continue
             try:
-                if target in cls.__dict__[field]:
+                if is_collection(value):
+                    for k, v in items(value):
+                        if target in v.lower():
+                            return True
+                elif target in value.lower():
                     return True
-            except KeyError:
+            except AttributeError:
+                # is not a string, and so 
                 pass
         return False
 
     # recognize() {{{2
     @classmethod
     def recognize(cls, data):
-        plugins = getattr(cls, 'plugins', ())
-        for plugin in plugins:
-            if isinstance(plugin, Recognizer):
-                secret = plugin.match(data, cls)
+        discovery = getattr(cls, 'discovery', ())
+        for recognizer in discovery:
+            if isinstance(recognizer, Recognizer):
+                secret = recognizer.match(data, cls)
                 if secret:
                     return secret
 
@@ -202,7 +229,7 @@ class Account:
 
         # Split name if given in the form: name/key
         try:
-            name, key = name.split('/')
+            name, key = name.split('.')
             try:
                 return name, int(key)
             except ValueError:
@@ -234,7 +261,8 @@ class Account:
         if key is None:
             return name
         else:
-            return '%s[%s]' % (name, key)
+            return '%s.%s' % (name, key)
+
     # write_summary() {{{2
     @classmethod
     def write_summary(cls):
@@ -251,16 +279,17 @@ class Account:
             key = str(key).upper().replace('_', ' ')
             return indent(LabelColor(key + ':') + sep + value, level*INDENT)
 
+        def reveal(name, key=None):
+            return "<reveal with 'avendesora %s %s'>" % (
+                cls.get_name(), cls.combine_name(name, key)
+            )
+
         def extract_collection(name, collection):
             lines = [fmt_field(key)]
-            try:
-                items = collection.items()
-            except AttributeError:
-                items = enumerate(collection)
-            for k, v in items:
+            for k, v in items(collection):
                 if hasattr(v, '_initiate'):
                     # is a secret, get description if available
-                    v = v.get_name() if hasattr(v, 'get_name') else '<secret>'
+                    v = v.get_name() if hasattr(v, 'get_name') else reveal(name, k)
                 lines.append(fmt_field(k, v, level=1))
             return lines
 
@@ -271,14 +300,22 @@ class Account:
         lines = [fmt_field('names', ', '.join(names))]
 
         for key, value in cls.values():
-            if key in ['aliases', 'default', 'master', 'plugins']:
+            if key in TOOL_FIELDS:
                 # is an Avendesora field
                 pass
             elif is_collection(value):
                 lines += extract_collection(key, value)
             elif hasattr(value, '_initiate'):
-                lines.append(fmt_field(key, '<secret>'))
+                lines.append(fmt_field(key, reveal(key)))
             else:
                 lines.append(fmt_field(key, value))
         output(*lines, sep='\n')
 
+    # open_browser() {{{2
+    @classmethod
+    def open_browser(cls, name):
+        browser = cls.get_value('browser', default=None)
+        if browser is None or is_str(browser):
+            browser = StandardBrowser(name)
+        url = cls.get_value('url', default=None)
+        browser.run(url)

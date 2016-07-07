@@ -10,6 +10,10 @@ usage:
 
 options:
     -a, --all               Output all account information.
+    -b, --browse            Open account in the default browser ({defbrowser}).
+    -B <choice>, --browser <choice>
+                            Open account in specified browser.  Choose from
+                            {browsers}.
     -c, --clipboard         Write output to clipboard rather than stdout.
     -f <text>, --find <text>
                             List any account that contains the given string in 
@@ -24,7 +28,8 @@ options:
                             Decode coded_text using base64.
     -s <text>, --search <text>
                             List any account that contains the given string in 
-                            {search_fields} or its ID.
+                            its ID or in any field value that is not encrypted
+                            or concealed.
     --stdout                Write output to the standard output without any
                             annotation or protections.
 """
@@ -47,7 +52,9 @@ options:
 # Imports {{{1
 from .generator import PasswordGenerator
 from .gpg import GPG
-from .preferences import SETTINGS_DIR, DEFAULT_LOG_FILENAME, SEARCH_FIELDS
+from .preferences import (
+    SETTINGS_DIR, DEFAULT_LOG_FILENAME, BROWSERS, DEFAULT_BROWSER
+)
 from .writer import get_writer
 from .secrets import Hidden
 from inform import Inform, Error, output, terminate, debug
@@ -70,7 +77,12 @@ def print_search_results(search_term, search_func):
 # Main {{{1
 def main():
     cmdline = docopt.docopt(
-        __doc__.format(search_fields=', '.join(SEARCH_FIELDS))
+        __doc__.format(
+            defbrowser=DEFAULT_BROWSER,
+            browsers=', '.join(
+                ['%s (%s)' % (k, BROWSERS[k].split()[0]) for k in sorted(BROWSERS)]
+            )
+        )
     )
     if cmdline['--hide']:
         debug(cmdline['--hide'])
@@ -111,11 +123,16 @@ def main():
         )
         if account_name:
             account = generator.get_account(account_name)
-            if cmdline['--all']:
-                account.write_summary()
-            if cmdline['<secret>'] or not cmdline['--all']:
-                writer.display_field(account, cmdline['<secret>'])
+            if cmdline['--browse'] or cmdline['--browser']:
+                account.open_browser(cmdline['--browser'])
+            else:
+                if cmdline['--all']:
+                    account.write_summary()
+                if cmdline['<secret>'] or not cmdline['--all']:
+                    writer.display_field(account, cmdline['<secret>'])
         else:
+            if cmdline['--browse'] or cmdline['--browser']:
+                fatal('account missing (required when starting browser).')
             account_name, script = generator.discover_account()
             account = generator.get_account(account_name)
             writer.run_script(account, script)

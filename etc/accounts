@@ -48,7 +48,7 @@ class AlertSCC(Account):
         SecurityQuestion('What street did you grow up on?'),
         SecurityQuestion('What was your childhood nickname?'),
     ]
-    plugins = [
+    discovery = [
         RecognizeAll(
             RecognizeURL('https://alertscc.bbcportal.com/Validation'),
             RecognizeUser('ken'),
@@ -75,7 +75,7 @@ class AlertSCC(Account):
 class Login(Account):
     aliases = ['luks']
     passcode = Passphrase(length=6)
-    plugins = [
+    discovery = [
         RecognizeAll(
             RecognizeHost('kundert'),
             RecognizeTitle(
@@ -99,14 +99,18 @@ class MyBank(Account):
     email = 'pizzaman@pizza.com'
     url = 'https://mb.com'
     passcode = Password()
+    verbal = Passphrase(length=1)
     pin = PIN()
     questions = [
         SecurityQuestion('What city were you born in?'),
         SecurityQuestion('What street did you grow up on?'),
         SecurityQuestion('What was your childhood nickname?'),
     ]
-    checking_account = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
-    savings_account = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+    accounts = {
+        'checking':   Hidden('MTIzNDU2Nzg='),
+        'savings':    Hidden('MjM0NTY3ODk='),
+        'creditcard': Hidden('MzQ1Njc4OTA='),
+    }
     customer_service = '1-866-229-6633'
 
 # NNN {{{1

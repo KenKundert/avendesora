@@ -59,7 +59,9 @@ class Hidden():
             )
 
     def _initiate(self, name, account):
-        log('        initializing Hidden(%s)' % account.get_name())
+        # we don't need to do anything, but having this method marks this value
+        # as being confidential
+        pass
 
     def __str__(self):
         return self.value

@@ -73,11 +73,11 @@ GPG_ARMOR = True
 # Associate a command with a browser key.
 # The command must contain a single %s, which is replaced with URL.
 BROWSERS = {
-    'x': 'xdg-open %s > /dev/null', # system default browser
-    'f': 'firefox -new-tab %s > /dev/null',
-    'd': 'dwb %s',
-    'c': 'google-chrome %s',
-    't': 'torbrowser %s > /dev/null',
+    'c': 'chrome %s',
+    'f': 'firefox -new-tab %s',
+    'g': 'google-chrome %s',
+    't': 'torbrowser %s',
+    'x': 'xdg-open %s', # system default browser
 }
 DEFAULT_BROWSER = 'x'
 
@@ -230,19 +230,4 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
 # Fields {{{1
 # Do not change these (not user configurable)
-SEARCH_FIELDS = ['username', 'account', 'email', 'url', 'remarks']
-# STRING_FIELDS = [
-#     'alphabet', 'autotype', 'email', 'master', 'prefix',
-#     'remarks', 'separator', 'suffix', 'template', 'type',
-#     'username', 'version'
-# ]
-# INTEGER_FIELDS = ['num-chars', 'num-words']
-# LIST_FIELDS = ['security questions', 'aliases']
-# LIST_OR_STRING_FIELDS = ['account', 'window', 'url']
-# ENUM_FIELDS = {
-#     'password-type': ['words', 'chars']
-# }
-# ALL_FIELDS = (
-#     STRING_FIELDS + INTEGER_FIELDS + LIST_FIELDS + LIST_OR_STRING_FIELDS +
-#     [each for each in ENUM_FIELDS.keys()]
-# )
+TOOL_FIELDS = ['aliases', 'default', 'master', 'discovery', 'browser']
