@@ -36,10 +36,10 @@ ken = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
 # AAA {{{1
 class AlertSCC(Account):
     aliases = ['scc']
-    email = 'alertscc@shalmirane.com'
+    email = 'pizzaman@pizza.com'
     comments = '''
-        Account where I signed up for local alert messages for Santa Clara 
-        County.
+        Account where I signed up for local alert messages from the county 
+        covernment.
     '''
     master = ken
     default  = 'password'
@@ -94,11 +94,12 @@ class Login(Account):
             script='{passcode}{return}'
         ),
     ]
+
 # MMM {{{1
 class MyBank(Account):
     aliases = ['mb']
-    username = 'jitterman'
-    email = 'jitterman@shalmirane.com'
+    username = 'pizzaman'
+    email = 'pizzaman@pizza.com'
     url = 'https://mb.com'
     passcode = Password()
     pin = PIN()

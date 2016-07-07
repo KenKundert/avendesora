@@ -157,95 +157,6 @@ class Account:
             except (IndexError, KeyError, TypeError):
                 raise Error('not found.', culprit=cls.combine_name(name, key))
 
-    # write_value() {{{2
-    # @classmethod
-    # def write_value(cls, name=None, writer=None):
-    #     # passes value to user using selected writer.
-    #     nm, key = cls.split_name(name)
-    #     name = cls.combine_name(nm, key)
-    #     try:
-    #         value = cls.get_value(nm, key)
-    #     except Error as err:
-    #         if err.is_collection:
-    #             output('is a collection, choose from:', culprit=name)
-    #             value = err.collection
-    #             try:
-    #                 items = value.items()
-    #             except AttributeError:
-    #                 items = enumerate(value)
-    #             for k, v in items:
-    #                 try:
-    #                     alt_name = v.get_name()
-    #                 except AttributeError:
-    #                     alt_name = None
-    #                 if alt_name:
-    #                     output('    %s: %s' % (k, alt_name))
-    #                 else:
-    #                     output('    %s' % k)
-    #             return
-    #         else:
-    #             raise
-    #     if value:
-    #         if writer:
-    #             raise NotImplementedError
-    #         else:
-    #             try:
-    #                 alt_name = value.get_name()
-    #                 if alt_name:
-    #                     name = '%s (%s)' % (name, alt_name)
-    #             except AttributeError:
-    #                 pass
-    #             output('%s = %s' % (name, value))
-    #     else:
-    #         raise Error('not found.', culprit=name)
-
-    # write_summary() {{{2
-    @classmethod
-    def write_summary(cls):
-        # present all account values that are not explicitly secret to the user
-
-        def fmt_field(key, value='', level=0):
-            if '\n' in value:
-                value = indent(dedent(value), INDENT).strip('\n')
-                sep = '\n'
-            elif value:
-                sep = ' '
-            else:
-                sep = ''
-            key = str(key).upper().replace('_', ' ')
-            return indent(LabelColor(key + ':') + sep + value, level*INDENT)
-
-        def extract_collection(name, collection):
-            lines = [fmt_field(key)]
-            try:
-                items = collection.items()
-            except AttributeError:
-                items = enumerate(collection)
-            for k, v in items:
-                if hasattr(v, '_initiate'):
-                    # is a secret, get description if available
-                    v = v.get_name() if hasattr(v, 'get_name') else '<secret>'
-                lines.append(fmt_field(k, v, level=1))
-            return lines
-
-        # preload list with the names associated with this account
-        names = [cls.get_name()]
-        if hasattr(cls, 'aliases'):
-            names += [cls.get_name()] + cls.aliases
-        lines = [fmt_field('names', ', '.join(names))]
-
-        for key, value in cls.values():
-            if key in ['aliases', 'default', 'master', 'plugins']:
-                # is an Avendesora field
-                pass
-            elif is_collection(value):
-                lines += extract_collection(key, value)
-            elif hasattr(value, '_initiate'):
-                lines.append(fmt_field(key, '<secret>'))
-            else:
-                lines.append(fmt_field(key, value))
-        output(*lines, sep='\n')
-
     # is_secret() {{{2
     @classmethod
     def is_secret(cls, name, key=None):
@@ -321,3 +232,50 @@ class Account:
             return name
         else:
             return '%s[%s]' % (name, key)
+    # write_summary() {{{2
+    @classmethod
+    def write_summary(cls):
+        # present all account values that are not explicitly secret to the user
+
+        def fmt_field(key, value='', level=0):
+            if '\n' in value:
+                value = indent(dedent(value), INDENT).strip('\n')
+                sep = '\n'
+            elif value:
+                sep = ' '
+            else:
+                sep = ''
+            key = str(key).upper().replace('_', ' ')
+            return indent(LabelColor(key + ':') + sep + value, level*INDENT)
+
+        def extract_collection(name, collection):
+            lines = [fmt_field(key)]
+            try:
+                items = collection.items()
+            except AttributeError:
+                items = enumerate(collection)
+            for k, v in items:
+                if hasattr(v, '_initiate'):
+                    # is a secret, get description if available
+                    v = v.get_name() if hasattr(v, 'get_name') else '<secret>'
+                lines.append(fmt_field(k, v, level=1))
+            return lines
+
+        # preload list with the names associated with this account
+        names = [cls.get_name()]
+        if hasattr(cls, 'aliases'):
+            names += [cls.get_name()] + cls.aliases
+        lines = [fmt_field('names', ', '.join(names))]
+
+        for key, value in cls.values():
+            if key in ['aliases', 'default', 'master', 'plugins']:
+                # is an Avendesora field
+                pass
+            elif is_collection(value):
+                lines += extract_collection(key, value)
+            elif hasattr(value, '_initiate'):
+                lines.append(fmt_field(key, '<secret>'))
+            else:
+                lines.append(fmt_field(key, value))
+        output(*lines, sep='\n')
+

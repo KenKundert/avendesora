@@ -57,22 +57,30 @@ class TTY_Writer(Writer):
         name, key = account.split_name(field)
         is_secret = account.is_secret(name, key)
         try:
-            value = str(account.get_value(name, key))
+            value = account.get_value(name, key)
+            tvalue = str(value)
         except Error as err:
             err.terminate()
         sep = ' '
-        if '\n' in value:
+        if '\n' in tvalue:
             if is_secret:
                 warn(
                     'secret contains newlines, will not be fully concealed.',
                     culprit=key
                 )
             else:
-                value = indent(dedent(value), INDENT).strip('\n')
+                tvalue = indent(dedent(tvalue), INDENT).strip('\n')
                 sep = '\n'
-        text = LabelColor(name + ':') + sep + str(value)
 
-        log('Writing to TTY.')
+        # build output string
+        label = account.combine_name(name, key)
+        log('Writing to TTY:', label)
+        try:
+            label = label.upper() + ' (%s)' % value.get_name()
+        except AttributeError:
+            pass
+        text = LabelColor(label + ':') + sep + tvalue
+
         if is_secret:
             try:
                 cursor.write(text + ' ')
@@ -148,6 +156,8 @@ class StdoutWriter(Writer):
             print(str(account.get_value(name, key)))
         except Error as err:
             err.terminate()
+
+
 # KeyboardWriter class {{{1
 class KeyboardWriter(Writer):
     """Writes output via pseudo-keyboard."""
@@ -216,6 +226,7 @@ class KeyboardWriter(Writer):
         regex = re.compile(r'({\w+})')
         out = []
         scrubbed = []
+        sleep(INITIAL_AUTOTYPE_DELAY)
         for term in regex.split(script):
             if term and term[0] == '{' and term[-1] == '}':
                 # we have found a command
