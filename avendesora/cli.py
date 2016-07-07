@@ -9,6 +9,8 @@ usage:
     avendesora [options] <account> [<secret>]
 
 options:
+    -a, --all               Output all account information.
+    -c, --clipboard         Write output to clipboard rather than stdout.
     -f <text>, --find <text>
                             List any account that contains the given string in 
                             its ID or aliases.
@@ -23,6 +25,8 @@ options:
     -s <text>, --search <text>
                             List any account that contains the given string in 
                             {search_fields} or its ID.
+    --stdout                Write output to the standard output without any
+                            annotation or protections.
 """
 
 # License {{{1
@@ -44,9 +48,10 @@ options:
 from .generator import PasswordGenerator
 from .gpg import GPG
 from .preferences import SETTINGS_DIR, DEFAULT_LOG_FILENAME, SEARCH_FIELDS
+from .writer import get_writer
 from .utilities import Hidden
 from inform import Inform, Error, output, terminate, debug
-from pathlib import Path
+from shlib import to_path
 
 import docopt
 import sys
@@ -81,7 +86,7 @@ def main():
 
     gpg = GPG(gpg_id=cmdline['--gpgid'])
     inform = Inform(
-        logfile=gpg.open(Path(SETTINGS_DIR, DEFAULT_LOG_FILENAME).expanduser()),
+        logfile=gpg.open(to_path(SETTINGS_DIR, DEFAULT_LOG_FILENAME)),
         termination_callback=teardown
     )
     try:
@@ -89,6 +94,8 @@ def main():
             gpg_id = cmdline['--gpgid'],
             init = cmdline['--init']
         )
+
+        # search for accounts that match search criteria
         if cmdline['--find']:
             print_search_results(cmdline['--find'], generator.find_accounts)
             terminate()
@@ -97,9 +104,22 @@ def main():
             print_search_results(cmdline['--search'], generator.search_accounts)
             terminate()
 
-        generator.activate_account(cmdline['<account>'])
-        secret = generator.get_secret(cmdline['<secret>'])
-        output('%s = %s' % (cmdline['<secret>'], secret))
+        # determine the account and output specified information
+        account_name = cmdline['<account>']
+        writer = get_writer(
+            cmdline['<account>'], cmdline['--clipboard'], cmdline['--stdout']
+        )
+        if account_name:
+            account = generator.get_account(account_name)
+            if cmdline['--all']:
+                account.write_summary()
+            if cmdline['<secret>'] or not cmdline['--all']:
+                writer.display_field(account, cmdline['<secret>'])
+        else:
+            account_name, script = generator.discover_account()
+            account = generator.get_account(account_name)
+            writer.run_script(account, script)
+
     except KeyboardInterrupt:
         output('Terminated by user.')
     except Error as err:

@@ -1,12 +1,15 @@
 #
 # INTERFACE TO GNUPG PACKAGE
 #
+# Package for reading and writing text files that may or may not be encrypted.
+# File will be encrypted if file path ends in a GPG extension.
 
 from .preferences import GPG_PATH, GPG_HOME, GPG_ARMOR
 from inform import debug, display, fatal, is_collection
-from pathlib import Path
+from shlib import to_path
 import gnupg
 import io
+GPG_EXTENSIONS = ['.gpg', '.asc']
 
 
 class GPG:
@@ -14,8 +17,8 @@ class GPG:
         gpg_id=None, gpg_path=None, gpg_home=None, armor=None
     ):
         self.gpg_id = gpg_id if gpg_id else self._guess_id()
-        self.gpg_path = Path(gpg_path if gpg_path else GPG_PATH)
-        self.gpg_home = Path(gpg_home if gpg_path else GPG_HOME).expanduser()
+        self.gpg_path = to_path(gpg_path if gpg_path else GPG_PATH)
+        self.gpg_home = to_path(gpg_home if gpg_path else GPG_HOME)
         self.armor = armor if armor is not None else GPG_ARMOR
 
         gpg_args = {}
@@ -40,24 +43,32 @@ class GPG:
         return username + '@' + hostname
 
     def save(self, path, contents):
-        encrypted = self.gpg.encrypt(contents, self.gpg_id, armor=self.armor)
-        if not encrypted.ok:
-            fatal('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
-        else:
-            if self.armor:
-                path.write_text(str(encrypted))
+        if path.suffix.lower() in GPG_EXTENSIONS:
+            encrypted = self.gpg.encrypt(contents, self.gpg_id, armor=self.armor)
+            if not encrypted.ok:
+                fatal('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
             else:
-                path.write_bytes(encrypted)
-            path.chmod(0o600)
+                if self.armor:
+                    path.write_text(str(encrypted))
+                else:
+                    path.write_bytes(encrypted)
+                path.chmod(0o600)
+        else:
+            path.write_text(contents)
 
     def read(self, path):
-        with path.open('rb') as f:
-            decrypted = self.gpg.decrypt_file(f)
-            if not decrypted.ok:
-                fatal('unable to decrypt.', decrypted.stderr, culprit=path, sep='\n')
-        return decrypted.data
+        # file is only assumed to be encrypted if path has gpg extension
+        if path.suffix.lower() in GPG_EXTENSIONS:
+            with path.open('rb') as f:
+                decrypted = self.gpg.decrypt_file(f)
+                if not decrypted.ok:
+                    fatal('unable to decrypt.', decrypted.stderr, culprit=path, sep='\n')
+            return decrypted.data
+        else:
+            return path.read_text()
 
     def open(self, path):
+        # file will only be encrypted if path has gpg extension
         self.path = path
         self.stream = io.StringIO()
         return self.stream

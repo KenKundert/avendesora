@@ -27,17 +27,14 @@ DICTIONARY_FILENAME = 'words'
 CONFIG_FILENAME = 'config'
     # config file must be unencrypted (it contains the gpg settings)
 DEFAULT_ACCOUNTS_FILENAME = 'accounts.gpg'
-DEFAULT_LOG_FILENAME = 'log.gpg'
+DEFAULT_LOG_FILENAME = 'log'
     # log file will be encrypted if you add .gpg or .asc extension
 DEFAULT_ARCHIVE_FILENAME = 'archive.gpg'
 
 # Settings {{{1
+INDENT = '    '
 LABEL_COLOR = 'yellow'
     # choose from normal, black, red, green, yellow, blue, magenta, cyan, white
-LABEL_STYLE = 'normal'
-    # choose from normal, bright, reverse, dim, underline, blink, reverse,
-    # invisible (these need to be implemented by underlying terminal, and some
-    # are not (such a blink and dim)
 INITIAL_AUTOTYPE_DELAY = 0.0
 DEBUG = False
     # Turns on the logging of extra information, but may expose sensitive
@@ -47,6 +44,9 @@ PREFER_HTTPS = True
     # http is explicitly specified in the url.
     # When PREFER_HTTPS is false, avendesora allows the http protocol unless
     # https is explicitly specified in the url.
+DEFAULT_FIELD = 'passcode'
+DEFAULT_VECTOR_FIELD = 'questions'
+DEFAULT_DISPLAY_TIME = 60
 
 
 # Utility programs {{{1
@@ -65,7 +65,7 @@ CHARSETS_SHA1 = "dab48b2103ebde97f78cfebd15cc1e66d6af6ed0"
 DICTIONARY_SHA1 = "d9aa1c08e08d6cacdf82819eeb5832429eadb95a"
 
 # GPG Settings
-GPG_PATH = '/usr/bin/gpg'
+GPG_PATH = '/usr/bin/gpg2'
 GPG_HOME = '~/.gnupg'
 GPG_ARMOR = True
 
@@ -98,13 +98,20 @@ REGEX_COMPONENTS = {
     'protocol': labelRegex('protocol', r'\w+'),
     'browser': labelRegex('browser', r'\w+'),
     'username': labelRegex('username', r'\w+'),
-    'email': labelRegex('email', EMAIL_REGEX)}
+    'email': labelRegex('email', EMAIL_REGEX)
+}
+
+# Required protocols (protocals that must be present in url if specified in
+# account
+REQUIRED_PROTOCOLS = ['https']
+
 # Hostname in Titlebar browser title regex
 HNITB_BROWSER_TITLE_PATTERN = re.compile(
     r'(?:{title} - )?{host} \({protocol}\)(?: - {browser})?'.format(
         **REGEX_COMPONENTS
     )
 )
+
 # This is for version 3 and beyond; requires that preferences in HNINTB be set 
 # to 'show the short URL' with a separator of '-'.
 HNITBv3_BROWSER_TITLE_PATTERN = re.compile(
@@ -180,11 +187,15 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
     )
     from avendesora.utilities import (
-        gethostname, getusername, RecognizeURL, Autotype, Hidden
+        gethostname, getusername, Autotype, Hidden
     )
     from avendesora.account import Account
     from avendesora.secrets import (
         Password, Passphrase, PIN, BirthDate, SecurityQuestions
+    )
+    from avendesora.recognizers import (
+        RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
+        RecognizeHost, RecognizeUser, RecognizeEnvVar
     )
 
     master_password = Hidden("""{master_password}""")

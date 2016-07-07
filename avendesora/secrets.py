@@ -11,6 +11,7 @@ other secrets.
 The following code should be ignored. It is defined here for the use of the 
 doctests::
 
+>>> from avendesora.secrets import *
 >>> class Account:
 ...     def get_value(self, name):
 ...          if name == 'master':
@@ -20,11 +21,13 @@ doctests::
 ...     def get_name(self):
 ...          return 'pux'
 >>> account = Account()
+
 """
 
-import hashlib
 from .charsets import DIGITS, DISTINGUISHABLE
 from .dictionary import DICTIONARY
+from inform import Error
+import hashlib
 
 # Exceptions {{{1
 class SecretExhausted(Exception):
@@ -46,11 +49,19 @@ class Secret():
         """
         self.name = self.master = self.version = None
 
+    def get_name(self):
+        return self.name
+
     def _initiate(self, name, account):
         master = self.master if self.master else account.get_value('master')
         name = self.name if self.name else name
-        version = self.version if self.version else account.get_value('version')
-        version = '' if version is None else version
+        if self.version:
+            version = self.version
+        else:
+            try:
+                version = account.get_value('version')
+            except Error:
+                version = ''
         account_name = account.get_name()
 
         key = ''.join([str(e) for e in [name, account_name, master, version]])
@@ -77,16 +88,6 @@ class Secret():
         [0:radix). The sequence of numbers seems random, but it is determined by 
         the components that are passed into the constructor.
 
-        >>> class Account:
-        ...     def get_value(self, name):
-        ...          if name == 'master':
-        ...              return 'fux'
-        ...          else:
-        ...              return None
-        ...     def get_name(self):
-        ...          return 'pux'
-        >>> account = Account()
-
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
@@ -107,16 +108,6 @@ class Secret():
         An iterator that returns a sequence of symbols. The length of the 
         sequence is *num_symbols* and each symbol is chosen uniformly from the 
         alphabet.
-
-        >>> class Account:
-        ...     def get_value(self, name):
-        ...          if name == 'master':
-        ...              return 'fux'
-        ...          else:
-        ...              return None
-        ...     def get_name(self):
-        ...          return 'pux'
-        >>> account = Account()
 
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
@@ -151,16 +142,6 @@ class Secret():
         Can be called repeatedly with different values for the radix until the 
         secret is exhausted.
 
-        >>> class Account:
-        ...     def get_value(self, name):
-        ...          if name == 'master':
-        ...              return 'fux'
-        ...          else:
-        ...              return None
-        ...     def get_name(self):
-        ...          return 'pux'
-        >>> account = Account()
-
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
@@ -182,16 +163,6 @@ class Secret():
         Returns a symbol pulled from the alphabet.
         Can be called repeatedly with different values for the radix until the 
         secret is exhausted.
-
-        >>> class Account:
-        ...     def get_value(self, name):
-        ...          if name == 'master':
-        ...              return 'fux'
-        ...          else:
-        ...              return None
-        ...     def get_name(self):
-        ...          return 'pux'
-        >>> account = Account()
 
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
@@ -231,16 +202,6 @@ class Password(Secret):
     empty string.  For passphrases, pass in a list of words as the alphabet and 
     make sep a space.
 
-    >>> class Account:
-    ...     def get_value(self, name):
-    ...          if name == 'master':
-    ...              return 'fux'
-    ...          else:
-    ...              return None
-    ...     def get_name(self):
-    ...          return 'pux'
-    >>> account = Account()
-
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = Password()
@@ -273,16 +234,6 @@ class Passphrase(Password):
     Identical to Password() except with different default values that will by 
     generate pass phrases rather than passwords.
 
-    >>> class Account:
-    ...     def get_value(self, name):
-    ...          if name == 'master':
-    ...              return 'fux'
-    ...          else:
-    ...              return None
-    ...     def get_name(self):
-    ...          return 'pux'
-    >>> account = Account()
-
     >>> import string
     >>> secret = Passphrase()
     >>> secret._initiate('dux', account)
@@ -311,16 +262,6 @@ class PIN(Password):
     Identical to Password() except with different default values that will by 
     default generate pass PINs rather than passwords.
 
-    >>> class Account:
-    ...     def get_value(self, name):
-    ...          if name == 'master':
-    ...              return 'fux'
-    ...          else:
-    ...              return None
-    ...     def get_name(self):
-    ...          return 'pux'
-    >>> account = Account()
-
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = PIN()
@@ -343,39 +284,39 @@ class PIN(Password):
         self.sep = ''
 
 
-# Question {{{1
-class SecurityQuestions(Passphrase):
-    # This needs work. It implements only one question, not many questions.
+# SecurityQuestion {{{1
+class SecurityQuestion(Passphrase):
     """
     Identical to Passphrase() except the name must be specified when created 
     and is taken to be the security question.
 
-    >>> class Account:
-    ...     def get_value(self, name):
-    ...          if name == 'master':
-    ...              return 'fux'
-    ...          else:
-    ...              return None
-    ...     def get_name(self):
-    ...          return 'pux'
-    >>> account = Account()
-
     >>> import string
-    >>> alphabet = string.ascii_letters + string.digits
-    >>> secret = SecurityQuestions()
+    >>> secret = SecurityQuestion('What city were you born in?')
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    'terrorize mourner molar combo'
+    'vandalize mausoleum canteen'
 
     """
+    # Generally the user will want to give several security questions, which
+    # they would do as an array. It might be tempting to use a dictionary, but
+    # that would be undesirable because ...
+    # 1. they would have to give the key twice (it is needed as a seed)
+    #    actually this is not necessary, could count on order to distinguish
+    #    questions, in this way the questions themselves become purely
+    #    descriptive, and the answers would change if you changed their order.
+    # 2. they would lose the index and any sense of order, so when they wanted
+    #    secret, they would have to identify it by typing in the entire question
+    #    exactly.
     def __init__(self,
-        length=4,
+        question,
+        length=3,
         alphabet=None,
         master=None,
         version=None,
         sep=' '
     ):
-        self.name = None
+        self.name = question
+        self.question = None
         self.length = length
         self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
@@ -394,16 +335,6 @@ class MixedPassword(Secret):
     from the default alphabet (*def_alphabet*) until the password has the 
     required number of characters (*num_symbols*).
 
-    >>> class Account:
-    ...     def get_value(self, name):
-    ...          if name == 'master':
-    ...              return 'fux'
-    ...          else:
-    ...              return None
-    ...     def get_name(self):
-    ...          return 'pux'
-    >>> account = Account()
-
     >>> import string
     >>> lowercase = string.ascii_lowercase
     >>> uppercase = string.ascii_uppercase
@@ -416,6 +347,7 @@ class MixedPassword(Secret):
     >>> secret._initiate('dux', account)
     >>> str(secret)
     'p32Ao6jvVTRK'
+
     """
     def __init__(
         self,
@@ -458,38 +390,32 @@ class BirthDate(Secret):
     """
     This function can be used to generate a birth date using::
 
-    >>> class Account:
-    ...     def get_value(self, name):
-    ...          if name == 'master':
-    ...              return 'fux'
-    ...          else:
-    ...              return None
-    ...     def get_name(self):
-    ...          return 'pux'
-    >>> account = Account()
-
     >>> secret = BirthDate(2015, 18, 65)
     >>> secret._initiate('dux', account)
     >>> str(secret)
     '1963-08-04'
 
     For year, enter the year the entry that contains BirthDate was created.  
-    Doing so anchors the age range.
+    Doing so anchors the age range. In this example, the creation date is 2015,
+    the minimum age is 18 and the maximum age is 65, meaning that a birthdate
+    will be chosen such that in 2015 the birth date could correspond to someone
+    that is between 18 and 65 years old.
 
     You can use the fmt argument to change the way in which the date is 
     formatted::
 
-    >>> secret = BirthDate(2015, 18, 65, fmt="%A, %B %d, %Y")
+    >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    'Sunday, August 04, 1963'
+    '8/4/63'
+
     """
     def __init__(
         self,
         year,
-        min_age,
-        max_age,
-        fmt=None,
+        min_age=18,
+        max_age=65,
+        fmt='YYYY-MM-DD',
         master=None,
         version=None,
     ):
@@ -501,17 +427,14 @@ class BirthDate(Secret):
         self.version = version
 
     def __str__(self):
-        from datetime import date
+        import arrow
         year = self._get_symbol(range(self.first_year, self.last_year))
-        jan1 = date(year, 1, 1)
-        dec31 = date(year, 12, 31)
+        jan1 = arrow.get(year, 1, 1)
+        dec31 = arrow.get(year, 12, 31)
         days_in_year = (dec31 - jan1).days
         day = self._get_symbol(range(days_in_year))
-        birthdate = date.fromordinal(jan1.toordinal() + day)
-        if self.fmt:
-            return birthdate.strftime(self.fmt)
-        else:
-            return birthdate.isoformat()
+        birthdate = jan1.replace(days=day)
+        return birthdate.format(self.fmt)
 
 if __name__ == "__main__":
     import doctest

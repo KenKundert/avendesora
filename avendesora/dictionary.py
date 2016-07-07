@@ -21,7 +21,7 @@
 
 # Imports (folds)
 from .preferences import SETTINGS_DIR, DICTIONARY_FILENAME, CONFIG_FILENAME
-from pathlib import Path
+from shlib import to_path
 from inform import codicil, error, warn, os_error
 from textwrap import dedent, wrap
 import hashlib
@@ -31,11 +31,11 @@ class Dictionary:
     """Read Dictionary"""
     def __init__(self, filename, settings_dir):
         # find the dictionary, initially look in the settings directory
-        path = Path(settings_dir, filename).expanduser()
+        path = to_path(settings_dir, filename)
         if not path.exists():
             # if not there look in install directory
             from pkg_resources import resource_filename
-            path = Path(resource_filename(__name__, 'words'))
+            path = to_path(resource_filename(__name__, 'words'))
 
         # open the dictionary
         try:

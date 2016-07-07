@@ -6,17 +6,18 @@ from .files import AccountFile
 from .gpg import GPG
 from .dictionary import DICTIONARY
 from .account import Account
+from .title import Title
 from inform import Error, debug, terminate_if_errors
-from pathlib import Path
+from shlib import to_path
+from urllib.parse import urlparse
 
 class PasswordGenerator:
     def __init__(self, init=False, gpg_id=None):
         self.gpg = GPG(gpg_id)
-        self.active_account = None
 
         # First open the config file
         self.config = AccountFile(
-            Path(SETTINGS_DIR, CONFIG_FILENAME),
+            to_path(SETTINGS_DIR, CONFIG_FILENAME),
             self.gpg,
             self,
             init,
@@ -26,7 +27,7 @@ class PasswordGenerator:
         # Now open any accounts files found
         for filename in self.config.accounts_files:
             AccountFile(
-                Path(SETTINGS_DIR, filename),
+                to_path(SETTINGS_DIR, filename),
                 self.gpg,
                 self,
                 init,
@@ -36,42 +37,58 @@ class PasswordGenerator:
 
         DICTIONARY.validate(self.config.dict_hash)
 
-    def activate_account(self, account):
-        if not account:
+    def get_account(self, name):
+        if not name:
             raise Error('no account specified.')
-        for each in Account.all_accounts():
-            if each.matches_exactly(account):
-                each.initialize()
-                self.active_account = each
-                return
-        raise Error('not found', culprit=account)
-
-    def get_secret(self, secret=None):
-        if not secret:
-             secret = self.active_account.get_value('default')
-        if not secret:
-             secret = 'passcode'
-        value = self.active_account.get_value(secret)
-        if value:
-            return value
-        else:
-            raise Error('not found', culprit=secret)
+        for account in Account.all_accounts():
+            if account.matches_exactly(name):
+                account.initialize()
+                return account
+        raise Error('not found.', culprit=name)
 
     def find_accounts(self, target):
         accounts = []
-        for each in Account.all_accounts():
-            if each.id_contains(target):
-                accounts.append(each)
+        for account in Account.all_accounts():
+            if account.id_contains(target):
+                accounts.append(account)
         return accounts
 
     def search_accounts(self, target):
         accounts = []
-        for each in Account.all_accounts():
-            if each.account_contains(target):
-                accounts.append(each)
+        for account in Account.all_accounts():
+            if account.account_contains(target):
+                accounts.append(account)
         return accounts
 
+    def discover_account(self):
+        # get and parse the title
+        data = Title().get_data()
+
+        # split the url into basic components if found
+        url = data.get('url')
+        if url:
+            url = urlparse(url)
+            data['protocol'] = url.scheme
+            data['host'] = url.netloc
+            data['path'] = url.path
+
+        # sweep through accounts to see if any recognize this title data
+        # recognizer may fund the following fields in data:
+        #     rawdata: the original title
+        #     title: the processed title
+        #     url: the full url
+        #     browser: the name of the browser
+        #     protocol: the url scheme (ex. http, https, ...)
+        #     host: the url host name or IP address
+        #     path: the path component of the url
+        #           does not include options or anchor
+        for account in Account.all_accounts():
+            secret = account.recognize(data)
+            if secret:
+                return account.get_name(), secret
+        raise Error('cannot find appropriate account.')
+
     def add_missing_master(self, master):
-        for each in Account.all_accounts():
-            if not hasattr(each, 'master'):
-                each.master = master
+        for account in Account.all_accounts():
+            if not hasattr(account, 'master'):
+                account.master = master

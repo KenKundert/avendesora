@@ -26,6 +26,7 @@ setup(
         'appdirs',
         'docopt',
         'inform',
+        'shlib',
         'python-gnupg',
             # Be careful.  There's a package called 'gnupg' that's an 
             # incompatible fork of 'python-gnupg'.  If both are installed, the 

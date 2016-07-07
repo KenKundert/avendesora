@@ -1,19 +1,36 @@
-#
-# READ or WRITE POSSIBLY ENCRYPTED PYTHON CODE FILES
-#
+# Read or write possibly encrypted python code fileS
 
-from pathlib import Path
+# License {{{1
+# Copyright (C) 2016 Kenneth S. Kundert
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see http://www.gnu.org/licenses/.
+
+
+# Imports {{{1
+from shlib import to_path
 from inform import debug, display, fatal, narrate, os_error
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
     DEFAULT_ARCHIVE_FILENAME
 )
 
+# AccountsFile class {{{1
 class AccountFile:
     def __init__(self, path, gpg, generator, init=None, contents=''):
-        path = Path(path).expanduser()
+        path = to_path(path)
         try:
-            Path(SETTINGS_DIR).expanduser().mkdir(parents=True, exist_ok=True)
+            to_path(SETTINGS_DIR).mkdir(parents=True, exist_ok=True)
             if init and path.exists():
                 display("%s: already exists." % path)
                 # file creation (init) requested, but file already exists
@@ -30,7 +47,7 @@ class AccountFile:
                     archive_file=DEFAULT_ARCHIVE_FILENAME,
                     gpg_id=gpg.gpg_id,
                     gpg_home='~/.gnupg',
-                    gpg_path='/usr/bin/gpg',
+                    gpg_path='/usr/bin/gpg2',
                     section='{''{''{''1',
                     master_password='not implemented yet',
                 )
@@ -38,7 +55,7 @@ class AccountFile:
                 if path.suffix in ['.gpg', '.asc']:
                     narrate('encrypting.', culprit=path)
                     # encrypt it
-                    gpg.save(Path(path), code)
+                    gpg.save(to_path(path), code)
                 else:
                     narrate('not encrypting.', culprit=path)
                     # file is not encrypted
@@ -48,7 +65,7 @@ class AccountFile:
                 # read the file
                 if path.suffix in ['.gpg', '.asc']:
                     # file is encrypted, decrypt it
-                    code = gpg.read(Path(path))
+                    code = gpg.read(to_path(path))
                 else:
                     # file is not encrypted
                     code = path.read_text()

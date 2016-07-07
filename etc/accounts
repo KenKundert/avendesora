@@ -18,11 +18,15 @@ from avendesora.charsets import (
     HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
 )
 from avendesora.utilities import (
-    gethostname, getusername, RecognizeURL, Autotype, Hidden
+    gethostname, getusername, Autotype, Hidden
 )
 from avendesora.account import Account
 from avendesora.secrets import (
-    Password, Passphrase, PIN, BirthDate, SecurityQuestions
+    Password, Passphrase, PIN, BirthDate, SecurityQuestion
+)
+from avendesora.recognizers import (
+    RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD, 
+    RecognizeHost, RecognizeUser, RecognizeEnvVar
 )
 
 master_password = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
@@ -30,22 +34,35 @@ ken = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
 
 # Accounts
 # AAA {{{1
-class AlertSCC(Account):                                                                                               
+class AlertSCC(Account):
     aliases = ['scc']
     email = 'alertscc@shalmirane.com'
-    default = 'password'
+    comments = '''
+        Account where I signed up for local alert messages for Santa Clara 
+        County.
+    '''
     master = ken
+    default  = 'password'
     password = Password()
-    birtdate = BirthDate(2014, 25, 55)
-    #questions = SecurityQuestions([
-    #    'What city were you born in?',
-    #    'What street did you grow up on?',
-    #    'What was your childhood nickname?',
-    #])
-    plugins = [
-        RecognizeURL('https://alertscc.bbcportal.com/Entry'),
-        Autotype('{email}{tab}{password}{return}'),
+    birthdate = BirthDate(2014, 25, 55)
+    questions = [
+        SecurityQuestion('What city were you born in?'),
+        SecurityQuestion('What street did you grow up on?'),
+        SecurityQuestion('What was your childhood nickname?'),
     ]
+    plugins = [
+        RecognizeAll(
+            RecognizeURL('https://alertscc.bbcportal.com/Validation'),
+            RecognizeUser('ken'),
+            script='{birthdate}{return}'
+        ),
+        RecognizeAll(
+            RecognizeURL('https://alertscc.bbcportal.com'),
+            RecognizeUser('ken'),
+            script='{email}{tab}{password}{return}'
+        ),
+    ]
+
 # BBB {{{1
 # CCC {{{1
 # DDD {{{1
@@ -57,22 +74,43 @@ class AlertSCC(Account):
 # JJJ {{{1
 # KKK {{{1
 # LLL {{{1
+class Login(Account):
+    aliases = ['luks']
+    master = ken
+    passcode = Passphrase(length=6)
+    plugins = [
+        RecognizeAll(
+            RecognizeHost('kundert'),
+            RecognizeTitle(
+                # these are used in the terminal
+                'sudo', 'sudo *',
+
+                # this is used in for virt-manager
+                'Authentication',
+
+                # this is used in for xxx (my logout script)
+                '/bin/csh -f /home/ken/bin/xxx'
+            ),
+            script='{passcode}{return}'
+        ),
+    ]
 # MMM {{{1
-class MyBank(Account):                                                                                                 
+class MyBank(Account):
     aliases = ['mb']
     username = 'jitterman'
     email = 'jitterman@shalmirane.com'
     url = 'https://mb.com'
     passcode = Password()
     pin = PIN()
-    #questions = SecurityQuestions([
-    #    'What city were you born in?',
-    #    'What street did you grow up on?',
-    #    'What was your childhood nickname?',
-    #])
+    questions = [
+        SecurityQuestion('What city were you born in?'),
+        SecurityQuestion('What street did you grow up on?'),
+        SecurityQuestion('What was your childhood nickname?'),
+    ]
     checking_account = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
     savings_account = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
     customer_service = '1-866-229-6633'
+
 # NNN {{{1
 # OOO {{{1
 # PPP {{{1
