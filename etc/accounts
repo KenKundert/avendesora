@@ -17,12 +17,9 @@ from avendesora.charsets import (
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
     HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
 )
-from avendesora.utilities import (
-    gethostname, getusername, Autotype, Hidden
-)
 from avendesora.account import Account
 from avendesora.secrets import (
-    Password, Passphrase, PIN, BirthDate, SecurityQuestion
+    Hidden, Password, Passphrase, PIN, BirthDate, SecurityQuestion
 )
 from avendesora.recognizers import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD, 
@@ -44,7 +41,8 @@ class AlertSCC(Account):
     master = ken
     default  = 'password'
     password = Password()
-    birthdate = BirthDate(2014, 25, 55)
+    account = Hidden('MTIzNDU2LTc4OTA=')
+    birthdate = BirthDate(2016, 25, 55)
     questions = [
         SecurityQuestion('What city were you born in?'),
         SecurityQuestion('What street did you grow up on?'),
@@ -76,7 +74,6 @@ class AlertSCC(Account):
 # LLL {{{1
 class Login(Account):
     aliases = ['luks']
-    master = ken
     passcode = Passphrase(length=6)
     plugins = [
         RecognizeAll(
