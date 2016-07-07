@@ -49,7 +49,7 @@ from .generator import PasswordGenerator
 from .gpg import GPG
 from .preferences import SETTINGS_DIR, DEFAULT_LOG_FILENAME, SEARCH_FIELDS
 from .writer import get_writer
-from .utilities import Hidden
+from .secrets import Hidden
 from inform import Inform, Error, output, terminate, debug
 from shlib import to_path
 

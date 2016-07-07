@@ -1,9 +1,20 @@
-from .utilities import gethostname, getusername
 from shlib import cwd, to_path
 from inform import error, log, warn
 from fnmatch import fnmatch
 from urllib.parse import urlparse
 import os
+
+# Utilities {{{1
+# gethostname {{{2
+# returns short version of the hostname (the hostname without any domain name)
+import socket
+def gethostname():
+    return socket.gethostname().split('.')[0]
+
+# getusername {{{2
+import getpass
+def getusername():
+    return getpass.getuser()
 
 # Recognizer Base Class {{{1
 class Recognizer:

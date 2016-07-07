@@ -186,12 +186,9 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
     )
-    from avendesora.utilities import (
-        gethostname, getusername, Autotype, Hidden
-    )
     from avendesora.account import Account
     from avendesora.secrets import (
-        Password, Passphrase, PIN, BirthDate, SecurityQuestions
+        Hidden, Password, Passphrase, PIN, BirthDate, SecurityQuestions
     )
     from avendesora.recognizers import (
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
@@ -234,18 +231,18 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 # Fields {{{1
 # Do not change these (not user configurable)
 SEARCH_FIELDS = ['username', 'account', 'email', 'url', 'remarks']
-STRING_FIELDS = [
-    'alphabet', 'autotype', 'email', 'master', 'prefix',
-    'remarks', 'separator', 'suffix', 'template', 'type',
-    'username', 'version'
-]
-INTEGER_FIELDS = ['num-chars', 'num-words']
-LIST_FIELDS = ['security questions', 'aliases']
-LIST_OR_STRING_FIELDS = ['account', 'window', 'url']
-ENUM_FIELDS = {
-    'password-type': ['words', 'chars']
-}
-ALL_FIELDS = (
-    STRING_FIELDS + INTEGER_FIELDS + LIST_FIELDS + LIST_OR_STRING_FIELDS +
-    [each for each in ENUM_FIELDS.keys()]
-)
+# STRING_FIELDS = [
+#     'alphabet', 'autotype', 'email', 'master', 'prefix',
+#     'remarks', 'separator', 'suffix', 'template', 'type',
+#     'username', 'version'
+# ]
+# INTEGER_FIELDS = ['num-chars', 'num-words']
+# LIST_FIELDS = ['security questions', 'aliases']
+# LIST_OR_STRING_FIELDS = ['account', 'window', 'url']
+# ENUM_FIELDS = {
+#     'password-type': ['words', 'chars']
+# }
+# ALL_FIELDS = (
+#     STRING_FIELDS + INTEGER_FIELDS + LIST_FIELDS + LIST_OR_STRING_FIELDS +
+#     [each for each in ENUM_FIELDS.keys()]
+# )

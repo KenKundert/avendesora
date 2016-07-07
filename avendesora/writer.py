@@ -22,11 +22,11 @@
 # Imports {{{1
 from . import cursor
 from .preferences import (
-    INDENT, LABEL_COLOR, XDOTOOL, XSEL, ALL_FIELDS, INITIAL_AUTOTYPE_DELAY,
+    INDENT, LABEL_COLOR, XDOTOOL, XSEL, INITIAL_AUTOTYPE_DELAY,
     DEFAULT_DISPLAY_TIME
 )
 from shlib import Run
-from inform import fatal, Error, log, Color
+from inform import output, fatal, Error, log, Color
 from time import sleep
 from textwrap import indent, dedent
 import re
@@ -75,8 +75,11 @@ class TTY_Writer(Writer):
         # build output string
         label = account.combine_name(name, key)
         log('Writing to TTY:', label)
+        label = label.upper()
         try:
-            label = label.upper() + ' (%s)' % value.get_name()
+            alt_name = value.get_name()
+            if alt_name:
+                label += ' (%s)' % value.get_name()
         except AttributeError:
             pass
         text = LabelColor(label + ':') + sep + tvalue

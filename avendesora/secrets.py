@@ -26,8 +26,10 @@ doctests::
 
 from .charsets import DIGITS, DISTINGUISHABLE
 from .dictionary import DICTIONARY
-from inform import Error
+from inform import Error, error, log
+from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 import hashlib
+import sys
 
 # Exceptions {{{1
 class SecretExhausted(Exception):
@@ -36,6 +38,41 @@ class SecretExhausted(Exception):
 
     def __str__(self):
         return "secret exhausted"
+
+# Hidden {{{1
+class Hidden():
+    def __init__(self, value, **kwargs):
+        try:
+            value = a2b_base64(value)
+            self.value = value.decode(kwargs.get('encoding', 'utf8'))
+        except BinasciiError as err:
+            import traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            filename, lineno = traceback.extract_stack()[-2][:2]
+                # context and content are also available, but in this case
+                # Hidden is generally instantiated from top-level so the 
+                # context is not interesting and the content (the actual line 
+                # of code) shown in this case is gibberish (encrypted).
+            error(
+                'invalid value specified to Hidden().',
+                culprit=(filename, lineno)
+            )
+
+    def _initiate(self, name, account):
+        log('        initializing Hidden(%s)' % account.get_name())
+
+    def __str__(self):
+        return self.value
+
+    @staticmethod
+    def hide(value, **kwargs):
+        value = value.encode(kwargs.get('encoding', 'utf8'))
+        return b2a_base64(value).rstrip().decode('ascii')
+
+    @staticmethod
+    def reveal(value, **kwargs):
+        value = a2b_base64(value.encode('ascii'))
+        return value.decode(kwargs.get('encoding', 'utf8'))
 
 # Secret {{{1
 class Secret():
@@ -54,6 +91,7 @@ class Secret():
 
     def _initiate(self, name, account):
         master = self.master if self.master else account.get_value('master')
+        assert master
         name = self.name if self.name else name
         if self.version:
             version = self.version

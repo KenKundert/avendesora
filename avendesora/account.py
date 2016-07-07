@@ -138,10 +138,13 @@ class Account:
 
     # get_value() {{{2
     @classmethod
-    def get_value(cls, name, key=None):
+    def get_value(cls, name, key=None, default=False):
         value = cls.__dict__.get(name)
         if value is None:
-            raise Error('not found.', culprit=cls.combine_name(name, key))
+            if default is False:
+                raise Error('not found.', culprit=cls.combine_name(name, key))
+            else:
+                return default
         if key is None:
             if is_collection(value):
                 raise Error(
@@ -167,7 +170,7 @@ class Account:
             try:
                 return hasattr(value[key], '_initiate')
             except (IndexError, KeyError, TypeError):
-                raise Error('not found.', culprit=name)
+                raise Error('not found.', culprit=cls.combine_name(name, key))
 
     # split_name() {{{2
     @classmethod
@@ -184,7 +187,7 @@ class Account:
         #     field[key] or field/key: for dictionary value
 
         if name is True or not name:
-            name = cls.get_value('default')
+            name = cls.get_value('default', default=None)
         if not name:
             name = DEFAULT_FIELD
 
