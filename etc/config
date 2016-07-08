@@ -1,13 +1,3 @@
-# Changing the contents of the dictionary, secrets, or charsets will change 
-# the secrets you generate, thus you do not want to change these files once 
-# you have started using the program. These are hashes for the contents of 
-# these files at the time that this file was created. The program will 
-# complain if the current contents of these files generate a different 
-# hash. Only update these hashes if you know what you are doing.
-dict_hash = 'd9aa1c08e08d6cacdf82819eeb5832429eadb95a'      # DO NOT CHANGE THIS LINE
-secrets_hash = 'not implemented yet'   # DO NOT CHANGE THIS LINE
-charsets_hash = 'not implemented yet'  # DO NOT CHANGE THIS LINE
-
 # List of the files that contain account information
 accounts_files = ['accounts', 'templates']
 
@@ -20,9 +10,28 @@ log_file = 'log.gpg'
 # and end the path in .gpg). Use None to disable archiving.
 archive_file = 'archive.gpg'
 
+# Various settings
+default_field = 'passcode'
+default_vector_field = 'questions'
+display_time = 60
+browsers = {
+    'c': 'chrome %s',
+    'f': 'firefox -new-tab %s',
+    'g': 'google-chrome %s',
+    't': 'torbrowser %s',
+    'x': 'xdg-open %s',
+}
+default_browser = 'x'
+required_protocols = ['https']
+
 # Information used by GPG when encrypting and decrypting files.
 gpg_id = 'ken@designers-guide.com'
+gpg_armor = True
 gpg_home = '~/.gnupg'
 gpg_executable = '/usr/bin/gpg2'
+
+# Utilities
+xdotool_executable = '/usr/bin/xdotool'
+xsel_executable = '/usr/bin/xsel'
 
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

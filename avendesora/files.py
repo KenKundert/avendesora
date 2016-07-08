@@ -18,66 +18,58 @@
 
 
 # Imports {{{1
-from shlib import to_path
-from inform import debug, display, Error, fatal, narrate, os_error
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
     DEFAULT_ARCHIVE_FILENAME
 )
+from shlib import to_path
+from inform import debug, display, Error, fatal, narrate, os_error
 
 # AccountsFile class {{{1
 class AccountFile:
-    def __init__(self, path, gpg=None, generator=None, init=None, contents=''):
-        path = to_path(path)
+    def __init__(self, path, gpg=None, contents=None):
+        self.path = to_path(path)
+        self.gpg = gpg
+
+    def read(self):
+        path = self.path
         try:
-            to_path(SETTINGS_DIR).mkdir(parents=True, exist_ok=True)
-            if init and path.exists():
-                display("%s: already exists." % path)
-                # file creation (init) requested, but file already exists
-                # don't overwrite the file, instead read it so the information 
-                # can be used to create any remaining files.
-            if init and not path.exists():
-                # create the file
-                code = contents.format(
-                    dict_hash='not implemented yet',
-                    secrets_hash='not implemented yet',
-                    charsets_hash='not implemented yet',
-                    accounts_file=DEFAULT_ACCOUNTS_FILENAME,
-                    log_file=DEFAULT_LOG_FILENAME,
-                    archive_file=DEFAULT_ARCHIVE_FILENAME,
-                    gpg_id=gpg.gpg_id,
-                    gpg_home='~/.gnupg',
-                    gpg_path='/usr/bin/gpg2',
-                    section='{''{''{''1',
-                    master_password='not implemented yet',
-                )
-                display('%s: creating.' % path)
-                if path.suffix in ['.gpg', '.asc']:
-                    narrate('encrypting.', culprit=path)
-                    # encrypt it
-                    gpg.save(to_path(path), code)
-                else:
-                    narrate('not encrypting.', culprit=path)
-                    # file is not encrypted
-                    with path.open('w') as f:
-                        f.write(code)
+            if path.suffix in ['.gpg', '.asc']:
+                # file is encrypted, decrypt it
+                code = self.gpg.read(to_path(path))
             else:
-                # read the file
-                if path.suffix in ['.gpg', '.asc']:
-                    # file is encrypted, decrypt it
-                    code = gpg.read(to_path(path))
-                else:
-                    # file is not encrypted
-                    code = path.read_text()
+                # file is not encrypted
+                code = path.read_text()
         except OSError as err:
             raise Error(os_error(err))
 
         contents = {}
         compiled = compile(code, str(path), 'exec')
         exec(compiled, contents)
-        if 'master_password' in contents:
-            generator.add_missing_master(contents['master_password'])
         self.contents = contents
+        return contents
 
-    def __getattr__(self, name):
-        return self.contents[name]
+    def create(self, contents):
+        path = self.path
+        try:
+            to_path(SETTINGS_DIR).mkdir(parents=True, exist_ok=True)
+            if path.exists():
+                # file creation (init) requested, but file already exists
+                # don't overwrite the file, instead read it so the information 
+                # can be used to create any remaining files.
+                display("%s: already exists." % path)
+                return
+            # create the file
+            display('%s: creating.' % path)
+            if path.suffix in ['.gpg', '.asc']:
+                narrate('encrypting.', culprit=path)
+                # encrypt it
+                self.gpg.save(to_path(path), contents)
+            else:
+                narrate('not encrypting.', culprit=path)
+                # file is not encrypted
+                with path.open('w') as f:
+                    f.write(contents)
+        except OSError as err:
+            raise Error(os_error(err))
+

@@ -26,7 +26,7 @@ doctests::
 
 from .charsets import DIGITS, DISTINGUISHABLE
 from .dictionary import DICTIONARY
-from inform import Error, error, log, output, terminate, warn
+from inform import Error, error, fatal, log, output, terminate, warn
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 import hashlib
 import getpass
@@ -54,7 +54,7 @@ class Hidden():
                 # Hidden is generally instantiated from top-level so the 
                 # context is not interesting and the content (the actual line 
                 # of code) shown in this case is gibberish (encrypted).
-            error(
+            fatal(
                 'invalid value specified to Hidden().',
                 culprit=(filename, lineno)
             )

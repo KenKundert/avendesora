@@ -19,13 +19,14 @@
 # Imports {{{1
 from .files import AccountFile
 from .preferences import (
-    DEFAULT_LOG_FILENAME, DEFAULT_ARCHIVE_FILENAME, DEFAULT_FIELD,
-    DEFAULT_VECTOR_FIELD, DEFAULT_DISPLAY_TIME, XDOTOOL_EXECUTABLE,
-    XSEL_EXECUTABLE, GPG_EXECUTABLE, GPG_HOME, GPG_ARMOR, BROWSERS,
-    DEFAULT_BROWSER, REQUIRED_PROTOCOLS, SETTINGS_DIR, CONFIG_FILENAME
+    BROWSERS, CHARSETS_SHA1, CONFIG_FILENAME, DEFAULT_ARCHIVE_FILENAME,
+    DEFAULT_BROWSER, DEFAULT_DISPLAY_TIME, DEFAULT_FIELD, DEFAULT_LOG_FILENAME,
+    DEFAULT_VECTOR_FIELD, DICTIONARY_SHA1, GPG_ARMOR, GPG_EXECUTABLE, GPG_HOME,
+    REQUIRED_PROTOCOLS, SECRETS_SHA1, SETTINGS_DIR, XDOTOOL_EXECUTABLE,
+    XSEL_EXECUTABLE,
 )
 from shlib import to_path
-from inform import Error, log
+from inform import Error, warn
 from textwrap import dedent
 import re
 from appdirs import user_config_dir
@@ -38,9 +39,11 @@ def read_config():
     # First open the config file
     try:
         config = AccountFile(to_path(SETTINGS_DIR, CONFIG_FILENAME))
-        Config.update({k.lower(): v for k,v in config.contents.items()})
+        contents = config.read()
+        Config.update({k.lower(): v for k,v in contents.items()})
     except Error as err:
-        log(err)
+        #warn(err)
+        pass # config file is optional
 
 # get_setting() {{{1
 def get_setting(name, default=None):
@@ -74,4 +77,10 @@ def get_setting(name, default=None):
             return DEFAULT_BROWSER
         if name == 'required_protocols':
             return REQUIRED_PROTOCOLS
+        if name == 'dict_hash':
+            return DICTIONARY_SHA1
+        if name == 'secrets_hash':
+            return SECRETS_SHA1
+        if name == 'charsets_hash':
+            return CHARSETS_SHA1
         return default

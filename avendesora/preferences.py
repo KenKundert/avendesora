@@ -26,7 +26,9 @@ SETTINGS_DIR = user_config_dir('avendesora')
 DICTIONARY_FILENAME = 'words'
 CONFIG_FILENAME = 'config'
     # config file must be unencrypted (it contains the gpg settings)
+HASHES_FILENAME = 'hashes'
 DEFAULT_ACCOUNTS_FILENAME = 'accounts.gpg'
+DEFAULT_TEMPLATES_FILENAME = 'templates'
 DEFAULT_LOG_FILENAME = 'log'
     # log file will be encrypted if you add .gpg or .asc extension
 DEFAULT_ARCHIVE_FILENAME = 'archive.gpg'
@@ -73,7 +75,6 @@ GPG_ARMOR = True
 # Associate a command with a browser key.
 # The command must contain a single %s, which is replaced with URL.
 BROWSERS = {
-    'c': 'chrome %s',
     'f': 'firefox -new-tab %s',
     'g': 'google-chrome %s',
     't': 'torbrowser %s',
@@ -107,34 +108,52 @@ REQUIRED_PROTOCOLS = ['https']
 
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
-    # Changing the contents of the dictionary, secrets, or charsets will change 
-    # the secrets you generate, thus you do not want to change these files once 
-    # you have started using the program. These are hashes for the contents of 
-    # these files at the time that this file was created. The program will 
-    # complain if the current contents of these files generate a different 
-    # hash. Only update these hashes if you know what you are doing.
-    dict_hash = '{dict_hash}'      # DO NOT CHANGE THIS LINE
-    secrets_hash = '{secrets_hash}'   # DO NOT CHANGE THIS LINE
-    charsets_hash = '{charsets_hash}'  # DO NOT CHANGE THIS LINE
-
     # List of the files that contain account information
-    accounts_files = ['{accounts_file}']
+    accounts_files = [{accounts_file}, {templates_file}]
 
     # The desired location of the log file (relative to config directory).
-    # Adding a suffix of .gpg or .asc causes the file to be encrypted 
+    # Adding a suffix of .gpg or .asc causes the file to be encrypted
     # (otherwise it can leak account names). Use None to disable logging.
-    log_file = '{log_file}'
+    log_file = {log_file}
 
-    # The desired location of the archive file (relative to config directory 
-    # and end the path in .gpg). Use None to disable archiving.
-    archive_file = '{archive_file}'
+    # The desired location of the archive file (relative to config director).
+    # End the path in .gpg. Use None to disable archiving.
+    archive_file = {archive_file}
+
+    # Various settings
+    default_field = {default_field}
+    default_vector_field = {default_vector_field}
+    display_time = {display_time}
+    browsers = {browsers}
+    default_browser = {default_browser}
+    required_protocols = {required_protocols}
 
     # Information used by GPG when encrypting and decrypting files.
-    gpg_id = '{gpg_id}'
-    gpg_home = '{gpg_home}'
-    gpg_path = '{gpg_path}'
+    gpg_id = {gpg_id}
+    gpg_armor = {gpg_armor}
+    gpg_home = {gpg_home}
+    gpg_executable = {gpg_executable}
+
+    # Utilities
+    xdotool_executable = {xdotool_executable}
+    xsel_executable = {xsel_executable}
 
     # vim: filetype=python sw=4 sts=4 et ai ff=unix :
+''')
+
+
+# Initial hash file {{{1
+HASH_FILE_INITIAL_CONTENTS = dedent('''\
+    # Changing the contents of the dictionary, secrets, or charsets will change
+    # the secrets you generate, thus you do not want to change these files once
+    # you have started using the program. These are hashes for the contents of
+    # these files at the time that this file was created. The program will
+    # complain if the current contents of these files generate a different
+    # hash. Only update these hashes if you know what you are doing.
+
+    dict_hash     = '{dict_hash}'  # DO NOT CHANGE THIS LINE
+    secrets_hash  = '{secrets_hash}'  # DO NOT CHANGE THIS LINE
+    charsets_hash = '{charsets_hash}'  # DO NOT CHANGE THIS LINE
 ''')
 
 
@@ -154,21 +173,23 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # or:
     #     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
 
-    from textwrap import dedent
-    from avendesora.charsets import (
+    from avendesora import (
+        # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
-        HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
-    )
-    from avendesora.account import Account
-    from avendesora.secrets import (
-        Hidden, Password, Passphrase, PIN, BirthDate, Question
-    )
-    from avendesora.recognizers import (
+        HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
+
+        # Account
+        Account,
+
+        # Secrets
+        Hidden, Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+
+        # Account Discovery
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
-        RecognizeHost, RecognizeUser, RecognizeEnvVar
+        RecognizeHost, RecognizeUser, RecognizeEnvVar,
     )
 
-    master_password = Hidden("""{master_password}""")
+    master_password = Hidden({master_password})
 
     # Accounts
     # AAA {section}
@@ -194,6 +215,150 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # UUU {section}
     # VVV {section}
     # WWW {section}
+    # XXX {section}
+    # YYY {section}
+    # ZZZ {section}
+
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix :
+''')
+
+# Initial templates file {{{1
+TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
+    # Templates
+    #
+    # Templates are accounts without master passwords and without much in the way of
+    # attributes. Use them to generate pass codes of various types for stealth
+    # accounts.
+
+    from avendesora import (
+        # Character sets
+        exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
+        HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
+
+        # Account
+        Account,
+
+        # Secrets
+        Password, Passphrase, PIN,
+    )
+
+    # Templates
+    # AAA {section}
+    class Anum4(Account):
+        passcode = Password(length=4, alphabet=DISTINGUISHABLE)
+
+    class Anum6(Account):
+        passcode = Password(length=6, alphabet=DISTINGUISHABLE)
+
+    class Anum8(Account):
+        passcode = Password(length=8, alphabet=DISTINGUISHABLE)
+
+    class Anum10(Account):
+        passcode = Password(length=10, alphabet=DISTINGUISHABLE)
+
+    class Anum12(Account):
+        aliases = ['anum']
+        passcode = Password(length=12, alphabet=DISTINGUISHABLE)
+
+    class Anum14(Account):
+        passcode = Password(length=14, alphabet=DISTINGUISHABLE)
+
+    class Anum16(Account):
+        passcode = Password(length=16, alphabet=DISTINGUISHABLE)
+
+    class Anum18(Account):
+        passcode = Password(length=18, alphabet=DISTINGUISHABLE)
+
+    class Anum20(Account):
+        passcode = Password(length=20, alphabet=DISTINGUISHABLE)
+
+    # BBB {section}
+    # CCC {section}
+    class Char4(Account):
+        passcode = Password(length=4, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char6(Account):
+        passcode = Password(length=6, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char8(Account):
+        passcode = Password(length=8, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char10(Account):
+        passcode = Password(length=10, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char12(Account):
+        aliases = ['char']
+        passcode = Password(length=12, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char14(Account):
+        passcode = Password(length=14, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char16(Account):
+        passcode = Password(length=16, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char18(Account):
+        passcode = Password(length=18, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char20(Account):
+        passcode = Password(length=20, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    # DDD {section}
+    # EEE {section}
+    class Extreme(Account):
+        passcode = Passphrase(length=64, alphabet=PRINTABLE)
+
+    # FFF {section}
+    # GGG {section}
+    # HHH {section}
+    # III {section}
+    # JJJ {section}
+    # KKK {section}
+    # LLL {section}
+    # MMM {section}
+    # NNN {section}
+    # OOO {section}
+    # PPP {section}
+    class Pin4(Account):
+        aliases = ['pin']
+        passcode = PIN(length=4)
+
+    class Pin6(Account):
+        passcode = PIN(length=6)
+
+    class Pin8(Account):
+        aliases = ['num']
+        passcode = PIN(length=8)
+
+    class Pin10(Account):
+        passcode = PIN(length=10)
+
+    class Pin12(Account):
+        passcode = PIN(length=12)
+
+    # QQQ {section}
+    # RRR {section}
+    # SSS {section}
+    # TTT {section}
+    # UUU {section}
+    # VVV {section}
+    # WWW {section}
+    class Word(Account):
+        passcode = Passphrase(length=1)
+
+    class Word2(Account):
+        aliases = ['pair']
+        passcode = Passphrase(length=2)
+
+    class Word4(Account):
+        aliases = ['word', 'xkcd']
+        passcode = Passphrase(length=4)
+
+    class Word6(Account):
+        passcode = Passphrase(length=6)
+
+    class Word8(Account):
+        passcode = Passphrase(length=8)
+
     # XXX {section}
     # YYY {section}
     # ZZZ {section}

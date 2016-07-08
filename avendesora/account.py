@@ -296,7 +296,7 @@ class Account:
         # preload list with the names associated with this account
         names = [cls.get_name()]
         if hasattr(cls, 'aliases'):
-            names += [cls.get_name()] + cls.aliases
+            names += cls.aliases
         lines = [fmt_field('names', ', '.join(names))]
 
         for key, value in cls.values():
