@@ -216,14 +216,14 @@ class Account:
         if name is True or not name:
             name = cls.get_value('default', default=None)
         if not name:
-            name = get_settings('default_field')
+            name = get_setting('default_field')
 
         # convert dashes to underscores
         name = name.replace('-', '_')
 
         # If name is an integer, treat it as number of security question.
         try:
-            return get_settings('default_vector_field'), int(name)
+            return get_setting('default_vector_field'), int(name)
         except ValueError:
             pass
 

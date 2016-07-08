@@ -4,12 +4,17 @@
 # attributes. Use them to generate pass codes of various types for stealth 
 # accounts.
 
-from avendesora.charsets import (
+from avendesora import (
+    # Character sets
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
-    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
+    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
+
+    # Account
+    Account,
+
+    # Secrets
+    Password, Passphrase, PIN,
 )
-from avendesora.account import Account
-from avendesora.secrets import Password, Passphrase, PIN
 
 # Templates
 # AAA {{{1

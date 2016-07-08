@@ -12,18 +12,20 @@
 # or:
 #     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
 
-from textwrap import dedent
-from avendesora.charsets import (
+from avendesora import (
+    # Character sets
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
-    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
-)
-from avendesora.account import Account
-from avendesora.secrets import (
-    Hidden, Password, Passphrase, PIN, BirthDate, Question
-)
-from avendesora.recognizers import (
-    RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD, 
-    RecognizeHost, RecognizeUser, RecognizeEnvVar
+    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
+
+    # Account
+    Account,
+
+    # Secrets
+    Hidden, Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+
+    # Account Discovery
+    RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
+    RecognizeHost, RecognizeUser, RecognizeEnvVar,
 )
 
 master_password = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
