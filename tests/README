@@ -1,0 +1,10 @@
+To run these tests, run:
+
+    py.tests
+
+The current implementation is problematic in that it requires HOME to be 
+overridden, which breaks the avendesora install, because python cannot find 
+~/.local.
+
+Probably need to override the config directory on the command line. Another 
+possible choice would be to install avendesora inside tests/home.
