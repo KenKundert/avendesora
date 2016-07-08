@@ -9,7 +9,7 @@ secrets_hash = 'not implemented yet'   # DO NOT CHANGE THIS LINE
 charsets_hash = 'not implemented yet'  # DO NOT CHANGE THIS LINE
 
 # List of the files that contain account information
-accounts_files = ['accounts']
+accounts_files = ['accounts', 'templates']
 
 # The desired location of the log file (relative to config directory).
 # Adding a suffix of .gpg or .asc causes the file to be encrypted 

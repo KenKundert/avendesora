@@ -13,7 +13,7 @@ doctests::
 
 >>> from avendesora.secrets import *
 >>> class Account:
-...     def get_value(self, name):
+...     def get_value(self, name, default=None):
 ...          if name == 'master':
 ...              return 'fux'
 ...          else:
@@ -26,9 +26,10 @@ doctests::
 
 from .charsets import DIGITS, DISTINGUISHABLE
 from .dictionary import DICTIONARY
-from inform import Error, error, log
+from inform import Error, error, log, output, terminate, warn
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 import hashlib
+import getpass
 import sys
 
 # Exceptions {{{1
@@ -92,8 +93,19 @@ class Secret():
         return self.name
 
     def _initiate(self, name, account):
-        master = self.master if self.master else account.get_value('master')
-        assert master
+        if self.master is None:
+            master = account.get_value('master', default=None)
+        else:
+            master = self.master
+        if not master:
+            try:
+                master = getpass.getpass(
+                    'master password for %s: ' % account.get_name()
+                )
+                if not master:
+                    warn("master password is empty.")
+            except (EOFError, KeyboardInterrupt):
+                terminate()
         name = self.name if self.name else name
         if self.version:
             version = self.version
@@ -131,7 +143,7 @@ class Secret():
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
-        '90 89 14 76 51 70 83 23 91 47'
+        '39 0 91 10 32 51 0 39 28 72'
 
         """
         max_index = radix-1
@@ -152,18 +164,18 @@ class Secret():
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
         >>> ' '.join(secret._symbols([str(i) for i in range(100)], 10))
-        '90 89 14 76 51 70 83 23 91 47'
+        '39 0 91 10 32 51 0 39 28 72'
 
         This function can be used to generate a password as follows:
         >>> import string
         >>> alphabet =  alphabet = string.ascii_letters + string.digits
         >>> ''.join(secret._symbols(alphabet, 16))
-        'ZU2pnw6Ag04Adn0Y'
+        'RwKKxLKUMoRlf3nm'
 
         This function can be used to generate a passphrase as follows:
         >>> dictionary = ['eeny', 'meeny', 'miny', 'moe']
         >>> ' '.join(secret._symbols(dictionary, 4))
-        'moe moe meeny miny'
+        'eeny meeny meeny moe'
 
         """
         radix = len(alphabet)
@@ -185,7 +197,7 @@ class Secret():
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
-        '90 89 14 76 51 70 83 23 91 47'
+        '39 0 91 10 32 51 0 39 28 72'
 
         """
         max_index = radix-1
@@ -207,7 +219,7 @@ class Secret():
         >>> secret = Secret()
         >>> secret._initiate('dux', account)
         >>> ' '.join([str(secret._get_symbol(range(100))) for i in range(10)])
-        '90 89 14 76 51 70 83 23 91 47'
+        '39 0 91 10 32 51 0 39 28 72'
 
         This function can be used to generate a birth date using:
         >>> def birthdate(secret, year, min_age=18, max_age=80):
@@ -217,7 +229,7 @@ class Secret():
         ...         secret._get_symbol(range(year-max_age, year-min_age))
         ...     )
         >>> birthdate(secret, 2014)
-        '06/14/1994'
+        '06/04/1975'
 
         """
         radix = len(alphabet)
@@ -247,7 +259,7 @@ class Password(Secret):
     >>> secret = Password()
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    'uv5X8p9RpgWc'
+    'zSxJKBTryBHD'
 
     """
     def __init__(self,
@@ -278,7 +290,7 @@ class Passphrase(Password):
     >>> secret = Passphrase()
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    'terrorize mourner molar combo'
+    'condition proxy broom customize'
 
     """
     def __init__(self,
@@ -307,7 +319,7 @@ class PIN(Password):
     >>> secret = PIN()
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    '0849'
+    '9205'
 
     """
     def __init__(self,
@@ -324,17 +336,17 @@ class PIN(Password):
         self.sep = ''
 
 
-# SecurityQuestion {{{1
-class SecurityQuestion(Passphrase):
+# Question {{{1
+class Question(Passphrase):
     """
     Identical to Passphrase() except the name must be specified when created 
     and is taken to be the security question.
 
     >>> import string
-    >>> secret = SecurityQuestion('What city were you born in?')
+    >>> secret = Question('What city were you born in?')
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    'vandalize mausoleum canteen'
+    'trapeze ditch arrange'
 
     """
     # Generally the user will want to give several security questions, which
@@ -386,7 +398,7 @@ class MixedPassword(Secret):
     ... )
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    'p32Ao6jvVTRK'
+    'C2Frf0j3Q4AY'
 
     """
     def __init__(
@@ -433,7 +445,7 @@ class BirthDate(Secret):
     >>> secret = BirthDate(2015, 18, 65)
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    '1963-08-04'
+    '1963-11-17'
 
     For year, enter the year the entry that contains BirthDate was created.  
     Doing so anchors the age range. In this example, the creation date is 2015,
@@ -447,7 +459,7 @@ class BirthDate(Secret):
     >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
     >>> secret._initiate('dux', account)
     >>> str(secret)
-    '8/4/63'
+    '11/17/63'
 
     """
     def __init__(

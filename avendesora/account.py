@@ -55,6 +55,7 @@ class Account:
             for sub in sub.all_accounts():
                 yield sub
 
+    # all_fields() {{{2
     @classmethod
     def all_fields(cls):
         for key, value in cls.__dict__.items():

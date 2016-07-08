@@ -14,6 +14,10 @@ from urllib.parse import urlparse
 class PasswordGenerator:
     def __init__(self, init=False, gpg_id=None):
         self.gpg = GPG(gpg_id)
+        self.accounts_files = []
+            # don't really need to access these later, but need to keep them
+            # around otherwise they will be garbage collected and we will lose
+            # access to the accounts in all but the last file.
 
         # First open the config file
         self.config = AccountFile(
@@ -26,13 +30,14 @@ class PasswordGenerator:
 
         # Now open any accounts files found
         for filename in self.config.accounts_files:
-            AccountFile(
+            account_file = AccountFile(
                 to_path(SETTINGS_DIR, filename),
                 self.gpg,
                 self,
                 init,
                 ACCOUNTS_FILE_INITIAL_CONTENTS,
             )
+            self.accounts_files.append(account_file)
         terminate_if_errors()
 
         DICTIONARY.validate(self.config.dict_hash)

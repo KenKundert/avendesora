@@ -188,7 +188,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     )
     from avendesora.account import Account
     from avendesora.secrets import (
-        Hidden, Password, Passphrase, PIN, BirthDate, SecurityQuestions
+        Hidden, Password, Passphrase, PIN, BirthDate, Question
     )
     from avendesora.recognizers import (
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,

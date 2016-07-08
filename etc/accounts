@@ -19,7 +19,7 @@ from avendesora.charsets import (
 )
 from avendesora.account import Account
 from avendesora.secrets import (
-    Hidden, Password, Passphrase, PIN, BirthDate, SecurityQuestion
+    Hidden, Password, Passphrase, PIN, BirthDate, Question
 )
 from avendesora.recognizers import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD, 
@@ -44,9 +44,9 @@ class AlertSCC(Account):
     account = Hidden('MTIzNDU2LTc4OTA=')
     birthdate = BirthDate(2016, 25, 55)
     questions = [
-        SecurityQuestion('What city were you born in?'),
-        SecurityQuestion('What street did you grow up on?'),
-        SecurityQuestion('What was your childhood nickname?'),
+        Question('What city were you born in?'),
+        Question('What street did you grow up on?'),
+        Question('What was your childhood nickname?'),
     ]
     discovery = [
         RecognizeAll(
@@ -102,9 +102,9 @@ class MyBank(Account):
     verbal = Passphrase(length=1)
     pin = PIN()
     questions = [
-        SecurityQuestion('What city were you born in?'),
-        SecurityQuestion('What street did you grow up on?'),
-        SecurityQuestion('What was your childhood nickname?'),
+        Question('What city were you born in?'),
+        Question('What street did you grow up on?'),
+        Question('What was your childhood nickname?'),
     ]
     accounts = {
         'checking':   Hidden('MTIzNDU2Nzg='),
