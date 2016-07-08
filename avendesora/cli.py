@@ -52,9 +52,9 @@ options:
 # Imports {{{1
 from .config import read_config, get_setting
 from .generator import PasswordGenerator
-from .gpg import GPG
+from .gpg import GnuPG
 from .preferences import SETTINGS_DIR
-from .secrets import Hidden
+from .concealers import Hidden
 from .writer import get_writer
 from inform import Inform, Error, output, terminate, debug
 from shlib import to_path
@@ -93,7 +93,7 @@ def main():
     def teardown():
         inform.disconnect()
         gpg.close()
-    gpg = GPG(gpg_id=cmdline['--gpgid'])
+    gpg = GnuPG(gpg_id=cmdline['--gpgid'])
     inform = Inform(
         logfile=gpg.open(to_path(SETTINGS_DIR, get_setting('log_file'))),
         termination_callback=teardown

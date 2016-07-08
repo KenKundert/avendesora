@@ -12,7 +12,7 @@ import io
 GPG_EXTENSIONS = ['.gpg', '.asc']
 
 
-class GPG:
+class GnuPG:
     def __init__(self,
         gpg_id=None, gpg_path=None, gpg_home=None, armor=None
     ):

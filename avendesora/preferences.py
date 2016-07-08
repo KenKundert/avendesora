@@ -174,15 +174,15 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     #     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
 
     from avendesora import (
+        # Basics
+        Account, Hidden,
+
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
 
-        # Account
-        Account,
-
         # Secrets
-        Hidden, Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+        Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
 
         # Account Discovery
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,

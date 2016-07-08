@@ -22,14 +22,14 @@ from .account import Account
 from .config import get_setting
 from .dictionary import DICTIONARY
 from .files import AccountFile
-from .gpg import GPG
+from .gpg import GnuPG
 from .preferences import (
     ACCOUNTS_FILE_INITIAL_CONTENTS, CONFIG_FILE_INITIAL_CONTENTS,
     CONFIG_FILENAME, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_TEMPLATES_FILENAME,
     HASHES_FILENAME, HASH_FILE_INITIAL_CONTENTS, SETTINGS_DIR,
     TEMPLATES_FILE_INITIAL_CONTENTS,
 )
-from .secrets import Hidden
+from .concealers import Hidden
 from .title import Title
 from inform import debug, Error, fatal, terminate, terminate_if_errors
 from shlib import to_path
@@ -57,7 +57,7 @@ def generate_random_string(length=64):
 # PasswordGenerator {{{1
 class PasswordGenerator:
     def __init__(self, gpg_id=None, init=False):
-        self.gpg = GPG(gpg_id)
+        self.gpg = GnuPG(gpg_id)
         self.accounts_files = []
             # don't really need to access these later, but need to keep them
             # around otherwise they will be garbage collected and we will lose
