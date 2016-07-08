@@ -23,6 +23,6 @@ archive_file = 'archive.gpg'
 # Information used by GPG when encrypting and decrypting files.
 gpg_id = 'ken@designers-guide.com'
 gpg_home = '~/.gnupg'
-gpg_path = '/usr/bin/gpg2'
+gpg_executable = '/usr/bin/gpg2'
 
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

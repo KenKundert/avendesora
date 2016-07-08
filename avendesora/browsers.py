@@ -20,7 +20,7 @@
 
 
 # Imports {{{1
-from .preferences import BROWSERS, DEFAULT_BROWSER
+from .config import get_setting
 from shlib import Run
 from inform import error, log
 
@@ -33,7 +33,7 @@ class Browser:
 # StandardBrowser class {{{1
 class StandardBrowser(Browser):
     def __init__(self, name=None, cmd=None):
-        self.name = name if name else DEFAULT_BROWSER
+        self.name = name if name else get_setting('default_browser')
         self.cmd = cmd
 
     def run(self, url, name=None):
@@ -42,7 +42,7 @@ class StandardBrowser(Browser):
             if '://' not in url:
                 url = 'https://' + url
             try:
-                cmd = self.cmd if self.cmd else BROWSERS[name]
+                cmd = self.cmd if self.cmd else get_setting('browsers')[name]
                 try:
                     cmd = cmd % url
                 except TypeError:
@@ -51,7 +51,7 @@ class StandardBrowser(Browser):
                 Run(cmd, 'sOew')
             except KeyError:
                 error('unknown browser, choose from %s.' % (
-                    name, ', '.join(BROWSERS)
+                    name, ', '.join(get_setting('browsers'))
                 ))
             except OSError as err:
                 error(os_error(err))

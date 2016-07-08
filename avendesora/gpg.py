@@ -4,7 +4,7 @@
 # Package for reading and writing text files that may or may not be encrypted.
 # File will be encrypted if file path ends in a GPG extension.
 
-from .preferences import GPG_PATH, GPG_HOME, GPG_ARMOR
+from .config import get_setting
 from inform import debug, display, fatal, is_collection
 from shlib import to_path
 import gnupg
@@ -17,9 +17,9 @@ class GPG:
         gpg_id=None, gpg_path=None, gpg_home=None, armor=None
     ):
         self.gpg_id = gpg_id if gpg_id else self._guess_id()
-        self.gpg_path = to_path(gpg_path if gpg_path else GPG_PATH)
-        self.gpg_home = to_path(gpg_home if gpg_path else GPG_HOME)
-        self.armor = armor if armor is not None else GPG_ARMOR
+        self.gpg_path = to_path(gpg_path if gpg_path else get_setting('gpg_executable'))
+        self.gpg_home = to_path(gpg_home if gpg_path else get_setting('gpg_home'))
+        self.armor = armor if armor is not None else get_setting('gpg_armor')
 
         gpg_args = {}
         if self.gpg_path:

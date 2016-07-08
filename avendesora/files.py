@@ -19,7 +19,7 @@
 
 # Imports {{{1
 from shlib import to_path
-from inform import debug, display, fatal, narrate, os_error
+from inform import debug, display, Error, fatal, narrate, os_error
 from .preferences import (
     SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME, DEFAULT_LOG_FILENAME, 
     DEFAULT_ARCHIVE_FILENAME
@@ -27,7 +27,7 @@ from .preferences import (
 
 # AccountsFile class {{{1
 class AccountFile:
-    def __init__(self, path, gpg, generator, init=None, contents=''):
+    def __init__(self, path, gpg=None, generator=None, init=None, contents=''):
         path = to_path(path)
         try:
             to_path(SETTINGS_DIR).mkdir(parents=True, exist_ok=True)
@@ -69,8 +69,8 @@ class AccountFile:
                 else:
                     # file is not encrypted
                     code = path.read_text()
-        except OSError as exception:
-            fatal(os_error(exception))
+        except OSError as err:
+            raise Error(os_error(err))
 
         contents = {}
         compiled = compile(code, str(path), 'exec')

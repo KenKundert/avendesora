@@ -51,8 +51,8 @@ DEFAULT_DISPLAY_TIME = 60
 
 # Utility programs {{{1
 # use absolute paths for xdotool and xsel so they cannot be maliciously replaced
-XDOTOOL = '/usr/bin/xdotool'
-XSEL = '/usr/bin/xsel'
+XDOTOOL_EXECUTABLE = '/usr/bin/xdotool'
+XSEL_EXECUTABLE = '/usr/bin/xsel'
 NOTIFIER_NORMAL = ['notify-send', '--urgency=low']
 NOTIFIER_ERROR = ['notify-send', '--urgency=normal']
 
@@ -65,7 +65,7 @@ CHARSETS_SHA1 = "dab48b2103ebde97f78cfebd15cc1e66d6af6ed0"
 DICTIONARY_SHA1 = "d9aa1c08e08d6cacdf82819eeb5832429eadb95a"
 
 # GPG Settings
-GPG_PATH = '/usr/bin/gpg2'
+GPG_EXECUTABLE = '/usr/bin/gpg2'
 GPG_HOME = '~/.gnupg'
 GPG_ARMOR = True
 
@@ -104,33 +104,6 @@ REGEX_COMPONENTS = {
 # Required protocols (protocals that must be present in url if specified in
 # account
 REQUIRED_PROTOCOLS = ['https']
-
-# Hostname in Titlebar browser title regex
-HNITB_BROWSER_TITLE_PATTERN = re.compile(
-    r'(?:{title} - )?{host} \({protocol}\)(?: - {browser})?'.format(
-        **REGEX_COMPONENTS
-    )
-)
-
-# This is for version 3 and beyond; requires that preferences in HNINTB be set 
-# to 'show the short URL' with a separator of '-'.
-HNITBv3_BROWSER_TITLE_PATTERN = re.compile(
-    r'(?:{title} - ){protocol}?://{host}(?: - {browser})?'.format(
-        **REGEX_COMPONENTS
-    )
-)
-# Simple browser title regex
-SIMPLE_BROWSER_TITLE_PATTERN = re.compile(
-    r'{title}(?: - {browser})?'.format(**REGEX_COMPONENTS))
-# Recognize components of the url
-URL_PATTERN = re.compile(
-    r'(?:{protocol}://)?{host}(?:/.*)?'.format(**REGEX_COMPONENTS))
-TITLE_PATTERNS = [
-    ('hostname-in-titlebar-browser-v3', HNITBv3_BROWSER_TITLE_PATTERN),
-    #('hostname-in-titlebar-browser', HNITB_BROWSER_TITLE_PATTERN),
-    # You can comment out the entry above if you are not using 'Hostname in
-    # Titlebar' extension to Firefox and Thunderbird
-    ('simple browser title', SIMPLE_BROWSER_TITLE_PATTERN)]
 
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\

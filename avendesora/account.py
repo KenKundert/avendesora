@@ -19,11 +19,10 @@
 
 
 # Imports {{{1
-from .preferences import (
-    DEFAULT_FIELD, DEFAULT_VECTOR_FIELD, LABEL_COLOR, INDENT, TOOL_FIELDS
-)
-from .recognizers import Recognizer
 from .browsers import StandardBrowser
+from .config import get_setting
+from .preferences import LABEL_COLOR, INDENT, TOOL_FIELDS
+from .recognizers import Recognizer
 from inform import Error, is_collection, log, output, Color
 from textwrap import indent, dedent
 import re
@@ -217,14 +216,14 @@ class Account:
         if name is True or not name:
             name = cls.get_value('default', default=None)
         if not name:
-            name = DEFAULT_FIELD
+            name = get_settings('default_field')
 
         # convert dashes to underscores
         name = name.replace('-', '_')
 
         # If name is an integer, treat it as number of security question.
         try:
-            return DEFAULT_VECTOR_FIELD, int(name)
+            return get_settings('default_vector_field'), int(name)
         except ValueError:
             pass
 

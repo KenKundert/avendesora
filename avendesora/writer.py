@@ -21,10 +21,8 @@
 
 # Imports {{{1
 from . import cursor
-from .preferences import (
-    INDENT, LABEL_COLOR, XDOTOOL, XSEL, INITIAL_AUTOTYPE_DELAY,
-    DEFAULT_DISPLAY_TIME
-)
+from .config import get_setting
+from .preferences import INDENT, LABEL_COLOR, INITIAL_AUTOTYPE_DELAY
 from shlib import Run
 from inform import output, fatal, Error, log, Color
 from time import sleep
@@ -87,7 +85,7 @@ class TTY_Writer(Writer):
         if is_secret:
             try:
                 cursor.write(text + ' ')
-                sleep(DEFAULT_DISPLAY_TIME)
+                sleep(get_setting('display_time'))
                 cursor.clear()
             except KeyboardInterrupt:
                 cursor.clear()
@@ -115,14 +113,18 @@ class ClipboardWriter(Writer):
 
         log('Writing to clipboard.')
         try:
-            Run([XSEL, '-b', '-i'], 'soew', stdin=value)
+            Run(
+                [get_settings('xsel_executable'), '-b', '-i'],
+                'soew',
+                stdin=value
+            )
         except Error as err:
             err.terminate()
 
         if is_secret:
             # produce count down
             try:
-                for t in range(DEFAULT_DISPLAY_TIME, -1, -1):
+                for t in range(get_setting('display_time'), -1, -1):
                     cursor.write(str(t))
                     sleep(1)
                     cursor.clear()
@@ -131,7 +133,7 @@ class ClipboardWriter(Writer):
 
             # clear the clipboard
             try:
-                Run([XSEL, '-b', '-c'], 'soew')
+                Run([get_settings('xsel_executable'), '-b', '-c'], 'soew')
             except Error as err:
                 err.terminate()
 
@@ -170,9 +172,13 @@ class KeyboardWriter(Writer):
         def run_xdotool(args, text=None):
             try:
                 if args:
-                    Run([XDOTOOL, 'getactivewindow'] + args, 'soeW')
+                    Run(
+                        [get_setting('xdotool_executable'), 'getactivewindow'] +
+                        args,
+                        'soeW'
+                    )
                 if text:
-                    Run([XDOTOOL, '-'], 'soeW',
+                    Run([get_setting('xdotool_executable'), '-'], 'soeW',
                         stdin="getactivewindow type '%s'" % text
                     )
             except OSError as err:

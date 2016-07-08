@@ -1,12 +1,13 @@
+from .account import Account
+from .config import get_setting
+from .files import AccountFile
+from .gpg import GPG
+from .dictionary import DICTIONARY
+from .title import Title
 from .preferences import (
     SETTINGS_DIR, CONFIG_FILENAME, CONFIG_FILE_INITIAL_CONTENTS,
     ACCOUNTS_FILE_INITIAL_CONTENTS
 )
-from .files import AccountFile
-from .gpg import GPG
-from .dictionary import DICTIONARY
-from .account import Account
-from .title import Title
 from inform import Error, debug, terminate_if_errors
 from shlib import to_path
 from urllib.parse import urlparse
@@ -19,28 +20,22 @@ class PasswordGenerator:
             # around otherwise they will be garbage collected and we will lose
             # access to the accounts in all but the last file.
 
-        # First open the config file
-        self.config = AccountFile(
-            to_path(SETTINGS_DIR, CONFIG_FILENAME),
-            self.gpg,
-            self,
-            init,
-            CONFIG_FILE_INITIAL_CONTENTS,
-        )
-
         # Now open any accounts files found
-        for filename in self.config.accounts_files:
-            account_file = AccountFile(
-                to_path(SETTINGS_DIR, filename),
-                self.gpg,
-                self,
-                init,
-                ACCOUNTS_FILE_INITIAL_CONTENTS,
-            )
-            self.accounts_files.append(account_file)
+        for filename in get_setting('accounts_files', []):
+            try:
+                account_file = AccountFile(
+                    to_path(SETTINGS_DIR, filename),
+                    self.gpg,
+                    self,
+                    init,
+                    ACCOUNTS_FILE_INITIAL_CONTENTS,
+                )
+                self.accounts_files.append(account_file)
+            except Error as err:
+                err.terminate()
         terminate_if_errors()
 
-        DICTIONARY.validate(self.config.dict_hash)
+        DICTIONARY.validate(get_setting('dict_hash'))
 
     def get_account(self, name):
         if not name:

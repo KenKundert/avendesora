@@ -50,13 +50,12 @@ options:
 
 
 # Imports {{{1
+from .config import read_config, get_setting
 from .generator import PasswordGenerator
 from .gpg import GPG
-from .preferences import (
-    SETTINGS_DIR, DEFAULT_LOG_FILENAME, BROWSERS, DEFAULT_BROWSER
-)
-from .writer import get_writer
+from .preferences import SETTINGS_DIR
 from .secrets import Hidden
+from .writer import get_writer
 from inform import Inform, Error, output, terminate, debug
 from shlib import to_path
 
@@ -76,14 +75,31 @@ def print_search_results(search_term, search_func):
 
 # Main {{{1
 def main():
+    # read config file
+    read_config()
+    browsers = get_setting('browsers')
+    browsers = ', '.join(
+        ['%s (%s)' % (k, browsers[k].split()[0]) for k in sorted(browsers)]
+    )
+
+    # read command line
     cmdline = docopt.docopt(
         __doc__.format(
-            defbrowser=DEFAULT_BROWSER,
-            browsers=', '.join(
-                ['%s (%s)' % (k, BROWSERS[k].split()[0]) for k in sorted(BROWSERS)]
-            )
+            defbrowser=get_setting('default_browser'), browsers=browsers
         )
     )
+
+    # start logging
+    def teardown():
+        inform.disconnect()
+        gpg.close()
+    gpg = GPG(gpg_id=cmdline['--gpgid'])
+    inform = Inform(
+        logfile=gpg.open(to_path(SETTINGS_DIR, get_setting('log_file'))),
+        termination_callback=teardown
+    )
+
+    # process hide/reveal commands
     if cmdline['--hide']:
         debug(cmdline['--hide'])
         output(Hidden.hide(cmdline['--hide']))
@@ -92,15 +108,7 @@ def main():
         output(Hidden.reveal(cmdline['--reveal']))
         terminate()
 
-    def teardown():
-        inform.disconnect()
-        gpg.close()
-
-    gpg = GPG(gpg_id=cmdline['--gpgid'])
-    inform = Inform(
-        logfile=gpg.open(to_path(SETTINGS_DIR, DEFAULT_LOG_FILENAME)),
-        termination_callback=teardown
-    )
+    # run the generator
     try:
         generator = PasswordGenerator(
             gpg_id = cmdline['--gpgid'],

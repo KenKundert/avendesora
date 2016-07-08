@@ -20,7 +20,7 @@
 
 
 # Imports {{{1
-from .preferences import XDOTOOL
+from .preferences import XDOTOOL_EXECUTABLE
 from shlib import Run
 from inform import error, log
 import re
@@ -42,7 +42,10 @@ REGEX_COMPONENTS = {
 class Title:
     def __init__(self):
         try:
-            xdotool = Run([XDOTOOL, 'getactivewindow', 'getwindowname'], 'sOeW')
+            xdotool = Run(
+                [XDOTOOL_EXECUTABLE, 'getactivewindow', 'getwindowname'],
+                'sOeW'
+            )
         except OSError as err:
             error(str(err))
         title = xdotool.stdout.strip()
