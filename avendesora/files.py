@@ -1,4 +1,5 @@
-# Read or write possibly encrypted python code fileS
+# File
+# Read or write possibly encrypted python code files
 
 # License {{{1
 # Copyright (C) 2016 Kenneth S. Kundert
@@ -25,16 +26,17 @@ from .preferences import (
 from shlib import to_path
 from inform import debug, display, Error, fatal, narrate, os_error
 
-# AccountsFile class {{{1
-class AccountFile:
+# File class {{{1
+class File:
     def __init__(self, path, gpg=None, contents=None):
         self.path = to_path(path)
         self.gpg = gpg
 
     def read(self):
         path = self.path
+        self.encrypted = path.suffix in ['.gpg', '.asc']
         try:
-            if path.suffix in ['.gpg', '.asc']:
+            if self.encrypted:
                 # file is encrypted, decrypt it
                 code = self.gpg.read(to_path(path))
             else:

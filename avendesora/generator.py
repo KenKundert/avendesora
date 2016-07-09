@@ -21,7 +21,7 @@
 from .account import Account
 from .config import get_setting
 from .dictionary import DICTIONARY
-from .files import AccountFile
+from .files import File
 from .gpg import GnuPG
 from .preferences import (
     ACCOUNTS_FILE_INITIAL_CONTENTS, CONFIG_FILE_INITIAL_CONTENTS,
@@ -71,11 +71,12 @@ class PasswordGenerator:
         for filename in get_setting('accounts_files', []):
             try:
                 path = to_path(SETTINGS_DIR, filename)
-                account_file = AccountFile(path, self.gpg)
+                account_file = File(path, self.gpg)
                 self.accounts_files.append(account_file)
                 contents = account_file.read()
                 if 'master_password' in contents:
-                    self.add_missing_master(contents['master_password'])
+                    self.add_master_to_accounts(contents['master_password'])
+                self.add_file_info_to_accounts(account_file)
             except Error as err:
                 err.terminate()
         terminate_if_errors()
@@ -125,22 +126,22 @@ class PasswordGenerator:
 
         # create the config file
         path = to_path(SETTINGS_DIR, CONFIG_FILENAME)
-        f = AccountFile(path, self.gpg)
+        f = File(path, self.gpg)
         f.create(CONFIG_FILE_INITIAL_CONTENTS.format(**fields))
 
         # create the hashes file
         path = to_path(SETTINGS_DIR, HASHES_FILENAME.format(**fields))
-        f = AccountFile(path, self.gpg)
+        f = File(path, self.gpg)
         f.create(HASH_FILE_INITIAL_CONTENTS.format(**fields))
 
         # create the initial accounts file
         path = to_path(SETTINGS_DIR, DEFAULT_ACCOUNTS_FILENAME)
-        f = AccountFile(path, self.gpg)
+        f = File(path, self.gpg)
         f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields))
 
         # create the templates file
         path = to_path(SETTINGS_DIR, DEFAULT_TEMPLATES_FILENAME)
-        f = AccountFile(path, self.gpg)
+        f = File(path, self.gpg)
         f.create(TEMPLATES_FILE_INITIAL_CONTENTS.format(**fields))
 
     def get_account(self, name):
@@ -194,7 +195,12 @@ class PasswordGenerator:
                 return account.get_name(), secret
         raise Error('cannot find appropriate account.')
 
-    def add_missing_master(self, master):
+    def add_master_to_accounts(self, master):
         for account in Account.all_accounts():
             if not hasattr(account, 'master'):
                 account.master = master
+
+    def add_file_info_to_accounts(self, file_info):
+        for account in Account.all_accounts():
+            if not hasattr(account, '_file_info'):
+                account._file_info = file_info

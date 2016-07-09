@@ -29,10 +29,11 @@ class Hidden():
     # This does a simple base64 encoding on the string to hide it from a casual
     # observer. But it is not encrypted. The original value can be trivially
     # recovered from the encoded version.
-    def __init__(self, value, **kwargs):
+    def __init__(self, value, secure=True, encoding='utf8'):
         try:
             value = a2b_base64(value)
-            self.value = value.decode(kwargs.get('encoding', 'utf8'))
+            self.value = value.decode(encoding)
+            self.secure = secure
         except BinasciiError as err:
             import traceback
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -51,15 +52,18 @@ class Hidden():
         # as being confidential
         pass
 
+    def is_secure(self):
+        return self.secure
+
     def __str__(self):
         return self.value
 
     @staticmethod
-    def hide(value, **kwargs):
-        value = value.encode(kwargs.get('encoding', 'utf8'))
+    def hide(value, encoding='utf8'):
+        value = value.encode(encoding)
         return b2a_base64(value).rstrip().decode('ascii')
 
     @staticmethod
-    def reveal(value, **kwargs):
+    def reveal(value, encoding='utf8'):
         value = a2b_base64(value.encode('ascii'))
-        return value.decode(kwargs.get('encoding', 'utf8'))
+        return value.decode(encoding)

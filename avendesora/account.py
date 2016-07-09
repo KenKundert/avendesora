@@ -23,7 +23,7 @@ from .browsers import StandardBrowser
 from .config import get_setting
 from .preferences import LABEL_COLOR, INDENT, TOOL_FIELDS
 from .recognizers import Recognizer
-from inform import Error, is_collection, log, output, Color
+from inform import Color, Error, is_collection, log, output, warn
 from textwrap import indent, dedent
 import re
 import sys
@@ -67,7 +67,7 @@ class Account:
         try:
             return cls.name
         except AttributeError:
-            # consider converting lower to upper case transitions in __name__ to 
+            # consider converting lower to upper case transitions in __name__ to
             # dashes.
             return cls.__name__.lower()
 
@@ -132,6 +132,15 @@ class Account:
     @classmethod
     def initialize(cls):
         log('initializing', cls.get_name())
+        try:
+            if cls.master.is_secure():
+                if not cls._file_info.encrypted:
+                    warn(
+                        'high value master password not contained in encrypted',
+                        'account file.', culprit=cls.get_name()
+                    )
+        except AttributeError as err:
+            pass
         for key, value in cls.__dict__.items():
 
             # initiate the secret
@@ -160,7 +169,7 @@ class Account:
     @classmethod
     def values(cls):
         for key in sorted(cls.__dict__):
-            if not key.startswith('__'):
+            if not key.startswith('_'):
                 yield key, cls.__dict__[key]
 
     # get_value() {{{2

@@ -38,14 +38,6 @@ INDENT = '    '
 LABEL_COLOR = 'yellow'
     # choose from normal, black, red, green, yellow, blue, magenta, cyan, white
 INITIAL_AUTOTYPE_DELAY = 0.0
-DEBUG = False
-    # Turns on the logging of extra information, but may expose sensitive
-    # account information in the log file.
-PREFER_HTTPS = True
-    # When PREFER_HTTPS is true, avendesora requires the https protocol unless
-    # http is explicitly specified in the url.
-    # When PREFER_HTTPS is false, avendesora allows the http protocol unless
-    # https is explicitly specified in the url.
 DEFAULT_FIELD = 'passcode'
 DEFAULT_VECTOR_FIELD = 'questions'
 DEFAULT_DISPLAY_TIME = 60
@@ -55,8 +47,11 @@ DEFAULT_DISPLAY_TIME = 60
 # use absolute paths for xdotool and xsel so they cannot be maliciously replaced
 XDOTOOL_EXECUTABLE = '/usr/bin/xdotool'
 XSEL_EXECUTABLE = '/usr/bin/xsel'
-NOTIFIER_NORMAL = ['notify-send', '--urgency=low']
-NOTIFIER_ERROR = ['notify-send', '--urgency=normal']
+
+# GPG Settings
+GPG_EXECUTABLE = '/usr/bin/gpg2'
+GPG_HOME = '~/.gnupg'
+GPG_ARMOR = True
 
 # Signatures {{{1
 # These signatures must be the sha1 signatures for the corresponding files
@@ -65,11 +60,6 @@ NOTIFIER_ERROR = ['notify-send', '--urgency=normal']
 SECRETS_SHA1 = "5d1c97a0fb699241fca5d50a7ad0508047990510"
 CHARSETS_SHA1 = "dab48b2103ebde97f78cfebd15cc1e66d6af6ed0"
 DICTIONARY_SHA1 = "d9aa1c08e08d6cacdf82819eeb5832429eadb95a"
-
-# GPG Settings
-GPG_EXECUTABLE = '/usr/bin/gpg2'
-GPG_HOME = '~/.gnupg'
-GPG_ARMOR = True
 
 # Browsers {{{1
 # Associate a command with a browser key.
@@ -84,27 +74,9 @@ DEFAULT_BROWSER = 'x'
 
 
 # Account Recognition {{{1
-# Title Recognition
-# Build up the regular expression used to recognize the various component of 
-# the window title.
-def labelRegex(label, regex):
-    return "(?P<%s>%s)" % (label, regex)
-HOST_REGEX = r'(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z0-9]+'
-EMAIL_REGEX = r'[a-zA-Z0-9\-]+@' + HOST_REGEX
-REGEX_COMPONENTS = {
-    # If you add new components, you must also add code that handles the
-    # component in accounts.py.
-    'title': labelRegex('title', r'.*'),
-    'host': labelRegex('host', HOST_REGEX),
-    'protocol': labelRegex('protocol', r'\w+'),
-    'browser': labelRegex('browser', r'\w+'),
-    'username': labelRegex('username', r'\w+'),
-    'email': labelRegex('email', EMAIL_REGEX)
-}
-
-# Required protocols (protocals that must be present in url if specified in
-# account
 REQUIRED_PROTOCOLS = ['https']
+    # If one of these protocols are specified in the recognition url, then that
+    # protocol must be used in the browser
 
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
@@ -367,5 +339,5 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
 ''')
 
 # Fields {{{1
-# Do not change these (not user configurable)
+# Fields reserved for use by Avendesora
 TOOL_FIELDS = ['aliases', 'default', 'master', 'discovery', 'browser']

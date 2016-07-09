@@ -17,7 +17,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from .files import AccountFile
+from .files import File
 from .preferences import (
     BROWSERS, CHARSETS_SHA1, CONFIG_FILENAME, DEFAULT_ARCHIVE_FILENAME,
     DEFAULT_BROWSER, DEFAULT_DISPLAY_TIME, DEFAULT_FIELD, DEFAULT_LOG_FILENAME,
@@ -38,8 +38,8 @@ Config = {}
 def read_config():
     # First open the config file
     try:
-        config = AccountFile(to_path(SETTINGS_DIR, CONFIG_FILENAME))
-        contents = config.read()
+        config_file = File(to_path(SETTINGS_DIR, CONFIG_FILENAME))
+        contents = config_file.read()
         Config.update({k.lower(): v for k,v in contents.items()})
     except Error as err:
         #warn(err)
