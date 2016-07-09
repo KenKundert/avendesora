@@ -54,7 +54,7 @@ from .config import read_config, get_setting
 from .generator import PasswordGenerator
 from .gpg import GnuPG
 from .preferences import SETTINGS_DIR
-from .concealers import Hidden
+from .secrets import Hidden
 from .writer import get_writer
 from inform import Inform, Error, output, terminate, debug
 from shlib import to_path

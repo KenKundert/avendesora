@@ -19,7 +19,7 @@
 
 # Imports {{{1
 from .account import Account
-from .concealers import Hidden
+from .secrets import Hidden
 from .config import get_setting
 from .dictionary import DICTIONARY
 from .files import File

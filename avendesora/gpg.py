@@ -4,7 +4,7 @@
 # Package for reading and writing text files that may or may not be encrypted.
 # File will be encrypted if file path ends in a GPG extension.
 
-from .config import get_setting
+from .config import get_setting, override_setting
 from inform import debug, display, fatal, is_collection
 from shlib import to_path
 import gnupg
@@ -13,13 +13,30 @@ GPG_EXTENSIONS = ['.gpg', '.asc']
 
 
 class GnuPG:
+    __shared_state = {}
+
     def __init__(self,
         gpg_id=None, gpg_path=None, gpg_home=None, armor=None
     ):
-        self.gpg_id = gpg_id if gpg_id else self._guess_id()
-        self.gpg_path = to_path(gpg_path if gpg_path else get_setting('gpg_executable'))
-        self.gpg_home = to_path(gpg_home if gpg_path else get_setting('gpg_home'))
+        if not gpg_id:
+            gpg_id = get_setting('gpg_id')
+        if not gpg_id:
+            gpg_id = self._guess_id()
+        self.gpg_id = gpg_id
+        override_setting('gpg_id', gpg_id)
+
+        self.gpg_path = to_path(
+            gpg_path if gpg_path else get_setting('gpg_executable')
+        )
+        override_setting('gpg_path', self.gpg_path)
+
+        self.gpg_home = to_path(
+            gpg_home if gpg_home else get_setting('gpg_home')
+        )
+        override_setting('gpg_home', self.gpg_home)
+
         self.armor = armor if armor is not None else get_setting('gpg_armor')
+        override_setting('gpg_armor', self.armor)
 
         gpg_args = {}
         if self.gpg_path:
@@ -27,9 +44,6 @@ class GnuPG:
         if self.gpg_home:
             gpg_args.update({'gnupghome': str(self.gpg_home)})
         self.gpg = gnupg.GPG(**gpg_args)
-
-    def update_id(self, gpg_id):
-        self.gpg_id = gpg_id
 
     def _guess_id(self):
         import socket, getpass

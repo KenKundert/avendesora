@@ -84,3 +84,7 @@ def get_setting(name, default=None):
         if name == 'charsets_hash':
             return CHARSETS_SHA1
         return default
+
+# override_setting() {{{1
+def override_setting(name, value):
+    Config[name.lower()] = value

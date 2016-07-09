@@ -14,7 +14,7 @@
 
 from avendesora import (
     # Basics
-    Account, Hidden,
+    Account, Hidden, GPG,
 
     # Character sets
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
@@ -30,6 +30,15 @@ from avendesora import (
 
 master_password = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
 ken = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+super_secret = GPG("""
+    -----BEGIN PGP MESSAGE-----
+    Version: GnuPG v2
+
+    jA0ECQMCuzATgEKKAR7m0k0BcN7d07IeVcIKZSsKs9jr8lc6Dtec6uQTVLBq9of2
+    eE5MbC3q0AxjQbbNybiP2S6Ffzvun8qKyEsj8+fOChRzodyc9511G+6jsQsebg==
+    =dhXT
+    -----END PGP MESSAGE-----
+""")   # passcode is 'heynow'
 
 # Accounts
 # AAA {{{1
@@ -77,6 +86,7 @@ class AlertSCC(Account):
 class Login(Account):
     aliases = ['luks']
     passcode = Passphrase(length=6)
+    master = super_secret
     discovery = [
         RecognizeAll(
             RecognizeHost('kundert'),

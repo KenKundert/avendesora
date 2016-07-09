@@ -24,7 +24,7 @@ from . import cursor
 from .config import get_setting
 from .preferences import INDENT, LABEL_COLOR, INITIAL_AUTOTYPE_DELAY
 from shlib import Run
-from inform import output, fatal, Error, log, Color
+from inform import output, fatal, Error, log, Color, warn
 from time import sleep
 from textwrap import indent, dedent
 import re
@@ -56,7 +56,7 @@ class TTY_Writer(Writer):
         is_secret = account.is_secret(name, key)
         try:
             value = account.get_value(name, key)
-            tvalue = str(value)
+            tvalue = dedent(str(value)).strip()
         except Error as err:
             err.terminate()
         sep = ' '
@@ -101,7 +101,7 @@ class ClipboardWriter(Writer):
         name, key = account.split_name(field)
         is_secret = account.is_secret(name, key)
         try:
-            value = str(account.get_value(name, key))
+            value = dedent(str(account.get_value(name, key))).strip()
         except Error as err:
             err.terminate()
 
@@ -158,7 +158,7 @@ class StdoutWriter(Writer):
     def display_field(self, account, field):
         name, key = account.split_name(field)
         try:
-            print(str(account.get_value(name, key)))
+            print(dedent(str(account.get_value(name, key))).strip())
         except Error as err:
             err.terminate()
 
@@ -261,7 +261,7 @@ class KeyboardWriter(Writer):
                 else:
                     name, key = account.split_name(cmd)
                     try:
-                        value = str(account.get_value(name, key))
+                        value = dedent(str(account.get_value(name, key))).strip()
                         out.append(value)
                         if account.is_secret(name, key):
                             scrubbed.append('<%s>' % cmd)

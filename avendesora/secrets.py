@@ -39,10 +39,15 @@
 
 # Imports {{{1
 from .charsets import DIGITS, DISTINGUISHABLE
+from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
 from inform import Error, error, fatal, log, output, terminate, warn
+from binascii import a2b_base64, b2a_base64, Error as BinasciiError
+from textwrap import dedent
 import hashlib
 import getpass
+import gnupg
+import sys
 
 # Exceptions {{{1
 class SecretExhausted(Exception):
@@ -52,9 +57,101 @@ class SecretExhausted(Exception):
     def __str__(self):
         return "secret exhausted"
 
+# Hidden {{{1
+class Hidden():
+    # This does a simple base64 encoding on the string to hide it from a casual
+    # observer. But it is not encrypted. The original value can be trivially
+    # recovered from the encoded version.
+    def __init__(self, value, secure=True, encoding='utf8'):
+        try:
+            value = a2b_base64(value)
+            self.value = value.decode(encoding)
+            self.secure = secure
+        except BinasciiError as err:
+            import traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            filename, lineno = traceback.extract_stack()[-2][:2]
+                # context and content are also available, but in this case
+                # Hidden is generally instantiated from top-level so the 
+                # context is not interesting and the content (the actual line 
+                # of code) shown in this case is gibberish (encrypted).
+            fatal(
+                'invalid value specified to Hidden().',
+                culprit=(filename, lineno)
+            )
+
+    def _initiate(self, name, account):
+        # we don't need to do anything, but having this method marks this value
+        # as being confidential
+        pass
+
+    def is_secure(self):
+        return self.secure
+
+    def __str__(self):
+        return self.value
+
+    @staticmethod
+    def hide(value, encoding='utf8'):
+        value = value.encode(encoding)
+        return b2a_base64(value).rstrip().decode('ascii')
+
+    @staticmethod
+    def reveal(value, encoding='utf8'):
+        value = a2b_base64(value.encode('ascii'))
+        return value.decode(encoding)
+# GPG {{{1
+class GPG():
+    # This does a full GPG decryption.
+    # To generate an entry for the GPG argument, you can use ...
+    #     gpg -a -c filename
+    # It will create filename.asc. Copy the contents of that file into the
+    # argument.
+    # This uses symmetric encryption to add an additional layer of protection.
+    # Generally one would use their private key to protect the gpg file, and
+    # then use a symmetric key, or perhaps a separate private key, to protect an
+    # individual piece of data, like a master password.
+    def __init__(self, value, secure=True, encoding='utf8'):
+        self.value = value
+        gpg_path = get_setting('gpg_path')
+        gpg_home = get_setting('gpg_home')
+        gpg_args = {}
+        if gpg_path:
+            gpg_args.update({'gpgbinary': str(gpg_path)})
+        if gpg_home:
+            gpg_args.update({'gnupghome': str(gpg_home)})
+        self.gpg = gnupg.GPG(**gpg_args)
+
+
+    def _initiate(self, name, account):
+        # must do this here in _initiate rather than in constructor to avoid
+        # decrypting this, and perhaps asking for a passcode,  every time
+        # Advendesora is run.
+        decrypted = self.gpg.decrypt(dedent(self.value))
+        if not decrypted.ok:
+            import traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            filename, lineno = traceback.extract_stack()[-2][:2]
+                # context and content are also available, but in this case
+                # GPG is generally instantiated from top-level so the 
+                # context is not interesting and the content (the actual line 
+                # of code) shown in this case is gibberish (encrypted).
+            msg = 'unable to decrypt argument to GPG()'
+            try:
+                msg = '%s: %s' % (msg, decrypted.stderr)
+            except AttributeError:
+                msg += '.'
+            fatal(msg, culprit=(filename, lineno))
+        self.decrypted = decrypted
+        pass
+
+    def __str__(self):
+        return str(self.decrypted)
+
+
 # Secret {{{1
 class Secret():
-    """Base class for secrets"""
+    """Base class for generated secrets"""
 
     def __init__(self):
         """Constructor

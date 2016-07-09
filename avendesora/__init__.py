@@ -3,9 +3,9 @@ from .charsets import (
     HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
 )
 from .account import Account
-from .concealers import Hidden
 from .secrets import (
-    Password, Passphrase, PIN, Question, MixedPassword, BirthDate
+    Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+    Hidden, GPG
 )
 from .recognizers import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
