@@ -11,4 +11,4 @@ from .recognizers import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
     RecognizeHost, RecognizeUser, RecognizeEnvVar
 )
-__version__ = '0.1.9'
+__version__ = '0.1.10'
