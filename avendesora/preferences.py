@@ -341,3 +341,4 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
 # Fields {{{1
 # Fields reserved for use by Avendesora
 TOOL_FIELDS = ['aliases', 'default', 'master', 'discovery', 'browser']
+

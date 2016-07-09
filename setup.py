@@ -25,6 +25,7 @@ setup(
     install_requires=[
         'appdirs',
         'docopt',
+        #'inform>=1.4',
         'inform',
         'shlib',
         'python-gnupg',

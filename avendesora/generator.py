@@ -19,6 +19,7 @@
 
 # Imports {{{1
 from .account import Account
+from .concealers import Hidden
 from .config import get_setting
 from .dictionary import DICTIONARY
 from .files import File
@@ -29,30 +30,11 @@ from .preferences import (
     HASHES_FILENAME, HASH_FILE_INITIAL_CONTENTS, SETTINGS_DIR,
     TEMPLATES_FILE_INITIAL_CONTENTS,
 )
-from .concealers import Hidden
 from .title import Title
-from inform import debug, Error, fatal, terminate, terminate_if_errors
+from .utilities import generate_random_string
+from inform import debug, Error, fatal, terminate, terminate_if_errors, notify
 from shlib import to_path
 from urllib.parse import urlparse
-
-# Utilities {{{1
-def generate_random_string(length=64):
-    # Generate a random long string to act as the default password
-
-    from string import ascii_letters, digits, punctuation
-    import random
-    rand = random.SystemRandom()
-
-    # Create alphabet from letters, digits, and punctuation, but 
-    # replace double quote with a space so password can be safely 
-    # represented as a double-quoted string.
-    alphabet = (ascii_letters + digits + punctuation).replace('"', ' ')
-
-    password = ''
-    for i in range(length):
-        password += rand.choice(alphabet)
-    return password
-
 
 # PasswordGenerator {{{1
 class PasswordGenerator:
@@ -193,7 +175,10 @@ class PasswordGenerator:
             secret = account.recognize(data)
             if secret:
                 return account.get_name(), secret
-        raise Error('cannot find appropriate account.')
+
+        msg = 'cannot find appropriate account.'
+        notify(msg)
+        raise Error(msg)
 
     def add_master_to_accounts(self, master):
         for account in Account.all_accounts():

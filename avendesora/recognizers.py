@@ -1,20 +1,30 @@
+# Account Recognizers
+#
+# Classes used in account discovery to recognize when a particular account
+# should be used based on environmental conditions (window title, hostname,
+# username, current directory, etc.)
+
+# License {{{1
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+
+# Imports {{{1
+from .utilities import gethostname, getusername
 from shlib import cwd, to_path
-from inform import error, log, warn
+from inform import error, log, warn, notify
 from fnmatch import fnmatch
 from urllib.parse import urlparse
 import os
-
-# Utilities {{{1
-# gethostname {{{2
-# returns short version of the hostname (the hostname without any domain name)
-import socket
-def gethostname():
-    return socket.gethostname().split('.')[0]
-
-# getusername {{{2
-import getpass
-def getusername():
-    return getpass.getuser()
 
 # Recognizer Base Class {{{1
 class Recognizer:
@@ -78,10 +88,9 @@ class RecognizeURL(Recognizer):
                     ):
                         return self.script
                     else:
-                        warn(
-                            'url matches, but uses wrong protocol.',
-                            culprit=account.get_name()
-                        )
+                        msg = 'url matches, but uses wrong protocol.'
+                        notify(msg)
+                        error(msg, culprit=account.get_name())
 
 
 # RecognizeCWD {{{1
