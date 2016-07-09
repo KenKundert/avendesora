@@ -141,29 +141,35 @@ class Account:
                     )
         except AttributeError as err:
             pass
-        for key, value in cls.__dict__.items():
 
-            # initiate the secret
-            if not key.startswith('_'):
-                try:
-                    # initiate a scalar secret
-                    value._initiate(key, cls)
-                    log('    found secret attribute:', key)
-                except AttributeError:
-                    try:
-                        # initiate a dictionary secret
-                        for n, v in value.items():
-                            name = 'key[%s]' % n
-                            v._initiate(name, cls)
-                    except AttributeError:
-                        try:
-                            # initiate a vector secret
-                            for i, each in enumerate(value):
-                                name = 'key[%s]' % i
-                                each._initiate(name, cls)
-                        except AttributeError:
-                            # not a secret
-                            continue
+        # This code generates all the secrets for the account in advance. This
+        # is undesirable as it may trigger the need for a passcode request from
+        # a GPG secret even though that secret is not actually needed. For
+        # example, if the user asked for a different secret. And it wastes a bit
+        # of time. So let's see if we can live without it. Living without it
+        # since 9 July 2016.
+        # for key, value in cls.__dict__.items():
+        #     # initiate the secret
+        #     if not key.startswith('_'):
+        #         try:
+        #             # initiate a scalar secret
+        #             value._generate(key, cls)
+        #             log('    found secret attribute:', key)
+        #         except AttributeError:
+        #             try:
+        #                 # initiate a dictionary secret
+        #                 for n, v in value.items():
+        #                     name = 'key[%s]' % n
+        #                     v._generate(name, cls)
+        #             except AttributeError:
+        #                 try:
+        #                     # initiate a vector secret
+        #                     for i, each in enumerate(value):
+        #                         name = 'key[%s]' % i
+        #                         each._generate(name, cls)
+        #                 except AttributeError:
+        #                     # not a secret
+        #                     continue
 
     # values() {{{2
     @classmethod
@@ -181,6 +187,13 @@ class Account:
                 raise Error('not found.', culprit=cls.combine_name(name, key))
             else:
                 return default
+
+        # generate the value if needed
+        try:
+            value._generate(key, cls)
+        except AttributeError:
+            pass
+
         if key is None:
             if is_collection(value):
                 raise Error(
@@ -201,10 +214,10 @@ class Account:
     def is_secret(cls, name, key=None):
         value = cls.__dict__.get(name)
         if key is None:
-            return hasattr(value, '_initiate')
+            return hasattr(value, '_generate')
         else:
             try:
-                return hasattr(value[key], '_initiate')
+                return hasattr(value[key], '_generate')
             except (IndexError, KeyError, TypeError):
                 raise Error('not found.', culprit=cls.combine_name(name, key))
 
@@ -296,7 +309,7 @@ class Account:
         def extract_collection(name, collection):
             lines = [fmt_field(key)]
             for k, v in items(collection):
-                if hasattr(v, '_initiate'):
+                if hasattr(v, '_generate'):
                     # is a secret, get description if available
                     v = v.get_name() if hasattr(v, 'get_name') else reveal(name, k)
                 lines.append(fmt_field(k, v, level=1))
@@ -314,7 +327,7 @@ class Account:
                 pass
             elif is_collection(value):
                 lines += extract_collection(key, value)
-            elif hasattr(value, '_initiate'):
+            elif hasattr(value, '_generate'):
                 lines.append(fmt_field(key, reveal(key)))
             else:
                 lines.append(fmt_field(key, value))
