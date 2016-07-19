@@ -30,6 +30,8 @@ var/
 *.egg
 MANIFEST
 tests/home/config/avendesora/log
+tests/home/config/avendesora/log.gpg
+tests/home/gnupg/.gpg-v21-migrated
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

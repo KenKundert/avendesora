@@ -19,9 +19,8 @@
 
 # Imports {{{1
 from .account import Account
-from .secrets import Hidden
 from .config import get_setting
-from .dictionary import DICTIONARY
+from .dialog import show_list_dialog
 from .files import File
 from .gpg import GnuPG
 from .preferences import (
@@ -30,21 +29,18 @@ from .preferences import (
     HASHES_FILENAME, HASH_FILE_INITIAL_CONTENTS, SETTINGS_DIR,
     TEMPLATES_FILE_INITIAL_CONTENTS,
 )
+from .secrets import Hidden
 from .title import Title
-from .utilities import generate_random_string
+from .utilities import generate_random_string, validate_componenets
 from inform import debug, Error, fatal, terminate, terminate_if_errors, notify
 from shlib import to_path
 from urllib.parse import urlparse
 
-# PasswordGenerator {{{1
+# PasswordGenerator class{{{1
 class PasswordGenerator:
     def __init__(self, gpg_id=None, init=False):
+        validate_componenets()
         self.gpg = GnuPG(gpg_id)
-        self.accounts_files = []
-            # don't really need to access these later, but need to keep them
-            # around otherwise they will be garbage collected and we will lose
-            # access to the accounts in all but the last file.
-
         if init:
             self.initialize()
             terminate()
@@ -54,7 +50,6 @@ class PasswordGenerator:
             try:
                 path = to_path(SETTINGS_DIR, filename)
                 account_file = File(path, self.gpg)
-                self.accounts_files.append(account_file)
                 contents = account_file.read()
                 if 'master_password' in contents:
                     self.add_master_to_accounts(contents['master_password'])
@@ -62,10 +57,6 @@ class PasswordGenerator:
             except Error as err:
                 err.terminate()
         terminate_if_errors()
-        if len(self.accounts_files) == 0:
-            fatal('no accounts files were specified.')
-
-        DICTIONARY.validate(get_setting('dict_hash'))
 
     def initialize(self):
         def split(s, l=72):
@@ -171,14 +162,21 @@ class PasswordGenerator:
         #     host: the url host name or IP address
         #     path: the path component of the url
         #           does not include options or anchor
+        matches = {}
         for account in Account.all_accounts():
             secret = account.recognize(data)
             if secret:
-                return account.get_name(), secret
+                matches[account.get_name()] = secret
 
-        msg = 'cannot find appropriate account.'
-        notify(msg)
-        raise Error(msg)
+        if not matches:
+            msg = 'cannot find appropriate account.'
+            notify(msg)
+            raise Error(msg)
+        if len(matches) > 1:
+            choice = show_list_dialog(sorted(matches.keys()))
+            return choice, matches[choice]
+        else:
+            return matches.popitem()
 
     def add_master_to_accounts(self, master):
         for account in Account.all_accounts():

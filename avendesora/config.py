@@ -19,10 +19,10 @@
 # Imports {{{1
 from .files import File
 from .preferences import (
-    BROWSERS, CHARSETS_SHA1, CONFIG_FILENAME, DEFAULT_ARCHIVE_FILENAME,
+    BROWSERS, CHARSETS_MD5, CONFIG_FILENAME, DEFAULT_ARCHIVE_FILENAME,
     DEFAULT_BROWSER, DEFAULT_DISPLAY_TIME, DEFAULT_FIELD, DEFAULT_LOG_FILENAME,
-    DEFAULT_VECTOR_FIELD, DICTIONARY_SHA1, GPG_ARMOR, GPG_EXECUTABLE, GPG_HOME,
-    REQUIRED_PROTOCOLS, SECRETS_SHA1, SETTINGS_DIR, XDOTOOL_EXECUTABLE,
+    DEFAULT_VECTOR_FIELD, DICTIONARY_MD5, GPG_ARMOR, GPG_EXECUTABLE, GPG_HOME,
+    REQUIRED_PROTOCOLS, SECRETS_MD5, SETTINGS_DIR, XDOTOOL_EXECUTABLE,
     XSEL_EXECUTABLE
 )
 from shlib import to_path
@@ -78,11 +78,11 @@ def get_setting(name, default=None):
         if name == 'required_protocols':
             return REQUIRED_PROTOCOLS
         if name == 'dict_hash':
-            return DICTIONARY_SHA1
+            return DICTIONARY_MD5
         if name == 'secrets_hash':
-            return SECRETS_SHA1
+            return SECRETS_MD5
         if name == 'charsets_hash':
-            return CHARSETS_SHA1
+            return CHARSETS_MD5
         return default
 
 # override_setting() {{{1

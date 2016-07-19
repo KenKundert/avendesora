@@ -1,0 +1,140 @@
+# Templates
+#
+# Templates are accounts without master passwords and without much in the way of 
+# attributes. Use them to generate pass codes of various types for stealth 
+# accounts.
+
+from avendesora import (
+    # Character sets
+    exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
+    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
+
+    # Account
+    Account,
+
+    # Secrets
+    Password, Passphrase, PIN,
+)
+
+# Templates
+# AAA {{{1
+class Anum4(Account):
+    passcode = Password(length=4, alphabet=DISTINGUISHABLE)
+
+class Anum6(Account):
+    passcode = Password(length=6, alphabet=DISTINGUISHABLE)
+
+class Anum8(Account):
+    passcode = Password(length=8, alphabet=DISTINGUISHABLE)
+
+class Anum10(Account):
+    passcode = Password(length=10, alphabet=DISTINGUISHABLE)
+
+class Anum12(Account):
+    aliases = ['anum']
+    passcode = Password(length=12, alphabet=DISTINGUISHABLE)
+
+class Anum14(Account):
+    passcode = Password(length=14, alphabet=DISTINGUISHABLE)
+
+class Anum16(Account):
+    passcode = Password(length=16, alphabet=DISTINGUISHABLE)
+
+class Anum18(Account):
+    passcode = Password(length=18, alphabet=DISTINGUISHABLE)
+
+class Anum20(Account):
+    passcode = Password(length=20, alphabet=DISTINGUISHABLE)
+
+# BBB {{{1
+# CCC {{{1
+class Char4(Account):
+    passcode = Password(length=4, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char6(Account):
+    passcode = Password(length=6, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char8(Account):
+    passcode = Password(length=8, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char10(Account):
+    passcode = Password(length=10, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char12(Account):
+    aliases = ['char']
+    passcode = Password(length=12, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char14(Account):
+    passcode = Password(length=14, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char16(Account):
+    passcode = Password(length=16, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char18(Account):
+    passcode = Password(length=18, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char20(Account):
+    passcode = Password(length=20, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+# DDD {{{1
+# EEE {{{1
+class Extreme(Account):
+    passcode = Passphrase(length=64, alphabet=PRINTABLE)
+
+# FFF {{{1
+# GGG {{{1
+# HHH {{{1
+# III {{{1
+# JJJ {{{1
+# KKK {{{1
+# LLL {{{1
+# MMM {{{1
+# NNN {{{1
+# OOO {{{1
+# PPP {{{1
+class Pin4(Account):
+    aliases = ['pin']
+    passcode = PIN(length=4)
+
+class Pin6(Account):
+    passcode = PIN(length=6)
+
+class Pin8(Account):
+    aliases = ['num']
+    passcode = PIN(length=8)
+
+class Pin10(Account):
+    passcode = PIN(length=10)
+
+class Pin12(Account):
+    passcode = PIN(length=12)
+
+# QQQ {{{1
+# RRR {{{1
+# SSS {{{1
+# TTT {{{1
+# UUU {{{1
+# VVV {{{1
+# WWW {{{1
+class Word(Account):
+    passcode = Passphrase(length=1)
+
+class Word2(Account):
+    aliases = ['pair']
+    passcode = Passphrase(length=2)
+
+class Word4(Account):
+    aliases = ['word', 'xkcd']
+    passcode = Passphrase(length=4)
+
+class Word6(Account):
+    passcode = Passphrase(length=6)
+
+class Word8(Account):
+    passcode = Passphrase(length=8)
+
+# XXX {{{1
+# YYY {{{1
+# ZZZ {{{1
+
+# vim: filetype=python sw=4 sts=4 et ai ff=unix :

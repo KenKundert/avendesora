@@ -24,13 +24,61 @@ from . import cursor
 from .config import get_setting
 from .preferences import INDENT, LABEL_COLOR, INITIAL_AUTOTYPE_DELAY
 from shlib import Run
-from inform import output, fatal, Error, log, Color, warn
+from inform import Color, Error, error, fatal, log, output, warn
 from time import sleep
 from textwrap import indent, dedent
+import string
 import re
 
 # Globals {{{1
 LabelColor = Color(LABEL_COLOR, enable=Color.isTTY())
+KEYSYMS = {
+    '!': 'exclam',
+    '"': 'quotedbl',
+    '#': 'numbersign',
+    '$': 'dollar',
+    '%': 'percent',
+    '&': 'ampersand',
+    "'": 'apostrophe',
+    '(': 'parenleft',
+    ')': 'parenright',
+    '*': 'asterisk',
+    '+': 'plus',
+    ',': 'comma',
+    '-': 'minus',
+    '.': 'period',
+    '/': 'slash',
+    '0': 'zero',
+    '1': 'one',
+    '2': 'two',
+    '3': 'three',
+    '4': 'four',
+    '5': 'five',
+    '6': 'six',
+    '7': 'seven',
+    '8': 'eight',
+    '9': 'nine',
+    ' ': 'space',
+    ':': 'colon',
+    ';': 'semicolon',
+    '<': 'less',
+    '=': 'equal',
+    '>': 'greater',
+    '?': 'question',
+    '@': 'at',
+    '[': 'bracketleft',
+    '\\': 'backslash',
+    ']': 'bracketright',
+    '^': 'asciicircum',
+    '_': 'underscore',
+    '`': 'grave',
+    '{': 'braceleft',
+    '|': 'bar',
+    '}': 'braceright',
+    '~': 'asciitilde',
+    '\n': 'Return',
+    '\t': 'Tab',
+}
 
 # Writer selection {{{1
 def get_writer(display=True, clipboard=False, stdout=False):
@@ -169,67 +217,34 @@ class KeyboardWriter(Writer):
 
     def run_script(self, account, script):
 
-        def run_xdotool(args, text=None):
+        def run_xdotool(args):
             try:
-                if args:
-                    Run(
-                        [get_setting('xdotool_executable'), 'getactivewindow'] +
-                        args,
-                        'soeW'
-                    )
-                if text:
-                    Run([get_setting('xdotool_executable'), '-'], 'soeW',
-                        stdin="getactivewindow type '%s'" % text
-                    )
+                #[get_setting('xdotool_executable'), 'getactivewindow'] +
+                Run([get_setting('xdotool_executable')] + args, 'soeW')
             except OSError as err:
                 fatal(os_error(err))
 
         def autotype(text):
-            # Use 'xdotool' to mimic the keyboard.
-            # A dollar sign in the argument to xdotool's type command is treated
-            # as an environment variable, so it must also be separated out and
-            # sent as a explicit 'key' stroke.
-            #
-            # 'type' must be the last action on a xdotool command line, so
-            # special characters (dollar sign) following text demand another 
-            # invocation of xdotool.
-            #
-            # It is desirable to pump the actions into standard input rather
-            # than place them on the command line so no part of the password is 
-            # visible using ps, however this mode seems flaky in xdotool. So 
-            # I have compromised and only send the individual 'key' strokes on 
-            # the command line and send the 'type' text through stdin. Still 
-            # seems flaky though, especially with Firefox.
-
-            regex = re.compile(r'([\n$]+)')
-
-            def add_action(action, arg):
-                actions.append((action, arg))
-
-            # split string so that special characters are isolated
-            actions = []
-            segments = regex.split(text)
-            for segment in segments:
-                for char in segment:
-                    if char == '\n':
-                        add_action('key', 'Return')
-                    elif char == '$':
-                        add_action('key', 'dollar')
-                    else:
-                        add_action('type', segment)
-                        break
-
-            # Gather keys until 'type' is found, and then output gathered keys 
-            # and type string all at once; this minimizes the number of times 
-            # xdotool must be called.
-            args = []
-            for action, arg in actions:
-                if action == 'type':
-                    run_xdotool(args, arg)
-                    args = []
+            # Split the text into individual key strokes and convert the special
+            # characters to their xkeysym names
+            keysyms = []
+            for char in text:
+                if char in string.ascii_letters:
+                    keysym = char
                 else:
-                    args += [action, arg]
-            run_xdotool(args)
+                    keysym = KEYSYMS.get(char)
+                if not keysym:
+                    error('cannot map to keysym, unknown', culprit=char)
+                else:
+                    keysyms.append(keysym)
+            run_xdotool('key --clearmodifiers'.split() + keysyms)
+
+        # Create the default script if a script was not given
+        if script is True:
+            # this bit of trickery gets the name of the default field
+            name, key = account.split_name(None)
+            name = account.combine_name(name, key)
+            script = "{%s}{return}" % name
 
         # Run the script
         regex = re.compile(r'({\w+})')

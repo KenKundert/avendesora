@@ -44,7 +44,7 @@ class Dictionary:
             error(os_error(err))
             contents = ''
 
-        self.hash = hashlib.sha1(contents.encode('utf-8')).hexdigest()
+        self.hash = hashlib.md5(contents.encode('utf-8')).hexdigest()
         self.words = contents.split()
 
     def validate(self, saved_hash):
@@ -56,10 +56,10 @@ class Dictionary:
             warn("dictionary has changed.")
             codicil(
                 *wrap(dedent("""\
-                    This results in pass phrases that are inconsistent
-                    with those created in the past.  Use 'avendesora --changed' 
-                    to assure that nothing has changed and then update 
-                    'dict_hash' in {settings}/{config} to {hash}.
+                    This results in pass phrases that are inconsistent with
+                    those created in the past.  Change {settings}/{config} to
+                    contain  "dict_hash = '{hash}'". Then use 'avendesora
+                    changed' to assure that nothing has changed.
                 """.format(
                     settings=SETTINGS_DIR,
                     config=CONFIG_FILENAME,

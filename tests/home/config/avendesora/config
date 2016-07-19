@@ -4,12 +4,12 @@
 # these files at the time that this file was created. The program will 
 # complain if the current contents of these files generate a different 
 # hash. Only update these hashes if you know what you are doing.
-dict_hash = 'd9aa1c08e08d6cacdf82819eeb5832429eadb95a'      # DO NOT CHANGE THIS LINE
-secrets_hash = 'not implemented yet'   # DO NOT CHANGE THIS LINE
-charsets_hash = 'not implemented yet'  # DO NOT CHANGE THIS LINE
+dict_hash = '11fe5bc734f4a956c37d7cb3da16ab3f'      # DO NOT CHANGE THIS LINE
+secrets_hash = '0779023f5f1687b92b094a2af5de5bd1'   # DO NOT CHANGE THIS LINE
+charsets_hash = '405332bcb8330b7502d292991026e328'  # DO NOT CHANGE THIS LINE
 
 # List of the files that contain account information
-accounts_files = ['accounts']
+accounts_files = ['accounts.gpg', 'templates']
 
 # The desired location of the log file (relative to config directory).
 # Adding a suffix of .gpg or .asc causes the file to be encrypted 
@@ -22,7 +22,6 @@ archive_file = 'archive.gpg'
 
 # Information used by GPG when encrypting and decrypting files.
 gpg_id = 'avendesora@nurdletech.com'
-gpg_home = '../../gnukey'
 gpg_path = '/usr/bin/gpg2'
 
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

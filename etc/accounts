@@ -47,7 +47,7 @@ class AlertSCC(Account):
     email = 'pizzaman@pizza.com'
     comments = '''
         Account where I signed up for local alert messages from the county 
-        covernment.
+        government.
     '''
     master = ken
     default  = 'password'
@@ -111,7 +111,7 @@ class MyBank(Account):
     email = 'pizzaman@pizza.com'
     url = 'https://mb.com'
     passcode = Password()
-    verbal = Passphrase(length=1)
+    verbal = Passphrase(length=2)
     pin = PIN()
     questions = [
         Question('What city were you born in?'),

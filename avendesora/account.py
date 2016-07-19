@@ -25,6 +25,7 @@ from .preferences import LABEL_COLOR, INDENT, TOOL_FIELDS
 from .recognizers import Recognizer
 from inform import Color, Error, is_collection, log, output, warn
 from textwrap import indent, dedent
+from urllib.parse import urlparse
 import re
 import sys
 
@@ -38,9 +39,15 @@ LabelColor = Color(LABEL_COLOR, enable=Color.isTTY())
 # iterate through either a dictionary or an array
 def items(collection):
     try:
+        # assume a dictionary
         iterator = collection.items()
     except AttributeError:
-        iterator = enumerate(collection)
+        # it is not a dictionary
+        if is_collection(collection):
+            iterator = enumerate(collection)  # it is an array
+        else:
+            iterator = [(None, collection)]   # it is a scalar
+
     for key, value in iterator:
         yield key, value
 
@@ -51,8 +58,8 @@ class Account:
     def all_accounts(cls):
         for sub in cls.__subclasses__():
             yield sub
-            for sub in sub.all_accounts():
-                yield sub
+            for each in sub.all_accounts():
+                yield each
 
     # all_fields() {{{2
     @classmethod
@@ -121,12 +128,35 @@ class Account:
     # recognize() {{{2
     @classmethod
     def recognize(cls, data):
+        # try the specified recognizers
         discovery = getattr(cls, 'discovery', ())
         for recognizer in discovery:
             if isinstance(recognizer, Recognizer):
-                secret = recognizer.match(data, cls)
-                if secret:
-                    return secret
+                script = recognizer.match(data, cls)
+                if script:
+                    return script
+        if discovery:
+            return
+
+        # If no recognizers specified, just check the url
+        try:
+            urls = cls.get_value('url')
+        except Error:
+            return
+        for _, url in items(urls):
+            components = urlparse(url)
+            protocol = components.scheme
+            host = components.netloc
+            if host == data.get('host'):
+                if (
+                    protocol != data.get('protocol') and
+                    data['protocol'] in get_setting('required_protocols')
+                ):
+                    msg = 'url matches, but uses wrong protocol.'
+                    notify(msg)
+                    error(msg, culprit=account.get_name())
+                else:
+                    return True
 
     # initialize() {{{2
     @classmethod
@@ -188,12 +218,6 @@ class Account:
             else:
                 return default
 
-        # generate the value if needed
-        try:
-            value._generate(key, cls)
-        except AttributeError:
-            pass
-
         if key is None:
             if is_collection(value):
                 raise Error(
@@ -202,22 +226,28 @@ class Account:
                     is_collection=True,
                     collection = value
                 )
-            return value
         else:
             try:
-                return value[key]
+                value = value[key]
             except (IndexError, KeyError, TypeError):
                 raise Error('not found.', culprit=cls.combine_name(name, key))
+
+        # generate the value if needed
+        try:
+            value.generate(key, cls)
+        except AttributeError as err:
+            pass
+        return value
 
     # is_secret() {{{2
     @classmethod
     def is_secret(cls, name, key=None):
         value = cls.__dict__.get(name)
         if key is None:
-            return hasattr(value, '_generate')
+            return hasattr(value, 'generate')
         else:
             try:
-                return hasattr(value[key], '_generate')
+                return hasattr(value[key], 'generate')
             except (IndexError, KeyError, TypeError):
                 raise Error('not found.', culprit=cls.combine_name(name, key))
 
@@ -309,7 +339,7 @@ class Account:
         def extract_collection(name, collection):
             lines = [fmt_field(key)]
             for k, v in items(collection):
-                if hasattr(v, '_generate'):
+                if hasattr(v, 'generate'):
                     # is a secret, get description if available
                     v = v.get_name() if hasattr(v, 'get_name') else reveal(name, k)
                 lines.append(fmt_field(k, v, level=1))
@@ -327,7 +357,7 @@ class Account:
                 pass
             elif is_collection(value):
                 lines += extract_collection(key, value)
-            elif hasattr(value, '_generate'):
+            elif hasattr(value, 'generate'):
                 lines.append(fmt_field(key, reveal(key)))
             else:
                 lines.append(fmt_field(key, value))

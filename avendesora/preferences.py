@@ -57,9 +57,9 @@ GPG_ARMOR = True
 # These signatures must be the sha1 signatures for the corresponding files
 # Regenerate them with 'sha1sum <filename>'
 # These are used in creating the initial master password file.
-SECRETS_SHA1 = "5d1c97a0fb699241fca5d50a7ad0508047990510"
-CHARSETS_SHA1 = "dab48b2103ebde97f78cfebd15cc1e66d6af6ed0"
-DICTIONARY_SHA1 = "d9aa1c08e08d6cacdf82819eeb5832429eadb95a"
+SECRETS_MD5 = '0779023f5f1687b92b094a2af5de5bd1'
+CHARSETS_MD5 = '405332bcb8330b7502d292991026e328'
+DICTIONARY_MD5 = '11fe5bc734f4a956c37d7cb3da16ab3f'
 
 # Browsers {{{1
 # Associate a command with a browser key.
@@ -109,6 +109,11 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # Utilities
     xdotool_executable = {xdotool_executable}
     xsel_executable = {xsel_executable}
+
+    # Hashes
+    charsets_hash = '{dict_hash}'
+    secrets_hash = '{charsets_hash}'
+    dict_hash = '{secrets_hash}'
 
     # vim: filetype=python sw=4 sts=4 et ai ff=unix :
 ''')

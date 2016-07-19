@@ -2,7 +2,7 @@
 #
 # Secret is a base class that can be used to easily generate various types of 
 # secretes. Basically, it gathers together a collection of strings (the arguments 
-# of the constructor and the _generate function) that are joined together and 
+# of the constructor and the generate function) that are joined together and 
 # hashed. The 512 bit hash is then used to generate passwords, passphrases, and 
 # other secrets.
 #
@@ -80,7 +80,7 @@ class Hidden():
                 culprit=(filename, lineno)
             )
 
-    def _generate(self, name, account):
+    def generate(self, name, account):
         # we don't need to do anything, but having this method marks this value
         # as being confidential
         pass
@@ -123,8 +123,8 @@ class GPG():
         self.gpg = gnupg.GPG(**gpg_args)
 
 
-    def _generate(self, name, account):
-        # must do this here in _generate rather than in constructor to avoid
+    def generate(self, name, account):
+        # must do this here in generate rather than in constructor to avoid
         # decrypting this, and perhaps asking for a passcode,  every time
         # Advendesora is run.
         decrypted = self.gpg.decrypt(dedent(self.value))
@@ -164,7 +164,7 @@ class Secret():
     def get_name(self):
         return self.name
 
-    def _generate(self, name, account):
+    def generate(self, name, account):
         if self.master is None:
             master = account.get_value('master', default=None)
         else:
@@ -213,7 +213,7 @@ class Secret():
         the components that are passed into the constructor.
 
         >>> secret = Secret()
-        >>> secret._generate('dux', account)
+        >>> secret.generate('dux', account)
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
         '39 0 91 10 32 51 0 39 28 72'
 
@@ -234,7 +234,7 @@ class Secret():
         alphabet.
 
         >>> secret = Secret()
-        >>> secret._generate('dux', account)
+        >>> secret.generate('dux', account)
         >>> ' '.join(secret._symbols([str(i) for i in range(100)], 10))
         '39 0 91 10 32 51 0 39 28 72'
 
@@ -267,7 +267,7 @@ class Secret():
         secret is exhausted.
 
         >>> secret = Secret()
-        >>> secret._generate('dux', account)
+        >>> secret.generate('dux', account)
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
         '39 0 91 10 32 51 0 39 28 72'
 
@@ -289,7 +289,7 @@ class Secret():
         secret is exhausted.
 
         >>> secret = Secret()
-        >>> secret._generate('dux', account)
+        >>> secret.generate('dux', account)
         >>> ' '.join([str(secret._get_symbol(range(100))) for i in range(10)])
         '39 0 91 10 32 51 0 39 28 72'
 
@@ -329,7 +329,7 @@ class Password(Secret):
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = Password()
-    >>> secret._generate('dux', account)
+    >>> secret.generate('dux', account)
     >>> str(secret)
     'zSxJKBTryBHD'
 
@@ -360,7 +360,7 @@ class Passphrase(Password):
 
     >>> import string
     >>> secret = Passphrase()
-    >>> secret._generate('dux', account)
+    >>> secret.generate('dux', account)
     >>> str(secret)
     'condition proxy broom customize'
 
@@ -389,7 +389,7 @@ class PIN(Password):
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = PIN()
-    >>> secret._generate('dux', account)
+    >>> secret.generate('dux', account)
     >>> str(secret)
     '9205'
 
@@ -416,7 +416,7 @@ class Question(Passphrase):
 
     >>> import string
     >>> secret = Question('What city were you born in?')
-    >>> secret._generate('dux', account)
+    >>> secret.generate('dux', account)
     >>> str(secret)
     'trapeze ditch arrange'
 
@@ -468,7 +468,7 @@ class MixedPassword(Secret):
     >>> secret = MixedPassword(
     ...     12, base, [(lowercase, 2), (uppercase, 2), (digits, 2)]
     ... )
-    >>> secret._generate('dux', account)
+    >>> secret.generate('dux', account)
     >>> str(secret)
     'C2Frf0j3Q4AY'
 
@@ -515,7 +515,7 @@ class BirthDate(Secret):
     This function can be used to generate a birth date using::
 
     >>> secret = BirthDate(2015, 18, 65)
-    >>> secret._generate('dux', account)
+    >>> secret.generate('dux', account)
     >>> str(secret)
     '1963-11-17'
 
@@ -529,7 +529,7 @@ class BirthDate(Secret):
     formatted::
 
     >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
-    >>> secret._generate('dux', account)
+    >>> secret.generate('dux', account)
     >>> str(secret)
     '11/17/63'
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Usage {{{1
 """
 Avendesora Password Generator
 
@@ -58,7 +59,6 @@ from .secrets import Hidden
 from .writer import get_writer
 from inform import Inform, Error, output, terminate, debug
 from shlib import to_path
-
 import docopt
 import sys
 
@@ -139,8 +139,11 @@ def main():
                 if cmdline['<secret>'] or not cmdline['--all']:
                     writer.display_field(account, cmdline['<secret>'])
         else:
+            # complain if account is required
             if cmdline['--browse'] or cmdline['--browser']:
                 fatal('account missing (required when starting browser).')
+
+            # use discovery to determine account
             account_name, script = generator.discover_account()
             account = generator.get_account(account_name)
             writer.run_script(account, script)
