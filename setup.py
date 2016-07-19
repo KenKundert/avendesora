@@ -25,8 +25,7 @@ setup(
     install_requires=[
         'appdirs',
         'docopt',
-        #'inform>=1.4',
-        'inform',
+        'inform>=1.4',
         'shlib',
         'python-gnupg',
             # Be careful.  There's a package called 'gnupg' that's an 
