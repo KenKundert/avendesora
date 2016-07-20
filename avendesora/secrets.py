@@ -6,19 +6,22 @@
 # hashed. The 512 bit hash is then used to generate passwords, passphrases, and 
 # other secrets.
 #
-# The following code should be ignored. It is defined here for the use of the 
-# doctests::
-#
-# >>> from avendesora.secrets import *
-# >>> class Account:
-# ...     def get_value(self, name, default=None):
-# ...          if name == 'master':
-# ...              return 'fux'
-# ...          else:
-# ...              return None
-# ...     def get_name(self):
-# ...          return 'pux'
-# >>> account = Account()
+"""
+The following code should be ignored. It is defined here for the use of the 
+doctests::
+
+>>> from avendesora.secrets import *
+>>> class Account:
+...     def get_value(self, name, default=None):
+...          if name == 'master':
+...              return 'fux'
+...          else:
+...              return None
+...     def get_name(self):
+...          return 'pux'
+>>> account = Account()
+
+"""
 
 # License {{{1
 # Copyright (C) 2016 Kenneth S. Kundert
