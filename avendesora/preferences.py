@@ -49,7 +49,7 @@ XDOTOOL_EXECUTABLE = '/usr/bin/xdotool'
 XSEL_EXECUTABLE = '/usr/bin/xsel'
 
 # GPG Settings
-GPG_EXECUTABLE = '/usr/bin/gpg2'
+GPG_EXECUTABLE = '/usr/bin/gpg'
 GPG_HOME = '~/.gnupg'
 GPG_ARMOR = True
 

@@ -24,7 +24,7 @@ from .preferences import (
     DEFAULT_ARCHIVE_FILENAME
 )
 from shlib import to_path
-from inform import debug, display, Error, fatal, narrate, os_error
+from inform import debug, display, Error, fatal, log, narrate, os_error
 
 # File class {{{1
 class File:
@@ -35,6 +35,7 @@ class File:
     def read(self):
         path = self.path
         self.encrypted = path.suffix in ['.gpg', '.asc']
+        log('reading.', culprit=path)
         try:
             if self.encrypted:
                 # file is encrypted, decrypt it

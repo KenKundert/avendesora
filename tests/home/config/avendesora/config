@@ -9,19 +9,19 @@ secrets_hash = '0779023f5f1687b92b094a2af5de5bd1'   # DO NOT CHANGE THIS LINE
 charsets_hash = '405332bcb8330b7502d292991026e328'  # DO NOT CHANGE THIS LINE
 
 # List of the files that contain account information
-accounts_files = ['accounts.gpg', 'templates']
+accounts_files = ['accounts', 'templates']
 
 # The desired location of the log file (relative to config directory).
 # Adding a suffix of .gpg or .asc causes the file to be encrypted 
 # (otherwise it can leak account names). Use None to disable logging.
-log_file = 'log.gpg'
+log_file = 'log'
 
 # The desired location of the archive file (relative to config directory 
 # and end the path in .gpg). Use None to disable archiving.
-archive_file = 'archive.gpg'
+archive_file = 'archive'
 
 # Information used by GPG when encrypting and decrypting files.
 gpg_id = 'avendesora@nurdletech.com'
-gpg_path = '/usr/bin/gpg'
+gpg_executable = '/usr/bin/gpg'
 
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

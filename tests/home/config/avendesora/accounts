@@ -13,23 +13,29 @@
 #     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
 
 from avendesora import (
+    # Basics
+    Account, Hidden, GPG,
+
     # Character sets
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
     HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
 
-    # Account
-    Account,
-
     # Secrets
-    Hidden, Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+    Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
 
     # Account Discovery
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
     RecognizeHost, RecognizeUser, RecognizeEnvVar,
 )
 
-master_password = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
-ken = Hidden('c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==')
+master_password = Hidden(
+    'c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==',
+    secure=False
+)
+ken = Hidden(
+    'c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==',
+    secure=False
+)
 
 # Accounts
 # AAA {{{1
@@ -101,7 +107,7 @@ class MyBank(Account):
     email = 'pizzaman@pizza.com'
     url = 'https://mb.com'
     passcode = Password()
-    verbal = Passphrase(length=1)
+    verbal = Passphrase(length=2)
     pin = PIN()
     questions = [
         Question('What city were you born in?'),

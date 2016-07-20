@@ -172,35 +172,6 @@ class Account:
         except AttributeError as err:
             pass
 
-        # This code generates all the secrets for the account in advance. This
-        # is undesirable as it may trigger the need for a passcode request from
-        # a GPG secret even though that secret is not actually needed. For
-        # example, if the user asked for a different secret. And it wastes a bit
-        # of time. So let's see if we can live without it. Living without it
-        # since 9 July 2016.
-        # for key, value in cls.__dict__.items():
-        #     # initiate the secret
-        #     if not key.startswith('_'):
-        #         try:
-        #             # initiate a scalar secret
-        #             value._generate(key, cls)
-        #             log('    found secret attribute:', key)
-        #         except AttributeError:
-        #             try:
-        #                 # initiate a dictionary secret
-        #                 for n, v in value.items():
-        #                     name = 'key[%s]' % n
-        #                     v._generate(name, cls)
-        #             except AttributeError:
-        #                 try:
-        #                     # initiate a vector secret
-        #                     for i, each in enumerate(value):
-        #                         name = 'key[%s]' % i
-        #                         each._generate(name, cls)
-        #                 except AttributeError:
-        #                     # not a secret
-        #                     continue
-
     # values() {{{2
     @classmethod
     def values(cls):

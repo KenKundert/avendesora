@@ -42,7 +42,7 @@ def read_config():
         contents = config_file.read()
         Config.update({k.lower(): v for k,v in contents.items()})
     except Error as err:
-        #warn(err)
+        #warn(err) # log() might be better, but log file is not available yet
         pass # config file is optional
 
 # get_setting() {{{1
