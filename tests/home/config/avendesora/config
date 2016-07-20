@@ -22,6 +22,6 @@ archive_file = 'archive.gpg'
 
 # Information used by GPG when encrypting and decrypting files.
 gpg_id = 'avendesora@nurdletech.com'
-gpg_path = '/usr/bin/gpg2'
+gpg_path = '/usr/bin/gpg'
 
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :
