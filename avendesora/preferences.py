@@ -57,7 +57,7 @@ GPG_ARMOR = True
 # These signatures must be the sha1 signatures for the corresponding files
 # Regenerate them with 'sha1sum <filename>'
 # These are used in creating the initial master password file.
-SECRETS_MD5 = '0779023f5f1687b92b094a2af5de5bd1'
+SECRETS_MD5 = '30299d590c05de077d419c2e4b0ff822'
 CHARSETS_MD5 = '405332bcb8330b7502d292991026e328'
 DICTIONARY_MD5 = '11fe5bc734f4a956c37d7cb3da16ab3f'
 
