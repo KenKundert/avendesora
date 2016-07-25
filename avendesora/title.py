@@ -20,9 +20,9 @@
 
 
 # Imports {{{1
-from .preferences import XDOTOOL_EXECUTABLE
+from .config import get_setting
 from shlib import Run
-from inform import error, log
+from inform import fatal, log
 import re
 
 
@@ -41,15 +41,21 @@ REGEX_COMPONENTS = {
 # Title base class {{{1
 class Title:
     def __init__(self):
+        log('Account Discovery ...')
+        xdotool = get_setting('xdotool_executable')
+        if not xdotool:
+            fatal(
+                "must set xdotool_executable'.",
+                culprit=get_setting('config_file')
+            )
         try:
-            xdotool = Run(
-                [XDOTOOL_EXECUTABLE, 'getactivewindow', 'getwindowname'],
+            output = Run(
+                [xdotool, 'getactivewindow', 'getwindowname'],
                 'sOeW'
             )
         except OSError as err:
-            error(str(err))
-        title = xdotool.stdout.strip()
-        log('Account Discovery ...')
+            fatal(str(err))
+        title = output.stdout.strip()
         log('Focused window title: %s' % title)
         data = {'rawtitle': title}
         for sub in Title.__subclasses__():

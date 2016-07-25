@@ -85,7 +85,7 @@ class Login(Account):
     passcode = Passphrase(length=6)
     discovery = [
         RecognizeAll(
-            RecognizeHost('kundert'),
+            RecognizeHost('pizzaville'),
             RecognizeTitle(
                 # these are used in the terminal
                 'sudo', 'sudo *',
@@ -106,7 +106,10 @@ class MyBank(Account):
     username = 'pizzaman'
     email = 'pizzaman@pizza.com'
     url = 'https://mb.com'
-    passcode = Password()
+    passcode = MixedPassword(
+        12, ALPHANUMERIC,
+        [(LOWERCASE, 2), (UPPERCASE, 2), (DIGITS, 2), ('@#$%&*+=', 2)]
+    )
     verbal = Passphrase(length=2)
     pin = PIN()
     questions = [

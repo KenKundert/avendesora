@@ -17,16 +17,9 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from .files import File
-from .preferences import (
-    BROWSERS, CHARSETS_MD5, CONFIG_FILENAME, DEFAULT_ARCHIVE_FILENAME,
-    DEFAULT_BROWSER, DEFAULT_DISPLAY_TIME, DEFAULT_FIELD, DEFAULT_LOG_FILENAME,
-    DEFAULT_VECTOR_FIELD, DICTIONARY_MD5, GPG_ARMOR, GPG_EXECUTABLE, GPG_HOME,
-    REQUIRED_PROTOCOLS, SECRETS_MD5, SETTINGS_DIR, XDOTOOL_EXECUTABLE,
-    XSEL_EXECUTABLE
-)
+from .preferences import CONFIG_DEFAULTS, NONCONFIG_SETTINGS
 from shlib import to_path
-from inform import Error, warn
+from inform import Error, comment, warn
 from textwrap import dedent
 import re
 from appdirs import user_config_dir
@@ -36,54 +29,72 @@ Config = {}
 
 # read_config() {{{1
 def read_config():
+    if Config.get('READ'):
+        return  # already read
+
     # First open the config file
+    from .gpg import File
+    path = get_setting('config_file')
+    assert path.suffix.lower() not in ['.gpg', '.asc']
+    config_file = File(path)
     try:
-        config_file = File(to_path(SETTINGS_DIR, CONFIG_FILENAME))
         contents = config_file.read()
+        for k, v in contents.items():
+            if k.startswith('_'):
+                continue
+            if k not in CONFIG_DEFAULTS:
+                warn('%s: unknown.' % k, culprit=config_file)
+                continue
+            if k.endswith('_executable'):
+                path = to_path(v)
+                if not path.is_absolute():
+                    warn(
+                        'should use absolute path for executables.',
+                        culprit=(config_file, k)
+                    )
+            Config[k] = v
+        Config['READ'] = True
+    except Error as err:
+        comment('not found.', culprit=config_file)
+
+    # Now open the hashes file
+    hashes_file = File(get_setting('hashes_file'))
+    try:
+        contents = hashes_file.read()
         Config.update({k.lower(): v for k,v in contents.items()})
     except Error as err:
-        #warn(err) # log() might be better, but log file is not available yet
-        pass # config file is optional
+        pass
+
+    # This cannot be here because gpg is not yet initialized.
+    # Should go in conceal.Scrypt.
+    # # Now open the user key file
+    # user_key_file = get_setting('user_key_file')
+    # if user_key_file:
+    #     user_key_file = File(get_setting('user_key_file'))
+    #     try:
+    #         contents = user_key_file.read()
+    #         Config.update({k.lower(): v for k,v in contents.items()})
+    #     except Error as err:
+    #         pass
 
 # get_setting() {{{1
 def get_setting(name, default=None):
     name = name.lower()
     try:
-        return Config[name]
+        value = Config[name]
     except KeyError:
-        if name == 'log_file':
-            return DEFAULT_LOG_FILENAME
-        if name == 'archive_file':
-            return DEFAULT_ARCHIVE_FILENAME
-        if name == 'default_field':
-            return DEFAULT_FIELD
-        if name == 'default_vector_field':
-            return DEFAULT_VECTOR_FIELD
-        if name == 'display_time':
-            return DEFAULT_DISPLAY_TIME
-        if name == 'xdotool_executable':
-            return XDOTOOL_EXECUTABLE
-        if name == 'xsel_executable':
-            return XSEL_EXECUTABLE
-        if name == 'gpg_executable':
-            return GPG_EXECUTABLE
-        if name == 'gpg_home':
-            return GPG_HOME
-        if name == 'gpg_armor':
-            return GPG_ARMOR
-        if name == 'browsers':
-            return BROWSERS
-        if name == 'default_browser':
-            return DEFAULT_BROWSER
-        if name == 'required_protocols':
-            return REQUIRED_PROTOCOLS
-        if name == 'dict_hash':
-            return DICTIONARY_MD5
-        if name == 'secrets_hash':
-            return SECRETS_MD5
-        if name == 'charsets_hash':
-            return CHARSETS_MD5
+        try:
+            value = CONFIG_DEFAULTS[name]
+        except KeyError:
+            try:
+                value = NONCONFIG_SETTINGS[name]
+            except KeyError:
+                return default
+    if value is None:
         return default
+    if name.endswith('_file'):
+        value = to_path(get_setting('settings_dir'), value)
+    return value
 
 # override_setting() {{{1
 def override_setting(name, value):

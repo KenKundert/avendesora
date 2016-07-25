@@ -110,7 +110,10 @@ class MyBank(Account):
     username = 'pizzaman'
     email = 'pizzaman@pizza.com'
     url = 'https://mb.com'
-    passcode = Password()
+    passcode = MixedPassword(
+        12, ALPHANUMERIC,
+        [(LOWERCASE, 2), (UPPERCASE, 2), (DIGITS, 2), ('@#$%&*+=', 2)]
+    )
     verbal = Passphrase(length=2)
     pin = PIN()
     questions = [

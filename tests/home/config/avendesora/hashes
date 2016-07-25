@@ -1,0 +1,10 @@
+# Changing the contents of the dictionary, secrets, or charsets will change
+# the secrets you generate, thus you do not want to change these files once
+# you have started using the program. These are hashes for the contents of
+# these files at the time that this file was created. The program will
+# complain if the current contents of these files generate a different
+# hash. Only update these hashes if you know what you are doing.
+
+charsets_hash = '405332bcb8330b7502d292991026e328'  # DO NOT CHANGE THIS LINE
+dict_hash     = '11fe5bc734f4a956c37d7cb3da16ab3f'  # DO NOT CHANGE THIS LINE
+secrets_hash  = 'f7aeadac3cefe513047fdb4efa26591f'  # DO NOT CHANGE THIS LINE

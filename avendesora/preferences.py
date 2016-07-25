@@ -21,67 +21,62 @@ from textwrap import dedent
 import re
 from appdirs import user_config_dir
 
-# Filenames {{{1
-SETTINGS_DIR = user_config_dir('avendesora')
-DICTIONARY_FILENAME = 'words'
-CONFIG_FILENAME = 'config'
-    # config file must be unencrypted (it contains the gpg settings)
-HASHES_FILENAME = 'hashes'
-DEFAULT_ACCOUNTS_FILENAME = 'accounts.gpg'
-DEFAULT_TEMPLATES_FILENAME = 'templates'
-DEFAULT_LOG_FILENAME = 'log'
-    # log file will be encrypted if you add .gpg or .asc extension
-DEFAULT_ARCHIVE_FILENAME = 'archive.gpg'
+# Config Settings {{{1
+# These are the default values for settings that may be found in the config file
+CONFIG_DEFAULTS = {
+    'log_file': 'log.gpg',
+    'archive_file': 'archive.gpg',
+    'user_key_file': 'key.gpg',
+    'dictionary_file': 'words',
+    'accounts_files': None,
+    'default_field': 'passcode',
+    'default_vector_field': 'questions',
+    'display_time': 60,
+    # use absolute paths for executables so they cannot be maliciously replaced
+    'xdotool_executable': '/usr/bin/xdotool',
+    'xsel_executable': '/usr/bin/xsel',
+    'gpg_executable': '/usr/bin/gpg2',
+    'gpg_home': '~/.gnupg',
+    'gpg_armor': True,
+    'gpg_id': None,
+    'browsers': {
+        'f': 'firefox -new-tab %s',
+        'g': 'google-chrome %s',
+        't': 'torbrowser %s',
+        'x': 'xdg-open %s', # system default browser
+    },
+    'default_browser': 'x',
+    'required_protocols': ['https'],
+}
 
-# Settings {{{1
+# the following could be config settings, but they do not seem worth promoting
 INDENT = '    '
 LABEL_COLOR = 'yellow'
     # choose from normal, black, red, green, yellow, blue, magenta, cyan, white
 INITIAL_AUTOTYPE_DELAY = 0.0
-DEFAULT_FIELD = 'passcode'
-DEFAULT_VECTOR_FIELD = 'questions'
-DEFAULT_DISPLAY_TIME = 60
 
-
-# Utility programs {{{1
-# use absolute paths for xdotool and xsel so they cannot be maliciously replaced
-XDOTOOL_EXECUTABLE = '/usr/bin/xdotool'
-XSEL_EXECUTABLE = '/usr/bin/xsel'
-
-# GPG Settings
-GPG_EXECUTABLE = '/usr/bin/gpg'
-GPG_HOME = '~/.gnupg'
-GPG_ARMOR = True
-
-# Signatures {{{1
-# These signatures must be the sha1 signatures for the corresponding files
-# Regenerate them with 'sha1sum <filename>'
-# These are used in creating the initial master password file.
-SECRETS_MD5 = '30299d590c05de077d419c2e4b0ff822'
-CHARSETS_MD5 = '405332bcb8330b7502d292991026e328'
-DICTIONARY_MD5 = '11fe5bc734f4a956c37d7cb3da16ab3f'
-
-# Browsers {{{1
-# Associate a command with a browser key.
-# The command must contain a single %s, which is replaced with URL.
-BROWSERS = {
-    'f': 'firefox -new-tab %s',
-    'g': 'google-chrome %s',
-    't': 'torbrowser %s',
-    'x': 'xdg-open %s', # system default browser
+# Non-Config Settings {{{1
+# These value can be accessed with get_settings,
+# but should not be found in the config file
+NONCONFIG_SETTINGS = {
+    'config_file': 'config',
+    'hashes_file': 'hashes',
+    'settings_dir': user_config_dir('avendesora'),
+    'default_accounts_file': 'accounts.gpg',
+    'default_templates_file': 'templates',
+    'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
+    'secrets_hash': 'f7aeadac3cefe513047fdb4efa26591f',
+    'charsets_hash': '405332bcb8330b7502d292991026e328',
 }
-DEFAULT_BROWSER = 'x'
 
-
-# Account Recognition {{{1
-REQUIRED_PROTOCOLS = ['https']
-    # If one of these protocols are specified in the recognition url, then that
-    # protocol must be used in the browser
 
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # List of the files that contain account information
-    accounts_files = [{accounts_file}, {templates_file}]
+    accounts_files = [
+        {default_accounts_file},
+        {default_templates_file}
+    ]
 
     # The desired location of the log file (relative to config directory).
     # Adding a suffix of .gpg or .asc causes the file to be encrypted
@@ -110,11 +105,6 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     xdotool_executable = {xdotool_executable}
     xsel_executable = {xsel_executable}
 
-    # Hashes
-    charsets_hash = '{dict_hash}'
-    secrets_hash = '{charsets_hash}'
-    dict_hash = '{secrets_hash}'
-
     # vim: filetype=python sw=4 sts=4 et ai ff=unix :
 ''')
 
@@ -128,9 +118,9 @@ HASH_FILE_INITIAL_CONTENTS = dedent('''\
     # complain if the current contents of these files generate a different
     # hash. Only update these hashes if you know what you are doing.
 
-    dict_hash     = '{dict_hash}'  # DO NOT CHANGE THIS LINE
-    secrets_hash  = '{secrets_hash}'  # DO NOT CHANGE THIS LINE
-    charsets_hash = '{charsets_hash}'  # DO NOT CHANGE THIS LINE
+    charsets_hash = {charsets_hash}  # DO NOT CHANGE THIS LINE
+    dict_hash     = {dict_hash}  # DO NOT CHANGE THIS LINE
+    secrets_hash  = {secrets_hash}  # DO NOT CHANGE THIS LINE
 ''')
 
 
@@ -342,6 +332,13 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
 
     # vim: filetype=python sw=4 sts=4 et ai ff=unix :
 ''')
+
+# Initial user key file {{{1
+USER_KEY_FILE_INITIAL_CONTENTS = dedent('''\
+    # DO NOT CHANGE THIS KEY
+    user_key = ({user_key})
+''')
+
 
 # Fields {{{1
 # Fields reserved for use by Avendesora

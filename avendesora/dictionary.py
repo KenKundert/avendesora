@@ -20,7 +20,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports (folds)
-from .preferences import SETTINGS_DIR, DICTIONARY_FILENAME, CONFIG_FILENAME
+from .config import get_setting
 from shlib import to_path
 from inform import codicil, error, warn, os_error
 from textwrap import dedent, wrap
@@ -29,9 +29,8 @@ import hashlib
 
 class Dictionary:
     """Read Dictionary"""
-    def __init__(self, filename, settings_dir):
+    def __init__(self, path):
         # find the dictionary, initially look in the settings directory
-        path = to_path(settings_dir, filename)
         if not path.exists():
             # if not there look in install directory
             from pkg_resources import resource_filename
@@ -47,25 +46,6 @@ class Dictionary:
         self.hash = hashlib.md5(contents.encode('utf-8')).hexdigest()
         self.words = contents.split()
 
-    def validate(self, saved_hash):
-        """Validate Dictionary"""
-        if saved_hash != self.hash:
-            if not self.hash:
-                # there is no dictionary and the user has already been informed
-                return
-            warn("dictionary has changed.")
-            codicil(
-                *wrap(dedent("""\
-                    This results in pass phrases that are inconsistent with
-                    those created in the past.  Change {settings}/{config} to
-                    contain  "dict_hash = '{hash}'". Then use 'avendesora
-                    changed' to assure that nothing has changed.
-                """.format(
-                    settings=SETTINGS_DIR,
-                    config=CONFIG_FILENAME,
-                    hash=self.hash
-                ))), sep='\n'
-            )
+DICTIONARY = Dictionary(get_setting('dictionary_file'))
 
-DICTIONARY = Dictionary(DICTIONARY_FILENAME, SETTINGS_DIR)
 # vim: set sw=4 sts=4 et:

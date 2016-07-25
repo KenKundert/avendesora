@@ -16,13 +16,10 @@
 
 # Imports {{{1
 from .config import get_setting
-from .dictionary import DICTIONARY
-from .preferences import (
-    SECRETS_MD5, CHARSETS_MD5, SETTINGS_DIR, CONFIG_FILENAME
-)
 from shlib import Run, to_path
-from inform import codicil, error, os_error, warn
+from inform import codicil, error, fatal, os_error, warn
 from textwrap import dedent, wrap
+from pkg_resources import resource_filename
 import hashlib
 
 # gethostname {{{1
@@ -57,46 +54,37 @@ def generate_random_string(length=64):
 
 # validate_componenets {{{1
 def validate_componenets():
-    # Check that dictionary has not changed.
-    # If the master password file exists, then self.data['dict_hash'] will 
-    # exist, and we will compare the current hash for the dictionary 
-    # against that stored in the master password file, otherwise we will 
-    # compare against the one present when the program was configured.
-    DICTIONARY.validate(get_setting('dict_hash'))
 
-    # Check that secrets.py and charset.py have not changed
-    for each, md5 in [
-        ('secrets', SECRETS_MD5),
-        ('charsets', CHARSETS_MD5)
+    # find dictionary file
+    dict_path = get_setting('dictionary_file')
+    if not dict_path.is_file():
+        # user did not provide a dictionary, so use the internal one
+        dict_path = to_path(resource_filename(__name__, 'words'))
+
+    # Check that files that are critical to the integrity of the generated
+    # secrets have not changed
+    for path, kind in [
+        (to_path(resource_filename(__name__,  'secrets.py')), 'secrets_hash'),
+        (to_path(resource_filename(__name__,  'charsets.py')), 'charsets_hash'),
+        (dict_path, 'dict_hash'),
     ]:
-        src_dir = to_path(__file__).parent
-        path = to_path(src_dir, each + '.py')
         try:
             contents = path.read_text()
-        except IOError as err:
-            path = to_path(src_dir, '..', each + '.py')
-            try:
-                contents = path.read_text()
-            except IOError as err:
-                error('%s: %s.' % (err.filename, err.strerror))
-        hash = hashlib.md5(contents.encode('utf-8')).hexdigest()
+        except OSError as err:
+            fatal(os_error(err))
+        md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
         # Check that file has not changed.
-        # If the master password file exists, then self.data['%s_hash'] 
-        # will exist, and we will compare the current hash for the file 
-        # against that stored in the master password file, otherwise we 
-        # will compare against the one present when the program was 
-        # configured.
-        if hash != get_setting('%s_hash' % each, md5):
+        if md5 != get_setting(kind):
             warn("file contents have changed.", culprit=path)
             codicil(
                 *wrap(dedent("""\
                     This results in passwords that are inconsistent with those
-                    created in the past.  Change {settings}/{config} to contain
-                    "{kind}_hash = '{hash}'".  Then use 'avendesora
-                    changed' to assure that nothing has changed.
+                    created in the past.  Change {hashes} to contain
+                    "{kind} = '{md5}'".  Then use 'avendesora changed'
+                    to assure that nothing has changed.
                 """.format(
-                    kind=each, settings=SETTINGS_DIR, config=CONFIG_FILENAME,
-                    hash=hash
+                    kind=kind, md5=md5,
+                    hashes=get_setting('hashes_file'),
                 ))),
                 sep = '\n'
             )

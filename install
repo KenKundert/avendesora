@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Set pip variable to select which version of python to use.
-# Generally either pip2 or pip3.
+# Use pip3.
 pip=pip3
 
 # Remove build directories from a previous install to assure a clean install.

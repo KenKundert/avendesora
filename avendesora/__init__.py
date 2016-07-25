@@ -5,10 +5,12 @@ from .charsets import (
 from .account import Account
 from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
-    Hidden, GPG
 )
-from .recognizers import (
+from .conceal import Hidden, GPG
+from .recognize import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
     RecognizeHost, RecognizeUser, RecognizeEnvVar
 )
+from .generator import PasswordGenerator
+from inform import Error
 __version__ = '0.2.0'

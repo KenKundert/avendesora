@@ -12,7 +12,7 @@ doctests::
 
 >>> from avendesora.secrets import *
 >>> class Account:
-...     def get_value(self, name, default=None):
+...     def get_field(self, name, default=None):
 ...          if name == 'master':
 ...              return 'fux'
 ...          else:
@@ -60,98 +60,6 @@ class SecretExhausted(Exception):
     def __str__(self):
         return "secret exhausted"
 
-# Hidden {{{1
-class Hidden():
-    # This does a simple base64 encoding on the string to hide it from a casual
-    # observer. But it is not encrypted. The original value can be trivially
-    # recovered from the encoded version.
-    def __init__(self, value, secure=True, encoding='utf8'):
-        try:
-            value = a2b_base64(value)
-            self.value = value.decode(encoding)
-            self.secure = secure
-        except BinasciiError as err:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            filename, lineno = traceback.extract_stack()[-2][:2]
-                # context and content are also available, but in this case
-                # Hidden is generally instantiated from top-level so the 
-                # context is not interesting and the content (the actual line 
-                # of code) shown in this case is gibberish (encrypted).
-            fatal(
-                'invalid value specified to Hidden().',
-                culprit=(filename, lineno)
-            )
-
-    def generate(self, name, account):
-        # we don't need to do anything, but having this method marks this value
-        # as being confidential
-        pass
-
-    def is_secure(self):
-        return self.secure
-
-    def __str__(self):
-        return self.value
-
-    @staticmethod
-    def hide(value, encoding='utf8'):
-        value = value.encode(encoding)
-        return b2a_base64(value).rstrip().decode('ascii')
-
-    @staticmethod
-    def reveal(value, encoding='utf8'):
-        value = a2b_base64(value.encode('ascii'))
-        return value.decode(encoding)
-# GPG {{{1
-class GPG():
-    # This does a full GPG decryption.
-    # To generate an entry for the GPG argument, you can use ...
-    #     gpg -a -c filename
-    # It will create filename.asc. Copy the contents of that file into the
-    # argument.
-    # This uses symmetric encryption to add an additional layer of protection.
-    # Generally one would use their private key to protect the gpg file, and
-    # then use a symmetric key, or perhaps a separate private key, to protect an
-    # individual piece of data, like a master password.
-    def __init__(self, value, secure=True, encoding='utf8'):
-        self.value = value
-        gpg_path = get_setting('gpg_path')
-        gpg_home = get_setting('gpg_home')
-        gpg_args = {}
-        if gpg_path:
-            gpg_args.update({'gpgbinary': str(gpg_path)})
-        if gpg_home:
-            gpg_args.update({'gnupghome': str(gpg_home)})
-        self.gpg = gnupg.GPG(**gpg_args)
-
-
-    def generate(self, name, account):
-        # must do this here in generate rather than in constructor to avoid
-        # decrypting this, and perhaps asking for a passcode,  every time
-        # Advendesora is run.
-        decrypted = self.gpg.decrypt(dedent(self.value))
-        if not decrypted.ok:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            filename, lineno = traceback.extract_stack()[-2][:2]
-                # context and content are also available, but in this case
-                # GPG is generally instantiated from top-level so the 
-                # context is not interesting and the content (the actual line 
-                # of code) shown in this case is gibberish (encrypted).
-            msg = 'unable to decrypt argument to GPG()'
-            try:
-                msg = '%s: %s' % (msg, decrypted.stderr)
-            except AttributeError:
-                msg += '.'
-            fatal(msg, culprit=(filename, lineno))
-        self.decrypted = decrypted
-        pass
-
-    def __str__(self):
-        return str(self.decrypted)
-
-
 # Secret {{{1
 class Secret():
     """Base class for generated secrets"""
@@ -162,50 +70,45 @@ class Secret():
         This base class should not be instantiated. A constructor is only provided 
         to so the doctests work on the helper methods.
         """
-        self.name = self.master = self.version = None
+        self.description = self.master = self.version = None
 
-    def get_name(self):
-        return self.name
+    def get_description(self):
+        return self.description
 
-    def generate(self, name, account):
+    def generate(self, description, account):
+        account_name = account.get_name()
         if self.master is None:
-            master = account.get_value('master', default=None)
+            master = account.get_field('master', default=None)
         else:
             master = self.master
         if not master:
             try:
                 master = getpass.getpass(
-                    'master password for %s: ' % account.get_name()
+                    'master password for %s: ' % account_name
                 )
                 if not master:
                     warn("master password is empty.")
             except (EOFError, KeyboardInterrupt):
                 terminate()
-        name = self.name if self.name else name
+        description = self.description if self.description else description
         if self.version:
             version = self.version
         else:
             try:
-                version = account.get_value('version')
+                version = account.get_field('version')
             except Error:
                 version = ''
-        account_name = account.get_name()
 
-        key = ''.join([str(e) for e in [name, account_name, master, version]])
+        seeds = [description, account_name, master, version]
+        key = ' '.join([str(seed) for seed in seeds])
 
         # Convert the key into 512 bit number
         digest = hashlib.sha512((key).encode('utf-8')).digest()
         bits_per_byte = 8
         radix = 1 << bits_per_byte
         bits = 0
-        try:
-            # in python3, digest is a byte array
-            for byte in digest:
-                bits = radix * bits + byte
-        except TypeError:
-            # in python2, digest is a string
-            for char in digest:
-                bits = radix * bits + ord(char)
+        for byte in digest:
+            bits = radix * bits + byte
         self.pool = bits
 
     def _partition(self, radix, num_partitions):
@@ -218,7 +121,7 @@ class Secret():
         >>> secret = Secret()
         >>> secret.generate('dux', account)
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
-        '39 0 91 10 32 51 0 39 28 72'
+        '79 62 46 89 95 5 98 70 13 81'
 
         """
         max_index = radix-1
@@ -239,18 +142,18 @@ class Secret():
         >>> secret = Secret()
         >>> secret.generate('dux', account)
         >>> ' '.join(secret._symbols([str(i) for i in range(100)], 10))
-        '39 0 91 10 32 51 0 39 28 72'
+        '79 62 46 89 95 5 98 70 13 81'
 
         This function can be used to generate a password as follows:
         >>> import string
         >>> alphabet =  alphabet = string.ascii_letters + string.digits
         >>> ''.join(secret._symbols(alphabet, 16))
-        'RwKKxLKUMoRlf3nm'
+        'uEKEj6mLDOkK6APv'
 
         This function can be used to generate a passphrase as follows:
         >>> dictionary = ['eeny', 'meeny', 'miny', 'moe']
         >>> ' '.join(secret._symbols(dictionary, 4))
-        'eeny meeny meeny moe'
+        'moe miny miny miny'
 
         """
         radix = len(alphabet)
@@ -272,7 +175,7 @@ class Secret():
         >>> secret = Secret()
         >>> secret.generate('dux', account)
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
-        '39 0 91 10 32 51 0 39 28 72'
+        '79 62 46 89 95 5 98 70 13 81'
 
         """
         max_index = radix-1
@@ -294,7 +197,7 @@ class Secret():
         >>> secret = Secret()
         >>> secret.generate('dux', account)
         >>> ' '.join([str(secret._get_symbol(range(100))) for i in range(10)])
-        '39 0 91 10 32 51 0 39 28 72'
+        '79 62 46 89 95 5 98 70 13 81'
 
         This function can be used to generate a birth date using:
         >>> def birthdate(secret, year, min_age=18, max_age=80):
@@ -304,7 +207,7 @@ class Secret():
         ...         secret._get_symbol(range(year-max_age, year-min_age))
         ...     )
         >>> birthdate(secret, 2014)
-        '06/04/1975'
+        '11/18/1976'
 
         """
         radix = len(alphabet)
@@ -334,7 +237,7 @@ class Password(Secret):
     >>> secret = Password()
     >>> secret.generate('dux', account)
     >>> str(secret)
-    'zSxJKBTryBHD'
+    '5NcmdF8QEqcL'
 
     """
     def __init__(self,
@@ -344,7 +247,7 @@ class Password(Secret):
         version=None,
         sep=''
     ):
-        self.name = None
+        self.description = None
         self.length = length
         self.alphabet = alphabet
         self.master = master
@@ -365,7 +268,7 @@ class Passphrase(Password):
     >>> secret = Passphrase()
     >>> secret.generate('dux', account)
     >>> str(secret)
-    'condition proxy broom customize'
+    'larva cause tearaway wharf'
 
     """
     def __init__(self,
@@ -375,7 +278,7 @@ class Passphrase(Password):
         version=None,
         sep=' '
     ):
-        self.name = None
+        self.description = None
         self.length = length
         self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
@@ -394,7 +297,7 @@ class PIN(Password):
     >>> secret = PIN()
     >>> secret.generate('dux', account)
     >>> str(secret)
-    '9205'
+    '9816'
 
     """
     def __init__(self,
@@ -403,7 +306,7 @@ class PIN(Password):
         master=None,
         version=None,
     ):
-        self.name = None
+        self.description = None
         self.length = length
         self.alphabet = alphabet
         self.master = master
@@ -414,14 +317,14 @@ class PIN(Password):
 # Question {{{1
 class Question(Passphrase):
     """
-    Identical to Passphrase() except the name must be specified when created 
-    and is taken to be the security question.
+    Identical to Passphrase() except the description must be specified when
+    created and is taken to be the security question.
 
     >>> import string
     >>> secret = Question('What city were you born in?')
     >>> secret.generate('dux', account)
     >>> str(secret)
-    'trapeze ditch arrange'
+    'picky robot mattock'
 
     """
     # Generally the user will want to give several security questions, which
@@ -442,7 +345,7 @@ class Question(Passphrase):
         version=None,
         sep=' '
     ):
-        self.name = question
+        self.description = question
         self.question = None
         self.length = length
         self.alphabet = alphabet if alphabet else DICTIONARY.words
@@ -473,7 +376,7 @@ class MixedPassword(Secret):
     ... )
     >>> secret.generate('dux', account)
     >>> str(secret)
-    'C2Frf0j3Q4AY'
+    'drcrDb7bZu83'
 
     """
     def __init__(
@@ -484,7 +387,7 @@ class MixedPassword(Secret):
         master=None,
         version=None,
     ):
-        self.name = None
+        self.description = None
         self.length = length
         self.def_alphabet = def_alphabet
         self.requirements = requirements
@@ -520,7 +423,7 @@ class BirthDate(Secret):
     >>> secret = BirthDate(2015, 18, 65)
     >>> secret.generate('dux', account)
     >>> str(secret)
-    '1963-11-17'
+    '1983-09-18'
 
     For year, enter the year the entry that contains BirthDate was created.  
     Doing so anchors the age range. In this example, the creation date is 2015,
@@ -534,7 +437,7 @@ class BirthDate(Secret):
     >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
     >>> secret.generate('dux', account)
     >>> str(secret)
-    '11/17/63'
+    '9/18/83'
 
     """
     def __init__(
@@ -546,7 +449,7 @@ class BirthDate(Secret):
         master=None,
         version=None,
     ):
-        self.name = None
+        self.description = None
         self.fmt = fmt
         self.last_year = year-min_age
         self.first_year = year-max_age

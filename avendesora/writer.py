@@ -103,7 +103,7 @@ class TTY_Writer(Writer):
         name, key = account.split_name(field)
         is_secret = account.is_secret(name, key)
         try:
-            value = account.get_value(name, key)
+            value = account.get_field(name, key)
             tvalue = dedent(str(value)).strip()
         except Error as err:
             err.terminate()
@@ -149,7 +149,7 @@ class ClipboardWriter(Writer):
         name, key = account.split_name(field)
         is_secret = account.is_secret(name, key)
         try:
-            value = dedent(str(account.get_value(name, key))).strip()
+            value = dedent(str(account.get_field(name, key))).strip()
         except Error as err:
             err.terminate()
 
@@ -204,9 +204,8 @@ class StdoutWriter(Writer):
     """Writes to the standard output."""
 
     def display_field(self, account, field):
-        name, key = account.split_name(field)
         try:
-            print(dedent(str(account.get_value(name, key))).strip())
+            print(dedent(str(account.get_value(field))).strip())
         except Error as err:
             err.terminate()
 
@@ -276,7 +275,7 @@ class KeyboardWriter(Writer):
                 else:
                     name, key = account.split_name(cmd)
                     try:
-                        value = dedent(str(account.get_value(name, key))).strip()
+                        value = dedent(str(account.get_field(name, key))).strip()
                         out.append(value)
                         if account.is_secret(name, key):
                             scrubbed.append('<%s>' % cmd)

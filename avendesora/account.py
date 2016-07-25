@@ -20,9 +20,11 @@
 
 # Imports {{{1
 from .browsers import StandardBrowser
+from .conceal import Conceal
 from .config import get_setting
 from .preferences import LABEL_COLOR, INDENT, TOOL_FIELDS
-from .recognizers import Recognizer
+from .recognize import Recognizer
+from .secrets import Secret
 from inform import Color, Error, is_collection, log, output, warn
 from textwrap import indent, dedent
 from urllib.parse import urlparse
@@ -36,20 +38,22 @@ LabelColor = Color(LABEL_COLOR, enable=Color.isTTY())
 
 # Utilities {{{1
 # items {{{2
-# iterate through either a dictionary or an array
 def items(collection):
+    # iterate through a collection returning key, value pairs in sorted order
+    # collection may be a dictionary, an array, or a scalar
     try:
         # assume a dictionary
-        iterator = collection.items()
+        iterator = sorted(collection.keys())
     except AttributeError:
         # it is not a dictionary
         if is_collection(collection):
-            iterator = enumerate(collection)  # it is an array
+            iterator = range(len(collection))  # it is an array
         else:
-            iterator = [(None, collection)]   # it is a scalar
+            yield None, collection             # it is a scalar
+            return
 
-    for key, value in iterator:
-        yield key, value
+    for key in iterator:
+        yield key, collection[key]
 
 # Account Class {{{1
 class Account:
@@ -61,9 +65,9 @@ class Account:
             for each in sub.all_accounts():
                 yield each
 
-    # all_fields() {{{2
+    # fields() {{{2
     @classmethod
-    def all_fields(cls):
+    def fields(cls):
         for key, value in cls.__dict__.items():
             if not key.startswith('_'):
                 yield key, value
@@ -72,7 +76,7 @@ class Account:
     @classmethod
     def get_name(cls):
         try:
-            return cls.name
+            return cls.NAME
         except AttributeError:
             # consider converting lower to upper case transitions in __name__ to
             # dashes.
@@ -110,7 +114,7 @@ class Account:
         if cls.id_contains(target):
             return True
         target = target.lower()
-        for key, value in cls.all_fields():
+        for key, value in cls.fields():
             if key in TOOL_FIELDS:
                 continue
             try:
@@ -140,7 +144,7 @@ class Account:
 
         # If no recognizers specified, just check the url
         try:
-            urls = cls.get_value('url')
+            urls = cls.get_field('url')
         except Error:
             return
         for _, url in items(urls):
@@ -179,9 +183,13 @@ class Account:
             if not key.startswith('_'):
                 yield key, cls.__dict__[key]
 
-    # get_value() {{{2
+    # get_field() {{{2
     @classmethod
-    def get_value(cls, name, key=None, default=False):
+    def get_field(cls, name, key=None, default=False):
+        """Get Field Value
+
+        Return value from the account given a field name and key.
+        """
         value = cls.__dict__.get(name)
         if value is None:
             if default is False:
@@ -237,7 +245,7 @@ class Account:
         #     field[key] or field/key: for dictionary value
 
         if name is True or not name:
-            name = cls.get_value('default', default=None)
+            name = cls.get_field('default', default=None)
         if not name:
             name = get_setting('default_field')
 
@@ -286,6 +294,23 @@ class Account:
         else:
             return '%s.%s' % (name, key)
 
+    # get_value() {{{2
+    @classmethod
+    def get_value(cls, name=None):
+        """Get Account Value
+
+        Return value from the account given a user friendly identifier. User
+        friendly identifiers include:
+            name: scalar value
+            name.key or name[key]:
+                member of a dict or array
+                dict if key is string, array if key is number
+        """
+        value = cls.get_field(*cls.split_name(name))
+        if isinstance(value, Secret) or isinstance(value, Conceal):
+            value = str(value)
+        return value
+
     # write_summary() {{{2
     @classmethod
     def write_summary(cls):
@@ -312,7 +337,10 @@ class Account:
             for k, v in items(collection):
                 if hasattr(v, 'generate'):
                     # is a secret, get description if available
-                    v = v.get_name() if hasattr(v, 'get_name') else reveal(name, k)
+                    try:
+                        v = '%s %s' % (v.get_description(), reveal(name, k))
+                    except AttributeError:
+                        v = reveal(name, k)
                 lines.append(fmt_field(k, v, level=1))
             return lines
 
@@ -337,8 +365,8 @@ class Account:
     # open_browser() {{{2
     @classmethod
     def open_browser(cls, name):
-        browser = cls.get_value('browser', default=None)
+        browser = cls.get_field('browser', default=None)
         if browser is None or is_str(browser):
             browser = StandardBrowser(name)
-        url = cls.get_value('url', default=None)
+        url = cls.get_field('url', default=None)
         browser.run(url)
