@@ -13,4 +13,4 @@ from .recognize import (
 )
 from .generator import PasswordGenerator
 from inform import Error
-__version__ = '0.2.0'
+__version__ = '0.3.0'
