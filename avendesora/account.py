@@ -250,7 +250,7 @@ class Account:
             name = get_setting('default_field')
 
         # convert dashes to underscores
-        name = name.replace('-', '_')
+        name = str(name).replace('-', '_')
 
         # If name is an integer, treat it as number of security question.
         try:
