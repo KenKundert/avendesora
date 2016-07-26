@@ -10,7 +10,7 @@ install:
   - pip install .
   - chmod -R go-rwx tests/home/gnupg
 script: 
-  - cd tests; py.test-3
+  - cd tests; py.test
 deploy:
     provider: pypi
     user: avendesora
