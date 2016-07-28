@@ -277,7 +277,7 @@ class Initialize(Command):
             avendesora [options] initialize
 
         Options:
-            -g <gpg-id>, --gpgid <gpg-id>
+            -g <gpg-id>, --gpg-id <gpg-id>
                                     Use this ID when creating any missing encrypted files.
     """).strip()
 
@@ -289,7 +289,8 @@ class Initialize(Command):
             {usage}
 
             Initial configuration and accounts files are created only if they
-            do not already exist.
+            do not already exist. If you do not give a GPG ID, Avendesora will 
+            try to guess it based on your user name and domain name.
         """).strip()
         return text.format(title=title(cls.DESC), usage=cls.USAGE)
 
@@ -299,7 +300,7 @@ class Initialize(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator(init=True)
+        generator = PasswordGenerator(init=True, gpg_id=cmdline['--gpg-id'])
 
 
 # Search {{{1

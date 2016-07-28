@@ -22,9 +22,9 @@
 
 
 # Imports {{{1
-from .config import get_setting
+from .config import get_setting, override_setting
 from shlib import to_path
-from inform import display, Error, fatal, log, narrate, os_error
+from inform import display, Error, error, fatal, log, narrate, os_error
 import gnupg
 import io
 GPG_EXTENSIONS = ['.gpg', '.asc']
@@ -42,12 +42,7 @@ class GnuPG:
     ):
         from .config import get_setting, override_setting
 
-        if not gpg_id:
-            gpg_id = get_setting('gpg_id')
-        if not gpg_id:
-            gpg_id = cls._guess_id()
-        cls.gpg_id = gpg_id
-        override_setting('gpg_id', gpg_id)
+        cls.set_gpg_id(gpg_id)
 
         cls.gpg_path = to_path(
             gpg_path if gpg_path else get_setting('gpg_executable')
@@ -70,6 +65,15 @@ class GnuPG:
         cls.gpg = gnupg.GPG(**gpg_args)
 
     @classmethod
+    def set_gpg_id(cls, gpg_id):
+        if not gpg_id:
+            gpg_id = get_setting('gpg_id')
+        if not gpg_id:
+            gpg_id = cls._guess_id()
+        cls.gpg_id = gpg_id
+        override_setting('gpg_id', gpg_id)
+
+    @classmethod
     def _guess_id(cls):
         import socket, getpass
         username = getpass.getuser()
@@ -86,7 +90,9 @@ class GnuPG:
         if path.suffix.lower() in GPG_EXTENSIONS:
             encrypted = cls.gpg.encrypt(contents, cls.gpg_id, armor=cls.armor)
             if not encrypted.ok:
-                fatal('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
+                error('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
+                    # Do not make this fatal.
+                    # It causes an infinite recursion within inform.
             else:
                 if cls.armor:
                     path.write_text(str(encrypted))

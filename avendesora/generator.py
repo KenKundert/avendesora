@@ -37,10 +37,11 @@ from urllib.parse import urlparse
 
 # PasswordGenerator class{{{1
 class PasswordGenerator:
-    def __init__(self, gpg = None, init=False):
-        # initialize avendesora (these shold already be done if called from cli)
+    def __init__(self, init=False, gpg_id = None):
+        # initialize avendesora (these should already be done if called from 
+        # main, but it is safe to call them again)
         read_config()
-        self.gpg = gpg if gpg else GnuPG.initialize()
+        self.gpg = GnuPG.initialize(gpg_id)
 
         # check the integrity of avendesora
         validate_componenets()
