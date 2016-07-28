@@ -77,21 +77,23 @@ class GnuPG:
     @classmethod
     def save_encrypted(cls, path, contents, gpg_ids=None):
         if not gpg_ids:
-            gpg_ids = get_setting('gpg_ids')
-        gpg_ids = gpg_ids.split() if is_str(gpg_ids) else gpg_ids
+            gpg_ids = get_setting('gpg_ids', [])
 
         if path.suffix.lower() in GPG_EXTENSIONS:
-            encrypted = cls.gpg.encrypt(contents, gpg_ids, armor=cls.armor)
-            if not encrypted.ok:
-                error('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
-                    # Do not make this fatal.
-                    # It causes an infinite recursion within inform.
-            else:
-                if cls.armor:
-                    path.write_text(str(encrypted))
+            try:
+                encrypted = cls.gpg.encrypt(contents, gpg_ids, armor=cls.armor)
+                if not encrypted.ok:
+                    error('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
+                        # Do not make this fatal.
+                        # It causes an infinite recursion within inform.
                 else:
-                    path.write_bytes(encrypted)
-                path.chmod(0o600)
+                    if cls.armor:
+                        path.write_text(str(encrypted))
+                    else:
+                        path.write_bytes(encrypted)
+                    path.chmod(0o600)
+            except ValueError as err:
+                raise Error(str(err), culprit=path)
         else:
             path.write_text(contents)
 
@@ -100,9 +102,12 @@ class GnuPG:
         # file is only assumed to be encrypted if path has gpg extension
         if path.suffix.lower() in GPG_EXTENSIONS:
             with path.open('rb') as f:
-                decrypted = cls.gpg.decrypt_file(f)
-                if not decrypted.ok:
-                    fatal('unable to decrypt.', decrypted.stderr, culprit=path, sep='\n')
+                try:
+                    decrypted = cls.gpg.decrypt_file(f)
+                    if not decrypted.ok:
+                        fatal('unable to decrypt.', decrypted.stderr, culprit=path, sep='\n')
+                except ValueError as err:
+                    raise Error(str(err), culprit=path)
             return decrypted.data
         else:
             return path.read_text()

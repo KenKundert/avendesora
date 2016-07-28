@@ -39,7 +39,7 @@ CONFIG_DEFAULTS = {
     'gpg_executable': '/usr/bin/gpg2',
     'gpg_home': '~/.gnupg',
     'gpg_armor': True,
-    'gpg_id': None,
+    'gpg_ids': None,
     'browsers': {
         'f': 'firefox -new-tab %s',
         'g': 'google-chrome %s',
@@ -101,7 +101,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
         # choose from dark, light
 
     # Information used by GPG when encrypting and decrypting files.
-    gpg_id = {gpg_id}
+    gpg_ids = {gpg_ids}
     gpg_armor = {gpg_armor}
     gpg_home = {gpg_home}
     gpg_executable = {gpg_executable}

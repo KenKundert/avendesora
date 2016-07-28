@@ -22,7 +22,7 @@ from .account import Account
 from .conceal import Hidden
 from .config import read_config, get_setting
 from .dialog import show_list_dialog
-from .gpg import GnuPG, File
+from .gpg import GnuPG, File, GPG_EXTENSIONS
 from .preferences import (
     CONFIG_DEFAULTS, NONCONFIG_SETTINGS, ACCOUNTS_FILE_INITIAL_CONTENTS,
     CONFIG_FILE_INITIAL_CONTENTS, USER_KEY_FILE_INITIAL_CONTENTS,
@@ -48,7 +48,7 @@ class PasswordGenerator:
 
         # create the avendesora data directory
         if init:
-            self.initialize(gpg_ids)
+            self.initialize(gpg_ids, init)
             terminate()
 
         # Now open any accounts files found
@@ -64,7 +64,7 @@ class PasswordGenerator:
                 err.terminate()
         terminate_if_errors()
 
-    def initialize(self, gpg_ids):
+    def initialize(self, gpg_ids, filename):
         def split(s, l=72):
             # Break long string into a series of adjacent shorter strings
             if len(s) < l:
@@ -89,6 +89,7 @@ class PasswordGenerator:
             value = get_setting(key)
             value = repr(str(value) if isinstance(value, Path) else value)
             fields.update({key: value})
+        gpg_ids = gpg_ids if gpg_ids else get_setting('gpg_ids', [])
         fields.update({
             'section': '{''{''{''1',
             'master_password': split(Hidden.conceal(generate_random_string(72))),
@@ -97,17 +98,29 @@ class PasswordGenerator:
         })
 
         # create the initial versions of the files in the settings directory
-        for path, contents in [
-            (get_setting('config_file'), CONFIG_FILE_INITIAL_CONTENTS),
-            (get_setting('hashes_file'), HASH_FILE_INITIAL_CONTENTS),
-            (get_setting('user_key_file'), USER_KEY_FILE_INITIAL_CONTENTS),
-            (get_setting('default_accounts_file'), ACCOUNTS_FILE_INITIAL_CONTENTS),
-            (get_setting('default_templates_file'), TEMPLATES_FILE_INITIAL_CONTENTS),
-        ]:
-            if path:
-                log('creating initial version.', culprit=path)
-                f = File(path)
-                f.create(contents.format(**fields), gpg_ids)
+        if filename is True:
+            # Assure that the default initial set of files is present
+            for path, contents in [
+                (get_setting('config_file'), CONFIG_FILE_INITIAL_CONTENTS),
+                (get_setting('hashes_file'), HASH_FILE_INITIAL_CONTENTS),
+                (get_setting('user_key_file'), USER_KEY_FILE_INITIAL_CONTENTS),
+                (get_setting('default_accounts_file'), ACCOUNTS_FILE_INITIAL_CONTENTS),
+                (get_setting('default_templates_file'), TEMPLATES_FILE_INITIAL_CONTENTS),
+            ]:
+                if path:
+                    log('creating initial version.', culprit=path)
+                    f = File(path)
+                    f.create(contents.format(**fields), gpg_ids)
+        else:
+            # Create a new accounts file
+            path = to_path(get_setting('settings_dir'), filename)
+            if path.exists():
+                fatal('exists.', culprit=path)
+            if path.suffix in GPG_EXTENSIONS and not gpg_ids:
+                fatal('Must specify GPG IDs.')
+            log('creating accounts file.', culprit=path)
+            f = File(path)
+            f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
 
     def get_account(self, name):
         if not name:

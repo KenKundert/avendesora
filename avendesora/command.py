@@ -77,7 +77,7 @@ class Command:
 
 # Add {{{1
 class Add(Command):
-    NAMES = 'new', 'add',
+    NAMES = 'add',
     DESCRIPTION = 'add a new account'
     USAGE = dedent("""
         Usage:
@@ -280,8 +280,11 @@ class Initialize(Command):
     DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
-            avendesora [options] init <gpg_id>...
-            avendesora [options] initialize <gpg_id>...
+            avendesora init (--gpg-id <id>)...
+            avendesora initialize (--gpg-id <id>)...
+
+        Options:
+            -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
     """).strip()
 
     @classmethod
@@ -292,8 +295,7 @@ class Initialize(Command):
             {usage}
 
             Initial configuration and accounts files are created only if they
-            do not already exist. If you do not give a GPG ID, Avendesora will 
-            try to guess it based on your user name and domain name.
+            do not already exist.  Existing files are not modified.
         """).strip()
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
@@ -303,12 +305,61 @@ class Initialize(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # save the gpg_ids for the logfile in case it is encrypted.
-        gpg_ids = cmdline['<gpg_id>']
+        gpg_ids = cmdline['--gpg-id']
         if not get_setting('gpg_ids'):
             override_setting('gpg_ids', gpg_ids)
 
         # run the generator
         generator = PasswordGenerator(init=True, gpg_ids=gpg_ids)
+
+
+# New {{{1
+class New(Command):
+    NAMES = 'new',
+    DESCRIPTION = 'create new accounts file'
+    USAGE = dedent("""
+        Usage:
+            avendesora new [--gpg-id <id>]... <name>
+
+        Options:
+            -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+
+            Creates a new accounts file. Accounts that share the same file share
+            the same master password by default and, if the file is encrypted,
+            can be decrypted by the same recipients.
+
+            Generally you would create a new accounts file for each person or
+            group with which you wish to share accounts. You would use separate
+            files for passwords with different security domains. For example, a
+            high-value passwords might be placed in an encrypted file that would
+            only be placed highly on protected computers. Conversely, low-value
+            passwords might be contained in perhaps an unencrypted file that is
+            found on many computers.
+
+            Add a '.gpg' extension to <name> to encrypt the file.
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # get the gpg ids of those who will be able to decrypt the file
+        gpg_ids = cmdline['--gpg-id']
+        if not gpg_ids:
+            gpg_ids = get_setting('gpg_ids', [])
+
+        # run the generator
+        generator = PasswordGenerator(init=cmdline['<name>'], gpg_ids=gpg_ids)
 
 
 # Search {{{1

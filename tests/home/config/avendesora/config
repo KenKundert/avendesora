@@ -11,7 +11,7 @@ log_file = 'log'
 archive_file = 'archive'
 
 # Information used by GPG when encrypting and decrypting files.
-gpg_id = 'avendesora@nurdletech.com'
+gpg_ids = 'avendesora@nurdletech.com'
 gpg_executable = '/usr/bin/gpg'
 
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

@@ -9,22 +9,26 @@ import os
 
 os.environ['HOME'] = 'home'
 
-def test_showall():
+# test_add() {{{1
+def test_add():
     try:
-        result = subprocess.check_output('avendesora help showall'.split())
+        result = subprocess.check_output('avendesora help add'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Display all account values.
-
-        Show all account values.
+        Add a new account.
 
         Usage:
-            avendesora all <account>
-            avendesora showall <account>
+            avendesora [options] new [<prototype>]
+            avendesora [options] add [<prototype>]
+
+        Options:
+            -f <file>, --file <file>
+                                    Add account to specified file.
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
+# test_browse() {{{1
 def test_browse():
     try:
         result = subprocess.check_output('avendesora help browse'.split())
@@ -48,47 +52,7 @@ def test_browse():
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
-def test_edit():
-    try:
-        result = subprocess.check_output('avendesora help edit'.split())
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        Edit an account.
-
-        Usage:
-            avendesora edit <account>
-    """).strip()
-    assert result == bytes(expected, encoding='ascii')
-
-def test_find():
-    try:
-        result = subprocess.check_output('avendesora help find'.split())
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        Find an account.
-
-        Find accounts whose name contains the search text.
-
-        Usage:
-            avendesora find <text>
-    """).strip()
-    assert result == bytes(expected, encoding='ascii')
-
-def test_help():
-    try:
-        result = subprocess.check_output('avendesora help help'.split())
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        Give information about commands or other topics.
-
-        Usage:
-            avendesora help [<topic>]
-    """).strip()
-    assert result == bytes(expected, encoding='ascii')
-
+# test_conceal() {{{1
 def test_conceal():
     try:
         result = subprocess.check_output('avendesora help conceal'.split())
@@ -116,6 +80,51 @@ def test_conceal():
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
+# test_edit() {{{1
+def test_edit():
+    try:
+        result = subprocess.check_output('avendesora help edit'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Edit an account.
+
+        Usage:
+            avendesora edit <account>
+    """).strip()
+    assert result == bytes(expected, encoding='ascii')
+
+# test_find() {{{1
+def test_find():
+    try:
+        result = subprocess.check_output('avendesora help find'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Find an account.
+
+        Find accounts whose name contains the search text.
+
+        Usage:
+            avendesora find <text>
+    """).strip()
+    assert result == bytes(expected, encoding='ascii')
+
+# test_help() {{{1
+def test_help():
+    try:
+        result = subprocess.check_output('avendesora help help'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Give information about commands or other topics.
+
+        Usage:
+            avendesora help [<topic>]
+    """).strip()
+    assert result == bytes(expected, encoding='ascii')
+
+# test_init() {{{1
 def test_init():
     try:
         result = subprocess.check_output('avendesora help init'.split())
@@ -125,70 +134,49 @@ def test_init():
         Create initial set of Avendesora files.
 
         Usage:
-            avendesora [options] init <gpg_id>...
-            avendesora [options] initialize <gpg_id>...
+            avendesora init (--gpg-id <id>)...
+            avendesora initialize (--gpg-id <id>)...
+
+        Options:
+            -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
 
         Initial configuration and accounts files are created only if they
-        do not already exist. If you do not give a GPG ID, Avendesora will 
-        try to guess it based on your user name and domain name.
+        do not already exist.  Existing files are not modified.
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
+# test_new() {{{1
 def test_new():
     try:
         result = subprocess.check_output('avendesora help new'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Add a new account.
+        Create new accounts file.
 
         Usage:
-            avendesora [options] new [<prototype>]
-            avendesora [options] add [<prototype>]
+            avendesora new [--gpg-id <id>]... <name>
 
         Options:
-            -f <file>, --file <file>
-                                    Add account to specified file.
+            -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+
+        Creates a new accounts file. Accounts that share the same file share
+        the same master password by default and, if the file is encrypted,
+        can be decrypted by the same recipients.
+
+        Generally you would create a new accounts file for each person or
+        group with which you wish to share accounts. You would use separate
+        files for passwords with different security domains. For example, a
+        high-value passwords might be placed in an encrypted file that would
+        only be placed highly on protected computers. Conversely, low-value
+        passwords might be contained in perhaps an unencrypted file that is
+        found on many computers.
+
+        Add a '.gpg' extension to <name> to encrypt the file.
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
-def test_search():
-    try:
-        result = subprocess.check_output('avendesora help search'.split())
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        Search accounts.
-
-        Search for accounts whose values contain the search text.
-
-        Usage:
-            avendesora search <text>
-    """).strip()
-    assert result == bytes(expected, encoding='ascii')
-
-def test_show():
-    try:
-        result = subprocess.check_output('avendesora help show'.split())
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        Show an account value.
-
-        Produce an account value. If the value is secret, it is produced only
-        temporarily unless --stdout is specified.
-
-        Usage:
-            avendesora show [--stdout | --clipboard] [<account> [<field>]]
-            avendesora s [--stdout | --clipboard] [<account> [<field>]]
-
-        Options:
-            -c, --clipboard         Write output to clipboard rather than stdout.
-            -s, --stdout            Write output to the standard output without
-                                    any annotation or protections.
-    """).strip()
-    assert result == bytes(expected, encoding='ascii')
-
+# test_reveal() {{{1
 def test_reveal():
     try:
         result = subprocess.check_output('avendesora help reveal'.split())
@@ -218,6 +206,63 @@ def test_reveal():
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
+# test_search() {{{1
+def test_search():
+    try:
+        result = subprocess.check_output('avendesora help search'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Search accounts.
+
+        Search for accounts whose values contain the search text.
+
+        Usage:
+            avendesora search <text>
+    """).strip()
+    assert result == bytes(expected, encoding='ascii')
+
+# test_show() {{{1
+def test_show():
+    try:
+        result = subprocess.check_output('avendesora help show'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Show an account value.
+
+        Produce an account value. If the value is secret, it is produced only
+        temporarily unless --stdout is specified.
+
+        Usage:
+            avendesora show [--stdout | --clipboard] [<account> [<field>]]
+            avendesora s [--stdout | --clipboard] [<account> [<field>]]
+
+        Options:
+            -c, --clipboard         Write output to clipboard rather than stdout.
+            -s, --stdout            Write output to the standard output without
+                                    any annotation or protections.
+    """).strip()
+    assert result == bytes(expected, encoding='ascii')
+
+# test_showall() {{{1
+def test_showall():
+    try:
+        result = subprocess.check_output('avendesora help showall'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Display all account values.
+
+        Show all account values.
+
+        Usage:
+            avendesora all <account>
+            avendesora showall <account>
+    """).strip()
+    assert result == bytes(expected, encoding='ascii')
+
+# test_version() {{{1
 def test_version():
     try:
         result = subprocess.check_output('avendesora help version'.split())
@@ -231,6 +276,7 @@ def test_version():
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
+# test_overview() {{{1
 def test_overview():
     try:
         result = subprocess.check_output('avendesora help overview'.split())

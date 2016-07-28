@@ -19,7 +19,7 @@
 # Imports {{{1
 from .preferences import CONFIG_DEFAULTS, NONCONFIG_SETTINGS
 from shlib import to_path
-from inform import Error, comment, warn
+from inform import Error, comment, warn, is_str
 from textwrap import dedent
 import re
 from appdirs import user_config_dir
@@ -92,7 +92,9 @@ def get_setting(name, default=None):
                 return default
     if value is None:
         return default
-    if name.endswith('_file'):
+    if name == 'gpg_ids':
+        value = value.split() if is_str(value) else value
+    elif name.endswith('_file'):
         value = to_path(get_setting('settings_dir'), value)
     return value
 
