@@ -11,98 +11,98 @@ os.environ['HOME'] = 'home'
 
 def test_mybank():
     try:
-        result = subprocess.check_output('avendesora --stdout mybank'.split())
+        result = subprocess.check_output('avendesora show --stdout mybank'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'&5U9eZ+iT84T\n'
 
 def test_mb():
     try:
-        result = subprocess.check_output('avendesora --stdout mb'.split())
+        result = subprocess.check_output('avendesora show --stdout mb'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'&5U9eZ+iT84T\n'
 
 def test_mb_checking():
     try:
-        result = subprocess.check_output('avendesora --stdout mb accounts.checking'.split())
+        result = subprocess.check_output('avendesora show --stdout mb accounts.checking'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'12345678\n'
 
 def test_mb_savings():
     try:
-        result = subprocess.check_output('avendesora --stdout mb accounts[savings]'.split())
+        result = subprocess.check_output('avendesora show --stdout mb accounts[savings]'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'23456789\n'
 
 def test_alertscc():
     try:
-        result = subprocess.check_output('avendesora --stdout alertscc'.split())
+        result = subprocess.check_output('avendesora show --stdout alertscc'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'qfUfLViukFcJ\n'
 
 def test_scc():
     try:
-        result = subprocess.check_output('avendesora --stdout scc'.split())
+        result = subprocess.check_output('avendesora show --stdout scc'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'qfUfLViukFcJ\n'
 
 def test_scc_account():
     try:
-        result = subprocess.check_output('avendesora --stdout scc account'.split())
+        result = subprocess.check_output('avendesora show --stdout scc account'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'123456-7890\n'
 
 def test_scc_birthdate():
     try:
-        result = subprocess.check_output('avendesora --stdout scc birthdate'.split())
+        result = subprocess.check_output('avendesora show --stdout scc birthdate'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'1978-10-18\n'
 
 def test_scc_email():
     try:
-        result = subprocess.check_output('avendesora --stdout scc email'.split())
+        result = subprocess.check_output('avendesora show --stdout scc email'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'pizzaman@pizza.com\n'
 
 def test_scc_q0():
     try:
-        result = subprocess.check_output('avendesora --stdout scc 0'.split())
+        result = subprocess.check_output('avendesora show --stdout scc 0'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'sniff flashy putsch\n'
 
 def test_scc_q1():
     try:
-        result = subprocess.check_output('avendesora --stdout scc questions.1'.split())
+        result = subprocess.check_output('avendesora show --stdout scc questions.1'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'clipping knight guest\n'
 
 def test_scc_q2():
     try:
-        result = subprocess.check_output('avendesora --stdout scc questions[2]'.split())
+        result = subprocess.check_output('avendesora show --stdout scc questions[2]'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'mistrust tumor bonfire\n'
 
 def test_login():
     try:
-        result = subprocess.check_output('avendesora --stdout login'.split())
+        result = subprocess.check_output('avendesora show --stdout login'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'archangel fiesta ripen tracksuit autobahn integer\n'
 
-def test_info():
+def test_show_all():
     try:
-        result = subprocess.check_output('avendesora info mb'.split())
+        result = subprocess.check_output('avendesora showall mb'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""\
@@ -148,16 +148,16 @@ def test_search():
     """)
     assert result == bytes(expected, encoding='ascii')
 
-def test_show():
+def test_reveal():
     try:
-        result = subprocess.check_output('avendesora show MTIzNDU2Nzg='.split())
+        result = subprocess.check_output('avendesora reveal MTIzNDU2Nzg='.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'12345678\n'
 
-def test_hide():
+def test_conceal():
     try:
-        result = subprocess.check_output('avendesora hide 12345678'.split())
+        result = subprocess.check_output('avendesora conceal 12345678'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'MTIzNDU2Nzg=\n'

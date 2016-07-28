@@ -33,6 +33,7 @@ CONFIG_DEFAULTS = {
     'default_vector_field': 'questions',
     'display_time': 60,
     # use absolute paths for executables so they cannot be maliciously replaced
+    # by changing the path.
     'xdotool_executable': '/usr/bin/xdotool',
     'xsel_executable': '/usr/bin/xsel',
     'gpg_executable': '/usr/bin/gpg2',
@@ -47,12 +48,12 @@ CONFIG_DEFAULTS = {
     },
     'default_browser': 'x',
     'required_protocols': ['https'],
+    'label_color': 'blue',
+    'color_scheme': 'dark',
 }
 
 # the following could be config settings, but they do not seem worth promoting
 INDENT = '    '
-LABEL_COLOR = 'yellow'
-    # choose from normal, black, red, green, yellow, blue, magenta, cyan, white
 INITIAL_AUTOTYPE_DELAY = 0.0
 
 # Non-Config Settings {{{1
@@ -94,6 +95,10 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     browsers = {browsers}
     default_browser = {default_browser}
     required_protocols = {required_protocols}
+    label_color = {label_color}
+        # choose from black, red, green, yellow, blue, magenta, cyan, white
+    color_scheme = {color_scheme}
+        # choose from dark, light
 
     # Information used by GPG when encrypting and decrypting files.
     gpg_id = {gpg_id}

@@ -21,6 +21,7 @@ from inform import codicil, error, fatal, os_error, warn
 from textwrap import dedent, wrap
 from pkg_resources import resource_filename
 import hashlib
+import os
 
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
@@ -88,3 +89,7 @@ def validate_componenets():
                 ))),
                 sep = '\n'
             )
+# pager {{{1
+def pager(text):
+    program = os.environ.get('PAGER', 'less')
+    Run([program], stdin=text, modes='Woes')

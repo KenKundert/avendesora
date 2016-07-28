@@ -22,7 +22,7 @@
 # Imports {{{1
 from . import cursor
 from .config import get_setting
-from .preferences import INDENT, LABEL_COLOR, INITIAL_AUTOTYPE_DELAY
+from .preferences import INDENT, INITIAL_AUTOTYPE_DELAY
 from shlib import Run
 from inform import Color, Error, error, fatal, log, output, warn
 from time import sleep
@@ -31,7 +31,11 @@ import string
 import re
 
 # Globals {{{1
-LabelColor = Color(LABEL_COLOR, enable=Color.isTTY())
+LabelColor = Color(
+    color=get_setting('label_color'),
+    scheme=get_setting('color_scheme'),
+    enable=Color.isTTY()
+)
 KEYSYMS = {
     '!': 'exclam',
     '"': 'quotedbl',

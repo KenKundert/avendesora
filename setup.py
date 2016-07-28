@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='avendesora',
-    version='0.3.1',
+    version='0.3.0',
     author='Ken Kundert and Kale Kundert',
     author_email='avendesora@nurdletech.com',
     description='An XKCD-style password generator.',
@@ -20,7 +20,7 @@ setup(
     ],
     package_data={'avendesora': ['words']},
     entry_points={
-        'console_scripts': ['avendesora=avendesora.cli:main'],
+        'console_scripts': ['avendesora=avendesora.main:main'],
     },
     install_requires=[
         'appdirs',

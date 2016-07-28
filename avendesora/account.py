@@ -22,7 +22,7 @@
 from .browsers import StandardBrowser
 from .conceal import Conceal
 from .config import get_setting
-from .preferences import LABEL_COLOR, INDENT, TOOL_FIELDS
+from .preferences import INDENT, TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
 from inform import Color, Error, is_collection, log, output, warn
@@ -34,7 +34,11 @@ import sys
 
 # Globals {{{1
 VECTOR_PATTERN = re.compile(r'\A(\w+)\[(\w+)\]\Z')
-LabelColor = Color(LABEL_COLOR, enable=Color.isTTY())
+LabelColor = Color(
+    color=get_setting('label_color'),
+    scheme=get_setting('color_scheme'),
+    enable=Color.isTTY()
+)
 
 # Utilities {{{1
 # items {{{2
