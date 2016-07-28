@@ -37,23 +37,25 @@ from urllib.parse import urlparse
 
 # PasswordGenerator class{{{1
 class PasswordGenerator:
-    def __init__(self, init=False, gpg_id = None):
+    def __init__(self, init=False, gpg_ids=None):
         # initialize avendesora (these should already be done if called from 
         # main, but it is safe to call them again)
         read_config()
-        self.gpg = GnuPG.initialize(gpg_id)
+        GnuPG.initialize()
 
         # check the integrity of avendesora
         validate_componenets()
+
+        # create the avendesora data directory
         if init:
-            self.initialize()
+            self.initialize(gpg_ids)
             terminate()
 
         # Now open any accounts files found
         for filename in get_setting('accounts_files', []):
             try:
                 path = to_path(get_setting('settings_dir'), filename)
-                account_file = File(path, self.gpg)
+                account_file = File(path)
                 contents = account_file.read()
                 if 'master_password' in contents:
                     self.add_master_to_accounts(contents['master_password'])
@@ -62,7 +64,7 @@ class PasswordGenerator:
                 err.terminate()
         terminate_if_errors()
 
-    def initialize(self):
+    def initialize(self, gpg_ids):
         def split(s, l=72):
             # Break long string into a series of adjacent shorter strings
             if len(s) < l:
@@ -91,6 +93,7 @@ class PasswordGenerator:
             'section': '{''{''{''1',
             'master_password': split(Hidden.conceal(generate_random_string(72))),
             'user_key': split(Hidden.conceal(generate_random_string(72))),
+            'gpg_ids': repr(' '.join(gpg_ids)),
         })
 
         # create the initial versions of the files in the settings directory
@@ -103,8 +106,8 @@ class PasswordGenerator:
         ]:
             if path:
                 log('creating initial version.', culprit=path)
-                f = File(path, self.gpg)
-                f.create(contents.format(**fields))
+                f = File(path)
+                f.create(contents.format(**fields), gpg_ids)
 
     def get_account(self, name):
         if not name:

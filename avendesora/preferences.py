@@ -50,10 +50,10 @@ CONFIG_DEFAULTS = {
     'required_protocols': ['https'],
     'label_color': 'blue',
     'color_scheme': 'dark',
+    'indent': '    ',
 }
 
 # the following could be config settings, but they do not seem worth promoting
-INDENT = '    '
 INITIAL_AUTOTYPE_DELAY = 0.0
 
 # Non-Config Settings {{{1
@@ -162,6 +162,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     )
 
     master_password = Hidden({master_password})
+    gpg_ids = {gpg_ids}
 
     # Accounts
     # AAA {section}
@@ -202,6 +203,7 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
     # attributes. Use them to generate pass codes of various types for stealth
     # accounts.
 
+    # Imports {section}
     from avendesora import (
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
@@ -213,9 +215,10 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
         # Secrets
         Password, Passphrase, PIN,
     )
+    gpg_ids = {gpg_ids}
 
     # Templates
-    # AAA {section}
+    # Alphanumeric passwords {section}
     class Anum4(Account):
         passcode = Password(length=4, alphabet=DISTINGUISHABLE)
 
@@ -244,8 +247,7 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
     class Anum20(Account):
         passcode = Password(length=20, alphabet=DISTINGUISHABLE)
 
-    # BBB {section}
-    # CCC {section}
+    # High entropy passwords {section}
     class Char4(Account):
         passcode = Password(length=4, alphabet=ALPHANUMERIC+PUNCTUATION)
 
@@ -274,22 +276,11 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
     class Char20(Account):
         passcode = Password(length=20, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    # DDD {section}
-    # EEE {section}
+    # Extreme passwords {section}
     class Extreme(Account):
         passcode = Passphrase(length=64, alphabet=PRINTABLE)
 
-    # FFF {section}
-    # GGG {section}
-    # HHH {section}
-    # III {section}
-    # JJJ {section}
-    # KKK {section}
-    # LLL {section}
-    # MMM {section}
-    # NNN {section}
-    # OOO {section}
-    # PPP {section}
+    # PINs {section}
     class Pin4(Account):
         aliases = ['pin']
         passcode = PIN(length=4)
@@ -307,13 +298,7 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
     class Pin12(Account):
         passcode = PIN(length=12)
 
-    # QQQ {section}
-    # RRR {section}
-    # SSS {section}
-    # TTT {section}
-    # UUU {section}
-    # VVV {section}
-    # WWW {section}
+    # Pass phrases {section}
     class Word(Account):
         passcode = Passphrase(length=1)
 
@@ -321,19 +306,24 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
         aliases = ['pair']
         passcode = Passphrase(length=2)
 
+    class Word3(Account):
+        passcode = Passphrase(length=3)
+
     class Word4(Account):
         aliases = ['word', 'xkcd']
         passcode = Passphrase(length=4)
 
+    class Word5(Account):
+        passcode = Passphrase(length=5)
+
     class Word6(Account):
         passcode = Passphrase(length=6)
 
+    class Word7(Account):
+        passcode = Passphrase(length=7)
+
     class Word8(Account):
         passcode = Passphrase(length=8)
-
-    # XXX {section}
-    # YYY {section}
-    # ZZZ {section}
 
     # vim: filetype=python sw=4 sts=4 et ai ff=unix :
 ''')

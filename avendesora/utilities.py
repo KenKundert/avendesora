@@ -93,3 +93,13 @@ def validate_componenets():
 def pager(text):
     program = os.environ.get('PAGER', 'less')
     Run([program], stdin=text, modes='Woes')
+
+# two_columns {{{1
+def two_columns(col1, col2, width=16, indent=True):
+    indent = get_setting('indent') if indent else ''
+    if len(col1) > width:
+        return '%s%s\n%s%s%s' % (
+            indent, col1, indent, '  '+width*' ', col2
+        )
+    else:
+        return '%s%-*s  %s' % (indent, width, col1, col2) 

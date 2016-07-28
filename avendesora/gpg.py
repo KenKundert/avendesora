@@ -24,7 +24,7 @@
 # Imports {{{1
 from .config import get_setting, override_setting
 from shlib import to_path
-from inform import display, Error, error, fatal, log, narrate, os_error
+from inform import display, Error, error, fatal, log, narrate, os_error, is_str
 import gnupg
 import io
 GPG_EXTENSIONS = ['.gpg', '.asc']
@@ -38,11 +38,9 @@ class GnuPG:
 
     @classmethod
     def initialize(cls,
-        gpg_id=None, gpg_path=None, gpg_home=None, armor=None
+        gpg_path=None, gpg_home=None, armor=None
     ):
         from .config import get_setting, override_setting
-
-        cls.set_gpg_id(gpg_id)
 
         cls.gpg_path = to_path(
             gpg_path if gpg_path else get_setting('gpg_executable')
@@ -65,15 +63,6 @@ class GnuPG:
         cls.gpg = gnupg.GPG(**gpg_args)
 
     @classmethod
-    def set_gpg_id(cls, gpg_id):
-        if not gpg_id:
-            gpg_id = get_setting('gpg_id')
-        if not gpg_id:
-            gpg_id = cls._guess_id()
-        cls.gpg_id = gpg_id
-        override_setting('gpg_id', gpg_id)
-
-    @classmethod
     def _guess_id(cls):
         import socket, getpass
         username = getpass.getuser()
@@ -86,9 +75,13 @@ class GnuPG:
         return username + '@' + hostname
 
     @classmethod
-    def save_encrypted(cls, path, contents):
+    def save_encrypted(cls, path, contents, gpg_ids=None):
+        if not gpg_ids:
+            gpg_ids = get_setting('gpg_ids')
+        gpg_ids = gpg_ids.split() if is_str(gpg_ids) else gpg_ids
+
         if path.suffix.lower() in GPG_EXTENSIONS:
-            encrypted = cls.gpg.encrypt(contents, cls.gpg_id, armor=cls.armor)
+            encrypted = cls.gpg.encrypt(contents, gpg_ids, armor=cls.armor)
             if not encrypted.ok:
                 error('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
                     # Do not make this fatal.
@@ -130,14 +123,13 @@ class BufferedFile(GnuPG):
 
     def close(self):
         contents = self.stream.getvalue()
-        self.save_encrypted(self.path, contents)
+        self.save_encrypted(self.path, contents, get_setting('gpg_ids'))
 
 
 # File class {{{1
 class File(GnuPG):
-    def __init__(self, path, gpg=None, contents=None):
+    def __init__(self, path, contents=None):
         self.path = to_path(path)
-        self.gpg = gpg
 
     def read(self):
         path = self.path
@@ -159,7 +151,7 @@ class File(GnuPG):
         self.contents = contents
         return contents
 
-    def create(self, contents):
+    def create(self, contents, gpg_ids):
         path = self.path
         try:
             to_path(get_setting('settings_dir')).mkdir(parents=True, exist_ok=True)
@@ -174,7 +166,7 @@ class File(GnuPG):
             if path.suffix in ['.gpg', '.asc']:
                 narrate('encrypting.', culprit=path)
                 # encrypt it
-                self.save_encrypted(to_path(path), contents)
+                self.save_encrypted(to_path(path), contents, gpg_ids)
             else:
                 narrate('not encrypting.', culprit=path)
                 # file is not encrypted

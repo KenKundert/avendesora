@@ -22,7 +22,7 @@
 # Imports {{{1
 from . import cursor
 from .config import get_setting
-from .preferences import INDENT, INITIAL_AUTOTYPE_DELAY
+from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
 from inform import Color, Error, error, fatal, log, output, warn
 from time import sleep
@@ -119,7 +119,7 @@ class TTY_Writer(Writer):
                     culprit=key
                 )
             else:
-                tvalue = indent(dedent(tvalue), INDENT).strip('\n')
+                tvalue = indent(dedent(tvalue), get_setting('indent')).strip('\n')
                 sep = '\n'
 
         # build output string

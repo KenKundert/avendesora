@@ -17,10 +17,10 @@
 
 # Imports {{{1
 from .conceal import Conceal
-from .config import read_config, get_setting
+from .config import read_config, get_setting, override_setting
 from .generator import PasswordGenerator
 from .gpg import GnuPG, BufferedFile
-from .preferences import INDENT
+from .utilities import two_columns
 from .writer import get_writer
 from .__init__ import __version__
 from inform import Error, error, codicil, output, debug
@@ -64,6 +64,13 @@ class Command:
             codicil("Use 'avendesora help' for list of available commands."),
 
     @classmethod
+    def summarize(cls, width=16):
+        summaries = []
+        for cmd in Command.commands_sorted():
+            summaries.append(two_columns(', '.join(cmd.NAMES), cmd.DESCRIPTION))
+        return '\n'.join(summaries)
+
+    @classmethod
     def get_name(cls):
         return cls.NAMES[0]
 
@@ -71,7 +78,7 @@ class Command:
 # Add {{{1
 class Add(Command):
     NAMES = 'new', 'add',
-    DESC = 'add a new account'
+    DESCRIPTION = 'add a new account'
     USAGE = dedent("""
         Usage:
             avendesora [options] new [<prototype>]
@@ -89,13 +96,13 @@ class Add(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
 
 # Browse {{{1
 class Browse(Command):
     NAMES = 'browse',
-    DESC = 'open account URL in web browser'
+    DESCRIPTION = 'open account URL in web browser'
     USAGE = dedent("""
         Usage:
             avendesora [options] browse <account> [<key>]
@@ -110,7 +117,7 @@ class Browse(Command):
         default_browser = get_setting('default_browser')
         browsers = get_setting('browsers')
         browsers = '\n'.join([
-            '%s%s  %s' % (INDENT, k, browsers[k].split()[0])
+            two_columns(k, browsers[k].split()[0], width=1)
             for k in sorted(browsers)
         ])
         text = dedent("""
@@ -122,7 +129,7 @@ class Browse(Command):
             {browsers}
         """).strip()
         return text.format(
-            title=title(cls.DESC), usage=cls.USAGE,
+            title=title(cls.DESCRIPTION), usage=cls.USAGE,
             default=default_browser, browsers=browsers
         )
 
@@ -141,7 +148,7 @@ class Browse(Command):
 # Edit {{{1
 class Edit(Command):
     NAMES = 'edit',
-    DESC = 'edit an account'
+    DESCRIPTION = 'edit an account'
     USAGE = dedent("""
         Usage:
             avendesora edit <account>
@@ -154,13 +161,13 @@ class Edit(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
 
 # Find {{{1
 class Find(Command):
     NAMES = 'find',
-    DESC = 'find an account'
+    DESCRIPTION = 'find an account'
     USAGE = dedent("""
         Find accounts whose name contains the search text.
 
@@ -175,7 +182,7 @@ class Find(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):
@@ -199,7 +206,7 @@ class Find(Command):
 # Help {{{1
 class Help(Command):
     NAMES = 'help',
-    DESC = 'give information about commands or other topics'
+    DESCRIPTION = 'give information about commands or other topics'
     USAGE = dedent("""
         Usage:
             avendesora help [<topic>]
@@ -212,7 +219,7 @@ class Help(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):
@@ -226,7 +233,7 @@ class Help(Command):
 # Hide {{{1
 class Hide(Command):
     NAMES = 'hide', 'conceal',
-    DESC = 'conceal text by encoding it'
+    DESCRIPTION = 'conceal text by encoding it'
     USAGE = dedent("""
         Usage:
             avendesora [options] hide <text>
@@ -255,7 +262,7 @@ class Hide(Command):
                 decode it.
         """).strip()
         return text.format(
-            title=title(cls.DESC), usage=cls.USAGE, encodings=encodings
+            title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings
         )
 
     @classmethod
@@ -270,15 +277,11 @@ class Hide(Command):
 # Initialize {{{1
 class Initialize(Command):
     NAMES = 'init', 'initialize',
-    DESC = 'create initial set of Avendesora files'
+    DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
-            avendesora [options] init
-            avendesora [options] initialize
-
-        Options:
-            -g <gpg-id>, --gpg-id <gpg-id>
-                                    Use this ID when creating any missing encrypted files.
+            avendesora [options] init <gpg_id>...
+            avendesora [options] initialize <gpg_id>...
     """).strip()
 
     @classmethod
@@ -292,21 +295,26 @@ class Initialize(Command):
             do not already exist. If you do not give a GPG ID, Avendesora will 
             try to guess it based on your user name and domain name.
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
+        # save the gpg_ids for the logfile in case it is encrypted.
+        gpg_ids = cmdline['<gpg_id>']
+        if not get_setting('gpg_ids'):
+            override_setting('gpg_ids', gpg_ids)
+
         # run the generator
-        generator = PasswordGenerator(init=True, gpg_id=cmdline['--gpg-id'])
+        generator = PasswordGenerator(init=True, gpg_ids=gpg_ids)
 
 
 # Search {{{1
 class Search(Command):
     NAMES = 'search',
-    DESC = 'search accounts'
+    DESCRIPTION = 'search accounts'
     USAGE = dedent("""
         Search for accounts whose values contain the search text.
 
@@ -321,7 +329,7 @@ class Search(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):
@@ -345,7 +353,7 @@ class Search(Command):
 # Show {{{1
 class Show(Command):
     NAMES = 'show', 's',
-    DESC = 'show an account value'
+    DESCRIPTION = 'show an account value'
     USAGE = dedent("""
         Produce an account value. If the value is secret, it is produced only
         temporarily unless --stdout is specified.
@@ -367,7 +375,7 @@ class Show(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):
@@ -395,7 +403,7 @@ class Show(Command):
 # ShowAll {{{1
 class ShowAll(Command):
     NAMES = 'all', 'showall',
-    DESC = 'display all account values'
+    DESCRIPTION = 'display all account values'
     USAGE = dedent("""
         Show all account values.
 
@@ -411,7 +419,7 @@ class ShowAll(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):
@@ -428,7 +436,7 @@ class ShowAll(Command):
 # Unhide {{{1
 class Unhide(Command):
     NAMES = 'unhide', 'reveal',
-    DESC = 'reveal concealed text'
+    DESCRIPTION = 'reveal concealed text'
     USAGE = dedent("""
         Transform concealed text to reveal its original form.
 
@@ -459,7 +467,7 @@ class Unhide(Command):
                 decode it.
         """).strip()
         return text.format(
-            title=title(cls.DESC), usage=cls.USAGE, encodings=encodings
+            title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings
         )
 
     @classmethod
@@ -474,7 +482,7 @@ class Unhide(Command):
 # Version {{{1
 class Version(Command):
     NAMES = 'version',
-    DESC = 'display Avendesora version'
+    DESCRIPTION = 'display Avendesora version'
     USAGE = dedent("""
         Usage:
             avendesora version
@@ -487,7 +495,7 @@ class Version(Command):
 
             {usage}
         """).strip()
-        return text.format(title=title(cls.DESC), usage=cls.USAGE)
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):

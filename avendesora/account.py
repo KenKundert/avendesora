@@ -22,7 +22,7 @@
 from .browsers import StandardBrowser
 from .conceal import Conceal
 from .config import get_setting
-from .preferences import INDENT, TOOL_FIELDS
+from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
 from inform import Color, Error, is_collection, log, output, warn
@@ -322,14 +322,15 @@ class Account:
 
         def fmt_field(key, value='', level=0):
             if '\n' in value:
-                value = indent(dedent(value), INDENT).strip('\n')
+                value = indent(dedent(value), get_setting('indent')).strip('\n')
                 sep = '\n'
             elif value:
                 sep = ' '
             else:
                 sep = ''
             key = str(key).upper().replace('_', ' ')
-            return indent(LabelColor(key + ':') + sep + value, level*INDENT)
+            leader = level*get_setting('indent')
+            return indent(LabelColor(key + ':') + sep + value, leader)
 
         def reveal(name, key=None):
             return "<reveal with 'avendesora %s %s'>" % (

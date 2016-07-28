@@ -31,14 +31,12 @@
 from .conceal import Conceal
 from .command import Command
 from .config import get_setting
-from .preferences import INDENT
-from .utilities import pager
+from .utilities import pager, two_columns
 from inform import error, output
 from textwrap import dedent
 
 # HelpMessage base class {{{1
 class HelpMessage:
-    __DESCRIPTION = "Lists available help topics."
     # get_name() {{{2
     @classmethod
     def get_name(cls):
@@ -70,24 +68,27 @@ class HelpMessage:
         else:
             cls.help()
 
+    # summarize {{{2
+    @classmethod
+    def summarize(cls, width=16):
+        summaries = []
+        for topic in sorted(cls.topics(), key=lambda topic: topic.get_name()):
+            summaries.append(two_columns(topic.get_name(), topic.DESCRIPTION))
+        return '\n'.join(summaries)
+
     # help {{{2
     @classmethod
     def help(cls):
         output('Available commands:')
-        for command in Command.commands_sorted():
-            output('    %s -- %s' % (', '.join(command.NAMES), command.DESC))
+        output(Command.summarize())
 
         output('\nAvailable topics:')
-        for topic in sorted(cls.topics(), key=lambda topic: topic.get_name()):
-            output('    %s -- %s' % (
-                topic.get_name(),
-                getattr(topic, '_%s__DESCRIPTION' % topic.__name__, '')
-            ))
+        output(cls.summarize())
 
 
 # Overview class {{{1
 class Overview(HelpMessage):
-    __DESCRIPTION = "overview of Avendesora"
+    DESCRIPTION = "overview of Avendesora"
 
     @staticmethod
     def help():
