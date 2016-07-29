@@ -21,6 +21,21 @@ from textwrap import dedent
 import re
 from appdirs import user_config_dir
 
+# Non-Config Settings {{{1
+# These value can be accessed with get_settings,
+# but should not be found in the config file
+NONCONFIG_SETTINGS = {
+    'config_file': 'config',
+    'hashes_file': 'hashes',
+    'settings_dir': user_config_dir('avendesora'),
+    'default_accounts_file': 'accounts.gpg',
+    'default_templates_file': 'templates',
+    'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
+    'secrets_hash': 'f7aeadac3cefe513047fdb4efa26591f',
+    'charsets_hash': '405332bcb8330b7502d292991026e328',
+}
+
+
 # Config Settings {{{1
 # These are the default values for settings that may be found in the config file
 CONFIG_DEFAULTS = {
@@ -28,7 +43,11 @@ CONFIG_DEFAULTS = {
     'archive_file': 'archive.gpg',
     'user_key_file': 'key.gpg',
     'dictionary_file': 'words',
-    'accounts_files': None,
+    'accounts_files': [
+        NONCONFIG_SETTINGS['default_accounts_file'],
+        NONCONFIG_SETTINGS['default_templates_file'],
+    ],
+    'account_list_file': 'account_list',
     'default_field': 'passcode',
     'default_vector_field': 'questions',
     'display_time': 60,
@@ -56,29 +75,8 @@ CONFIG_DEFAULTS = {
 # the following could be config settings, but they do not seem worth promoting
 INITIAL_AUTOTYPE_DELAY = 0.0
 
-# Non-Config Settings {{{1
-# These value can be accessed with get_settings,
-# but should not be found in the config file
-NONCONFIG_SETTINGS = {
-    'config_file': 'config',
-    'hashes_file': 'hashes',
-    'settings_dir': user_config_dir('avendesora'),
-    'default_accounts_file': 'accounts.gpg',
-    'default_templates_file': 'templates',
-    'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'f7aeadac3cefe513047fdb4efa26591f',
-    'charsets_hash': '405332bcb8330b7502d292991026e328',
-}
-
-
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
-    # List of the files that contain account information
-    accounts_files = [
-        {default_accounts_file},
-        {default_templates_file}
-    ]
-
     # The desired location of the log file (relative to config directory).
     # Adding a suffix of .gpg or .asc causes the file to be encrypted
     # (otherwise it can leak account names). Use None to disable logging.
@@ -332,6 +330,11 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
 USER_KEY_FILE_INITIAL_CONTENTS = dedent('''\
     # DO NOT CHANGE THIS KEY
     user_key = ({user_key})
+''')
+
+# Account list file {{{1
+ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
+    accounts_files = {accounts_files}
 ''')
 
 

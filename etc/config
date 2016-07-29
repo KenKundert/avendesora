@@ -25,7 +25,7 @@ default_browser = 'x'
 required_protocols = ['https']
 
 # Information used by GPG when encrypting and decrypting files.
-gpg_id = 'ken@designers-guide.com'
+gpg_ids = 'ken@designers-guide.com'
 gpg_armor = True
 gpg_home = '~/.gnupg'
 gpg_executable = '/usr/bin/gpg2'

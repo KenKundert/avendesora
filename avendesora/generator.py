@@ -27,6 +27,7 @@ from .preferences import (
     CONFIG_DEFAULTS, NONCONFIG_SETTINGS, ACCOUNTS_FILE_INITIAL_CONTENTS,
     CONFIG_FILE_INITIAL_CONTENTS, USER_KEY_FILE_INITIAL_CONTENTS,
     HASH_FILE_INITIAL_CONTENTS, TEMPLATES_FILE_INITIAL_CONTENTS,
+    ACCOUNT_LIST_FILE_CONTENTS,
 )
 from .title import Title
 from .utilities import generate_random_string, validate_componenets
@@ -37,6 +38,8 @@ from urllib.parse import urlparse
 
 # PasswordGenerator class{{{1
 class PasswordGenerator:
+
+    # Constructor {{{2
     def __init__(self, init=False, gpg_ids=None):
         # initialize avendesora (these should already be done if called from 
         # main, but it is safe to call them again)
@@ -64,6 +67,7 @@ class PasswordGenerator:
                 err.terminate()
         terminate_if_errors()
 
+    # initialize() {{{2
     def initialize(self, gpg_ids, filename):
         def split(s, l=72):
             # Break long string into a series of adjacent shorter strings
@@ -114,6 +118,7 @@ class PasswordGenerator:
         else:
             # Create a new accounts file
             path = to_path(get_setting('settings_dir'), filename)
+            fields['accounts_files'] = get_setting('accounts_files', []) + [str(path)]
             if path.exists():
                 fatal('exists.', culprit=path)
             if path.suffix in GPG_EXTENSIONS and not gpg_ids:
@@ -122,6 +127,17 @@ class PasswordGenerator:
             f = File(path)
             f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
 
+        # Create a new accounts file
+        path = to_path(get_setting('account_list_file'))
+        if path.suffix in GPG_EXTENSIONS:
+            fatal('encryption is not supported.', culprit=path)
+        try:
+            log('writing.', culprit=path)
+            path.write_text(ACCOUNT_LIST_FILE_CONTENTS.format(**fields))
+        except OSError as err:
+            error(os_error(err))
+
+    # get_acount() {{{2
     def get_account(self, name):
         if not name:
             raise Error('no account specified.')
@@ -131,6 +147,7 @@ class PasswordGenerator:
                 return account
         raise Error('not found.', culprit=name)
 
+    # find_acounts() {{{2
     def find_accounts(self, target):
         accounts = []
         for account in Account.all_accounts():
@@ -138,6 +155,7 @@ class PasswordGenerator:
                 accounts.append(account)
         return accounts
 
+    # search_acounts() {{{2
     def search_accounts(self, target):
         accounts = []
         for account in Account.all_accounts():
@@ -145,6 +163,7 @@ class PasswordGenerator:
                 accounts.append(account)
         return accounts
 
+    # discover_account() {{{2
     def discover_account(self):
         # get and parse the title
         data = Title().get_data()
@@ -183,11 +202,13 @@ class PasswordGenerator:
         else:
             return matches.popitem()
 
+    # add_master_to_accounts() {{{2
     def add_master_to_accounts(self, master):
         for account in Account.all_accounts():
             if not hasattr(account, 'master'):
                 account.master = master
 
+    # add_file_info_to_accounts() {{{2
     def add_file_info_to_accounts(self, file_info):
         for account in Account.all_accounts():
             if not hasattr(account, '_file_info'):
