@@ -14,4 +14,5 @@ archive_file = 'archive'
 gpg_ids = 'avendesora@nurdletech.com'
 gpg_executable = '/usr/bin/gpg'
 
+# Include a few unicode characters, but to make sure they work: ±αβγδε
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

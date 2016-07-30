@@ -134,11 +134,13 @@ def test_init():
         Create initial set of Avendesora files.
 
         Usage:
-            avendesora init (--gpg-id <id>)...
-            avendesora initialize (--gpg-id <id>)...
+            avendesora init [--gpg-id <id>]... [options]
+            avendesora initialize [--gpg-id <id>]... [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+            -h <path>, --gpg-home <path>
+                                    GPG home directory (default is ~/.gnupg).
 
         Initial configuration and accounts files are created only if they
         do not already exist.  Existing files are not modified.

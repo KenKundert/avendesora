@@ -26,10 +26,9 @@ from appdirs import user_config_dir
 # but should not be found in the config file
 NONCONFIG_SETTINGS = {
     'config_file': 'config',
-    'hashes_file': 'hashes',
     'settings_dir': user_config_dir('avendesora'),
     'default_accounts_file': 'accounts.gpg',
-    'default_templates_file': 'templates',
+    'default_templates_file': 'templates.asc',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
     'secrets_hash': 'f7aeadac3cefe513047fdb4efa26591f',
     'charsets_hash': '405332bcb8330b7502d292991026e328',
@@ -39,37 +38,41 @@ NONCONFIG_SETTINGS = {
 # Config Settings {{{1
 # These are the default values for settings that may be found in the config file
 CONFIG_DEFAULTS = {
-    'log_file': 'log.gpg',
-    'archive_file': 'archive.gpg',
-    'user_key_file': 'key.gpg',
-    'dictionary_file': 'words',
     'accounts_files': [
         NONCONFIG_SETTINGS['default_accounts_file'],
         NONCONFIG_SETTINGS['default_templates_file'],
     ],
-    'account_list_file': 'account_list',
-    'default_field': 'passcode',
-    'default_vector_field': 'questions',
-    'display_time': 60,
-    # use absolute paths for executables so they cannot be maliciously replaced
-    # by changing the path.
-    'xdotool_executable': '/usr/bin/xdotool',
-    'xsel_executable': '/usr/bin/xsel',
-    'gpg_executable': '/usr/bin/gpg2',
-    'gpg_home': '~/.gnupg',
-    'gpg_armor': True,
-    'gpg_ids': None,
+    'account_list_file': '.accounts_files',
+    'archive_file': 'archive.gpg',
     'browsers': {
         'f': 'firefox -new-tab %s',
         'g': 'google-chrome %s',
         't': 'torbrowser %s',
         'x': 'xdg-open %s', # system default browser
     },
-    'default_browser': 'x',
-    'required_protocols': ['https'],
-    'label_color': 'blue',
     'color_scheme': 'dark',
+    'default_browser': 'x',
+    'default_field': 'passcode',
+    'default_vector_field': 'questions',
+    'display_time': 60,
+    'dictionary_file': 'words',
+    'encoding': 'utf8',
+    'hashes_file': '.hashes',
     'indent': '    ',
+    'label_color': 'blue',
+    'log_file': 'log.gpg',
+    'required_protocols': ['https'],
+    'user_key_file': '.key.gpg',
+
+    # use absolute paths for executables so they cannot be maliciously replaced
+    # by changing the path.
+    'gpg_executable': '/usr/bin/gpg2',
+    'gpg_home': '~/.gnupg',
+    'gpg_armor': 'extension',
+    'gpg_ids': None,
+    'xdotool_executable': '/usr/bin/xdotool',
+    'xsel_executable': '/usr/bin/xsel',
+
 }
 
 # the following could be config settings, but they do not seem worth promoting
@@ -77,6 +80,7 @@ INITIAL_AUTOTYPE_DELAY = 0.0
 
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
+    # Include a few unicode characters, but to make sure they work: ±αβγδε
     # The desired location of the log file (relative to config directory).
     # Adding a suffix of .gpg or .asc causes the file to be encrypted
     # (otherwise it can leak account names). Use None to disable logging.
@@ -90,6 +94,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     default_field = {default_field}
     default_vector_field = {default_vector_field}
     display_time = {display_time}
+    encoding = {encoding}
     browsers = {browsers}
     default_browser = {default_browser}
     required_protocols = {required_protocols}
@@ -101,10 +106,12 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # Information used by GPG when encrypting and decrypting files.
     gpg_ids = {gpg_ids}
     gpg_armor = {gpg_armor}
+        # choose between 'always', 'never' and 'by-ext' (.asc: armor, .gpg: no)
     gpg_home = {gpg_home}
-    gpg_executable = {gpg_executable}
 
     # Utilities
+    # use of full absolute paths for executables is recommended
+    gpg_executable = {gpg_executable}
     xdotool_executable = {xdotool_executable}
     xsel_executable = {xsel_executable}
 
@@ -114,6 +121,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
 
 # Initial hash file {{{1
 HASH_FILE_INITIAL_CONTENTS = dedent('''\
+    # Include a few unicode characters, but to make sure they work: ±αβγδε
     # Changing the contents of the dictionary, secrets, or charsets will change
     # the secrets you generate, thus you do not want to change these files once
     # you have started using the program. These are hashes for the contents of
@@ -129,6 +137,7 @@ HASH_FILE_INITIAL_CONTENTS = dedent('''\
 
 # Initial accounts file {{{1
 ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
+    # Include a few unicode characters, but to make sure they work: ±αβγδε
     # Account information
     #
     # Add information about each of your accounts to the accounts dictionary.
@@ -195,6 +204,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
 # Initial templates file {{{1
 TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
+    # Include a few unicode characters, but to make sure they work: ±αβγδε
     # Templates
     #
     # Templates are accounts without master passwords and without much in the way of
@@ -328,12 +338,14 @@ TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
 
 # Initial user key file {{{1
 USER_KEY_FILE_INITIAL_CONTENTS = dedent('''\
+    # Include a few unicode characters, but to make sure they work: ±αβγδε
     # DO NOT CHANGE THIS KEY
     user_key = ({user_key})
 ''')
 
 # Account list file {{{1
 ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
+    # Include a few unicode characters, but to make sure they work: ±αβγδε
     accounts_files = {accounts_files}
 ''')
 

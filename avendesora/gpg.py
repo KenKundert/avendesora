@@ -27,7 +27,10 @@ from shlib import to_path
 from inform import display, Error, error, fatal, log, narrate, os_error, is_str
 import gnupg
 import io
+
+# Globals {{{1
 GPG_EXTENSIONS = ['.gpg', '.asc']
+ARMOR_CHOICES = ['always', 'never', 'extension']
 
 
 # GnuPG class {{{1
@@ -52,8 +55,15 @@ class GnuPG:
         )
         override_setting('gpg_home', cls.gpg_home)
 
-        cls.armor = armor if armor is not None else get_setting('gpg_armor')
-        override_setting('gpg_armor', cls.armor)
+        armor = armor if armor is not None else get_setting('gpg_armor')
+        if armor not in ARMOR_CHOICES:
+            warn(
+                "'%s' is not valid, choose from %s." % conjoin(ARMOR_CHOICES),
+                culprit=get_setting('config_file')
+            )
+            armor = None
+        cls.armor = armor
+        override_setting('gpg_armor', armor)
 
         gpg_args = {}
         if cls.gpg_path:
@@ -76,26 +86,31 @@ class GnuPG:
 
     @classmethod
     def save_encrypted(cls, path, contents, gpg_ids=None):
+        encoded = contents.encode(get_setting('encoding'))
         if not gpg_ids:
             gpg_ids = get_setting('gpg_ids', [])
+        if not gpg_ids:
+            raise Error('must specify GPG ID.')
 
-        if path.suffix.lower() in GPG_EXTENSIONS:
+        use_gpg, use_armor = cls.make_choices(path)
+        if use_gpg:
             try:
-                encrypted = cls.gpg.encrypt(contents, gpg_ids, armor=cls.armor)
+                encrypted = cls.gpg.encrypt(encoded, gpg_ids, armor=use_armor)
                 if not encrypted.ok:
-                    error('unable to encrypt.', encrypted.stderr, culprit=path, sep='\n')
-                        # Do not make this fatal.
-                        # It causes an infinite recursion within inform.
+                    raise Error(
+                        'unable to encrypt.', encrypted.stderr,
+                        culprit=path, sep='\n'
+                    )
                 else:
-                    if cls.armor:
+                    if use_armor:
                         path.write_text(str(encrypted))
                     else:
-                        path.write_bytes(encrypted)
+                        path.write_bytes(encrypted.data)
                     path.chmod(0o600)
             except ValueError as err:
                 raise Error(str(err), culprit=path)
         else:
-            path.write_text(contents)
+            path.write_text(encoded)
 
     @classmethod
     def read_encrypted(cls, path):
@@ -108,10 +123,22 @@ class GnuPG:
                         fatal('unable to decrypt.', decrypted.stderr, culprit=path, sep='\n')
                 except ValueError as err:
                     raise Error(str(err), culprit=path)
-            return decrypted.data
-        else:
-            return path.read_text()
+            return decrypted.data.decode(get_setting('encoding'))
 
+        else:
+            return path.read_text().decode(get_setting('encoding'))
+
+    @classmethod
+    def make_choices(cls, path):
+        extension = path.suffix.lower()
+        if extension in GPG_EXTENSIONS:
+            if cls.armor == 'never':
+                return True, False
+            elif cls.armor != 'always' and extension == '.gpg':
+                return True, False
+            return True, True
+        else:
+            return False, False
 
 # BufferedFile class {{{1
 class BufferedFile(GnuPG):
@@ -131,8 +158,8 @@ class BufferedFile(GnuPG):
         self.save_encrypted(self.path, contents, get_setting('gpg_ids'))
 
 
-# File class {{{1
-class File(GnuPG):
+# PythonFile class {{{1
+class PythonFile(GnuPG):
     def __init__(self, path, contents=None):
         self.path = to_path(path)
 
@@ -151,7 +178,17 @@ class File(GnuPG):
             raise Error(os_error(err))
 
         contents = {}
-        compiled = compile(code, str(path), 'exec')
+        try:
+            compiled = compile(code, str(path), 'exec')
+        except SyntaxError as err:
+            fatal(
+                err.msg + ':', err.text, (err.offset-1)*' ' + '^',
+                culprit=(err.filename, err.lineno), sep='\n'
+            )
+            # File "/home/ken/.config/avendesora/config", line 18
+            #   'g': 'google-chrome %s'
+            #      ^
+
         exec(compiled, contents)
         self.contents = contents
         return contents

@@ -19,7 +19,6 @@
 from .conceal import Conceal
 from .config import read_config, get_setting, override_setting
 from .generator import PasswordGenerator
-from .gpg import GnuPG, BufferedFile
 from .utilities import two_columns
 from .writer import get_writer
 from .__init__ import __version__
@@ -280,11 +279,13 @@ class Initialize(Command):
     DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
-            avendesora init (--gpg-id <id>)...
-            avendesora initialize (--gpg-id <id>)...
+            avendesora init [--gpg-id <id>]... [options]
+            avendesora initialize [--gpg-id <id>]... [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+            -h <path>, --gpg-home <path>
+                                    GPG home directory (default is ~/.gnupg).
     """).strip()
 
     @classmethod
@@ -303,6 +304,8 @@ class Initialize(Command):
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        if cmdline['--gpg-home']:
+            override_setting('gpg_home', cmdline['--gpg-home'])
 
         # save the gpg_ids for the logfile in case it is encrypted.
         gpg_ids = cmdline['--gpg-id']

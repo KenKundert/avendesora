@@ -22,7 +22,7 @@ from .account import Account
 from .conceal import Hidden
 from .config import read_config, get_setting
 from .dialog import show_list_dialog
-from .gpg import GnuPG, File, GPG_EXTENSIONS
+from .gpg import GnuPG, PythonFile, GPG_EXTENSIONS
 from .preferences import (
     CONFIG_DEFAULTS, NONCONFIG_SETTINGS, ACCOUNTS_FILE_INITIAL_CONTENTS,
     CONFIG_FILE_INITIAL_CONTENTS, USER_KEY_FILE_INITIAL_CONTENTS,
@@ -30,7 +30,7 @@ from .preferences import (
     ACCOUNT_LIST_FILE_CONTENTS,
 )
 from .title import Title
-from .utilities import generate_random_string, validate_componenets
+from .utilities import generate_random_string, validate_componenets, to_python
 from inform import debug, Error, fatal, log, terminate, terminate_if_errors
 from shlib import to_path
 from pathlib import Path
@@ -58,7 +58,7 @@ class PasswordGenerator:
         for filename in get_setting('accounts_files', []):
             try:
                 path = to_path(get_setting('settings_dir'), filename)
-                account_file = File(path)
+                account_file = PythonFile(path)
                 contents = account_file.read()
                 if 'master_password' in contents:
                     self.add_master_to_accounts(contents['master_password'])
@@ -86,12 +86,12 @@ class PasswordGenerator:
         # Create dictionary of available substitutions for CONTENTS strings
         fields = {}
         for key in CONFIG_DEFAULTS:
-            value = get_setting(key)
-            value = repr(str(value) if isinstance(value, Path) else value)
+            value = get_setting(key, expand=False)
+            value = to_python(str(value) if isinstance(value, Path) else value)
             fields.update({key: value})
         for key in NONCONFIG_SETTINGS:
-            value = get_setting(key)
-            value = repr(str(value) if isinstance(value, Path) else value)
+            value = get_setting(key, expand=False)
+            value = to_python(str(value) if isinstance(value, Path) else value)
             fields.update({key: value})
         gpg_ids = gpg_ids if gpg_ids else get_setting('gpg_ids', [])
         fields.update({
@@ -113,18 +113,18 @@ class PasswordGenerator:
             ]:
                 if path:
                     log('creating initial version.', culprit=path)
-                    f = File(path)
+                    f = PythonFile(path)
                     f.create(contents.format(**fields), gpg_ids)
         else:
             # Create a new accounts file
+            fields['accounts_files'] = get_setting('accounts_files', []) + [filename]
             path = to_path(get_setting('settings_dir'), filename)
-            fields['accounts_files'] = get_setting('accounts_files', []) + [str(path)]
             if path.exists():
                 fatal('exists.', culprit=path)
             if path.suffix in GPG_EXTENSIONS and not gpg_ids:
                 fatal('Must specify GPG IDs.')
             log('creating accounts file.', culprit=path)
-            f = File(path)
+            f = PythonFile(path)
             f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
 
         # Create a new accounts file

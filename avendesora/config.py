@@ -33,10 +33,10 @@ def read_config():
         return  # already read
 
     # First open the config file
-    from .gpg import File
+    from .gpg import PythonFile
     path = get_setting('config_file')
     assert path.suffix.lower() not in ['.gpg', '.asc']
-    config_file = File(path)
+    config_file = PythonFile(path)
     try:
         contents = config_file.read()
         for k, v in contents.items():
@@ -58,7 +58,7 @@ def read_config():
         comment('not found.', culprit=config_file)
 
     # Now open the hashes file
-    hashes_file = File(get_setting('hashes_file'))
+    hashes_file = PythonFile(get_setting('hashes_file'))
     try:
         contents = hashes_file.read()
         Config.update({k.lower(): v for k,v in contents.items()})
@@ -66,7 +66,7 @@ def read_config():
         pass
 
     # Now open the account list file
-    account_list_file = File(get_setting('account_list_file'))
+    account_list_file = PythonFile(get_setting('account_list_file'))
     try:
         contents = account_list_file.read()
         Config.update({k.lower(): v for k,v in contents.items()})
@@ -78,7 +78,7 @@ def read_config():
     # # Now open the user key file
     # user_key_file = get_setting('user_key_file')
     # if user_key_file:
-    #     user_key_file = File(get_setting('user_key_file'), get_setting('gpg_ids))
+    #     user_key_file = PythonFile(get_setting('user_key_file'), get_setting('gpg_ids))
     #     try:
     #         contents = user_key_file.read()
     #         Config.update({k.lower(): v for k,v in contents.items()})
@@ -86,7 +86,7 @@ def read_config():
     #         pass
 
 # get_setting() {{{1
-def get_setting(name, default=None):
+def get_setting(name, default=None, expand=True):
     name = name.lower()
     try:
         value = Config[name]
@@ -102,7 +102,7 @@ def get_setting(name, default=None):
         return default
     if name == 'gpg_ids':
         value = value.split() if is_str(value) else value
-    elif name.endswith('_file'):
+    elif expand and name.endswith('_file'):
         value = to_path(get_setting('settings_dir'), value)
     return value
 

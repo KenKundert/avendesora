@@ -138,4 +138,5 @@ class MyBank(Account):
 # YYY {{{1
 # ZZZ {{{1
 
+# Include a few unicode characters, but to make sure they work: ±αβγδε
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :
