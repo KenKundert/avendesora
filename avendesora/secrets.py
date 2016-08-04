@@ -41,14 +41,17 @@ doctests::
 
 
 # Imports {{{1
-from .charsets import DIGITS, DISTINGUISHABLE
+from .charsets import (
+    ALPHANUMERIC, DIGITS, DISTINGUISHABLE, LOWERCASE, SYMBOLS, UPPERCASE,
+)
 from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
-from inform import Error, error, fatal, log, output, terminate, warn
+from inform import Error, terminate, warn
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import hashlib
 import getpass
+import re
 import gnupg
 import sys
 
@@ -237,7 +240,7 @@ class Password(Secret):
     >>> secret = Password()
     >>> secret.generate('dux', account)
     >>> str(secret)
-    '5NcmdF8QEqcL'
+    'vo9WSyfEqRgH'
 
     """
     def __init__(self,
@@ -413,6 +416,74 @@ class MixedPassword(Secret):
             password.append(symbols.pop(i))
             self.length -= 1
         return ''.join(password)
+
+# PasswordRecipe{{{1
+class PasswordRecipe(MixedPassword):
+    """
+    A version of MixedPassword where the requirements are specified with a short
+    string rather than using the more flexible but more cumbersome method of
+    MixedPassword. The string consists of a series of terms separated by white
+    space. The first term is a number that specifies the total number of
+    characters in the password. The remaining terms specify the number of
+    characters that should be pulled from a particular class of characters. The
+    classes are u (upper case letters), l (lower case letters), d (digits), s
+    (punctuation), and c (an explicitly specified set of characters). For
+    example, '12 2u 2d 2s' indicates that a 12 character password should be
+    generated that includes 2 upper case letters, 2 digits, and 2 symbols. The
+    remaining characters will be chosen from the base character set, which by
+    default is the set of alphanumeric characters.
+
+    The c class is special in that it allow you to explicitly specify the
+    characters to use. For example, '12 2c!@#$%^&=' directs that a 12 character
+    password be generated, 2 of which are taken from the set !@#$%^&=.
+
+    >>> secret = PasswordRecipe('12 2u 2d 2s')
+    >>> secret.generate('pux', account)
+    >>> str(secret)
+    '~Y47&DOsBa43'
+
+    >>> secret = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
+    >>> secret.generate('bux', account)
+    >>> str(secret)
+    '0Jx8erS53#H*'
+
+    """
+
+    ALPHABETS = {
+        'l': LOWERCASE,
+        'u': UPPERCASE,
+        'd': DIGITS,
+        's': SYMBOLS,
+        'c': None,
+    }
+    PATTERN = re.compile(r'(\d*)([%s])(.*)' % ''.join(ALPHABETS.keys()))
+
+    def __init__(
+        self,
+        recipe,
+        def_alphabet=ALPHANUMERIC,
+        master=None,
+        version=None,
+    ):
+        parts = recipe.split()
+        requirements = []
+        try:
+            each = parts[0]
+            length = int(each)
+            for each in parts[1:]:
+                num, kind, alphabet = self.PATTERN.match(each).groups()
+                if self.ALPHABETS[kind]:
+                    alphabet = self.ALPHABETS[kind]
+                requirements += [(alphabet, int(num))]
+        except (ValueError, AttributeError) as err:
+            raise Error('invalid term in recipe: %s.' % each)
+
+        self.description = None
+        self.length = length
+        self.def_alphabet = def_alphabet
+        self.requirements = requirements
+        self.master = master
+        self.version = version
 
 
 # BirthDate {{{1

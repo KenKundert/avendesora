@@ -17,8 +17,8 @@
 # Imports {{{1
 from .config import get_setting
 from shlib import Run, to_path
-from inform import codicil, error, fatal, os_error, warn
-from textwrap import dedent, wrap
+from inform import codicil, error, fatal, os_error, warn, is_str
+from textwrap import dedent, wrap, indent
 from pkg_resources import resource_filename
 import hashlib
 import os
@@ -107,7 +107,7 @@ def two_columns(col1, col2, width=16, indent=True):
 # to_python {{{1
 def to_python(obj, _level=0):
     """Recursively convert object to string with reasonable formatting"""
-    def indent(relative_level=0):
+    def leader(relative_level=0):
         return (_level+relative_level)*'    '
     output = []
     if type(obj) == dict:
@@ -115,30 +115,32 @@ def to_python(obj, _level=0):
         for key in sorted(obj.keys()):
             value = obj[key]
             output += ['%s%r: %s,' % (
-                indent(1), key, to_python(value, _level+1)
+                leader(1), key, to_python(value, _level+1)
             )]
-        output += ['%s}' % (indent(0))]
+        output += ['%s}' % (leader(0))]
     elif type(obj) == list:
         output += ['[']
         for each in obj:
             output += ['%s%s,' % (
-                indent(1), to_python(each, _level+1)
+                leader(1), to_python(each, _level+1)
             )]
-        output += ['%s]' % (indent(0))]
+        output += ['%s]' % (leader(0))]
     elif type(obj) == tuple:
         output += ['(']
         for each in obj:
             output += ['%s%s,' % (
-                indent(1), to_python(each, _level+1)
+                leader(1), to_python(each, _level+1)
             )]
-        output += ['%s)' % (indent(0))]
+        output += ['%s)' % (leader(0))]
     elif type(obj) == set:
         output += ['set([']
         for each in sorted(obj):
             output += ['%s%s,' % (
-                indent(1), to_python(each, _level+1)
+                leader(1), to_python(each, _level+1)
             )]
-        output += ['%s])' % (indent(0))]
+        output += ['%s])' % (leader(0))]
+    elif is_str(obj) and '\n' in obj:
+        output += ['"""' + indent(dedent(obj), leader(1)) + leader(0) + '"""']
     else:
         output += [obj.__repr__()]
     return '\n'.join(output)

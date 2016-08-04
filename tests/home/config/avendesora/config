@@ -1,6 +1,3 @@
-# List of the files that contain account information
-accounts_files = ['accounts', 'templates']
-
 # The desired location of the log file (relative to config directory).
 # Adding a suffix of .gpg or .asc causes the file to be encrypted 
 # (otherwise it can leak account names). Use None to disable logging.

@@ -19,12 +19,14 @@ def test_add():
         Add a new account.
 
         Usage:
-            avendesora [options] new [<prototype>]
             avendesora [options] add [<prototype>]
 
         Options:
             -f <file>, --file <file>
                                     Add account to specified file.
+
+        The default prototype is bank. The available prototypes are:
+        bank, command and website
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 

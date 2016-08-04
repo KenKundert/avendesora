@@ -23,8 +23,10 @@
 
 # Imports {{{1
 from .config import get_setting, override_setting
-from shlib import to_path
-from inform import display, Error, error, fatal, log, narrate, os_error, is_str
+from shlib import to_path, mv
+from inform import (
+    conjoin, display, Error, fatal, log, narrate, os_error, warn,
+)
 import gnupg
 import io
 
@@ -35,9 +37,8 @@ ARMOR_CHOICES = ['always', 'never', 'extension']
 
 # GnuPG class {{{1
 class GnuPG:
-    def __init(self):
-        # This class acts as a singleton by just using class methods
-        raise NotImplementedError
+    def __init__(self, path):
+        self.path = to_path(path)
 
     @classmethod
     def initialize(cls,
@@ -58,8 +59,9 @@ class GnuPG:
         armor = armor if armor is not None else get_setting('gpg_armor')
         if armor not in ARMOR_CHOICES:
             warn(
-                "'%s' is not valid, choose from %s." % conjoin(ARMOR_CHOICES),
-                culprit=get_setting('config_file')
+                "'%s' is not valid, choose from %s." % (
+                    armor, conjoin(ARMOR_CHOICES)
+                ), culprit=(get_setting('config_file'), 'gpg_armor')
             )
             armor = None
         cls.armor = armor
@@ -72,30 +74,18 @@ class GnuPG:
             gpg_args.update({'gnupghome': str(cls.gpg_home)})
         cls.gpg = gnupg.GPG(**gpg_args)
 
-    @classmethod
-    def _guess_id(cls):
-        import socket, getpass
-        username = getpass.getuser()
-        hostname = socket.gethostname().split('.')
-        if len(hostname) <= 2:
-            hostname = '.'.join(hostname)
-        else:
-            # strip off name of local machine
-            hostname = '.'.join(hostname[1:])
-        return username + '@' + hostname
-
-    @classmethod
-    def save_encrypted(cls, path, contents, gpg_ids=None):
+    def save(self, contents, gpg_ids=None):
+        path = self.path
         encoded = contents.encode(get_setting('encoding'))
         if not gpg_ids:
             gpg_ids = get_setting('gpg_ids', [])
         if not gpg_ids:
             raise Error('must specify GPG ID.')
 
-        use_gpg, use_armor = cls.make_choices(path)
+        use_gpg, use_armor = self._choices()
         if use_gpg:
             try:
-                encrypted = cls.gpg.encrypt(encoded, gpg_ids, armor=use_armor)
+                encrypted = self.gpg.encrypt(encoded, gpg_ids, armor=use_armor)
                 if not encrypted.ok:
                     raise Error(
                         'unable to encrypt.', encrypted.stderr,
@@ -106,39 +96,50 @@ class GnuPG:
                         path.write_text(str(encrypted))
                     else:
                         path.write_bytes(encrypted.data)
-                    path.chmod(0o600)
             except ValueError as err:
                 raise Error(str(err), culprit=path)
         else:
             path.write_text(encoded)
+        path.chmod(0o600)
 
-    @classmethod
-    def read_encrypted(cls, path):
+    def read(self):
+        path = self.path
         # file is only assumed to be encrypted if path has gpg extension
         if path.suffix.lower() in GPG_EXTENSIONS:
             with path.open('rb') as f:
                 try:
-                    decrypted = cls.gpg.decrypt_file(f)
+                    decrypted = self.gpg.decrypt_file(f)
                     if not decrypted.ok:
-                        fatal('unable to decrypt.', decrypted.stderr, culprit=path, sep='\n')
+                        fatal(
+                            'unable to decrypt.', decrypted.stderr,
+                            culprit=path, sep='\n'
+                        )
                 except ValueError as err:
                     raise Error(str(err), culprit=path)
             return decrypted.data.decode(get_setting('encoding'))
 
         else:
-            return path.read_text().decode(get_setting('encoding'))
+            return path.read_text(encoding=get_setting('encoding'))
 
-    @classmethod
-    def make_choices(cls, path):
-        extension = path.suffix.lower()
+    def _choices(self):
+        extension = self.path.suffix.lower()
         if extension in GPG_EXTENSIONS:
-            if cls.armor == 'never':
+            if self.armor == 'never':
                 return True, False
-            elif cls.armor != 'always' and extension == '.gpg':
+            elif self.armor != 'always' and extension == '.gpg':
                 return True, False
             return True, True
         else:
             return False, False
+
+    def remove(self):
+        self.path.unlink()
+
+    def rename(self, extension):
+        new = to_path(str(self.path) + extension)
+        mv(self.path, new)
+        self.path = new
+
 
 # BufferedFile class {{{1
 class BufferedFile(GnuPG):
@@ -155,25 +156,17 @@ class BufferedFile(GnuPG):
 
     def close(self):
         contents = self.stream.getvalue()
-        self.save_encrypted(self.path, contents, get_setting('gpg_ids'))
+        self.save(contents, get_setting('gpg_ids'))
 
 
 # PythonFile class {{{1
 class PythonFile(GnuPG):
-    def __init__(self, path, contents=None):
-        self.path = to_path(path)
-
-    def read(self):
+    def run(self):
         path = self.path
         self.encrypted = path.suffix in ['.gpg', '.asc']
         log('reading.', culprit=path)
         try:
-            if self.encrypted:
-                # file is encrypted, decrypt it
-                code = self.read_encrypted(to_path(path))
-            else:
-                # file is not encrypted
-                code = path.read_text()
+            code = self.read()
         except OSError as err:
             raise Error(os_error(err))
 
@@ -208,7 +201,7 @@ class PythonFile(GnuPG):
             if path.suffix in ['.gpg', '.asc']:
                 narrate('encrypting.', culprit=path)
                 # encrypt it
-                self.save_encrypted(to_path(path), contents, gpg_ids)
+                self.save(contents, gpg_ids)
             else:
                 narrate('not encrypting.', culprit=path)
                 # file is not encrypted

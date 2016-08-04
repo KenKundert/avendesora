@@ -1,4 +1,4 @@
-# Avendesora Password Generator Preferences
+# Avendesora Password Generator Settings
 #
 # Copyright (C) 2016 Kenneth S. Kundert
 
@@ -38,7 +38,7 @@ def read_config():
     assert path.suffix.lower() not in ['.gpg', '.asc']
     config_file = PythonFile(path)
     try:
-        contents = config_file.read()
+        contents = config_file.run()
         for k, v in contents.items():
             if k.startswith('_'):
                 continue
@@ -60,7 +60,7 @@ def read_config():
     # Now open the hashes file
     hashes_file = PythonFile(get_setting('hashes_file'))
     try:
-        contents = hashes_file.read()
+        contents = hashes_file.run()
         Config.update({k.lower(): v for k,v in contents.items()})
     except Error as err:
         pass
@@ -68,7 +68,7 @@ def read_config():
     # Now open the account list file
     account_list_file = PythonFile(get_setting('account_list_file'))
     try:
-        contents = account_list_file.read()
+        contents = account_list_file.run()
         Config.update({k.lower(): v for k,v in contents.items()})
     except Error as err:
         pass
@@ -80,10 +80,13 @@ def read_config():
     # if user_key_file:
     #     user_key_file = PythonFile(get_setting('user_key_file'), get_setting('gpg_ids))
     #     try:
-    #         contents = user_key_file.read()
+    #         contents = user_key_file.run()
     #         Config.update({k.lower(): v for k,v in contents.items()})
     #     except Error as err:
     #         pass
+
+def add_setting(name, default):
+    CONFIG_DEFAULTS[name] = default
 
 # get_setting() {{{1
 def get_setting(name, default=None, expand=True):

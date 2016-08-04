@@ -59,7 +59,7 @@ class PasswordGenerator:
             try:
                 path = to_path(get_setting('settings_dir'), filename)
                 account_file = PythonFile(path)
-                contents = account_file.read()
+                contents = account_file.run()
                 if 'master_password' in contents:
                     self.add_master_to_accounts(contents['master_password'])
                 self.add_file_info_to_accounts(account_file)
@@ -208,8 +208,10 @@ class PasswordGenerator:
             if not hasattr(account, 'master'):
                 account.master = master
 
-    # add_file_info_to_accounts() {{{2
+    # dd_file_info_to_accounts() {{{2
     def add_file_info_to_accounts(self, file_info):
         for account in Account.all_accounts():
+            # _file_info is used (as opposed to file_info) to prevent this 
+            # attribute from being displayed by showall.
             if not hasattr(account, '_file_info'):
                 account._file_info = file_info

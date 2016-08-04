@@ -42,7 +42,7 @@ def test_alertscc():
         password = account.get_value()
     except Error as err:
         password = str(err)
-    assert password == 'qfUfLViukFcJ'
+    assert password == 'vGnKdofWRFLT'
 
 def test_alertscc_question1():
     try:

@@ -18,14 +18,17 @@
 # Imports {{{1
 from .conceal import Conceal
 from .config import read_config, get_setting, override_setting
+from .editors import GenericEditor
 from .generator import PasswordGenerator
+from .gpg import GnuPG
 from .utilities import two_columns
 from .writer import get_writer
 from .__init__ import __version__
-from inform import Error, error, codicil, output, debug
-from shlib import to_path
+from inform import Error, error, codicil, output, conjoin, os_error
+from shlib import to_path, mv
 from docopt import docopt
 from textwrap import dedent
+import re
 import sys
 
 
@@ -80,7 +83,6 @@ class Add(Command):
     DESCRIPTION = 'add a new account'
     USAGE = dedent("""
         Usage:
-            avendesora [options] new [<prototype>]
             avendesora [options] add [<prototype>]
 
         Options:
@@ -94,8 +96,86 @@ class Add(Command):
             {title}
 
             {usage}
+
+            The default prototype is {default}. The available prototypes are:
+            {prototypes}
         """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+        return text.format(
+            title=title(cls.DESCRIPTION), usage=cls.USAGE,
+            default=get_setting('default_prototype_account'),
+            prototypes=conjoin(sorted(get_setting('prototype_accounts').keys()))
+        )
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        try:
+            # get the specified prototype
+            prototypes = get_setting('prototype_accounts')
+            if cmdline['<prototype>']:
+                prototype_name = cmdline['<prototype>']
+            else:
+                prototype_name = get_setting('default_prototype_account')
+            prototype = dedent(prototypes[prototype_name]).strip() + '\n'
+
+            # save prototype to tmp file and open it in the editor
+            from tempfile import mktemp
+            tmpfile = GnuPG(mktemp(suffix='_avendesora.gpg'))
+            tmpfile.save(prototype, get_setting('gpg_ids'))
+            GenericEditor.open_and_search(tmpfile.path)
+
+            # read the tmp file and determine if it has changed
+            new = tmpfile.read()
+            tmpfile.remove()
+            if new == prototype:
+                return output('Unchanged, and so ignored.')
+
+            # hide the files that should be hidden
+            def hide(match):
+                return 'Hidden(%r)' % Conceal.hide(match.group(1))
+            new = re.sub("<<(.*?)>>", hide, new)
+
+            # determine the accounts file
+            prefix = cmdline['--file']
+            if prefix:
+                candidates = [
+                    p
+                    for p in get_setting('accounts_files')
+                    if p.startswith(prefix)
+                ]
+                if not candidates:
+                    raise Error('not found.', cuplrit=cmdline['--file'])
+                if len(candidates) > 0:
+                    raise Error(
+                        'ambiguous, matches %s.' % conjoin(candidates),
+                        cuplrit=prefix
+                    )
+                filename = candidates[0]
+            else:
+                filename = get_setting('accounts_files')[0]
+            path = to_path(get_setting('settings_dir'), filename)
+
+            # get original contents of accounts file
+            orig_accounts_file = GnuPG(path)
+            accounts = orig_accounts_file.read()
+
+            # add new account to the contents
+            accounts = accounts + new + '\n'
+
+            # rename the original file and then save the new version
+            orig_accounts_file.rename('.saved')
+            new_accounts_file = GnuPG(path)
+            new_accounts_file.save(accounts)
+        except OSError as err:
+            error(os_error(err))
+        except KeyError as err:
+            error(
+                'unknown account prototype, choose from %s.' % conjoin(
+                    sorted(prototypes.keys())
+                ), culprit=prototype_name
+            )
 
 
 # Browse {{{1
@@ -161,6 +241,20 @@ class Edit(Command):
             {usage}
         """).strip()
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # determine the account and open the URL
+        account = generator.get_account(cmdline['<account>'])
+        filepath = account._file_info.path
+        account_name = account.__name__
+        GenericEditor.open_and_search(filepath, account_name)
 
 
 # Find {{{1

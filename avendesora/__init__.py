@@ -1,10 +1,11 @@
 from .charsets import (
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
-    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE
+    HEXDIGITS, PUNCTUATION, SYMBOLS, WHITESPACE, PRINTABLE, DISTINGUISHABLE
 )
 from .account import Account
 from .secrets import (
-    Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+    Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
+    BirthDate,
 )
 from .conceal import Hidden, GPG
 from .recognize import (

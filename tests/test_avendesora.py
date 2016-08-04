@@ -42,14 +42,14 @@ def test_alertscc():
         result = subprocess.check_output('avendesora show --stdout alertscc'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'qfUfLViukFcJ\n'
+    assert result == b'vGnKdofWRFLT\n'
 
 def test_scc():
     try:
         result = subprocess.check_output('avendesora show --stdout scc'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'qfUfLViukFcJ\n'
+    assert result == b'vGnKdofWRFLT\n'
 
 def test_scc_account():
     try:

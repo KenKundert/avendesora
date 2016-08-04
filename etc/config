@@ -23,10 +23,22 @@ browsers = {
 }
 default_browser = 'x'
 required_protocols = ['https']
+edit_account = (
+    'vim',
+    '+silent /^class {account}(Account):$/',
+    '+foldopen',
+    '{filepath}',
+)
+edit_prototype = (
+    'vim',
+    '+silent /{field}/',
+    '+foldopen',
+    '{filepath}',
+)
 
 # Information used by GPG when encrypting and decrypting files.
 gpg_ids = 'ken@designers-guide.com'
-gpg_armor = True
+gpg_armor = 'extension'
 gpg_home = '~/.gnupg'
 gpg_executable = '/usr/bin/gpg2'
 
@@ -34,4 +46,47 @@ gpg_executable = '/usr/bin/gpg2'
 xdotool_executable = '/usr/bin/xdotool'
 xsel_executable = '/usr/bin/xsel'
 
-# vim: filetype=python sw=4 sts=4 et ai ff=unix :
+prototype_accounts = {
+    'website': """
+        class _NAME_(Account): # {{{1
+            aliases = ['_ALIASES_']
+            username = '_USERNAME_'
+            email = '_EMAIL_'
+            passcode = Password()
+            discovery = RecognizeURL(
+                'https://_URL_',
+                script='{email}{tab}{passcode}{return}'
+            )
+    """,
+    'command': """
+        class _NAME_(Account): # {{{1
+            aliases = ['_ALIASES_']
+            passcode = Passphrase()
+            discovery = RecognizeTitle(
+                '_TITLE_', '_TITLE_',
+                script='{passcode}{return}'
+            )
+    """,
+    'bank': """
+        class _NAME_(Account): # {{{1
+            aliases = ['_ALIASES_']
+            username = '_NAME_'
+            email = '_EMAIL_'
+            accounts = {
+                'checking':   <<_ACCOUNT_NUMBER_>>,
+                'savings':    <<_ACCOUNT_NUMBER_>>,
+                'creditcard': <<_ACCOUNT_NUMBER_>>,
+            }
+            customer_service = '_PHONE_NUMBER_'
+            passcode = Password('12u2l2n2s2')
+            verbal = Passphrase(length=2)
+            pin = PIN()
+            questions = [
+                Question('_QUESTION_'),
+                Question('_QUESTION_'),
+                Question('_QUESTION_'),
+            ]
+    """,
+}
+
+# vim: filetype=python sw=4 sts=4 et ai ff=unix nofen:

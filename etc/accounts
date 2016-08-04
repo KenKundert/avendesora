@@ -41,7 +41,7 @@ super_secret = GPG("""
 """)   # passcode is 'heynow'
 
 # Accounts
-# AAA {{{1
+# AlertSCC {{{1
 class AlertSCC(Account):
     aliases = ['scc']
     email = 'pizzaman@pizza.com'
@@ -72,17 +72,7 @@ class AlertSCC(Account):
         ),
     ]
 
-# BBB {{{1
-# CCC {{{1
-# DDD {{{1
-# EEE {{{1
-# FFF {{{1
-# GGG {{{1
-# HHH {{{1
-# III {{{1
-# JJJ {{{1
-# KKK {{{1
-# LLL {{{1
+# Login {{{1
 class Login(Account):
     aliases = ['luks']
     passcode = Passphrase(length=6)
@@ -104,7 +94,7 @@ class Login(Account):
         ),
     ]
 
-# MMM {{{1
+# MyBank {{{1
 class MyBank(Account):
     aliases = ['mb']
     username = 'pizzaman'
@@ -127,19 +117,5 @@ class MyBank(Account):
         'creditcard': Hidden('MzQ1Njc4OTA='),
     }
     customer_service = '1-866-229-6633'
-
-# NNN {{{1
-# OOO {{{1
-# PPP {{{1
-# QQQ {{{1
-# RRR {{{1
-# SSS {{{1
-# TTT {{{1
-# UUU {{{1
-# VVV {{{1
-# WWW {{{1
-# XXX {{{1
-# YYY {{{1
-# ZZZ {{{1
 
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

@@ -28,10 +28,10 @@ NONCONFIG_SETTINGS = {
     'config_file': 'config',
     'settings_dir': user_config_dir('avendesora'),
     'default_accounts_file': 'accounts.gpg',
-    'default_templates_file': 'templates.asc',
+    'default_templates_file': 'templates',
+    'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'f7aeadac3cefe513047fdb4efa26591f',
-    'charsets_hash': '405332bcb8330b7502d292991026e328',
+    'secrets_hash': '74ad5101d77118a23d96aa29e2c695e9',
 }
 
 
@@ -57,12 +57,67 @@ CONFIG_DEFAULTS = {
     'display_time': 60,
     'dictionary_file': 'words',
     'encoding': 'utf8',
+    'edit_account': (
+        'vim',
+        '+silent /^class {account}(Account):$/',
+        '+silent foldopen',
+        '{filepath}'
+    ),
+    'edit_prototype': (
+        'vim',
+        '+silent /{field}/',
+        '+silent foldopen',
+        '{filepath}'
+    ),
     'hashes_file': '.hashes',
     'indent': '    ',
     'label_color': 'blue',
     'log_file': 'log.gpg',
     'required_protocols': ['https'],
     'user_key_file': '.key.gpg',
+    'default_prototype_account': 'bank',
+    'prototype_accounts': {
+        'website': """
+            class _NAME_(Account): # %s1
+                aliases = ['_ALIASES_']
+                username = '_USERNAME_'
+                email = '_EMAIL_'
+                passcode = PasswordRecipe('12 2u 2d 2s')
+                discovery = RecognizeURL(
+                    'https://_URL_',
+                    script='{email}{tab}{passcode}{return}'
+                )
+        """ % (3*'{'),
+        'command': """
+            class _NAME_(Account): # %s1
+                aliases = ['_ALIASES_']
+                passcode = Passphrase()
+                discovery = RecognizeTitle(
+                    '_TITLE1_', '_TITLE2_',
+                    script='{passcode}{return}'
+                )
+        """ % (3*'{'),
+        'bank': """
+            class _NAME_(Account): # %s1
+                aliases = ['_ALIASES_']
+                username = '_NAME_'
+                email = '_EMAIL_'
+                accounts = {
+                    'checking':   <<_ACCOUNT_NUMBER_>>,
+                    'savings':    <<_ACCOUNT_NUMBER_>>,
+                    'creditcard': <<_ACCOUNT_NUMBER_>>,
+                }
+                customer_service = '_PHONE_NUMBER_'
+                passcode = PasswordRecipe('12 2u 2d 2s')
+                verbal = Passphrase(length=2)
+                pin = PIN()
+                questions = [
+                    Question('_QUESTION_'),
+                    Question('_QUESTION_'),
+                    Question('_QUESTION_'),
+                ]
+        """ % (3*'{'),
+    },
 
     # use absolute paths for executables so they cannot be maliciously replaced
     # by changing the path.
@@ -95,6 +150,8 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     default_vector_field = {default_vector_field}
     display_time = {display_time}
     encoding = {encoding}
+    edit_account = {edit_account}
+    edit_prototype = {edit_prototype}
     browsers = {browsers}
     default_browser = {default_browser}
     required_protocols = {required_protocols}
@@ -102,6 +159,10 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
         # choose from black, red, green, yellow, blue, magenta, cyan, white
     color_scheme = {color_scheme}
         # choose from dark, light
+
+    # Prototype accounts
+    default_prototype_account = {default_prototype_account}
+    prototype_accounts = {prototype_accounts}
 
     # Information used by GPG when encrypting and decrypting files.
     gpg_ids = {gpg_ids}
@@ -115,7 +176,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     xdotool_executable = {xdotool_executable}
     xsel_executable = {xsel_executable}
 
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix :
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen :
 ''')
 
 
@@ -151,17 +212,20 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     #     'alphabet': exclude(PRINTABLE, '\\t')
     # or:
     #     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
+    #
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix :
 
     from avendesora import (
         # Basics
-        Account, Hidden,
+        Account, Hidden, GPG,
 
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
-        HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
+        HEXDIGITS, PUNCTUATION, SYMBOLS, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
 
         # Secrets
-        Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+        Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
+        BirthDate,
 
         # Account Discovery
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
@@ -172,34 +236,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     gpg_ids = {gpg_ids}
 
     # Accounts
-    # AAA {section}
-    # BBB {section}
-    # CCC {section}
-    # DDD {section}
-    # EEE {section}
-    # FFF {section}
-    # GGG {section}
-    # HHH {section}
-    # III {section}
-    # JJJ {section}
-    # KKK {section}
-    # LLL {section}
-    # MMM {section}
-    # NNN {section}
-    # OOO {section}
-    # PPP {section}
-    # QQQ {section}
-    # RRR {section}
-    # SSS {section}
-    # TTT {section}
-    # UUU {section}
-    # VVV {section}
-    # WWW {section}
-    # XXX {section}
-    # YYY {section}
-    # ZZZ {section}
 
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix :
 ''')
 
 # Initial templates file {{{1
@@ -345,7 +382,10 @@ USER_KEY_FILE_INITIAL_CONTENTS = dedent('''\
 
 # Account list file {{{1
 ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
-    # Include a few unicode characters, but to make sure they work: ±αβγδε
+    # The list of files that contain accounts. The order of the files is
+    # immaterial, except that first file given is the default file, meaning that
+    # the add account will add a new account to the first files specified unless
+    # a different files is specified explicitly.
     accounts_files = {accounts_files}
 ''')
 
