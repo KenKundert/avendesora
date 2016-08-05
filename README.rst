@@ -221,3 +221,6 @@ Once an account exists, you can edit it using::
 
     > avendesora edit [<account>]
 
+This opens the accounts file with your editor (set this with the *edit_account* 
+setting in the config file). If you are using default version of *edit_account*, 
+which uses VIM, it should take you directly to the account.
