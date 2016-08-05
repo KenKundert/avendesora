@@ -333,7 +333,7 @@ class Account:
             return indent(LabelColor(key + ':') + sep + value, leader)
 
         def reveal(name, key=None):
-            return "<reveal with 'avendesora %s %s'>" % (
+            return "<reveal with 'avendesora show %s %s'>" % (
                 cls.get_name(), cls.combine_name(name, key)
             )
 

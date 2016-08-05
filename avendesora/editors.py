@@ -38,7 +38,7 @@ class GenericEditor(Editor):
                 # matches user modifiable fields in protptypes
             'section': '{' '{' '{' '1',
         }
-        cmd = get_setting('edit_account' if account else 'edit_prototype')
+        cmd = get_setting('edit_account' if account else 'edit_template')
         cmd = [e.format(**args) for e in cmd]
 
         try:

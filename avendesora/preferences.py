@@ -59,14 +59,14 @@ CONFIG_DEFAULTS = {
     'encoding': 'utf8',
     'edit_account': (
         'vim',
-        '+silent /^class {account}(Account):$/',
-        '+silent foldopen',
+        '+silent /^class {account}(Account):/',
+        '+silent normal zozt', # open the fold, position near top of screen
         '{filepath}'
     ),
-    'edit_prototype': (
+    'edit_template': (
         'vim',
         '+silent /{field}/',
-        '+silent foldopen',
+        '+silent normal zozt', # open the fold, position near top of screen
         '{filepath}'
     ),
     'hashes_file': '.hashes',
@@ -75,8 +75,8 @@ CONFIG_DEFAULTS = {
     'log_file': 'log.gpg',
     'required_protocols': ['https'],
     'user_key_file': '.key.gpg',
-    'default_prototype_account': 'bank',
-    'prototype_accounts': {
+    'default_account_template': 'bank',
+    'account_templates': {
         'website': """
             class _NAME_(Account): # %s1
                 aliases = ['_ALIASES_']
@@ -151,7 +151,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     display_time = {display_time}
     encoding = {encoding}
     edit_account = {edit_account}
-    edit_prototype = {edit_prototype}
+    edit_template = {edit_template}
     browsers = {browsers}
     default_browser = {default_browser}
     required_protocols = {required_protocols}
@@ -161,8 +161,8 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
         # choose from dark, light
 
     # Prototype accounts
-    default_prototype_account = {default_prototype_account}
-    prototype_accounts = {prototype_accounts}
+    default_account_template = {default_account_template}
+    account_templates = {account_templates}
 
     # Information used by GPG when encrypting and decrypting files.
     gpg_ids = {gpg_ids}

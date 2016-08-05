@@ -18,6 +18,37 @@ Install with::
     :target: https://travis-ci.org/KenKundert/avendesora
 
 
+Upgrading
+---------
+
+Avendesora is a password generator rather than a password vault. As a result, 
+there is always a chance that something could change in the password generation 
+algorithm that causes the generated passwords to change. Of course, the program 
+is thoroughly tested to assure this does not happen, but there is still a small 
+chance that something slips through.  To assure that you are not affected by 
+this, you should archive your passwords before you upgrade with::
+
+    avendesora archive  # Not implemented yet.
+
+Then upgrade with::
+
+    pip install -U --user avendesora
+
+Finally, run::
+
+    avendesora changed  # Not implemented yet
+
+to confirm that none of your generated passwords have changed.
+
+
+Install with::
+
+    pip install --user avendesora
+
+.. image:: https://travis-ci.org/KenKundert/avendesora.svg?branch=master
+    :target: https://travis-ci.org/KenKundert/avendesora
+
+
 Requirements
 ------------
 
@@ -90,9 +121,103 @@ Accounts
 Avendesora holds information about your accounts in accounts files. The list of 
 current accounts files is contained in ~/.config/avendesora/.accounts_files.  
 Each is a possibly encrypted Python file. All information known about 
-a particular account is 
+a particular account is contained in the attributes of a class that is created 
+for that account. For example::
+
+    class BigBank(Account):
+        aliases = ['bb']
+        username = 'gman33'
+        email = 'gman33@pizza.com'
+        url = 'https://bigbank.com/login'
+        passcode = Password(length=12)
+        verbal = Passphrase(length=2)
+        pin = PIN()
+        accounts = {
+            'checking':   Hidden('MTIzNDU2Nzg='),
+            'savings':    Hidden('MjM0NTY3ODk='),
+            'creditcard': Hidden('MzQ1Njc4OTA='),
+        }
+        questions = [
+            Question('What city were you born in?'),
+            Question('What street did you grow up on?'),
+            Question('What was your childhood nickname?'),
+        ]
+        customer_service = '1-866-229-6633'
+
+Each attribute represents a piece of information that can be requested. For 
+example, a summary of all information can be requested with::
+
+    > avendesora all bb
+    NAMES: bigbank, bb
+    ACCOUNTS:
+        CHECKING: <reveal with 'avendesora show bigbank accounts.checking'>
+        CREDITCARD: <reveal with 'avendesora show bigbank accounts.creditcard'>
+        SAVINGS: <reveal with 'avendesora show bigbank accounts.savings'>
+    CUSTOMER SERVICE: 1-866-229-6633
+    EMAIL: gman33@pizza.com
+    PASSCODE: <reveal with 'avendesora show bigbank passcode'>
+    PIN: <reveal with 'avendesora show bigbank pin'>
+    QUESTIONS:
+        0: What city were you born in? <reveal with 'avendesora show bigbank questions.0'>
+        1: What street did you grow up on? <reveal with 'avendesora show bigbank questions.1'>
+        2: What was your childhood nickname? <reveal with 'avendesora show bigbank questions.2'>
+    URL: https://bigbank.com/login
+    USERNAME: gman33
+    VERBAL: <reveal with 'avendesora show bigbank verbal'>
+
+The attributes have various levels of confidentiality.  Simple strings are not 
+considered sensitive. Those values provided by Python classes inherit the 
+confidentiality of the class.  Hidden() provides simple concealment. GPG()
+provides full encryption. And classes like Password(), Passphrase(), PIN() and 
+Question generates secrets.  Attributes that are considered sensitive are not 
+shown in the above summary, but can be requested individually::
+
+    > avendesora show bb pin
+    PIN: 7784
+
+Attributes can be simple scalars, such as PIN. They can be arrays, such as 
+questions::
+
+    > avendesora show bigbank questions.1
+    QUESTIONS.1: contact insulator crumb
+
+Or they can be dictionaries::
+
+    > avendesora show bb accounts.checking
+    ACCOUNTS.CHECKING (base64): 12345678
+
+The passcode attribute is the default scalar attribute::
+
+    > avendesora show bb
+    PASSCODE: Nj3gpqHNfiie
+
+The questions attribute is the default array attribute::
+
+    > avendesora show bb 0
+    QUESTIONS.0: muffin favorite boyfriend
 
 
+Adding And Editing Accounts
+---------------------------
 
+You add new accounts using the *add* command::
 
+    > avendesora add [<template>]
+
+The available templates can be found using::
+
+    > avendesora help add
+
+You can add new templates or edit the existing templates by changing 
+*account_templates* in ~/.config/avendesora/config.
+
+The *add* command will open your editor (set this with the *edit_template* 
+setting in the config file). If you are using default version of *edit_template* 
+the template will be opened in Vim with the *n* key is mapped to take you to the 
+next field. You can edit any part of the template you like, but at a minimum you 
+need to edit the fields.
+
+Once an account exists, you can edit it using::
+
+    > avendesora edit [<account>]
 

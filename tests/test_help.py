@@ -19,13 +19,13 @@ def test_add():
         Add a new account.
 
         Usage:
-            avendesora [options] add [<prototype>]
+            avendesora [options] add [<template>]
 
         Options:
             -f <file>, --file <file>
                                     Add account to specified file.
 
-        The default prototype is bank. The available prototypes are:
+        The default template is bank. The available templates are:
         bank, command and website
     """).strip()
     assert result == bytes(expected, encoding='ascii')
@@ -249,10 +249,10 @@ def test_show():
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
-# test_showall() {{{1
-def test_showall():
+# test_summary() {{{1
+def test_summary():
     try:
-        result = subprocess.check_output('avendesora help showall'.split())
+        result = subprocess.check_output('avendesora help summary'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -261,8 +261,8 @@ def test_showall():
         Show all account values.
 
         Usage:
-            avendesora all <account>
-            avendesora showall <account>
+            avendesora sum <account>
+            avendesora summary <account>
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 

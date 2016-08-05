@@ -9,6 +9,7 @@ import os
 
 os.environ['HOME'] = 'home'
 
+# test_mybank() {{{1
 def test_mybank():
     try:
         result = subprocess.check_output('avendesora show --stdout mybank'.split())
@@ -16,6 +17,7 @@ def test_mybank():
         result = os_error(err)
     assert result == b'&5U9eZ+iT84T\n'
 
+# test_mb() {{{1
 def test_mb():
     try:
         result = subprocess.check_output('avendesora show --stdout mb'.split())
@@ -23,6 +25,7 @@ def test_mb():
         result = os_error(err)
     assert result == b'&5U9eZ+iT84T\n'
 
+# test_mb_checking() {{{1
 def test_mb_checking():
     try:
         result = subprocess.check_output('avendesora show --stdout mb accounts.checking'.split())
@@ -30,6 +33,7 @@ def test_mb_checking():
         result = os_error(err)
     assert result == b'12345678\n'
 
+# test_mb_savings() {{{1
 def test_mb_savings():
     try:
         result = subprocess.check_output('avendesora show --stdout mb accounts[savings]'.split())
@@ -37,6 +41,7 @@ def test_mb_savings():
         result = os_error(err)
     assert result == b'23456789\n'
 
+# test_alertscc() {{{1
 def test_alertscc():
     try:
         result = subprocess.check_output('avendesora show --stdout alertscc'.split())
@@ -44,6 +49,7 @@ def test_alertscc():
         result = os_error(err)
     assert result == b'vGnKdofWRFLT\n'
 
+# test_scc() {{{1
 def test_scc():
     try:
         result = subprocess.check_output('avendesora show --stdout scc'.split())
@@ -51,6 +57,7 @@ def test_scc():
         result = os_error(err)
     assert result == b'vGnKdofWRFLT\n'
 
+# test_scc_account() {{{1
 def test_scc_account():
     try:
         result = subprocess.check_output('avendesora show --stdout scc account'.split())
@@ -58,6 +65,7 @@ def test_scc_account():
         result = os_error(err)
     assert result == b'123456-7890\n'
 
+# test_scc_birthdate() {{{1
 def test_scc_birthdate():
     try:
         result = subprocess.check_output('avendesora show --stdout scc birthdate'.split())
@@ -65,6 +73,7 @@ def test_scc_birthdate():
         result = os_error(err)
     assert result == b'1978-10-18\n'
 
+# test_scc_email() {{{1
 def test_scc_email():
     try:
         result = subprocess.check_output('avendesora show --stdout scc email'.split())
@@ -72,6 +81,7 @@ def test_scc_email():
         result = os_error(err)
     assert result == b'pizzaman@pizza.com\n'
 
+# test_scc_q0() {{{1
 def test_scc_q0():
     try:
         result = subprocess.check_output('avendesora show --stdout scc 0'.split())
@@ -79,6 +89,7 @@ def test_scc_q0():
         result = os_error(err)
     assert result == b'sniff flashy putsch\n'
 
+# test_scc_q1() {{{1
 def test_scc_q1():
     try:
         result = subprocess.check_output('avendesora show --stdout scc questions.1'.split())
@@ -86,6 +97,7 @@ def test_scc_q1():
         result = os_error(err)
     assert result == b'clipping knight guest\n'
 
+# test_scc_q2() {{{1
 def test_scc_q2():
     try:
         result = subprocess.check_output('avendesora show --stdout scc questions[2]'.split())
@@ -93,6 +105,7 @@ def test_scc_q2():
         result = os_error(err)
     assert result == b'mistrust tumor bonfire\n'
 
+# test_login() {{{1
 def test_login():
     try:
         result = subprocess.check_output('avendesora show --stdout login'.split())
@@ -100,31 +113,33 @@ def test_login():
         result = os_error(err)
     assert result == b'archangel fiesta ripen tracksuit autobahn integer\n'
 
-def test_show_all():
+# test_summary() {{{1
+def test_summary():
     try:
-        result = subprocess.check_output('avendesora showall mb'.split())
+        result = subprocess.check_output('avendesora summary mb'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""\
         NAMES: mybank, mb
         ACCOUNTS:
-            CHECKING: <reveal with 'avendesora mybank accounts.checking'>
-            CREDITCARD: <reveal with 'avendesora mybank accounts.creditcard'>
-            SAVINGS: <reveal with 'avendesora mybank accounts.savings'>
+            CHECKING: <reveal with 'avendesora show mybank accounts.checking'>
+            CREDITCARD: <reveal with 'avendesora show mybank accounts.creditcard'>
+            SAVINGS: <reveal with 'avendesora show mybank accounts.savings'>
         CUSTOMER SERVICE: 1-866-229-6633
         EMAIL: pizzaman@pizza.com
-        PASSCODE: <reveal with 'avendesora mybank passcode'>
-        PIN: <reveal with 'avendesora mybank pin'>
+        PASSCODE: <reveal with 'avendesora show mybank passcode'>
+        PIN: <reveal with 'avendesora show mybank pin'>
         QUESTIONS:
-            0: What city were you born in? <reveal with 'avendesora mybank questions.0'>
-            1: What street did you grow up on? <reveal with 'avendesora mybank questions.1'>
-            2: What was your childhood nickname? <reveal with 'avendesora mybank questions.2'>
+            0: What city were you born in? <reveal with 'avendesora show mybank questions.0'>
+            1: What street did you grow up on? <reveal with 'avendesora show mybank questions.1'>
+            2: What was your childhood nickname? <reveal with 'avendesora show mybank questions.2'>
         URL: https://mb.com
         USERNAME: pizzaman
-        VERBAL: <reveal with 'avendesora mybank verbal'>
+        VERBAL: <reveal with 'avendesora show mybank verbal'>
     """)
     assert result == bytes(expected, encoding='ascii')
 
+# test_find() {{{1
 def test_find():
     try:
         result = subprocess.check_output('avendesora find bank'.split())
@@ -136,6 +151,7 @@ def test_find():
     """)
     assert result == bytes(expected, encoding='ascii')
 
+# test_search() {{{1
 def test_search():
     try:
         result = subprocess.check_output('avendesora search pizza'.split())
@@ -148,6 +164,7 @@ def test_search():
     """)
     assert result == bytes(expected, encoding='ascii')
 
+# test_reveal() {{{1
 def test_reveal():
     try:
         result = subprocess.check_output('avendesora reveal MTIzNDU2Nzg='.split())
@@ -155,6 +172,7 @@ def test_reveal():
         result = os_error(err)
     assert result == b'12345678\n'
 
+# test_conceal() {{{1
 def test_conceal():
     try:
         result = subprocess.check_output('avendesora conceal 12345678'.split())

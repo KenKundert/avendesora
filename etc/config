@@ -29,7 +29,7 @@ edit_account = (
     '+foldopen',
     '{filepath}',
 )
-edit_prototype = (
+edit_template = (
     'vim',
     '+silent /{field}/',
     '+foldopen',
@@ -46,7 +46,8 @@ gpg_executable = '/usr/bin/gpg2'
 xdotool_executable = '/usr/bin/xdotool'
 xsel_executable = '/usr/bin/xsel'
 
-prototype_accounts = {
+default_account_template = 'bank'
+account_templates = {
     'website': """
         class _NAME_(Account): # {{{1
             aliases = ['_ALIASES_']

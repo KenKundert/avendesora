@@ -83,7 +83,7 @@ class Add(Command):
     DESCRIPTION = 'add a new account'
     USAGE = dedent("""
         Usage:
-            avendesora [options] add [<prototype>]
+            avendesora [options] add [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -97,13 +97,13 @@ class Add(Command):
 
             {usage}
 
-            The default prototype is {default}. The available prototypes are:
-            {prototypes}
+            The default template is {default}. The available templates are:
+            {templates}
         """).strip()
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
-            default=get_setting('default_prototype_account'),
-            prototypes=conjoin(sorted(get_setting('prototype_accounts').keys()))
+            default=get_setting('default_account_template'),
+            templates=conjoin(sorted(get_setting('account_templates').keys()))
         )
 
     @classmethod
@@ -112,24 +112,24 @@ class Add(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         try:
-            # get the specified prototype
-            prototypes = get_setting('prototype_accounts')
-            if cmdline['<prototype>']:
-                prototype_name = cmdline['<prototype>']
+            # get the specified template
+            templates = get_setting('account_templates')
+            if cmdline['<template>']:
+                template_name = cmdline['<template>']
             else:
-                prototype_name = get_setting('default_prototype_account')
-            prototype = dedent(prototypes[prototype_name]).strip() + '\n'
+                template_name = get_setting('default_account_template')
+            template = dedent(templates[template_name]).strip() + '\n'
 
-            # save prototype to tmp file and open it in the editor
+            # save template to tmp file and open it in the editor
             from tempfile import mktemp
             tmpfile = GnuPG(mktemp(suffix='_avendesora.gpg'))
-            tmpfile.save(prototype, get_setting('gpg_ids'))
+            tmpfile.save(template, get_setting('gpg_ids'))
             GenericEditor.open_and_search(tmpfile.path)
 
             # read the tmp file and determine if it has changed
             new = tmpfile.read()
             tmpfile.remove()
-            if new == prototype:
+            if new == template:
                 return output('Unchanged, and so ignored.')
 
             # hide the files that should be hidden
@@ -172,9 +172,9 @@ class Add(Command):
             error(os_error(err))
         except KeyError as err:
             error(
-                'unknown account prototype, choose from %s.' % conjoin(
-                    sorted(prototypes.keys())
-                ), culprit=prototype_name
+                'unknown account template, choose from %s.' % conjoin(
+                    sorted(templates.keys())
+                ), culprit=template_name
             )
 
 
@@ -549,15 +549,15 @@ class Show(Command):
 
 
 # ShowAll {{{1
-class ShowAll(Command):
-    NAMES = 'all', 'showall',
+class Summary(Command):
+    NAMES = 'sum', 'summary',
     DESCRIPTION = 'display all account values'
     USAGE = dedent("""
         Show all account values.
 
         Usage:
-            avendesora all <account>
-            avendesora showall <account>
+            avendesora sum <account>
+            avendesora summary <account>
     """).strip()
 
     @classmethod
