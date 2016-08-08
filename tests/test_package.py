@@ -15,7 +15,7 @@ def test_login():
         passphrase = account.get_value()
     except Error as err:
         passphrase = str(err)
-    assert passphrase == 'archangel fiesta ripen tracksuit autobahn integer'
+    assert passphrase == 'enthrall sunflower screening order shard rejoin'
 
 def test_mybank_accounts_checking():
     try:
@@ -40,9 +40,12 @@ def test_alertscc():
         pw = PasswordGenerator()
         account = pw.get_account('alertscc')
         password = account.get_value()
+        password2 = account.get_value()
     except Error as err:
         password = str(err)
-    assert password == 'vGnKdofWRFLT'
+        password2 = str(err)
+    assert password == 'KLwuU8itfect'
+    assert password2 == 'KLwuU8itfect'
 
 def test_alertscc_question1():
     try:
@@ -51,7 +54,7 @@ def test_alertscc_question1():
         answer = account.get_value(1)
     except Error as err:
         answer = str(err)
-    assert answer == 'clipping knight guest'
+    assert answer == 'placate rocky barge'
 
 def test_alertscc_question2():
     try:
@@ -60,4 +63,4 @@ def test_alertscc_question2():
         answer = account.get_field('questions', 2)
     except Error as err:
         answer = str(err)
-    assert str(answer) == 'mistrust tumor bonfire'
+    assert str(answer) == 'jigsaw tilde century'

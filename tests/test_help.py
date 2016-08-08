@@ -64,8 +64,8 @@ def test_conceal():
         Conceal text by encoding it.
 
         Usage:
-            avendesora [options] hide <text>
-            avendesora [options] conceal <text>
+            avendesora [options] hide [<text>]
+            avendesora [options] conceal [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -79,6 +79,12 @@ def test_conceal():
             protect text from observers that get a quick glance of the
             encoded text, but if they are able to capture it they can easily
             decode it.
+
+        Though available as an option for convenience, you should not pass
+        the text to be hidden as an argument as it is possible for others to
+        examine the commands you run and their argument list. For any
+        sensitive secret, you should simply run 'avendesora conceal' and
+        then enter the secret text when prompted.
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
@@ -192,8 +198,8 @@ def test_reveal():
         Transform concealed text to reveal its original form.
 
         Usage:
-            avendesora [options] unhide <text>
-            avendesora [options] reveal <text>
+            avendesora [options] unhide [<text>]
+            avendesora [options] reveal [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -207,6 +213,12 @@ def test_reveal():
             protect text from observers that get a quick glance of the
             encoded text, but if they are able to capture it they can easily
             decode it.
+
+        Though available as an option for convenience, you should not pass
+        the text to be revealed as an argument as it is possible for others
+        to examine the commands you run and their argument list. For any
+        sensitive secret, you should simply run 'avendesora reveal' and then
+        enter the encoded text when prompted.
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 

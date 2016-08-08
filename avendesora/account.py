@@ -25,7 +25,8 @@ from .config import get_setting
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
-from inform import Color, Error, is_collection, log, output, warn
+from .utilities import items
+from inform import Color, Error, is_collection, log, output, warn, is_str
 from textwrap import indent, dedent
 from urllib.parse import urlparse
 import re
@@ -40,27 +41,11 @@ LabelColor = Color(
     enable=Color.isTTY()
 )
 
-# Utilities {{{1
-# items {{{2
-def items(collection):
-    # iterate through a collection returning key, value pairs in sorted order
-    # collection may be a dictionary, an array, or a scalar
-    try:
-        # assume a dictionary
-        iterator = sorted(collection.keys())
-    except AttributeError:
-        # it is not a dictionary
-        if is_collection(collection):
-            iterator = range(len(collection))  # it is an array
-        else:
-            yield None, collection             # it is a scalar
-            return
-
-    for key in iterator:
-        yield key, collection[key]
-
-# Account Class {{{1
+# Account class {{{1
 class Account:
+    __NO_MASTER = True
+        # prevents master password from being added to this base class
+
     # all_accounts() {{{2
     @classmethod
     def all_accounts(cls):
@@ -85,6 +70,14 @@ class Account:
             # consider converting lower to upper case transitions in __name__ to
             # dashes.
             return cls.__name__.lower()
+
+    # get_seed() {{{2
+    @classmethod
+    def get_seed(cls):
+        try:
+            return cls.seed
+        except AttributeError:
+            return cls.get_name()
 
     # matches_exactly() {{{2
     @classmethod
@@ -217,7 +210,7 @@ class Account:
 
         # generate the value if needed
         try:
-            value.generate(key, cls)
+            value.generate(name, key, cls)
         except AttributeError as err:
             pass
         return value
@@ -343,7 +336,7 @@ class Account:
                 if hasattr(v, 'generate'):
                     # is a secret, get description if available
                     try:
-                        v = '%s %s' % (v.get_description(), reveal(name, k))
+                        v = '%s %s' % (v.get_key(), reveal(name, k))
                     except AttributeError:
                         v = reveal(name, k)
                 lines.append(fmt_field(k, v, level=1))
@@ -367,6 +360,25 @@ class Account:
                 lines.append(fmt_field(key, value))
         output(*lines, sep='\n')
 
+    # archive() { {{2
+    @classmethod
+    def archive(cls):
+        # return all account fields along with their values as a dictionary
+
+        def extract(value, name, key=None):
+            if not is_collection(value):
+                if hasattr(value, 'generate'):
+                    value.generate(name, key, cls)
+                    #value = 'Hidden(%s)' % Conceal.hide(str(value))
+                return value
+            try:
+                return {k: extract(v, name, k) for k, v in value.items()}
+            except AttributeError:
+                # still need to work out how to output the question.
+                return [extract(v, name, i) for i, v in enumerate(value)]
+
+        return {k: extract(v, k) for k, v in cls.values() if k != 'master'}
+
     # open_browser() {{{2
     @classmethod
     def open_browser(cls, name):
@@ -375,3 +387,31 @@ class Account:
             browser = StandardBrowser(name)
         url = cls.get_field('url', default=None)
         browser.run(url)
+
+
+# StealthAccount class {{{1
+class StealthAccount(Account):
+    __NO_MASTER = True
+        # prevents master password from being added to this base class
+
+    @classmethod
+    def get_seed(cls):
+        # need to handle case where stdin/stdout is not available.
+        # perhaps write generic password getter that supports both gui and tui.
+        # Then have global option that indicates which should be used.
+        # Separate name from seed. Only request seed when generating a password.
+        import getpass
+        try:
+            name = getpass.getpass('account name: ')
+        except EOFError:
+            output()
+            name = ''
+        if not name:
+            warn('null account name.')
+        return name
+
+    @classmethod
+    def archive(cls):
+        # do not archive stealth accounts
+        pass
+

@@ -16,8 +16,9 @@
 
 # Imports {{{1
 from .config import get_setting
+from .gpg import get_active_file
 from shlib import Run, to_path
-from inform import codicil, error, fatal, os_error, warn, is_str
+from inform import codicil, error, fatal, os_error, warn, is_str, is_collection
 from textwrap import dedent, wrap, indent
 from pkg_resources import resource_filename
 import hashlib
@@ -144,4 +145,41 @@ def to_python(obj, _level=0):
     else:
         output += [obj.__repr__()]
     return '\n'.join(output)
+
+# error_source {{{1
+def error_source(lvl=3):
+    """Source of error
+    Reads stack trace to determine filename and lineno of error.
+    """
+    import traceback
+    try:
+        # return filename and lineno
+        # context and content are also available
+        return traceback.extract_stack()[-lvl][:2]
+    except SyntaxError:
+        # extract_stack() does not work on binary encrypted files. It generates
+        # a syntax error that indicates that the file encoding is missing
+        # because the function tries to read the file and sees binary data. This
+        # is not a problem with ascii encrypted files as we don't actually show
+        # code, which is gibberish, but does not require an encoding.
+        return get_active_file()
+
+# items {{{1
+def items(collection):
+    # iterate through a collection returning key, value pairs in sorted order
+    # collection may be a dictionary, an array, or a scalar
+    try:
+        # assume a dictionary
+        iterator = sorted(collection.keys())
+    except AttributeError:
+        # it is not a dictionary
+        if is_collection(collection):
+            iterator = range(len(collection))  # it is an array
+        else:
+            yield None, collection             # it is a scalar
+            return
+
+    for key in iterator:
+        yield key, collection[key]
+
 

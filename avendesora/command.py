@@ -20,11 +20,13 @@ from .conceal import Conceal
 from .config import read_config, get_setting, override_setting
 from .editors import GenericEditor
 from .generator import PasswordGenerator
-from .gpg import GnuPG
-from .utilities import two_columns
+from .gpg import GnuPG, PythonFile
+from .utilities import two_columns, to_python, items
 from .writer import get_writer
 from .__init__ import __version__
-from inform import Error, error, codicil, output, conjoin, os_error
+from inform import (
+    Error, error, codicil, output, conjoin, os_error, indent, is_collection
+)
 from shlib import to_path, mv
 from docopt import docopt
 from textwrap import dedent
@@ -147,7 +149,7 @@ class Add(Command):
                 ]
                 if not candidates:
                     raise Error('not found.', cuplrit=cmdline['--file'])
-                if len(candidates) > 0:
+                if len(candidates) > 1:
                     raise Error(
                         'ambiguous, matches %s.' % conjoin(candidates),
                         cuplrit=prefix
@@ -158,16 +160,17 @@ class Add(Command):
             path = to_path(get_setting('settings_dir'), filename)
 
             # get original contents of accounts file
-            orig_accounts_file = GnuPG(path)
-            accounts = orig_accounts_file.read()
+            orig_accounts_file = PythonFile(path)
+            accounts = orig_accounts_file.run()
+            gpg_ids = accounts.get('gpg_ids')
 
             # add new account to the contents
-            accounts = accounts + new + '\n'
+            accounts = orig_accounts_file.code + new + '\n'
 
             # rename the original file and then save the new version
             orig_accounts_file.rename('.saved')
             new_accounts_file = GnuPG(path)
-            new_accounts_file.save(accounts)
+            new_accounts_file.save(accounts, gpg_ids)
         except OSError as err:
             error(os_error(err))
         except KeyError as err:
@@ -176,6 +179,63 @@ class Add(Command):
                     sorted(templates.keys())
                 ), culprit=template_name
             )
+
+
+# Archive {{{1
+class Archive(Command):
+    NAMES = 'archive',
+    DESCRIPTION = 'generates archive of all account information'
+    USAGE = dedent("""
+        Usage:
+            avendesora archive
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(
+            title=title(cls.DESCRIPTION), usage=cls.USAGE,
+        )
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # determine the account and open the URL
+        entries = []
+        for account in generator.all_accounts():
+            entry = account.archive()
+            if entry:
+                entries.append(indent('%r: %s,' % (
+                    account.get_name(), to_python(entry)
+                )))
+
+        # build file contents
+        from .preferences import ARCHIVE_FILE_CONTENTS
+        import arrow
+        contents = ARCHIVE_FILE_CONTENTS.format(
+            encoding = get_setting('encoding'),
+            date=str(arrow.now()),
+            accounts = '\n\n'.join(entries)
+        )
+
+        archive_file = get_setting('archive_file')
+        archive = GnuPG(archive_file)
+        if not archive.will_encrypt():
+            warn('archive file is not encrypted.', culprit=archive_file)
+        try:
+            archive.save(contents)
+        except OSError as err:
+            raise Error(os_error(err), culprit=archive_file)
+
 
 
 # Browse {{{1
@@ -223,6 +283,102 @@ class Browse(Command):
         # determine the account and open the URL
         account = generator.get_account(cmdline['<account>'])
         account.open_browser(cmdline['--browser'])
+
+# Changed {{{1
+class Changed(Command):
+    NAMES = 'changed',
+    DESCRIPTION = 'identify any changes that have occurred since the archive was created'
+    USAGE = dedent("""
+        Usage:
+            avendesora changed
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(
+            title=title(cls.DESCRIPTION), usage=cls.USAGE,
+        )
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # read archive file
+        archive_path = get_setting('archive_file')
+        f = PythonFile(archive_path)
+        archive = f.run()
+        import arrow
+        created = archive.get('CREATED')
+        if created:
+            created = arrow.get(created).format('YYYY-MM-DD hh:mm:ss A ZZ')
+            output('archive created: %s' % created)
+        archive_accounts = archive.get('ACCOUNTS')
+        if not archive_accounts:
+            raise Error(
+                'corrupt archive, ACCOUNTS missing.', culprit=archive_path
+            )
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # determine the account and open the URL
+        current_accounts = {}
+        for account in generator.all_accounts():
+            entry = account.archive()
+            if entry:
+                current_accounts[account.get_name()] = entry
+
+        # report any new or missing accounts
+        new = current_accounts.keys() - archive_accounts.keys()
+        missing = archive_accounts.keys() - current_accounts.keys()
+        for each in sorted(new):
+            output('new account:', each)
+        for each in sorted(missing):
+            output('missing account:', each)
+
+        # for the common accounts, report any differences in the fields
+        common = archive_accounts.keys() & current_accounts.keys()
+        for account_name in sorted(common):
+            archive_account = archive_accounts[account_name]
+            current_account = current_accounts[account_name]
+
+            # report any new or missing fields
+            new = current_account.keys() - archive_account.keys()
+            missing = archive_account.keys() - current_account.keys()
+            for each in sorted(new):
+                output(account_name, 'new field', each, sep=': ')
+            for each in sorted(missing):
+                output(account_name, 'new field', each, sep=': ')
+
+            # for the common fields, report any differences in the values
+            shared = archive_account.keys() & current_account.keys()
+            for field_name in sorted(shared):
+                archive_value = archive_account[field_name]
+                current_value = current_account[field_name]
+                if is_collection(current_value):
+                    archive_items = items(archive_account[field_name])
+                    current_items = items(current_account[field_name])
+                    archive_keys = set(k for k, v in archive_items)
+                    current_keys = set(k for k, v in current_items)
+                    new = current_keys - archive_keys
+                    missing = archive_keys - current_keys
+                    for each in sorted(new):
+                        output(account_name, field_name, 'new member', each, sep=': ')
+                    for each in sorted(missing):
+                        output(account_name, field_name, 'missing member', each, sep=': ')
+                    for k in sorted(archive_keys & current_keys):
+                        if str(archive_value[k]) != str(current_value[k]):
+                            output(account_name, 'member differs', '%s[%s]' % (field_name, k), sep=': ')
+                else:
+                    if str(archive_value) != str(current_value):
+                        output(account_name, 'field differs:', field_name, sep=': ')
+
 
 # Edit {{{1
 class Edit(Command):
@@ -329,8 +485,8 @@ class Hide(Command):
     DESCRIPTION = 'conceal text by encoding it'
     USAGE = dedent("""
         Usage:
-            avendesora [options] hide <text>
-            avendesora [options] conceal <text>
+            avendesora [options] hide [<text>]
+            avendesora [options] conceal [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -353,6 +509,12 @@ class Hide(Command):
                 protect text from observers that get a quick glance of the
                 encoded text, but if they are able to capture it they can easily
                 decode it.
+
+            Though available as an option for convenience, you should not pass
+            the text to be hidden as an argument as it is possible for others to
+            examine the commands you run and their argument list. For any
+            sensitive secret, you should simply run 'avendesora conceal' and
+            then enter the secret text when prompted.
         """).strip()
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings
@@ -363,8 +525,17 @@ class Hide(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
+        # get the text
+        text = cmdline['<text>']
+        if not text:
+            import getpass
+            try:
+                text = getpass.getpass('text: ')
+            except EOFError:
+                return
+
         # transform and output the string
-        output(Conceal.hide(cmdline['<text>'], cmdline['--encoding']))
+        output(Conceal.hide(text, cmdline['--encoding']))
 
 
 # Initialize {{{1
@@ -589,8 +760,8 @@ class Unhide(Command):
         Transform concealed text to reveal its original form.
 
         Usage:
-            avendesora [options] unhide <text>
-            avendesora [options] reveal <text>
+            avendesora [options] unhide [<text>]
+            avendesora [options] reveal [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -613,6 +784,12 @@ class Unhide(Command):
                 protect text from observers that get a quick glance of the
                 encoded text, but if they are able to capture it they can easily
                 decode it.
+
+            Though available as an option for convenience, you should not pass
+            the text to be revealed as an argument as it is possible for others
+            to examine the commands you run and their argument list. For any
+            sensitive secret, you should simply run 'avendesora reveal' and then
+            enter the encoded text when prompted.
         """).strip()
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings
@@ -623,8 +800,17 @@ class Unhide(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
+        # get the text
+        text = cmdline['<text>']
+        if not text:
+            import getpass
+            try:
+                text = getpass.getpass('hidden text: ')
+            except EOFError:
+                return
+
         # transform and output the string
-        output(Conceal.show(cmdline['<text>'], cmdline['--encoding']))
+        output(Conceal.show(text, cmdline['--encoding']))
 
 
 # Version {{{1

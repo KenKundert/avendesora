@@ -23,15 +23,15 @@
 # Imports {{{1
 from .charsets import DIGITS, DISTINGUISHABLE
 from .config import get_setting, override_setting
-from .gpg import GnuPG
 from .dictionary import DICTIONARY
-from inform import Error, error, fatal, log, output, terminate, warn
+from .gpg import GnuPG
+from .utilities import error_source
+from inform import Error, error, log, output, terminate, warn
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import hashlib
 import getpass
 import gnupg
-import sys
 
 # Conceal {{{1
 class Conceal:
@@ -62,7 +62,7 @@ class Conceal:
         for concealer in cls.concealers():
             if encoding == concealer.get_name():
                 return concealer.conceal(text)
-        error('not found.', culprit=encoding)
+        raise Error('not found.', culprit=encoding)
 
     # show() {{{2
     @classmethod
@@ -78,32 +78,28 @@ class Conceal:
     def encodings(cls):
         return [c.get_name() for c in cls.concealers()]
 
+    # __repr__() {{{2
+    def __repr__(self):
+        return "Hidden('%s')" % (Conceal.hide(self.plaintext, 'base64'))
 
 # Hidden {{{1
 class Hidden(Conceal):
     NAME = 'base64'
-    # This does a simple base64 encoding on the string to hide it from a casual
+    # This decodes a string that is encoded in base64 to hide it from a casual
     # observer. But it is not encrypted. The original value can be trivially
     # recovered from the encoded version.
-    def __init__(self, value, secure=True, encoding='utf8'):
+    def __init__(self, ciphertext, secure=True, encoding='utf8'):
+        self.ciphertext = ciphertext
         try:
-            value = a2b_base64(value)
-            self.value = value.decode(encoding)
+            self.plaintext = a2b_base64(ciphertext).decode(encoding)
             self.secure = secure
         except BinasciiError as err:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            filename, lineno = traceback.extract_stack()[-2][:2]
-                # context and content are also available, but in this case
-                # Hidden is generally instantiated from top-level so the 
-                # context is not interesting and the content (the actual line 
-                # of code) shown in this case is gibberish (encrypted).
-            fatal(
-                'invalid value specified to Hidden().',
-                culprit=(filename, lineno)
+            raise Error(
+                'invalid value specified to Hidden(): %s.' % str(err),
+                culprit=error_source()
             )
 
-    def generate(self, name, account):
+    def generate(self, field_name, field_key, account):
         # we don't need to do anything, but having this method marks this value
         # as being confidential
         pass
@@ -112,19 +108,27 @@ class Hidden(Conceal):
         return self.secure
 
     def __str__(self):
-        return self.value
+        return self.plaintext
 
     @staticmethod
-    def conceal(value, encoding='utf8'):
+    def conceal(value, encoding=None):
+        encoding = encoding if encoding else get_setting('encoding')
         if not value:
-            value = getpass.getpass('text to hide: ')
+            try:
+                value = getpass.getpass('text to hide: ')
+            except EOFError:
+                value = ''
         value = value.encode(encoding)
         return b2a_base64(value).rstrip().decode('ascii')
 
     @staticmethod
-    def reveal(value, encoding='utf8'):
+    def reveal(value, encoding=None):
+        encoding = encoding if encoding else get_setting('encoding')
         if not value:
-            value = getpass.getpass('text to show: ')
+            try:
+                value = getpass.getpass('text to hide: ')
+            except EOFError:
+                value = ''
         value = a2b_base64(value.encode('ascii'))
         return value.decode(encoding)
 
@@ -139,8 +143,8 @@ class GPG(Conceal, GnuPG):
     # Generally one would use their private key to protect the gpg file, and
     # then use a symmetric key, or perhaps a separate private key, to protect an
     # individual piece of data, like a master password.
-    def __init__(self, value, secure=True, encoding='utf8'):
-        self.value = value
+    def __init__(self, ciphertext, secure=True, encoding='utf8'):
+        self.ciphertext = ciphertext
         #gpg_path = get_setting('gpg_path')
         #gpg_home = get_setting('gpg_home')
         #gpg_args = {}
@@ -148,33 +152,25 @@ class GPG(Conceal, GnuPG):
         #    gpg_args.update({'gpgbinary': str(gpg_path)})
         #if gpg_home:
         #    gpg_args.update({'gnupghome': str(gpg_home)})
-        #print('#####', gpg_args)
         #self.gpg = gnupg.GPG(**gpg_args)
 
 
-    def generate(self, name, account):
+    def generate(self, field_name, field_key, account):
         # must do this here in generate rather than in constructor to avoid
         # decrypting this, and perhaps asking for a passcode,  every time
         # Advendesora is run.
-        decrypted = self.gpg.decrypt(dedent(self.value))
-        if not decrypted.ok:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            filename, lineno = traceback.extract_stack()[-2][:2]
-                # context and content are also available, but in this case
-                # GPG is generally instantiated from top-level so the 
-                # context is not interesting and the content (the actual line 
-                # of code) shown in this case is gibberish (encrypted).
+        plaintext = self.gpg.decrypt(dedent(self.ciphertext))
+        if not plaintext.ok:
             msg = 'unable to decrypt argument to GPG()'
             try:
-                msg = '%s: %s' % (msg, decrypted.stderr)
+                msg = '%s: %s' % (msg, plaintext.stderr)
             except AttributeError:
                 msg += '.'
-            fatal(msg, culprit=(filename, lineno))
-        self.decrypted = decrypted
+            raise Error(msg, culprit=error_source())
+        self.plaintext = plaintext
         pass
 
     def __str__(self):
-        return str(self.decrypted)
+        return str(self.plaintext)
 
 

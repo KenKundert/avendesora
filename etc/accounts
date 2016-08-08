@@ -97,8 +97,8 @@ class Login(Account):
 # MyBank {{{1
 class MyBank(Account):
     aliases = ['mb']
-    username = 'pizzaman'
-    email = 'pizzaman@pizza.com'
+    username = 'πman'
+    email = 'πman@pizza.com'
     url = 'https://mb.com'
     passcode = MixedPassword(
         12, ALPHANUMERIC,
@@ -110,6 +110,7 @@ class MyBank(Account):
         Question('What city were you born in?'),
         Question('What street did you grow up on?'),
         Question('What was your childhood nickname?'),
+        Question('Are you an α male?'),
     ]
     accounts = {
         'checking':   Hidden('MTIzNDU2Nzg='),

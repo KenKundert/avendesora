@@ -191,7 +191,8 @@ The passcode attribute is the default scalar attribute::
     > avendesora show bb
     PASSCODE: Nj3gpqHNfiie
 
-The questions attribute is the default array attribute::
+The questions attribute is the default array attribute, which is used if the 
+requested field is a number::
 
     > avendesora show bb 0
     QUESTIONS.0: muffin favorite boyfriend

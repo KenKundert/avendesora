@@ -19,6 +19,8 @@ doctests::
 ...              return None
 ...     def get_name(self):
 ...          return 'pux'
+...     def get_seed(self):
+...          return 'pux'
 >>> account = Account()
 
 """
@@ -44,9 +46,11 @@ doctests::
 from .charsets import (
     ALPHANUMERIC, DIGITS, DISTINGUISHABLE, LOWERCASE, SYMBOLS, UPPERCASE,
 )
+from .conceal import Conceal
 from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
-from inform import Error, terminate, warn
+from .utilities import error_source
+from inform import Error, terminate, warn, output
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import hashlib
@@ -64,7 +68,7 @@ class SecretExhausted(Exception):
         return "secret exhausted"
 
 # Secret {{{1
-class Secret():
+class Secret:
     """Base class for generated secrets"""
 
     def __init__(self):
@@ -73,27 +77,32 @@ class Secret():
         This base class should not be instantiated. A constructor is only provided 
         to so the doctests work on the helper methods.
         """
-        self.description = self.master = self.version = None
+        self.master = self.version = None
 
-    def get_description(self):
-        return self.description
+    def get_key(self, default=None):
+        return default
 
-    def generate(self, description, account):
+    def generate(self, field_name, field_key, account):
         account_name = account.get_name()
+        account_seed = account.get_seed()
         if self.master is None:
             master = account.get_field('master', default=None)
         else:
             master = self.master
         if not master:
             try:
-                master = getpass.getpass(
-                    'master password for %s: ' % account_name
-                )
+                try:
+                    master = getpass.getpass(
+                        'master password for %s: ' % account_name
+                    )
+                except EOFError:
+                    output()
+                    master = ''
                 if not master:
                     warn("master password is empty.")
             except (EOFError, KeyboardInterrupt):
                 terminate()
-        description = self.description if self.description else description
+        field_key = self.get_key(field_key)
         if self.version:
             version = self.version
         else:
@@ -102,7 +111,8 @@ class Secret():
             except Error:
                 version = ''
 
-        seeds = [description, account_name, master, version]
+        assert field_name and account_seed and master
+        seeds = [field_name, field_key, account_seed, master, version]
         key = ' '.join([str(seed) for seed in seeds])
 
         # Convert the key into 512 bit number
@@ -122,9 +132,9 @@ class Secret():
         the components that are passed into the constructor.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', account)
+        >>> secret.generate('dux', None, account)
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
-        '79 62 46 89 95 5 98 70 13 81'
+        '72 11 92 60 22 7 7 59 0 64'
 
         """
         max_index = radix-1
@@ -143,20 +153,20 @@ class Secret():
         alphabet.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', account)
+        >>> secret.generate('dux', None, account)
         >>> ' '.join(secret._symbols([str(i) for i in range(100)], 10))
-        '79 62 46 89 95 5 98 70 13 81'
+        '72 11 92 60 22 7 7 59 0 64'
 
         This function can be used to generate a password as follows:
         >>> import string
         >>> alphabet =  alphabet = string.ascii_letters + string.digits
         >>> ''.join(secret._symbols(alphabet, 16))
-        'uEKEj6mLDOkK6APv'
+        '53ivicA5cXIhE2pu'
 
         This function can be used to generate a passphrase as follows:
         >>> dictionary = ['eeny', 'meeny', 'miny', 'moe']
         >>> ' '.join(secret._symbols(dictionary, 4))
-        'moe miny miny miny'
+        'moe miny moe eeny'
 
         """
         radix = len(alphabet)
@@ -176,9 +186,9 @@ class Secret():
         secret is exhausted.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', account)
+        >>> secret.generate('dux', None, account)
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
-        '79 62 46 89 95 5 98 70 13 81'
+        '72 11 92 60 22 7 7 59 0 64'
 
         """
         max_index = radix-1
@@ -198,9 +208,9 @@ class Secret():
         secret is exhausted.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', account)
+        >>> secret.generate('dux', None, account)
         >>> ' '.join([str(secret._get_symbol(range(100))) for i in range(10)])
-        '79 62 46 89 95 5 98 70 13 81'
+        '72 11 92 60 22 7 7 59 0 64'
 
         This function can be used to generate a birth date using:
         >>> def birthdate(secret, year, min_age=18, max_age=80):
@@ -210,7 +220,7 @@ class Secret():
         ...         secret._get_symbol(range(year-max_age, year-min_age))
         ...     )
         >>> birthdate(secret, 2014)
-        '11/18/1976'
+        '02/05/1940'
 
         """
         radix = len(alphabet)
@@ -225,6 +235,9 @@ class Secret():
 
         return alphabet[index]
 
+    # __repr__() {{{2
+    def __repr__(self):
+        return "Hidden('%s')" % Conceal.hide(str(self))
 
 # Password {{{1
 class Password(Secret):
@@ -238,9 +251,9 @@ class Password(Secret):
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = Password()
-    >>> secret.generate('dux', account)
+    >>> secret.generate('dux', None, account)
     >>> str(secret)
-    'vo9WSyfEqRgH'
+    '7zLoNaZ8aJaD'
 
     """
     def __init__(self,
@@ -250,15 +263,26 @@ class Password(Secret):
         version=None,
         sep=''
     ):
-        self.description = None
-        self.length = length
+        try:
+            self.length = int(length)
+        except ValueError:
+            raise Error(
+                'expecting an integer for length.', culprit=error_source()
+            )
         self.alphabet = alphabet
         self.master = master
         self.version = version
         self.sep = sep
 
     def __str__(self):
-        return self.sep.join(self._symbols(self.alphabet, self.length))
+        try:
+            secret = self.secret
+        except AttributeError:
+            # it is important that this be called only once, because the secret
+            # changes each time it is called
+            secret = self.sep.join(self._symbols(self.alphabet, self.length))
+        self.secret = secret
+        return secret
 
 
 # Passphrase {{{1
@@ -269,9 +293,9 @@ class Passphrase(Password):
 
     >>> import string
     >>> secret = Passphrase()
-    >>> secret.generate('dux', account)
+    >>> secret.generate('dux', None, account)
     >>> str(secret)
-    'larva cause tearaway wharf'
+    'baron session contagion aphid'
 
     """
     def __init__(self,
@@ -281,8 +305,12 @@ class Passphrase(Password):
         version=None,
         sep=' '
     ):
-        self.description = None
-        self.length = length
+        try:
+            self.length = int(length)
+        except ValueError:
+            raise Error(
+                'expecting an integer for length.', culprit=error_source()
+            )
         self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
         self.version = version
@@ -298,9 +326,9 @@ class PIN(Password):
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = PIN()
-    >>> secret.generate('dux', account)
+    >>> secret.generate('dux', None, account)
     >>> str(secret)
-    '9816'
+    '2259'
 
     """
     def __init__(self,
@@ -309,8 +337,12 @@ class PIN(Password):
         master=None,
         version=None,
     ):
-        self.description = None
-        self.length = length
+        try:
+            self.length = int(length)
+        except ValueError:
+            raise Error(
+                'expecting an integer for length.', culprit=error_source()
+            )
         self.alphabet = alphabet
         self.master = master
         self.version = version
@@ -320,14 +352,15 @@ class PIN(Password):
 # Question {{{1
 class Question(Passphrase):
     """
-    Identical to Passphrase() except the description must be specified when
-    created and is taken to be the security question.
+    Identical to Passphrase() except a question must be specified when
+    created and is taken to be the security question. The question is used
+    rather than the field name when generating the secret.
 
     >>> import string
     >>> secret = Question('What city were you born in?')
-    >>> secret.generate('dux', account)
+    >>> secret.generate('dux', None, account)
     >>> str(secret)
-    'picky robot mattock'
+    'figment increment stiletto'
 
     """
     # Generally the user will want to give several security questions, which
@@ -340,22 +373,51 @@ class Question(Passphrase):
     # 2. they would lose the index and any sense of order, so when they wanted
     #    secret, they would have to identify it by typing in the entire question
     #    exactly.
+    # constructor {{{2
     def __init__(self,
         question,
         length=3,
         alphabet=None,
         master=None,
         version=None,
-        sep=' '
+        sep=' ',
+        answer=None
     ):
-        self.description = question
-        self.question = None
-        self.length = length
+        self.question = question
+        try:
+            self.length = int(length)
+        except ValueError:
+            raise Error(
+                'expecting an integer for length.', culprit=error_source()
+            )
         self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
         self.version = version
         self.sep = sep
+        self.answer = answer
+            # answer allows the user to override the generator and simply
+            # specify the answer. This is also used when producing the archive.
 
+    # get_key() {{{2
+    def get_key(self, default=None):
+        return self.question
+
+    # __str__() {{{2
+    def __str__(self):
+        if self.answer:
+            answer = str(self.answer)
+        else:
+            # it is important that this be called only once, because the secret
+            # changes each time it is called
+            answer = self.sep.join(self._symbols(self.alphabet, self.length))
+        self.answer = answer
+        return answer
+
+    # __repr__() {{{2
+    def __repr__(self):
+        return "Question('%s', answer=Hidden('%s'))" % (
+            self.question, Conceal.hide(str(self))
+        )
 
 # MixedPassword {{{1
 class MixedPassword(Secret):
@@ -377,9 +439,9 @@ class MixedPassword(Secret):
     >>> secret = MixedPassword(
     ...     12, base, [(lowercase, 2), (uppercase, 2), (digits, 2)]
     ... )
-    >>> secret.generate('dux', account)
+    >>> secret.generate('dux', None, account)
     >>> str(secret)
-    'drcrDb7bZu83'
+    'IHrFQCg1kCS7'
 
     """
     def __init__(
@@ -390,32 +452,45 @@ class MixedPassword(Secret):
         master=None,
         version=None,
     ):
-        self.description = None
-        self.length = length
+        try:
+            self.length = int(length)
+        except ValueError:
+            raise Error(
+                'expecting an integer for length.', culprit=error_source()
+            )
         self.def_alphabet = def_alphabet
         self.requirements = requirements
         self.master = master
         self.version = version
 
     def __str__(self):
-        # Choose the symbols we will used to create the password by drawing from 
-        # the various alphabets in order.
-        num_required = 0
-        symbols = []
-        for alphabet, count in self.requirements:
-            for i in range(count):
-                symbols.append(self._get_symbol(alphabet))
-                num_required += 1
-        for i in range(self.length - num_required):
-            symbols.append(self._get_symbol(self.def_alphabet))
+        try:
+            secret = self.secret
+        except AttributeError:
+            # It is important that this be called only once, because the secret
+            # changes each time it is called.
 
-        # Now, randomize the symbols to produce the password.
-        password = []
-        while (self.length > 0):
-            i = self._get_index(self.length)
-            password.append(symbols.pop(i))
-            self.length -= 1
-        return ''.join(password)
+            # Choose the symbols we will used to create the password by drawing from 
+            # the various alphabets in order.
+            num_required = 0
+            symbols = []
+            for alphabet, count in self.requirements:
+                for i in range(count):
+                    symbols.append(self._get_symbol(alphabet))
+                    num_required += 1
+            for i in range(self.length - num_required):
+                symbols.append(self._get_symbol(self.def_alphabet))
+
+            # Now, randomize the symbols to produce the password.
+            password = []
+            length = self.length
+            while (length > 0):
+                i = self._get_index(length)
+                password.append(symbols.pop(i))
+                length -= 1
+            secret = ''.join(password)
+        self.secret = secret
+        return secret
 
 # PasswordRecipe{{{1
 class PasswordRecipe(MixedPassword):
@@ -438,14 +513,14 @@ class PasswordRecipe(MixedPassword):
     password be generated, 2 of which are taken from the set !@#$%^&=.
 
     >>> secret = PasswordRecipe('12 2u 2d 2s')
-    >>> secret.generate('pux', account)
+    >>> secret.generate('pux', None, account)
     >>> str(secret)
-    '~Y47&DOsBa43'
+    'HTq64thNN8>;'
 
     >>> secret = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
-    >>> secret.generate('bux', account)
+    >>> secret.generate('bux', None, account)
     >>> str(secret)
-    '0Jx8erS53#H*'
+    'WZ4$7F&8kOXz'
 
     """
 
@@ -465,8 +540,14 @@ class PasswordRecipe(MixedPassword):
         master=None,
         version=None,
     ):
-        parts = recipe.split()
         requirements = []
+        try:
+            parts = recipe.split()
+        except (ValueError, AttributeError) as err:
+            raise Error(
+                'recipe must be a string, found %s.' % recipe,
+                culprit=error_source()
+            )
         try:
             each = parts[0]
             length = int(each)
@@ -474,11 +555,13 @@ class PasswordRecipe(MixedPassword):
                 num, kind, alphabet = self.PATTERN.match(each).groups()
                 if self.ALPHABETS[kind]:
                     alphabet = self.ALPHABETS[kind]
-                requirements += [(alphabet, int(num))]
+                requirements += [(alphabet, int('0' + num))]
         except (ValueError, AttributeError) as err:
-            raise Error('invalid term in recipe: %s.' % each)
+            raise Error(
+                "%s: invalid term in recipe '%s'." % (each, recipe),
+                culprit=error_source()
+            )
 
-        self.description = None
         self.length = length
         self.def_alphabet = def_alphabet
         self.requirements = requirements
@@ -492,9 +575,9 @@ class BirthDate(Secret):
     This function can be used to generate a birth date using::
 
     >>> secret = BirthDate(2015, 18, 65)
-    >>> secret.generate('dux', account)
+    >>> secret.generate('dux', None, account)
     >>> str(secret)
-    '1983-09-18'
+    '1994-09-21'
 
     For year, enter the year the entry that contains BirthDate was created.  
     Doing so anchors the age range. In this example, the creation date is 2015,
@@ -506,9 +589,9 @@ class BirthDate(Secret):
     formatted::
 
     >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
-    >>> secret.generate('dux', account)
+    >>> secret.generate('dux', None, account)
     >>> str(secret)
-    '9/18/83'
+    '9/21/94'
 
     """
     def __init__(
@@ -520,7 +603,6 @@ class BirthDate(Secret):
         master=None,
         version=None,
     ):
-        self.description = None
         self.fmt = fmt
         self.last_year = year-min_age
         self.first_year = year-max_age
@@ -528,14 +610,21 @@ class BirthDate(Secret):
         self.version = version
 
     def __str__(self):
-        import arrow
-        year = self._get_symbol(range(self.first_year, self.last_year))
-        jan1 = arrow.get(year, 1, 1)
-        dec31 = arrow.get(year, 12, 31)
-        days_in_year = (dec31 - jan1).days
-        day = self._get_symbol(range(days_in_year))
-        birthdate = jan1.replace(days=day)
-        return birthdate.format(self.fmt)
+        try:
+            secret = self.secret
+        except AttributeError:
+            # It is important that this be called only once, because the secret
+            # changes each time it is called.
+            import arrow
+            year = self._get_symbol(range(self.first_year, self.last_year))
+            jan1 = arrow.get(year, 1, 1)
+            dec31 = arrow.get(year, 12, 31)
+            days_in_year = (dec31 - jan1).days
+            day = self._get_symbol(range(days_in_year))
+            birthdate = jan1.replace(days=day)
+            secret = birthdate.format(self.fmt)
+        self.secret = secret
+        return secret
 
 if __name__ == "__main__":
     import doctest

@@ -2,7 +2,7 @@ from .charsets import (
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
     HEXDIGITS, PUNCTUATION, SYMBOLS, WHITESPACE, PRINTABLE, DISTINGUISHABLE
 )
-from .account import Account
+from .account import Account, StealthAccount
 from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
     BirthDate,
@@ -14,4 +14,4 @@ from .recognize import (
 )
 from .generator import PasswordGenerator
 from inform import Error
-__version__ = '0.6.1'
+__version__ = '0.6.0'

@@ -28,10 +28,10 @@ NONCONFIG_SETTINGS = {
     'config_file': 'config',
     'settings_dir': user_config_dir('avendesora'),
     'default_accounts_file': 'accounts.gpg',
-    'default_templates_file': 'templates',
+    'default_stealth_accounts_file': 'stealth_accounts.gpg',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '74ad5101d77118a23d96aa29e2c695e9',
+    'secrets_hash': '17a77a0bc84628755218cb98fff61d84',
 }
 
 
@@ -40,7 +40,7 @@ NONCONFIG_SETTINGS = {
 CONFIG_DEFAULTS = {
     'accounts_files': [
         NONCONFIG_SETTINGS['default_accounts_file'],
-        NONCONFIG_SETTINGS['default_templates_file'],
+        NONCONFIG_SETTINGS['default_stealth_accounts_file'],
     ],
     'account_list_file': '.accounts_files',
     'archive_file': 'archive.gpg',
@@ -135,7 +135,9 @@ INITIAL_AUTOTYPE_DELAY = 0.0
 
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
-    # Include a few unicode characters, but to make sure they work: ±αβγδε
+    # Avendesora Configuration
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
+    #
     # The desired location of the log file (relative to config directory).
     # Adding a suffix of .gpg or .asc causes the file to be encrypted
     # (otherwise it can leak account names). Use None to disable logging.
@@ -175,20 +177,30 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     gpg_executable = {gpg_executable}
     xdotool_executable = {xdotool_executable}
     xsel_executable = {xsel_executable}
-
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen :
 ''')
 
 
 # Initial hash file {{{1
 HASH_FILE_INITIAL_CONTENTS = dedent('''\
-    # Include a few unicode characters, but to make sure they work: ±αβγδε
+    # Avendesora Hashes
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
+    #
     # Changing the contents of the dictionary, secrets, or charsets will change
     # the secrets you generate, thus you do not want to change these files once
     # you have started using the program. These are hashes for the contents of
     # these files at the time that this file was created. The program will
     # complain if the current contents of these files generate a different
     # hash. Only update these hashes if you know what you are doing.
+    #
+    # Here is the procedure you should use.
+    # 1. Using the original version of Advendesora, run 'avendesora archive'
+    #    This version should not emit a hash warning.
+    # 2. Update Avendesora
+    #    This version may emit hash warnings.
+    # 3. Run 'avendesora changed'. If no changes are noted, it is okay to update
+    #    the appropriate hashes.
+    # 4. If there are changes, either do not upgrade or manually override the
+    #    changed secrets to return them to their original values.
 
     charsets_hash = {charsets_hash}  # DO NOT CHANGE THIS LINE
     dict_hash     = {dict_hash}  # DO NOT CHANGE THIS LINE
@@ -198,8 +210,8 @@ HASH_FILE_INITIAL_CONTENTS = dedent('''\
 
 # Initial accounts file {{{1
 ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
-    # Include a few unicode characters, but to make sure they work: ±αβγδε
-    # Account information
+    # Avendesora Accounts
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
     #
     # Add information about each of your accounts to the accounts dictionary.
     #
@@ -213,11 +225,10 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # or:
     #     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
     #
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix :
 
     from avendesora import (
         # Basics
-        Account, Hidden, GPG,
+        Account, StealthAccount, Hidden, GPG,
 
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
@@ -239,145 +250,203 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
 ''')
 
-# Initial templates file {{{1
-TEMPLATES_FILE_INITIAL_CONTENTS = dedent('''\
-    # Include a few unicode characters, but to make sure they work: ±αβγδε
-    # Templates
+# Initial stealth_accounts file {{{1
+STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
+    # Avendesora Stealth Accounts
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
     #
-    # Templates are accounts without master passwords and without much in the way of
-    # attributes. Use them to generate pass codes of various types for stealth
-    # accounts.
+    # Stealth accounts are accounts where the class name is not taken to be the
+    # account name, instead the user is interactively asked for the account
+    # name. In this way there is no record that the account actually exists.
 
     # Imports {section}
     from avendesora import (
+        # Account
+        StealthAccount,
+
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
 
-        # Account
-        Account,
-
         # Secrets
-        Password, Passphrase, PIN,
+        Password, PasswordRecipe, Passphrase, PIN, Hidden,
     )
+
+    master_password = Hidden({master_password2})
     gpg_ids = {gpg_ids}
 
-    # Templates
+    # Accounts
     # Alphanumeric passwords {section}
-    class Anum4(Account):
+    class Anum4(StealthAccount):
         passcode = Password(length=4, alphabet=DISTINGUISHABLE)
 
-    class Anum6(Account):
+    class Anum6(StealthAccount):
         passcode = Password(length=6, alphabet=DISTINGUISHABLE)
 
-    class Anum8(Account):
+    class Anum8(StealthAccount):
         passcode = Password(length=8, alphabet=DISTINGUISHABLE)
 
-    class Anum10(Account):
+    class Anum10(StealthAccount):
         passcode = Password(length=10, alphabet=DISTINGUISHABLE)
 
-    class Anum12(Account):
+    class Anum12(StealthAccount):
         aliases = ['anum']
         passcode = Password(length=12, alphabet=DISTINGUISHABLE)
 
-    class Anum14(Account):
+    class Anum14(StealthAccount):
         passcode = Password(length=14, alphabet=DISTINGUISHABLE)
 
-    class Anum16(Account):
+    class Anum16(StealthAccount):
         passcode = Password(length=16, alphabet=DISTINGUISHABLE)
 
-    class Anum18(Account):
+    class Anum18(StealthAccount):
         passcode = Password(length=18, alphabet=DISTINGUISHABLE)
 
-    class Anum20(Account):
+    class Anum20(StealthAccount):
         passcode = Password(length=20, alphabet=DISTINGUISHABLE)
 
     # High entropy passwords {section}
-    class Char4(Account):
+    class Char4(StealthAccount):
         passcode = Password(length=4, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char6(Account):
+    class Char6(StealthAccount):
         passcode = Password(length=6, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char8(Account):
+    class Char8(StealthAccount):
         passcode = Password(length=8, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char10(Account):
+    class Char10(StealthAccount):
         passcode = Password(length=10, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char12(Account):
+    class Char12(StealthAccount):
         aliases = ['char']
         passcode = Password(length=12, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char14(Account):
+    class Char14(StealthAccount):
         passcode = Password(length=14, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char16(Account):
+    class Char16(StealthAccount):
         passcode = Password(length=16, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char18(Account):
+    class Char18(StealthAccount):
         passcode = Password(length=18, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    class Char20(Account):
+    class Char20(StealthAccount):
         passcode = Password(length=20, alphabet=ALPHANUMERIC+PUNCTUATION)
 
     # Extreme passwords {section}
-    class Extreme(Account):
+    class Extreme(StealthAccount):
         passcode = Passphrase(length=64, alphabet=PRINTABLE)
 
     # PINs {section}
-    class Pin4(Account):
+    class Pin4(StealthAccount):
         aliases = ['pin']
         passcode = PIN(length=4)
 
-    class Pin6(Account):
+    class Pin6(StealthAccount):
         passcode = PIN(length=6)
 
-    class Pin8(Account):
+    class Pin8(StealthAccount):
         aliases = ['num']
         passcode = PIN(length=8)
 
-    class Pin10(Account):
+    class Pin10(StealthAccount):
         passcode = PIN(length=10)
 
-    class Pin12(Account):
+    class Pin12(StealthAccount):
         passcode = PIN(length=12)
 
     # Pass phrases {section}
-    class Word(Account):
+    class Word(StealthAccount):
         passcode = Passphrase(length=1)
 
-    class Word2(Account):
+    class Word2(StealthAccount):
         aliases = ['pair']
         passcode = Passphrase(length=2)
 
-    class Word3(Account):
+    class Word3(StealthAccount):
         passcode = Passphrase(length=3)
 
-    class Word4(Account):
+    class Word4(StealthAccount):
         aliases = ['word', 'xkcd']
         passcode = Passphrase(length=4)
 
-    class Word5(Account):
+    class Word5(StealthAccount):
         passcode = Passphrase(length=5)
 
-    class Word6(Account):
+    class Word6(StealthAccount):
         passcode = Passphrase(length=6)
 
-    class Word7(Account):
+    class Word7(StealthAccount):
         passcode = Passphrase(length=7)
 
-    class Word8(Account):
+    class Word8(StealthAccount):
         passcode = Passphrase(length=8)
 
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix :
+    # Web passwords {section}
+    class Web6(StealthAccount):
+        passcode = PasswordRecipe('6 u d s')
+
+    class Web8(StealthAccount):
+        passcode = PasswordRecipe('8 u d s')
+
+    class Web10(StealthAccount):
+        passcode = PasswordRecipe('10 2u 2d 2s')
+
+    class Web12(StealthAccount):
+        aliases = ['web']
+        passcode = PasswordRecipe('12 2u 2d 2s')
+
+    class Web14(StealthAccount):
+        passcode = PasswordRecipe('14 2u 2d 2s')
+
+    class Web16(StealthAccount):
+        passcode = PasswordRecipe('16 3u 3d 3s')
+
+    class Web18(StealthAccount):
+        passcode = PasswordRecipe('18 3u 3d 3s')
+
+    class Web20(StealthAccount):
+        passcode = PasswordRecipe('20 3u 3d 3s')
 ''')
 
 # Initial user key file {{{1
 USER_KEY_FILE_INITIAL_CONTENTS = dedent('''\
-    # Include a few unicode characters, but to make sure they work: ±αβγδε
-    # DO NOT CHANGE THIS KEY
+    # Avendesora Personal Key
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
+    #
+    # This is your personal encryption key.
+    # DO NOT CHANGE THIS KEY.  DO NOT SHARE THIS KEY.
     user_key = ({user_key})
+''')
+
+# Archive file header {{{1
+ARCHIVE_FILE_CONTENTS = dedent('''\
+    # Avendesora Archive File
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
+    #
+    # This file allows you to recover your secrets if Avendesora is not
+    # available.  Except for the master passwords it contains all of the
+    # information for all of the accounts. The secrets have been generated and
+    # hidden using base64 encoding. To decode a hidden argument of the form:
+    # Hidden('<hidden_arg>'), you can use:
+    #
+    #     > avendesora reveal
+    #     hidden text: <hidden_text>
+    #
+    # or
+    #
+    #     > base64 -d - < <filename>
+    #
+    # where <filename> contains <hidden_arg>.
+    #
+
+    from avendesora import Hidden, Question
+
+    CREATED = '{date}'
+    ACCOUNTS = {{
+    {accounts}
+    }}
 ''')
 
 # Account list file {{{1

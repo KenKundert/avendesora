@@ -26,7 +26,7 @@ from .gpg import GnuPG, PythonFile, GPG_EXTENSIONS
 from .preferences import (
     CONFIG_DEFAULTS, NONCONFIG_SETTINGS, ACCOUNTS_FILE_INITIAL_CONTENTS,
     CONFIG_FILE_INITIAL_CONTENTS, USER_KEY_FILE_INITIAL_CONTENTS,
-    HASH_FILE_INITIAL_CONTENTS, TEMPLATES_FILE_INITIAL_CONTENTS,
+    HASH_FILE_INITIAL_CONTENTS, STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS,
     ACCOUNT_LIST_FILE_CONTENTS,
 )
 from .title import Title
@@ -97,6 +97,7 @@ class PasswordGenerator:
         fields.update({
             'section': '{''{''{''1',
             'master_password': split(Hidden.conceal(generate_random_string(72))),
+            'master_password2': split(Hidden.conceal(generate_random_string(72))),
             'user_key': split(Hidden.conceal(generate_random_string(72))),
             'gpg_ids': repr(' '.join(gpg_ids)),
         })
@@ -109,7 +110,7 @@ class PasswordGenerator:
                 (get_setting('hashes_file'), HASH_FILE_INITIAL_CONTENTS),
                 (get_setting('user_key_file'), USER_KEY_FILE_INITIAL_CONTENTS),
                 (get_setting('default_accounts_file'), ACCOUNTS_FILE_INITIAL_CONTENTS),
-                (get_setting('default_templates_file'), TEMPLATES_FILE_INITIAL_CONTENTS),
+                (get_setting('default_stealth_accounts_file'), STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS),
             ]:
                 if path:
                     log('creating initial version.', culprit=path)
@@ -136,6 +137,11 @@ class PasswordGenerator:
             path.write_text(ACCOUNT_LIST_FILE_CONTENTS.format(**fields))
         except OSError as err:
             error(os_error(err))
+
+    # all_accounts() {{{2
+    def all_accounts(self):
+        for account in Account.all_accounts():
+            yield account
 
     # get_acount() {{{2
     def get_account(self, name):
@@ -205,10 +211,13 @@ class PasswordGenerator:
     # add_master_to_accounts() {{{2
     def add_master_to_accounts(self, master):
         for account in Account.all_accounts():
-            if not hasattr(account, 'master'):
-                account.master = master
+            if hasattr(account, 'master'):
+                continue
+            if hasattr(account, '_%s__NO_MASTER' % account.__name__):
+                continue
+            account.master = master
 
-    # dd_file_info_to_accounts() {{{2
+    # add_file_info_to_accounts() {{{2
     def add_file_info_to_accounts(self, file_info):
         for account in Account.all_accounts():
             # _file_info is used (as opposed to file_info) to prevent this 
