@@ -12,7 +12,7 @@ Installation
 
 Install with::
 
-    pip install --user avendesora
+    pip3 install --user avendesora
 
 .. image:: https://travis-ci.org/KenKundert/avendesora.svg?branch=master
     :target: https://travis-ci.org/KenKundert/avendesora
@@ -39,14 +39,6 @@ Finally, run::
     avendesora changed  # Not implemented yet
 
 to confirm that none of your generated passwords have changed.
-
-
-Install with::
-
-    pip install --user avendesora
-
-.. image:: https://travis-ci.org/KenKundert/avendesora.svg?branch=master
-    :target: https://travis-ci.org/KenKundert/avendesora
 
 
 Requirements
@@ -82,6 +74,39 @@ give GPG IDs for everyone::
 
 After initialization, there should be several files in ~/.config/avendesora. In 
 particular, you should see at least an initial accounts files and a config file.
+
+####
+TODO
+####
+
+1. Must describe how to update gnupg.py to avoid the errors. Specifically add 
+   "PROGRESS", ..., "WARNING", "KEY_CONSIDERED" to the list near line 250 that 
+   contains ...
+
+        elif key in ("RSA_OR_IDEA", "NODATA", "IMPORT_RES", "PLAINTEXT",
+                     "PLAINTEXT_LENGTH", "POLICY_URL", "DECRYPTION_INFO",
+                     "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
+                     "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
+                     "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA",
+                     "IMPORT_OK", "PROGRESS", "PINENTRY_LAUNCHED", "NEWSIG",
+                     "WARNING", "KEY_CONSIDERED"):
+            pass
+
+2. Must describe how to add GPG support to VIM.
+
+    Download::
+
+        http://www.vim.org/scripts/script.php?script_id=3645
+
+    Copy into::
+
+        cp gnupg.vim ~/.vim/plugin
+
+3. Must install linux utilities::
+
+        dnf install xdotool xsel
+
+3. Must describe how to create a gpg key and how to configure gpg-agent
 
 
 Configuration
@@ -175,13 +200,13 @@ shown in the above summary, but can be requested individually::
     > avendesora show bb pin
     PIN: 7784
 
-Attributes can be simple scalars, such as PIN. They can be arrays, such as 
-questions::
+Attributes can be simple scalars, such as PIN. They can be array memberss, such 
+as questions::
 
     > avendesora show bigbank questions.1
     QUESTIONS.1: contact insulator crumb
 
-Or they can be dictionaries::
+Or they can be dictionary members::
 
     > avendesora show bb accounts.checking
     ACCOUNTS.CHECKING (base64): 12345678
@@ -225,3 +250,23 @@ Once an account exists, you can edit it using::
 This opens the accounts file with your editor (set this with the *edit_account* 
 setting in the config file). If you are using default version of *edit_account*, 
 which uses VIM, it should take you directly to the account.
+
+
+Finding Accounts
+----------------
+
+There are two ways of finding accounts. First, you can list any accounts whose 
+name or aliases contains a text fragment. For example::
+
+    > avendesora find bank
+    bank:
+        bankofamerica (boa)
+
+Second, you can list any accounts that contain a text fragment in any non-secret 
+field. For example::
+
+
+    > avendesora find 4408
+    4408:
+        bankofamerica (boa)
+

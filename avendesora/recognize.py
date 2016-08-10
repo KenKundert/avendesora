@@ -19,7 +19,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from .utilities import gethostname, getusername
+from .utilities import gethostname, getusername, split
 from shlib import cwd, to_path
 from inform import error, log, warn, notify
 from fnmatch import fnmatch
@@ -28,7 +28,14 @@ import os
 
 # Recognizer Base Class {{{1
 class Recognizer:
-    pass
+    def all_urls(self):
+        urls = {}
+        if hasattr(self, 'recognizers'):
+            for each in self.recognizers:
+                urls.update(each.all_urls())
+        if hasattr(self, 'get_urls'):
+            urls.update(self.get_urls())
+        return urls
 
 
 # RecognizeAll {{{1
@@ -69,12 +76,13 @@ class RecognizeTitle(Recognizer):
 
 # RecognizeURL {{{1
 class RecognizeURL(Recognizer):
-    def __init__(self, *urls, script=True):
+    def __init__(self, *urls, script=True, name=None):
         self.urls = urls
         self.script = script
+        self.name = name
 
     def match(self, data, account):
-        for url in self.urls:
+        for url in split(self.urls):
             url = urlparse(url)
             protocol = url.scheme
             host = url.netloc
@@ -92,6 +100,8 @@ class RecognizeURL(Recognizer):
                         notify(msg)
                         error(msg, culprit=account.get_name())
 
+    def get_urls(self):
+        return {self.name: self.urls}
 
 # RecognizeCWD {{{1
 class RecognizeCWD(Recognizer):

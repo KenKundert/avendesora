@@ -25,7 +25,7 @@
 from .config import get_setting, override_setting
 from shlib import to_path, mv
 from inform import (
-    conjoin, display, Error, fatal, log, narrate, os_error, warn, is_str
+    conjoin, cull, display, Error, log, narrate, os_error, warn, is_str
 )
 import gnupg
 import io
@@ -93,10 +93,10 @@ class GnuPG:
                 encoded = contents.encode(get_setting('encoding'))
                 encrypted = self.gpg.encrypt(encoded, gpg_ids, armor=use_armor)
                 if not encrypted.ok:
-                    raise Error(
-                        'unable to encrypt.', encrypted.stderr,
-                        culprit=path, sep='\n'
-                    )
+                    msg = ' '.join(cull(
+                        ['unable to encrypt.', getattr(encrypted, 'stderr')]
+                    ))
+                    raise Error(msg, culprit=path, sep='\n')
                 else:
                     if use_armor:
                         path.write_text(str(encrypted))
@@ -116,10 +116,10 @@ class GnuPG:
                 try:
                     decrypted = self.gpg.decrypt_file(f)
                     if not decrypted.ok:
-                        fatal(
-                            'unable to decrypt.', decrypted.stderr,
-                            culprit=path, sep='\n'
-                        )
+                        msg = ' '.join(cull(
+                            ['unable to decrypt.', getattr(encrypted, 'stderr')]
+                        ))
+                        raise Error(msg, culprit=path, sep='\n')
                 except ValueError as err:
                     raise Error(str(err), culprit=path)
             return decrypted.data.decode(get_setting('encoding'))
@@ -185,7 +185,7 @@ class PythonFile(GnuPG):
         try:
             compiled = compile(self.code, str(path), 'exec')
         except SyntaxError as err:
-            fatal(
+            raise Error(
                 err.msg + ':', err.text, (err.offset-1)*' ' + '^',
                 culprit=(err.filename, err.lineno), sep='\n'
             )

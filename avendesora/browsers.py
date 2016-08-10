@@ -44,7 +44,7 @@ class StandardBrowser(Browser):
             try:
                 cmd = self.cmd if self.cmd else get_setting('browsers')[name]
                 try:
-                    cmd = cmd % url
+                    cmd = cmd.format(url=url)
                 except TypeError:
                     pass
                 log("running '%s'" % cmd)

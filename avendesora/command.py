@@ -21,7 +21,7 @@ from .config import read_config, get_setting, override_setting
 from .editors import GenericEditor
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
-from .utilities import two_columns, to_python, items
+from .utilities import two_columns, to_python, items, split
 from .writer import get_writer
 from .__init__ import __version__
 from inform import (
@@ -282,7 +282,7 @@ class Browse(Command):
 
         # determine the account and open the URL
         account = generator.get_account(cmdline['<account>'])
-        account.open_browser(cmdline['--browser'])
+        account.open_browser(cmdline['--browser'], cmdline['<key>'])
 
 # Changed {{{1
 class Changed(Command):
@@ -444,7 +444,7 @@ class Find(Command):
         # find accounts whose name matches the criteria
         to_print = []
         for acct in generator.find_accounts(cmdline['<text>']):
-            aliases = getattr(acct, 'aliases', [])
+            aliases = split(getattr(acct, 'aliases', []))
 
             aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
             to_print += [acct.get_name() + aliases]
@@ -661,7 +661,7 @@ class Search(Command):
         # search for accounts that match search criteria
         to_print = []
         for acct in generator.search_accounts(cmdline['<text>']):
-            aliases = getattr(acct, 'aliases', [])
+            aliases = split(getattr(acct, 'aliases', []))
 
             aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
             to_print += [acct.get_name() + aliases]

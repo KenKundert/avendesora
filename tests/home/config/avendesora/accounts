@@ -95,7 +95,7 @@ class MyBank(Account):
     aliases = ['mb']
     username = 'pizzaman'
     email = 'pizzaman@pizza.com'
-    url = 'https://mb.com'
+    urls = 'https://mb.com'
     passcode = MixedPassword(
         12, ALPHANUMERIC,
         [(LOWERCASE, 2), (UPPERCASE, 2), (DIGITS, 2), ('@#$%&*+=', 2)]

@@ -133,7 +133,7 @@ def test_summary():
             0: What city were you born in? <reveal with 'avendesora show mybank questions.0'>
             1: What street did you grow up on? <reveal with 'avendesora show mybank questions.1'>
             2: What was your childhood nickname? <reveal with 'avendesora show mybank questions.2'>
-        URL: https://mb.com
+        URLS: https://mb.com
         USERNAME: pizzaman
         VERBAL: <reveal with 'avendesora show mybank verbal'>
     """)

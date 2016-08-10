@@ -34,8 +34,6 @@ class GenericEditor(Editor):
         args = {
             'filepath': filepath,
             'account': account,
-            'field': r'_[A-Z_]\+_',
-                # matches user modifiable fields in protptypes
             'section': '{' '{' '{' '1',
         }
         cmd = get_setting('edit_account' if account else 'edit_template')

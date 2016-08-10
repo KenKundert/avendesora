@@ -26,7 +26,7 @@ def test_add():
                                     Add account to specified file.
 
         The default template is bank. The available templates are:
-        bank, command and website
+        bank, shell and website
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 

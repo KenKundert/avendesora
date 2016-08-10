@@ -182,4 +182,18 @@ def items(collection):
     for key in iterator:
         yield key, collection[key]
 
-
+# values {{{1
+def values(collection):
+    return (v for k, v in items(collection))
+# split {{{1
+def split(collection):
+    # Collection may be an array, a dict, or a string. If it is a string, it is
+    # split. Iterate through the values in the collection.
+    try:
+        values = collection.values()     # is is a dictionary
+    except AttributeError:
+        if is_collection(collection):
+            values = iter(collection)    # it is an array
+        else:
+            values = collection.split()  # it is a string, split it
+    return values

@@ -25,8 +25,10 @@ from .config import get_setting
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
-from .utilities import items
-from inform import Color, Error, is_collection, log, output, warn, is_str
+from .utilities import items, values, split
+from inform import (
+    Color, conjoin, Error, is_collection, is_str, log, output, warn,
+)
 from textwrap import indent, dedent
 from urllib.parse import urlparse
 import re
@@ -85,7 +87,7 @@ class Account:
         if account == cls.get_name():
             return True
         try:
-            if account in cls.aliases:
+            if account in split(cls.aliases):
                 return True
         except AttributeError:
             pass
@@ -98,7 +100,7 @@ class Account:
         if target in cls.get_name().lower():
             return True
         try:
-            for alias in cls.aliases:
+            for alias in split(cls.aliases):
                 if target in alias.lower():
                     return True
         except AttributeError:
@@ -131,7 +133,7 @@ class Account:
     def recognize(cls, data):
         # try the specified recognizers
         discovery = getattr(cls, 'discovery', ())
-        for recognizer in discovery:
+        for recognizer in values(discovery):
             if isinstance(recognizer, Recognizer):
                 script = recognizer.match(data, cls)
                 if script:
@@ -139,25 +141,25 @@ class Account:
         if discovery:
             return
 
-        # If no recognizers specified, just check the url
+        # If no recognizers specified, just check the urls
         try:
-            urls = cls.get_field('url')
+            urls = split(cls.get_field('urls'))
+            for url in split(cls.get_field('urls')):
+                components = urlparse(url)
+                protocol = components.scheme
+                host = components.netloc
+                if host == data.get('host'):
+                    if (
+                        protocol != data.get('protocol') and
+                        data['protocol'] in get_setting('required_protocols')
+                    ):
+                        msg = 'url matches, but uses wrong protocol.'
+                        notify(msg)
+                        error(msg, culprit=account.get_name())
+                    else:
+                        return True
         except Error:
-            return
-        for _, url in items(urls):
-            components = urlparse(url)
-            protocol = components.scheme
-            host = components.netloc
-            if host == data.get('host'):
-                if (
-                    protocol != data.get('protocol') and
-                    data['protocol'] in get_setting('required_protocols')
-                ):
-                    msg = 'url matches, but uses wrong protocol.'
-                    notify(msg)
-                    error(msg, culprit=account.get_name())
-                else:
-                    return True
+            pass
 
     # initialize() {{{2
     @classmethod
@@ -173,9 +175,9 @@ class Account:
         except AttributeError as err:
             pass
 
-    # values() {{{2
+    # items() {{{2
     @classmethod
-    def values(cls):
+    def items(cls):
         for key in sorted(cls.__dict__):
             if not key.startswith('_'):
                 yield key, cls.__dict__[key]
@@ -204,7 +206,11 @@ class Account:
                 )
         else:
             try:
-                value = value[key]
+                if is_collection(value):
+                    value = value[key]
+                else:
+                    warn('not a composite value, key ignored.', culprit=name)
+                    key = None
             except (IndexError, KeyError, TypeError):
                 raise Error('not found.', culprit=cls.combine_name(name, key))
 
@@ -345,10 +351,10 @@ class Account:
         # preload list with the names associated with this account
         names = [cls.get_name()]
         if hasattr(cls, 'aliases'):
-            names += cls.aliases
+            names += split(cls.aliases)
         lines = [fmt_field('names', ', '.join(names))]
 
-        for key, value in cls.values():
+        for key, value in cls.items():
             if key in TOOL_FIELDS:
                 # is an Avendesora field
                 pass
@@ -377,15 +383,43 @@ class Account:
                 # still need to work out how to output the question.
                 return [extract(v, name, i) for i, v in enumerate(value)]
 
-        return {k: extract(v, k) for k, v in cls.values() if k != 'master'}
+        return {k: extract(v, k) for k, v in cls.items() if k != 'master'}
 
     # open_browser() {{{2
     @classmethod
-    def open_browser(cls, name):
+    def open_browser(cls, name, key=None):
         browser = cls.get_field('browser', default=None)
         if browser is None or is_str(browser):
             browser = StandardBrowser(name)
-        url = cls.get_field('url', default=None)
+
+        # get the urls from the urls attribute
+        if not key:
+            key= cls.get_field('default_url')
+        urls = getattr(cls, 'urls', ())
+
+        # get the urls from the url recognizers
+        # currently urls from recognizers dominate over those from attributes
+        discovery = getattr(cls, 'discovery', ())
+        for each in values(discovery):
+            urls.update(each.all_urls())
+
+        # select the urls
+        try:
+            urls = urls[key]
+        except TypeError:
+            if key:
+                raise Error(
+                    'keys are not supported with urls on this account.',
+                    culprit=self.get_name()
+                )
+        except KeyError:
+            raise Error(
+                'unknown key, choose from %s.' % conjoin(urls.keys()),
+                culprit=key
+            )
+        url = split(urls)[0]  # use the first url specified
+
+        # open the url
         browser.run(url)
 
 

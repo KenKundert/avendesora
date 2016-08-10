@@ -15,11 +15,11 @@ default_field = 'passcode'
 default_vector_field = 'questions'
 display_time = 60
 browsers = {
-    'c': 'chrome %s',
-    'f': 'firefox -new-tab %s',
-    'g': 'google-chrome %s',
-    't': 'torbrowser %s',
-    'x': 'xdg-open %s',
+    'c': 'chrome {url}',
+    'f': 'firefox -new-tab {url}',
+    'g': 'google-chrome {url}',
+    't': 'torbrowser {url}',
+    'x': 'xdg-open {url}',
 }
 default_browser = 'x'
 required_protocols = ['https']

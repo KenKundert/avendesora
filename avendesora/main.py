@@ -60,14 +60,14 @@ def main():
 
     # start logging
     logfile=BufferedFile(get_setting('log_file'))
-    try:
-        with Inform(logfile=logfile, hanging_indent=False):
+    with Inform(logfile=logfile, hanging_indent=False):
+        try:
             Command.execute(cmdline['<command>'], cmdline['<args>'])
-    except KeyboardInterrupt:
-        output('Terminated by user.')
-    except Error as err:
-        err.terminate()
-    except OSError as err:
-        fatal(os_error(err))
+        except KeyboardInterrupt:
+            output('Terminated by user.')
+        except Error as err:
+            err.terminate()
+        except OSError as err:
+            fatal(os_error(err))
 
-    terminate()
+        terminate()

@@ -45,10 +45,10 @@ CONFIG_DEFAULTS = {
     'account_list_file': '.accounts_files',
     'archive_file': 'archive.gpg',
     'browsers': {
-        'f': 'firefox -new-tab %s',
-        'g': 'google-chrome %s',
-        't': 'torbrowser %s',
-        'x': 'xdg-open %s', # system default browser
+        'f': 'firefox -new-tab {url}',
+        'g': 'google-chrome {url}',
+        't': 'torbrowser {url}',
+        'x': 'xdg-open {url}', # system default browser
     },
     'color_scheme': 'dark',
     'default_browser': 'x',
@@ -60,13 +60,14 @@ CONFIG_DEFAULTS = {
     'edit_account': (
         'vim',
         '+silent /^class {account}(Account):/',
-        '+silent normal zozt', # open the fold, position near top of screen
+        '+silent normal zozt',      # open the fold, position near top of screen
         '{filepath}'
     ),
     'edit_template': (
         'vim',
-        '+silent /{field}/',
-        '+silent normal zozt', # open the fold, position near top of screen
+        '+silent /_[A-Z0-9_]\+_/',  # matches user modifiable template fields
+                                    # fields take the form '_AAA_'
+        '+silent normal zozt',      # open the fold, position near top of screen
         '{filepath}'
     ),
     'hashes_file': '.hashes',
@@ -79,7 +80,7 @@ CONFIG_DEFAULTS = {
     'account_templates': {
         'website': """
             class _NAME_(Account): # %s1
-                aliases = ['_ALIASES_']
+                aliases = '_ALIAS1_ _ALIAS2_'
                 username = '_USERNAME_'
                 email = '_EMAIL_'
                 passcode = PasswordRecipe('12 2u 2d 2s')
@@ -88,9 +89,9 @@ CONFIG_DEFAULTS = {
                     script='{email}{tab}{passcode}{return}'
                 )
         """ % (3*'{'),
-        'command': """
+        'shell': """
             class _NAME_(Account): # %s1
-                aliases = ['_ALIASES_']
+                aliases = '_ALIAS1_ _ALIAS2_'
                 passcode = Passphrase()
                 discovery = RecognizeTitle(
                     '_TITLE1_', '_TITLE2_',
@@ -99,7 +100,7 @@ CONFIG_DEFAULTS = {
         """ % (3*'{'),
         'bank': """
             class _NAME_(Account): # %s1
-                aliases = ['_ALIASES_']
+                aliases = '_ALIAS1_ _ALIAS2_'
                 username = '_NAME_'
                 email = '_EMAIL_'
                 accounts = {
@@ -112,10 +113,14 @@ CONFIG_DEFAULTS = {
                 verbal = Passphrase(length=2)
                 pin = PIN()
                 questions = [
-                    Question('_QUESTION_'),
-                    Question('_QUESTION_'),
-                    Question('_QUESTION_'),
+                    Question('_QUESTION1_'),
+                    Question('_QUESTION2_'),
+                    Question('_QUESTION3_'),
                 ]
+                discovery = RecognizeURL(
+                    'https://_URL_',
+                    script='{email}{tab}{passcode}{return}'
+                )
         """ % (3*'{'),
     },
 
@@ -290,7 +295,7 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         passcode = Password(length=10, alphabet=DISTINGUISHABLE)
 
     class Anum12(StealthAccount):
-        aliases = ['anum']
+        aliases = 'anum'
         passcode = Password(length=12, alphabet=DISTINGUISHABLE)
 
     class Anum14(StealthAccount):
@@ -319,7 +324,7 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         passcode = Password(length=10, alphabet=ALPHANUMERIC+PUNCTUATION)
 
     class Char12(StealthAccount):
-        aliases = ['char']
+        aliases = 'char'
         passcode = Password(length=12, alphabet=ALPHANUMERIC+PUNCTUATION)
 
     class Char14(StealthAccount):
@@ -340,14 +345,14 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
     # PINs {section}
     class Pin4(StealthAccount):
-        aliases = ['pin']
+        aliases = 'pin'
         passcode = PIN(length=4)
 
     class Pin6(StealthAccount):
         passcode = PIN(length=6)
 
     class Pin8(StealthAccount):
-        aliases = ['num']
+        aliases = 'num'
         passcode = PIN(length=8)
 
     class Pin10(StealthAccount):
@@ -361,14 +366,14 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         passcode = Passphrase(length=1)
 
     class Word2(StealthAccount):
-        aliases = ['pair']
+        aliases = 'pair'
         passcode = Passphrase(length=2)
 
     class Word3(StealthAccount):
         passcode = Passphrase(length=3)
 
     class Word4(StealthAccount):
-        aliases = ['word', 'xkcd']
+        aliases = 'word xkcd'
         passcode = Passphrase(length=4)
 
     class Word5(StealthAccount):
@@ -394,7 +399,7 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         passcode = PasswordRecipe('10 2u 2d 2s')
 
     class Web12(StealthAccount):
-        aliases = ['web']
+        aliases = 'web'
         passcode = PasswordRecipe('12 2u 2d 2s')
 
     class Web14(StealthAccount):
@@ -461,5 +466,6 @@ ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
 
 # Fields {{{1
 # Fields reserved for use by Avendesora
-TOOL_FIELDS = ['aliases', 'default', 'master', 'discovery', 'browser']
-
+TOOL_FIELDS = [
+    'aliases', 'default', 'master', 'discovery', 'browser', 'default_url'
+]
