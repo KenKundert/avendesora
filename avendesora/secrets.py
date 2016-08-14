@@ -46,9 +46,9 @@ doctests::
 from .charsets import (
     ALPHANUMERIC, DIGITS, DISTINGUISHABLE, LOWERCASE, SYMBOLS, UPPERCASE,
 )
-from .conceal import Conceal
 from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
+from .obscure import Obscure
 from .utilities import error_source
 from inform import Error, terminate, warn, output
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
@@ -242,7 +242,7 @@ class Secret:
 
     # __repr__() {{{2
     def __repr__(self):
-        return "Hidden('%s')" % Conceal.hide(str(self))
+        return "Hidden('%s')" % Obscure.hide(str(self))
 
 # Password {{{1
 class Password(Secret):
@@ -411,7 +411,7 @@ class Question(Passphrase):
     # __repr__() {{{2
     def __repr__(self):
         return "Question('%s', answer=Hidden('%s'))" % (
-            self.question, Conceal.hide(str(self))
+            self.question, Obscure.hide(str(self))
         )
 
 # MixedPassword {{{1

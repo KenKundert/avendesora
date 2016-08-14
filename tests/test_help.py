@@ -20,6 +20,7 @@ def test_add():
 
         Usage:
             avendesora [options] add [<template>]
+            avendesora [options] a [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -41,6 +42,7 @@ def test_browse():
 
         Usage:
             avendesora [options] browse <account> [<key>]
+            avendesora [options] b <account> [<key>]
 
         Options:
             -b <browser>, --browser <browser>
@@ -64,8 +66,8 @@ def test_conceal():
         Conceal text by encoding it.
 
         Usage:
-            avendesora [options] hide [<text>]
             avendesora [options] conceal [<text>]
+            avendesora [options] c [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -99,6 +101,7 @@ def test_edit():
 
         Usage:
             avendesora edit <account>
+            avendesora e <account>
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
@@ -115,6 +118,7 @@ def test_find():
 
         Usage:
             avendesora find <text>
+            avendesora f <text>
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
@@ -129,21 +133,22 @@ def test_help():
 
         Usage:
             avendesora help [<topic>]
+            avendesora h [<topic>]
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
-# test_init() {{{1
-def test_init():
+# test_initialize() {{{1
+def test_initialize():
     try:
-        result = subprocess.check_output('avendesora help init'.split())
+        result = subprocess.check_output('avendesora help initialize'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
         Create initial set of Avendesora files.
 
         Usage:
-            avendesora init [--gpg-id <id>]... [options]
             avendesora initialize [--gpg-id <id>]... [options]
+            avendesora I [--gpg-id <id>]... [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -166,6 +171,7 @@ def test_new():
 
         Usage:
             avendesora new [--gpg-id <id>]... <name>
+            avendesora N [--gpg-id <id>]... <name>
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -198,8 +204,8 @@ def test_reveal():
         Transform concealed text to reveal its original form.
 
         Usage:
-            avendesora [options] unhide [<text>]
             avendesora [options] reveal [<text>]
+            avendesora [options] r [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -235,13 +241,14 @@ def test_search():
 
         Usage:
             avendesora search <text>
+            avendesora s <text>
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
-# test_show() {{{1
-def test_show():
+# test_value() {{{1
+def test_value():
     try:
-        result = subprocess.check_output('avendesora help show'.split())
+        result = subprocess.check_output('avendesora help value'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -251,8 +258,9 @@ def test_show():
         temporarily unless --stdout is specified.
 
         Usage:
-            avendesora show [--stdout | --clipboard] [<account> [<field>]]
-            avendesora s [--stdout | --clipboard] [<account> [<field>]]
+            avendesora value [--stdout | --clipboard] [<account> [<field>]]
+            avendesora val [--stdout | --clipboard] [<account> [<field>]]
+            avendesora v [--stdout | --clipboard] [<account> [<field>]]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
@@ -261,10 +269,10 @@ def test_show():
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
-# test_summary() {{{1
-def test_summary():
+# test_values() {{{1
+def test_values():
     try:
-        result = subprocess.check_output('avendesora help summary'.split())
+        result = subprocess.check_output('avendesora help values'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -273,8 +281,9 @@ def test_summary():
         Show all account values.
 
         Usage:
-            avendesora sum <account>
-            avendesora summary <account>
+            avendesora values <account>
+            avendesora vals <account>
+            avendesora V <account>
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 

@@ -19,10 +19,10 @@
 
 # Imports {{{1
 from .account import Account
-from .conceal import Hidden
 from .config import read_config, get_setting
 from .dialog import show_list_dialog
 from .gpg import GnuPG, PythonFile, GPG_EXTENSIONS
+from .obscure import Hidden
 from .preferences import (
     CONFIG_DEFAULTS, NONCONFIG_SETTINGS, ACCOUNTS_FILE_INITIAL_CONTENTS,
     CONFIG_FILE_INITIAL_CONTENTS, USER_KEY_FILE_INITIAL_CONTENTS,

@@ -20,8 +20,8 @@
 
 # Imports {{{1
 from .browsers import StandardBrowser
-from .conceal import Conceal
 from .config import get_setting
+from .obscure import Obscure
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
@@ -310,7 +310,7 @@ class Account:
                 dict if key is string, array if key is number
         """
         value = cls.get_field(*cls.split_name(name))
-        if isinstance(value, Secret) or isinstance(value, Conceal):
+        if isinstance(value, Secret) or isinstance(value, Obscure):
             value = str(value)
         return value
 
@@ -375,7 +375,7 @@ class Account:
             if not is_collection(value):
                 if hasattr(value, 'generate'):
                     value.generate(name, key, cls)
-                    #value = 'Hidden(%s)' % Conceal.hide(str(value))
+                    #value = 'Hidden(%s)' % Obscure.hide(str(value))
                 return value
             try:
                 return {k: extract(v, name, k) for k, v in value.items()}

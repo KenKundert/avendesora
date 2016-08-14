@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts.gpg',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '02bca31cc328970aecd512b5f8630dbb',
+    'secrets_hash': '0c6eabae3a4ea64c9804e5a9a02a4ae1',
 }
 
 

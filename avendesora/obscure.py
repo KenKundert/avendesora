@@ -1,4 +1,4 @@
-# Conceal Information
+# Obscure Information
 #
 # Defines classes used to conceal or encrypt information found in the accounts
 # file.
@@ -33,15 +33,15 @@ import hashlib
 import getpass
 import gnupg
 
-# Conceal {{{1
-class Conceal:
-    # concealers() {{{2
+# Obscure {{{1
+class Obscure:
+    # obscurers() {{{2
     @classmethod
-    def concealers(cls):
+    def obscurers(cls):
         for sub in cls.__subclasses__():
             if hasattr(sub, 'conceal') and hasattr(sub, 'reveal'):
                 yield sub
-                for each in sub.concealers():
+                for each in sub.obscurers():
                     if hasattr(each, 'conceal') and hasattr(each, 'reveal'):
                         yield each
 
@@ -59,31 +59,31 @@ class Conceal:
     @classmethod
     def hide(cls, text, encoding=None):
         encoding = encoding.lower() if encoding else 'base64'
-        for concealer in cls.concealers():
-            if encoding == concealer.get_name():
-                return concealer.conceal(text)
+        for obscurer in cls.obscurers():
+            if encoding == obscurer.get_name():
+                return obscurer.conceal(text)
         raise Error('not found.', culprit=encoding)
 
     # show() {{{2
     @classmethod
     def show(cls, text, encoding='base64'):
         encoding = encoding.lower() if encoding else 'base64'
-        for concealer in cls.concealers():
-            if encoding == concealer.get_name():
-                return concealer.reveal(text)
+        for obscurer in cls.obscurers():
+            if encoding == obscurer.get_name():
+                return obscurer.reveal(text)
         error('not found.', culprit=encoding)
 
     # encodings() {{{2
     @classmethod
     def encodings(cls):
-        return [c.get_name() for c in cls.concealers()]
+        return [c.get_name() for c in cls.obscurers()]
 
     # __repr__() {{{2
     def __repr__(self):
-        return "Hidden('%s')" % (Conceal.hide(self.plaintext, 'base64'))
+        return "Hidden('%s')" % (Obscure.hide(self.plaintext, 'base64'))
 
 # Hidden {{{1
-class Hidden(Conceal):
+class Hidden(Obscure):
     NAME = 'base64'
     # This decodes a string that is encoded in base64 to hide it from a casual
     # observer. But it is not encrypted. The original value can be trivially
@@ -133,7 +133,7 @@ class Hidden(Conceal):
         return value.decode(encoding)
 
 # GPG {{{1
-class GPG(Conceal, GnuPG):
+class GPG(Obscure, GnuPG):
     # This does a full GPG decryption.
     # To generate an entry for the GPG argument, you can use ...
     #     gpg -a -c filename

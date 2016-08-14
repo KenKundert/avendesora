@@ -16,11 +16,11 @@
 
 
 # Imports {{{1
-from .conceal import Conceal
 from .config import read_config, get_setting, override_setting
 from .editors import GenericEditor
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
+from .obscure import Obscure
 from .utilities import two_columns, to_python, items, split
 from .writer import get_writer
 from .__init__ import __version__
@@ -137,7 +137,7 @@ class Add(Command):
 
             # hide the values that should be hidden
             def hide(match):
-                return 'Hidden(%r)' % Conceal.hide(match.group(1))
+                return 'Hidden(%r)' % Obscure.hide(match.group(1))
             new = re.sub("<<(.*?)>>", hide, new)
 
             # determine the accounts file
@@ -400,7 +400,7 @@ class Conceal(Command):
 
     @classmethod
     def help(cls):
-        encodings = '    ' + '\n    '.join(Conceal.encodings())
+        encodings = '    ' + '\n    '.join(Obscure.encodings())
         text = dedent("""
             {title}
 
@@ -440,7 +440,7 @@ class Conceal(Command):
                 return
 
         # transform and output the string
-        output(Conceal.hide(text, cmdline['--encoding']))
+        output(Obscure.hide(text, cmdline['--encoding']))
 
 
 # Edit {{{1
@@ -656,7 +656,7 @@ class Reveal(Command):
 
     @classmethod
     def help(cls):
-        encodings = '    ' + '\n    '.join(Conceal.encodings())
+        encodings = '    ' + '\n    '.join(Obscure.encodings())
         text = dedent("""
             {title}
 
@@ -696,7 +696,7 @@ class Reveal(Command):
                 return
 
         # transform and output the string
-        output(Conceal.show(text, cmdline['--encoding']))
+        output(Obscure.show(text, cmdline['--encoding']))
 
 
 # Search {{{1

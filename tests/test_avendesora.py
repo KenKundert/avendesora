@@ -12,7 +12,7 @@ os.environ['HOME'] = 'home'
 # test_mybank() {{{1
 def test_mybank():
     try:
-        result = subprocess.check_output('avendesora show --stdout mybank'.split())
+        result = subprocess.check_output('avendesora value --stdout mybank'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'jFi$TH66w*Fg\n'
@@ -20,7 +20,7 @@ def test_mybank():
 # test_mb() {{{1
 def test_mb():
     try:
-        result = subprocess.check_output('avendesora show --stdout mb'.split())
+        result = subprocess.check_output('avendesora value --stdout mb'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'jFi$TH66w*Fg\n'
@@ -28,7 +28,7 @@ def test_mb():
 # test_mb_checking() {{{1
 def test_mb_checking():
     try:
-        result = subprocess.check_output('avendesora show --stdout mb accounts.checking'.split())
+        result = subprocess.check_output('avendesora value --stdout mb accounts.checking'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'12345678\n'
@@ -36,7 +36,7 @@ def test_mb_checking():
 # test_mb_savings() {{{1
 def test_mb_savings():
     try:
-        result = subprocess.check_output('avendesora show --stdout mb accounts[savings]'.split())
+        result = subprocess.check_output('avendesora value --stdout mb accounts[savings]'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'23456789\n'
@@ -44,7 +44,7 @@ def test_mb_savings():
 # test_alertscc() {{{1
 def test_alertscc():
     try:
-        result = subprocess.check_output('avendesora show --stdout alertscc'.split())
+        result = subprocess.check_output('avendesora value --stdout alertscc'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'KLwuU8itfect\n'
@@ -52,7 +52,7 @@ def test_alertscc():
 # test_scc() {{{1
 def test_scc():
     try:
-        result = subprocess.check_output('avendesora show --stdout scc'.split())
+        result = subprocess.check_output('avendesora value --stdout scc'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'KLwuU8itfect\n'
@@ -60,7 +60,7 @@ def test_scc():
 # test_scc_account() {{{1
 def test_scc_account():
     try:
-        result = subprocess.check_output('avendesora show --stdout scc account'.split())
+        result = subprocess.check_output('avendesora value --stdout scc account'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'123456-7890\n'
@@ -68,7 +68,7 @@ def test_scc_account():
 # test_scc_birthdate() {{{1
 def test_scc_birthdate():
     try:
-        result = subprocess.check_output('avendesora show --stdout scc birthdate'.split())
+        result = subprocess.check_output('avendesora value --stdout scc birthdate'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'1963-04-10\n'
@@ -76,7 +76,7 @@ def test_scc_birthdate():
 # test_scc_email() {{{1
 def test_scc_email():
     try:
-        result = subprocess.check_output('avendesora show --stdout scc email'.split())
+        result = subprocess.check_output('avendesora value --stdout scc email'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'pizzaman@pizza.com\n'
@@ -84,7 +84,7 @@ def test_scc_email():
 # test_scc_q0() {{{1
 def test_scc_q0():
     try:
-        result = subprocess.check_output('avendesora show --stdout scc 0'.split())
+        result = subprocess.check_output('avendesora value --stdout scc 0'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'gyroscope ossify slink\n'
@@ -92,7 +92,7 @@ def test_scc_q0():
 # test_scc_q1() {{{1
 def test_scc_q1():
     try:
-        result = subprocess.check_output('avendesora show --stdout scc questions.1'.split())
+        result = subprocess.check_output('avendesora value --stdout scc questions.1'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'placate rocky barge\n'
@@ -100,7 +100,7 @@ def test_scc_q1():
 # test_scc_q2() {{{1
 def test_scc_q2():
     try:
-        result = subprocess.check_output('avendesora show --stdout scc questions[2]'.split())
+        result = subprocess.check_output('avendesora value --stdout scc questions[2]'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'jigsaw tilde century\n'
@@ -108,7 +108,7 @@ def test_scc_q2():
 # test_login() {{{1
 def test_login():
     try:
-        result = subprocess.check_output('avendesora show --stdout login'.split())
+        result = subprocess.check_output('avendesora value --stdout login'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'enthrall sunflower screening order shard rejoin\n'
@@ -116,26 +116,26 @@ def test_login():
 # test_summary() {{{1
 def test_summary():
     try:
-        result = subprocess.check_output('avendesora summary mb'.split())
+        result = subprocess.check_output('avendesora values mb'.split())
     except OSError as err:
         result = os_error(err)
     expected = dedent("""\
         NAMES: mybank, mb
         ACCOUNTS:
-            CHECKING: <reveal with 'avendesora show mybank accounts.checking'>
-            CREDITCARD: <reveal with 'avendesora show mybank accounts.creditcard'>
-            SAVINGS: <reveal with 'avendesora show mybank accounts.savings'>
+            CHECKING: <reveal with 'avendesora value mybank accounts.checking'>
+            CREDITCARD: <reveal with 'avendesora value mybank accounts.creditcard'>
+            SAVINGS: <reveal with 'avendesora value mybank accounts.savings'>
         CUSTOMER SERVICE: 1-866-229-6633
         EMAIL: pizzaman@pizza.com
-        PASSCODE: <reveal with 'avendesora show mybank passcode'>
-        PIN: <reveal with 'avendesora show mybank pin'>
+        PASSCODE: <reveal with 'avendesora value mybank passcode'>
+        PIN: <reveal with 'avendesora value mybank pin'>
         QUESTIONS:
-            0: What city were you born in? <reveal with 'avendesora show mybank questions.0'>
-            1: What street did you grow up on? <reveal with 'avendesora show mybank questions.1'>
-            2: What was your childhood nickname? <reveal with 'avendesora show mybank questions.2'>
+            0: What city were you born in? <reveal with 'avendesora value mybank questions.0'>
+            1: What street did you grow up on? <reveal with 'avendesora value mybank questions.1'>
+            2: What was your childhood nickname? <reveal with 'avendesora value mybank questions.2'>
         URLS: https://mb.com
         USERNAME: pizzaman
-        VERBAL: <reveal with 'avendesora show mybank verbal'>
+        VERBAL: <reveal with 'avendesora value mybank verbal'>
     """)
     assert result == bytes(expected, encoding='ascii')
 

@@ -28,9 +28,9 @@
 
 
 # Imports {{{1
-from .conceal import Conceal
 from .command import Command
 from .config import get_setting
+from .obscure import Obscure
 from .utilities import pager, two_columns
 from inform import error, output
 from textwrap import dedent
@@ -57,7 +57,6 @@ class HelpMessage:
     @classmethod
     def show(cls, name=None):
         if name:
-            name = name.lower()
             command = Command.find(name)
             if command:
                 return pager(command.help())
