@@ -83,6 +83,11 @@ class Secret:
         return default
 
     def generate(self, field_name, field_key, account):
+        try:
+            if self.secret:
+                return
+        except AttributeError:
+            pass
         account_name = account.get_name()
         account_seed = account.get_seed()
         if self.master is None:
@@ -394,24 +399,14 @@ class Question(Passphrase):
         self.master = master
         self.version = version
         self.sep = sep
-        self.answer = answer
+        if answer:
+            self.secret = str(answer)
             # answer allows the user to override the generator and simply
             # specify the answer. This is also used when producing the archive.
 
     # get_key() {{{2
     def get_key(self, default=None):
         return self.question
-
-    # __str__() {{{2
-    def __str__(self):
-        if self.answer:
-            answer = str(self.answer)
-        else:
-            # it is important that this be called only once, because the secret
-            # changes each time it is called
-            answer = self.sep.join(self._symbols(self.alphabet, self.length))
-        self.answer = answer
-        return answer
 
     # __repr__() {{{2
     def __repr__(self):

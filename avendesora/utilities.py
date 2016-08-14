@@ -190,10 +190,19 @@ def split(collection):
     # Collection may be an array, a dict, or a string. If it is a string, it is
     # split. Iterate through the values in the collection.
     try:
-        values = collection.values()     # is is a dictionary
+        return collection.values()       # is is a dictionary
     except AttributeError:
         if is_collection(collection):
-            values = iter(collection)    # it is an array
+            values = collection          # it is an array
         else:
             values = collection.split()  # it is a string, split it
-    return values
+        return iter(values)
+
+# flatten {{{1
+def flatten(collection):
+    for each in split(collection):
+        if is_collection(each):
+            for e in flatten(each):
+                yield e
+        else:
+            yield each

@@ -332,7 +332,7 @@ class Account:
             return indent(LabelColor(key + ':') + sep + value, leader)
 
         def reveal(name, key=None):
-            return "<reveal with 'avendesora show %s %s'>" % (
+            return "<reveal with 'avendesora value %s %s'>" % (
                 cls.get_name(), cls.combine_name(name, key)
             )
 
@@ -366,7 +366,7 @@ class Account:
                 lines.append(fmt_field(key, value))
         output(*lines, sep='\n')
 
-    # archive() { {{2
+    # archive() {{{2
     @classmethod
     def archive(cls):
         # return all account fields along with their values as a dictionary
@@ -394,8 +394,12 @@ class Account:
 
         # get the urls from the urls attribute
         if not key:
-            key= cls.get_field('default_url')
-        urls = getattr(cls, 'urls', ())
+            key = getattr(cls, 'default_url', None)
+        urls = getattr(cls, 'urls', [])
+        if type(urls) != dict:
+            if is_str(urls):
+                urls = urls.split()
+            urls = {None: urls}
 
         # get the urls from the url recognizers
         # currently urls from recognizers dominate over those from attributes
@@ -417,7 +421,7 @@ class Account:
                 'unknown key, choose from %s.' % conjoin(urls.keys()),
                 culprit=key
             )
-        url = split(urls)[0]  # use the first url specified
+        url = next(split(urls))  # use the first url specified
 
         # open the url
         browser.run(url)

@@ -19,7 +19,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from .utilities import gethostname, getusername, split
+from .utilities import flatten, gethostname, getusername, split
 from shlib import cwd, to_path
 from inform import error, log, warn, notify
 from fnmatch import fnmatch
@@ -63,7 +63,7 @@ class RecognizeAny(Recognizer):
 # RecognizeTitle {{{1
 class RecognizeTitle(Recognizer):
     def __init__(self, *titles, script=True):
-        self.titles = titles
+        self.titles = flatten(titles)
         self.script = script
 
     def match(self, data, account):
@@ -77,12 +77,12 @@ class RecognizeTitle(Recognizer):
 # RecognizeURL {{{1
 class RecognizeURL(Recognizer):
     def __init__(self, *urls, script=True, name=None):
-        self.urls = urls
+        self.urls = flatten(urls)
         self.script = script
         self.name = name
 
     def match(self, data, account):
-        for url in split(self.urls):
+        for url in self.urls:
             url = urlparse(url)
             protocol = url.scheme
             host = url.netloc
@@ -106,7 +106,7 @@ class RecognizeURL(Recognizer):
 # RecognizeCWD {{{1
 class RecognizeCWD(Recognizer):
     def __init__(self, *dirs, script=True):
-        self.dirs = dirs
+        self.dirs = flatten(dirs)
         self.script = script
 
     def match(self, data, account):
@@ -119,7 +119,7 @@ class RecognizeCWD(Recognizer):
 # RecognizeHost {{{1
 class RecognizeHost(Recognizer):
     def __init__(self, *hosts, script=True):
-        self.hosts = hosts
+        self.hosts = flatten(hosts)
         self.script = script
 
     def match(self, data, account):
@@ -132,14 +132,13 @@ class RecognizeHost(Recognizer):
 # RecognizeUser {{{1
 class RecognizeUser(Recognizer):
     def __init__(self, *users, script=True):
-        self.users = users
+        self.users = flatten(users)
         self.script = script
 
     def match(self, data, account):
         username = getusername()
-        for user in self.users:
-            if user == username:
-                return self.script
+        if username in self.users:
+            return self.script
 
 
 # RecognizeEnvVar {{{1

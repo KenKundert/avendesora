@@ -52,16 +52,6 @@ KEYSYMS = {
     '-': 'minus',
     '.': 'period',
     '/': 'slash',
-    '0': 'zero',
-    '1': 'one',
-    '2': 'two',
-    '3': 'three',
-    '4': 'four',
-    '5': 'five',
-    '6': 'six',
-    '7': 'seven',
-    '8': 'eight',
-    '9': 'nine',
     ' ': 'space',
     ':': 'colon',
     ';': 'semicolon',
@@ -127,9 +117,9 @@ class TTY_Writer(Writer):
         log('Writing to TTY:', label)
         label = label.upper()
         try:
-            alt_name = value.get_name()
+            alt_name = value.get_key()
             if alt_name:
-                label += ' (%s)' % value.get_name()
+                label += ' (%s)' % alt_name
         except AttributeError:
             pass
         text = LabelColor(label + ':') + sep + tvalue
@@ -232,7 +222,7 @@ class KeyboardWriter(Writer):
             # characters to their xkeysym names
             keysyms = []
             for char in text:
-                if char in string.ascii_letters:
+                if char in string.ascii_letters + string.digits:
                     keysym = char
                 else:
                     keysym = KEYSYMS.get(char)

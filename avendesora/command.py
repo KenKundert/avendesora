@@ -81,11 +81,12 @@ class Command:
 
 # Add {{{1
 class Add(Command):
-    NAMES = 'add',
+    NAMES = 'add', 'a'
     DESCRIPTION = 'add a new account'
     USAGE = dedent("""
         Usage:
             avendesora [options] add [<template>]
+            avendesora [options] a [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -134,7 +135,7 @@ class Add(Command):
             if new == template:
                 return output('Unchanged, and so ignored.')
 
-            # hide the files that should be hidden
+            # hide the values that should be hidden
             def hide(match):
                 return 'Hidden(%r)' % Conceal.hide(match.group(1))
             new = re.sub("<<(.*?)>>", hide, new)
@@ -183,11 +184,12 @@ class Add(Command):
 
 # Archive {{{1
 class Archive(Command):
-    NAMES = 'archive',
+    NAMES = 'archive', 'A'
     DESCRIPTION = 'generates archive of all account information'
     USAGE = dedent("""
         Usage:
             avendesora archive
+            avendesora A
     """).strip()
 
     @classmethod
@@ -240,11 +242,12 @@ class Archive(Command):
 
 # Browse {{{1
 class Browse(Command):
-    NAMES = 'browse',
+    NAMES = 'browse', 'b'
     DESCRIPTION = 'open account URL in web browser'
     USAGE = dedent("""
         Usage:
             avendesora [options] browse <account> [<key>]
+            avendesora [options] b <account> [<key>]
 
         Options:
             -b <browser>, --browser <browser>
@@ -286,11 +289,12 @@ class Browse(Command):
 
 # Changed {{{1
 class Changed(Command):
-    NAMES = 'changed',
+    NAMES = 'changed', 'C'
     DESCRIPTION = 'identify any changes that have occurred since the archive was created'
     USAGE = dedent("""
         Usage:
             avendesora changed
+            avendesora C
     """).strip()
 
     @classmethod
@@ -380,113 +384,14 @@ class Changed(Command):
                         output(account_name, 'field differs:', field_name, sep=': ')
 
 
-# Edit {{{1
-class Edit(Command):
-    NAMES = 'edit',
-    DESCRIPTION = 'edit an account'
-    USAGE = dedent("""
-        Usage:
-            avendesora edit <account>
-    """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
-    def run(cls, command, args):
-        # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-
-        # run the generator
-        generator = PasswordGenerator()
-
-        # determine the account and open the URL
-        account = generator.get_account(cmdline['<account>'])
-        filepath = account._file_info.path
-        account_name = account.__name__
-        GenericEditor.open_and_search(filepath, account_name)
-
-
-# Find {{{1
-class Find(Command):
-    NAMES = 'find',
-    DESCRIPTION = 'find an account'
-    USAGE = dedent("""
-        Find accounts whose name contains the search text.
-
-        Usage:
-            avendesora find <text>
-    """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
-    def run(cls, command, args):
-        # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-
-        # run the generator
-        generator = PasswordGenerator()
-
-        # find accounts whose name matches the criteria
-        to_print = []
-        for acct in generator.find_accounts(cmdline['<text>']):
-            aliases = split(getattr(acct, 'aliases', []))
-
-            aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
-            to_print += [acct.get_name() + aliases]
-        output(cmdline['<text>']+ ':')
-        output('    ' + ('\n    '.join(sorted(to_print))))
-
-
-# Help {{{1
-class Help(Command):
-    NAMES = 'help',
-    DESCRIPTION = 'give information about commands or other topics'
-    USAGE = dedent("""
-        Usage:
-            avendesora help [<topic>]
-    """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
-    def run(cls, command, args):
-        # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-
-        from .help import HelpMessage
-        HelpMessage.show(cmdline['<topic>'])
-
-
-# Hide {{{1
-class Hide(Command):
-    NAMES = 'hide', 'conceal',
+# Conceal {{{1
+class Conceal(Command):
+    NAMES = 'conceal', 'c'
     DESCRIPTION = 'conceal text by encoding it'
     USAGE = dedent("""
         Usage:
-            avendesora [options] hide [<text>]
             avendesora [options] conceal [<text>]
+            avendesora [options] c [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -538,14 +443,116 @@ class Hide(Command):
         output(Conceal.hide(text, cmdline['--encoding']))
 
 
+# Edit {{{1
+class Edit(Command):
+    NAMES = 'edit', 'e'
+    DESCRIPTION = 'edit an account'
+    USAGE = dedent("""
+        Usage:
+            avendesora edit <account>
+            avendesora e <account>
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # determine the account and open the URL
+        account = generator.get_account(cmdline['<account>'])
+        filepath = account._file_info.path
+        account_name = account.__name__
+        GenericEditor.open_and_search(filepath, account_name)
+
+
+# Find {{{1
+class Find(Command):
+    NAMES = 'find', 'f'
+    DESCRIPTION = 'find an account'
+    USAGE = dedent("""
+        Find accounts whose name contains the search text.
+
+        Usage:
+            avendesora find <text>
+            avendesora f <text>
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # find accounts whose name matches the criteria
+        to_print = []
+        for acct in generator.find_accounts(cmdline['<text>']):
+            aliases = split(getattr(acct, 'aliases', []))
+
+            aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
+            to_print += [acct.get_name() + aliases]
+        output(cmdline['<text>']+ ':')
+        output('    ' + ('\n    '.join(sorted(to_print))))
+
+
+# Help {{{1
+class Help(Command):
+    NAMES = 'help', 'h'
+    DESCRIPTION = 'give information about commands or other topics'
+    USAGE = dedent("""
+        Usage:
+            avendesora help [<topic>]
+            avendesora h [<topic>]
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        from .help import HelpMessage
+        HelpMessage.show(cmdline['<topic>'])
+
+
 # Initialize {{{1
 class Initialize(Command):
-    NAMES = 'init', 'initialize',
+    NAMES = 'initialize', 'I'
     DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
-            avendesora init [--gpg-id <id>]... [options]
             avendesora initialize [--gpg-id <id>]... [options]
+            avendesora I [--gpg-id <id>]... [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -583,11 +590,12 @@ class Initialize(Command):
 
 # New {{{1
 class New(Command):
-    NAMES = 'new',
+    NAMES = 'new', 'N'
     DESCRIPTION = 'create new accounts file'
     USAGE = dedent("""
         Usage:
             avendesora new [--gpg-id <id>]... <name>
+            avendesora N [--gpg-id <id>]... <name>
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -630,138 +638,16 @@ class New(Command):
         generator = PasswordGenerator(init=cmdline['<name>'], gpg_ids=gpg_ids)
 
 
-# Search {{{1
-class Search(Command):
-    NAMES = 'search',
-    DESCRIPTION = 'search accounts'
-    USAGE = dedent("""
-        Search for accounts whose values contain the search text.
-
-        Usage:
-            avendesora search <text>
-    """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
-    def run(cls, command, args):
-        # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-
-        # run the generator
-        generator = PasswordGenerator()
-
-        # search for accounts that match search criteria
-        to_print = []
-        for acct in generator.search_accounts(cmdline['<text>']):
-            aliases = split(getattr(acct, 'aliases', []))
-
-            aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
-            to_print += [acct.get_name() + aliases]
-        output(cmdline['<text>']+ ':')
-        output('    ' + ('\n    '.join(sorted(to_print))))
-
-
-# Show {{{1
-class Show(Command):
-    NAMES = 'show', 's',
-    DESCRIPTION = 'show an account value'
-    USAGE = dedent("""
-        Produce an account value. If the value is secret, it is produced only
-        temporarily unless --stdout is specified.
-
-        Usage:
-            avendesora show [--stdout | --clipboard] [<account> [<field>]]
-            avendesora s [--stdout | --clipboard] [<account> [<field>]]
-
-        Options:
-            -c, --clipboard         Write output to clipboard rather than stdout.
-            -s, --stdout            Write output to the standard output without
-                                    any annotation or protections.
-    """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
-    def run(cls, command, args):
-        # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-
-        # run the generator
-        generator = PasswordGenerator()
-
-        # determine the account and output specified information
-        account_name = cmdline['<account>']
-        writer = get_writer(
-            bool(account_name), cmdline['--clipboard'], cmdline['--stdout']
-        )
-        if account_name:
-            account = generator.get_account(account_name)
-            writer.display_field(account, cmdline['<field>'])
-        else:
-            # use discovery to determine account
-            account_name, script = generator.discover_account()
-            account = generator.get_account(account_name)
-            writer.run_script(account, script)
-
-
-# ShowAll {{{1
-class Summary(Command):
-    NAMES = 'sum', 'summary',
-    DESCRIPTION = 'display all account values'
-    USAGE = dedent("""
-        Show all account values.
-
-        Usage:
-            avendesora sum <account>
-            avendesora summary <account>
-    """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
-    def run(cls, command, args):
-        # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-
-        # run the generator
-        generator = PasswordGenerator()
-
-        # determine the account
-        account = generator.get_account(cmdline['<account>'])
-        account.write_summary()
-
-# Unhide {{{1
-class Unhide(Command):
-    NAMES = 'unhide', 'reveal',
+# Reveal {{{1
+class Reveal(Command):
+    NAMES = 'reveal', 'r'
     DESCRIPTION = 'reveal concealed text'
     USAGE = dedent("""
         Transform concealed text to reveal its original form.
 
         Usage:
-            avendesora [options] unhide [<text>]
             avendesora [options] reveal [<text>]
+            avendesora [options] r [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -812,6 +698,131 @@ class Unhide(Command):
         # transform and output the string
         output(Conceal.show(text, cmdline['--encoding']))
 
+
+# Search {{{1
+class Search(Command):
+    NAMES = 'search', 's'
+    DESCRIPTION = 'search accounts'
+    USAGE = dedent("""
+        Search for accounts whose values contain the search text.
+
+        Usage:
+            avendesora search <text>
+            avendesora s <text>
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # search for accounts that match search criteria
+        to_print = []
+        for acct in generator.search_accounts(cmdline['<text>']):
+            aliases = split(getattr(acct, 'aliases', []))
+
+            aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
+            to_print += [acct.get_name() + aliases]
+        output(cmdline['<text>']+ ':')
+        output('    ' + ('\n    '.join(sorted(to_print))))
+
+
+# Value {{{1
+class Value(Command):
+    NAMES = 'value', 'val', 'v'
+    DESCRIPTION = 'show an account value'
+    USAGE = dedent("""
+        Produce an account value. If the value is secret, it is produced only
+        temporarily unless --stdout is specified.
+
+        Usage:
+            avendesora value [--stdout | --clipboard] [<account> [<field>]]
+            avendesora val [--stdout | --clipboard] [<account> [<field>]]
+            avendesora v [--stdout | --clipboard] [<account> [<field>]]
+
+        Options:
+            -c, --clipboard         Write output to clipboard rather than stdout.
+            -s, --stdout            Write output to the standard output without
+                                    any annotation or protections.
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # determine the account and output specified information
+        account_name = cmdline['<account>']
+        writer = get_writer(
+            bool(account_name), cmdline['--clipboard'], cmdline['--stdout']
+        )
+        if account_name:
+            account = generator.get_account(account_name)
+            writer.display_field(account, cmdline['<field>'])
+        else:
+            # use discovery to determine account
+            account_name, script = generator.discover_account()
+            account = generator.get_account(account_name)
+            writer.run_script(account, script)
+
+
+# Values {{{1
+class Values(Command):
+    NAMES = 'values', 'vals', 'V'
+    DESCRIPTION = 'display all account values'
+    USAGE = dedent("""
+        Show all account values.
+
+        Usage:
+            avendesora values <account>
+            avendesora vals <account>
+            avendesora V <account>
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # determine the account
+        account = generator.get_account(cmdline['<account>'])
+        account.write_summary()
 
 # Version {{{1
 class Version(Command):
