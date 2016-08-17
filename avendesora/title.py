@@ -22,7 +22,7 @@
 # Imports {{{1
 from .config import get_setting
 from shlib import Run
-from inform import fatal, log
+from inform import Error, log
 from urllib.parse import urlparse
 import re
 
@@ -48,7 +48,7 @@ class Title:
         else:
             xdotool = get_setting('xdotool_executable')
             if not xdotool:
-                fatal(
+                raise Error(
                     "must set xdotool_executable'.",
                     culprit=get_setting('config_file')
                 )
@@ -58,20 +58,14 @@ class Title:
                     'sOeW'
                 )
             except OSError as err:
-                fatal(str(err))
+                raise Error(str(err))
             title = output.stdout.strip()
         log('Focused window title: %s' % title)
         data = {'rawtitle': title}
-        for sub in Title.__subclasses__():
-            sub._process(title, data)
-
-        # split the url into basic components if found
-        url = data.get('url')
-        if url:
-            url = urlparse(url)
-            data['protocol'] = url.scheme
-            data['host'] = url.netloc
-            data['path'] = url.path
+        for sub in sorted(Title.__subclasses__(), key=lambda c: c.PRIORITY):
+            matched = sub._process(title, data)
+            if matched:
+                break
 
         # log the components of the title
         log('Recognized title components ...')
@@ -85,15 +79,38 @@ class Title:
 
     @classmethod
     def _process(cls, title, data):
-        match = cls.pattern.match(title)
+        match = cls.PATTERN.match(title)
         if match:
-            data.update(match.groupdict())
+            found = match.groupdict()
+            if 'url' in found:
+                components = urlparse(found.get('url'))
+                if components.netloc:
+                    log('title matched.', culprit=cls.__name__)
+                    data.update(found)
+                    data['protocol'] = components.scheme
+                    data['host'] = components.netloc
+                    data['path'] = components.path
+                    return True
 
 
-# AddURLToWindow class {{{1
+# AddURLToWindow (Firefox) {{{1
 class AddURLToWindow(Title):
     # This matches the default pattern produced by AddURLToWindow in Firefox
-    # Also matches old HostNameInTitleBar in Firefox
-    pattern = re.compile(
+    PATTERN = re.compile(
         r'\A{title} - {url} - {host} - {browser}\Z'.format(**REGEX_COMPONENTS)
     )
+    PRIORITY = 1
+
+
+# URLinTitle (Chrome) {{{1
+class URLinTitle(Title):
+    # This matches the default pattern produced by URLinTitle in Chrome
+    # By default URLinTitle does not include path or args. Can change the
+    # tab title format option to:
+    #     {title} - {protocol}://{hostname}{port}/{path}{args}
+    # to access these fields as well.
+    PATTERN = re.compile(
+        r'\A{title} - {url} - {browser}\Z'.format(**REGEX_COMPONENTS)
+    )
+    PRIORITY = 2
+

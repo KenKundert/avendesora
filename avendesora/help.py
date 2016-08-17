@@ -185,14 +185,17 @@ class Discovery(HelpMessage):
                 )
 
             When giving the URL, anything specified must match and globbing is
-            not supported. If you do not give the protocol, https is assumed.
+            not supported. If you give a partial path, by default Avendesora
+            will match up to what you have given, but you can require an exact
+            match of the entire path by specifying exact_path=True to
+            RecognizeURL.  If you do not give the protocol, https is assumed.
 
             The following recognizers are available::
 
                 RecognizeAll(<recognizer>..., [script=<script>])
                 RecognizeAny(<recognizer>..., [script=<script>])
                 RecognizeTitle(<title>..., [script=<script>])
-                RecognizeURL(<title>..., [script=<script>, [name=<name>]])
+                RecognizeURL(<title>..., [script=<script>, [name=<name>]], [exact_path=<bool>])
                 RecognizeHost(<host>..., [script=<script>])
                 RecognizeUser(<user>..., [script=<script>])
                 RecognizeCWD(<cwd>..., [script=<script>])

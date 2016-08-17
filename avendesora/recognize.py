@@ -123,10 +123,11 @@ class RecognizeTitle(Recognizer):
 
 # RecognizeURL {{{1
 class RecognizeURL(Recognizer):
-    def __init__(self, *urls, script=True, name=None):
+    def __init__(self, *urls, script=True, name=None, exact_path=False):
         self.urls = flatten(urls)
         self.script = script
         self.name = name
+        self.exact_path = exact_path
 
     def match(self, data, account, verbose=False):
         try:
@@ -136,8 +137,30 @@ class RecognizeURL(Recognizer):
                 host = url.netloc
                 path = url.path
 
+                # data may contain the following fields after successful title
+                # recognition:
+                #     rawdata: the original title
+                #     title: the processed title
+                #     url: the full url
+                #     browser: the name of the browser
+                #     protocol: the url scheme (ex. http, https, ...)
+                #     host: the url host name or IP address
+                #     path: the path component of the url
+                #           does not include options or anchor
                 if host == data.get('host'):
-                    if not path or path == data.get('path'):
+
+                    def path_matches(expected, actual):
+                        if not expected:
+                            # path was not specified, treat it as don't care
+                            return True
+                        if self.exact_path:
+                            # exact path match expected
+                            return expected == actual
+                        else:
+                            # otherwise just match what was given
+                            return actual.startswith(expected)
+
+                    if path_matches(path, data.get('path')):
                         if (
                             protocol == data.get('protocol') or
                             protocol not in REQUIRED_PROTOCOLS
