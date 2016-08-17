@@ -143,7 +143,7 @@ def to_python(obj, _level=0):
     elif is_str(obj) and '\n' in obj:
         output += ['"""' + indent(dedent(obj), leader(1)) + leader(0) + '"""']
     else:
-        output += [obj.__repr__()]
+        output += [repr(obj)]
     return '\n'.join(output)
 
 # error_source {{{1

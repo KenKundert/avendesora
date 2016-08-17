@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts.gpg',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '0c6eabae3a4ea64c9804e5a9a02a4ae1',
+    'secrets_hash': 'aa804218068fe3f4760b280539cd61ac',
 }
 
 
@@ -446,7 +446,11 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
     # where <filename> contains <hidden_arg>.
     #
 
-    from avendesora import Hidden, Question
+    from avendesora import (
+        Hidden, Question,
+        RecognizeAll, RecognizeTitle, RecognizeURL, RecognizeCWD, RecognizeHost,
+        RecognizeUser, RecognizeEnvVar
+    )
 
     CREATED = '{date}'
     ACCOUNTS = {{

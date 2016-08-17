@@ -21,7 +21,7 @@
 # Imports {{{1
 from .utilities import flatten, gethostname, getusername, split
 from shlib import cwd, to_path
-from inform import error, log, warn, notify
+from inform import Error, log, warn, notify
 from fnmatch import fnmatch
 from urllib.parse import urlparse
 import os
@@ -37,6 +37,8 @@ class Recognizer:
             urls.update(self.get_urls())
         return urls
 
+    def get_name(self):
+        return self.__class__.__name__
 
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):
@@ -44,9 +46,25 @@ class RecognizeAll(Recognizer):
         self.recognizers = recognizers
         self.script = script
 
-    def match(self, data, account):
-        if all([each.match(data, account) for each in self.recognizers]):
-            return self.script
+    def match(self, data, account, verbose=False):
+        try:
+            match = all([
+                each.match(data, account, verbose) for each in self.recognizers
+            ])
+            if match:
+                if verbose:
+                    log('    %s: matches.' % self.get_name())
+                return self.script
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        args = [repr(each) for each in self.recognizers]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 
 # RecognizeAny {{{1
@@ -55,9 +73,25 @@ class RecognizeAny(Recognizer):
         self.recognizers = recognizers
         self.script = script
 
-    def match(self, data, account):
-        if Any([each.match(data, account) for each in self.recognizers]):
-            return self.script
+    def match(self, data, account, verbose=False):
+        try:
+            match = Any([
+                each.match(data, account, verbose) for each in self.recognizers
+            ])
+            if match:
+                if verbose:
+                    log('    %s: matches.' % self.get_name())
+                return self.script
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        args = [repr(each) for each in self.recognizers]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 
 # RecognizeTitle {{{1
@@ -66,12 +100,25 @@ class RecognizeTitle(Recognizer):
         self.titles = flatten(titles)
         self.script = script
 
-    def match(self, data, account):
-        found = data.get('rawtitle')
-        if found:
-            for title in self.titles:
-                if fnmatch(found, title):
-                    return self.script
+    def match(self, data, account, verbose=False):
+        try:
+            actual = data.get('rawtitle')
+            if actual:
+                for candidate in self.titles:
+                    if fnmatch(actual, candidate):
+                        if verbose:
+                            log('    %s: matches.' % self.get_name())
+                        return self.script
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        args = [repr(each) for each in self.titles]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 
 # RecognizeURL {{{1
@@ -81,27 +128,42 @@ class RecognizeURL(Recognizer):
         self.script = script
         self.name = name
 
-    def match(self, data, account):
-        for url in self.urls:
-            url = urlparse(url)
-            protocol = url.scheme
-            host = url.netloc
-            path = url.path
+    def match(self, data, account, verbose=False):
+        try:
+            for url in self.urls:
+                url = urlparse(url)
+                protocol = url.scheme
+                host = url.netloc
+                path = url.path
 
-            if host == data.get('host'):
-                if not path or path == data.get('path'):
-                    if (
-                        protocol == data.get('protocol') or
-                        protocol not in REQUIRED_PROTOCOLS
-                    ):
-                        return self.script
-                    else:
-                        msg = 'url matches, but uses wrong protocol.'
-                        notify(msg)
-                        error(msg, culprit=account.get_name())
+                if host == data.get('host'):
+                    if not path or path == data.get('path'):
+                        if (
+                            protocol == data.get('protocol') or
+                            protocol not in REQUIRED_PROTOCOLS
+                        ):
+                            if verbose:
+                                log('    %s: matches.' % self.get_name())
+                            return self.script
+                        else:
+                            msg = 'url matches, but uses wrong protocol.'
+                            notify(msg)
+                            raise Error(msg, culprit=account.get_name())
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
 
     def get_urls(self):
         return {self.name: self.urls}
+
+    def __repr__(self):
+        args = [repr(each) for each in self.urls]
+        if self.script:
+            args.append('script=%r' % self.script)
+        if self.name:
+            args.append('name=%r' % self.name)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 # RecognizeCWD {{{1
 class RecognizeCWD(Recognizer):
@@ -109,11 +171,24 @@ class RecognizeCWD(Recognizer):
         self.dirs = flatten(dirs)
         self.script = script
 
-    def match(self, data, account):
-        cwd = cwd()
-        for directory in self.dirs:
-            if cwd.samefile(to_path(directory)):
-                return self.script
+    def match(self, data, account, verbose=False):
+        try:
+            cwd = cwd()
+            for directory in self.dirs:
+                if cwd.samefile(to_path(directory)):
+                    if verbose:
+                        log('    %s: matches.' % self.get_name())
+                    return self.script
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        args = [repr(each) for each in self.dirs]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 
 # RecognizeHost {{{1
@@ -122,11 +197,24 @@ class RecognizeHost(Recognizer):
         self.hosts = flatten(hosts)
         self.script = script
 
-    def match(self, data, account):
-        hostname = gethostname()
-        for host in self.hosts:
-            if host == hostname:
-                return self.script
+    def match(self, data, account, verbose=False):
+        try:
+            hostname = gethostname()
+            for host in self.hosts:
+                if host == hostname:
+                    if verbose:
+                        log('    %s: matches.' % self.get_name())
+                    return self.script
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        args = [repr(each) for each in self.hosts]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 
 # RecognizeUser {{{1
@@ -135,11 +223,23 @@ class RecognizeUser(Recognizer):
         self.users = flatten(users)
         self.script = script
 
-    def match(self, data, account):
-        username = getusername()
-        if username in self.users:
-            return self.script
+    def match(self, data, account, verbose=False):
+        try:
+            username = getusername()
+            if username in self.users:
+                if verbose:
+                    log('    %s: matches.' % self.get_name())
+                return self.script
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
 
+    def __repr__(self):
+        args = [repr(each) for each in self.users]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 # RecognizeEnvVar {{{1
 class RecognizeEnvVar(Recognizer):
@@ -148,7 +248,19 @@ class RecognizeEnvVar(Recognizer):
         self.value = value
         self.script = script
 
-    def match(self, data, account):
-        if name in os.environ and value == os.environ[name]:
-            return self.script
+    def match(self, data, account, verbose=False):
+        try:
+            if name in os.environ and value == os.environ[name]:
+                if verbose:
+                    log('    %s: matches.' % self.get_name())
+                return self.script
+        except Exception as err:
+            raise Error(str(err), culprit=err.__class__.__name__)
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, ', '.join([
+            repr(each) for each in [self.name, self.value, self.script]
+        ]))
 

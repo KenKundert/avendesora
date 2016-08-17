@@ -31,7 +31,7 @@ from .preferences import (
 )
 from .title import Title
 from .utilities import generate_random_string, validate_componenets, to_python
-from inform import debug, Error, fatal, log, terminate, terminate_if_errors
+from inform import debug, Error, notify, log, terminate, terminate_if_errors
 from shlib import to_path
 from pathlib import Path
 from urllib.parse import urlparse
@@ -121,9 +121,9 @@ class PasswordGenerator:
             fields['accounts_files'] = get_setting('accounts_files', []) + [filename]
             path = to_path(get_setting('settings_dir'), filename)
             if path.exists():
-                fatal('exists.', culprit=path)
+                raise Error('exists.', culprit=path)
             if path.suffix in GPG_EXTENSIONS and not gpg_ids:
-                fatal('Must specify GPG IDs.')
+                raise Error('Must specify GPG IDs.')
             log('creating accounts file.', culprit=path)
             f = PythonFile(path)
             f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
@@ -131,12 +131,12 @@ class PasswordGenerator:
         # Create a new accounts file
         path = to_path(get_setting('account_list_file'))
         if path.suffix in GPG_EXTENSIONS:
-            fatal('encryption is not supported.', culprit=path)
+            raise Error('encryption is not supported.', culprit=path)
         try:
             log('writing.', culprit=path)
             path.write_text(ACCOUNT_LIST_FILE_CONTENTS.format(**fields))
         except OSError as err:
-            error(os_error(err))
+            raise Error(os_error(err))
 
     # all_accounts() {{{2
     def all_accounts(self):
@@ -170,17 +170,11 @@ class PasswordGenerator:
         return accounts
 
     # discover_account() {{{2
-    def discover_account(self):
-        # get and parse the title
-        data = Title().get_data()
+    def discover_account(self, title=None, verbose=False):
+        log('Account Discovery ...')
 
-        # split the url into basic components if found
-        url = data.get('url')
-        if url:
-            url = urlparse(url)
-            data['protocol'] = url.scheme
-            data['host'] = url.netloc
-            data['path'] = url.path
+        # get and parse the title
+        data = Title(override=title).get_data()
 
         # sweep through accounts to see if any recognize this title data
         # recognizer may fund the following fields in data:
@@ -194,19 +188,24 @@ class PasswordGenerator:
         #           does not include options or anchor
         matches = {}
         for account in Account.all_accounts():
-            secret = account.recognize(data)
-            if secret:
-                matches[account.get_name()] = secret
+            name = account.get_name()
+            if verbose:
+                log('Trying:', name)
+            for key, script in account.recognize(data, verbose):
+                ident = '%s (%s)' % (name, key) if key else name
+                matches[ident] = name, script
+                if verbose:
+                    log('    %s matches' % ident)
 
         if not matches:
             msg = 'cannot find appropriate account.'
-            log(msg)
+            notify(msg)
             raise Error(msg)
         if len(matches) > 1:
             choice = show_list_dialog(sorted(matches.keys()))
-            return choice, matches[choice]
+            return matches[choice]
         else:
-            return matches.popitem()
+            return matches.popitem()[1]
 
     # add_master_to_accounts() {{{2
     def add_master_to_accounts(self, master):

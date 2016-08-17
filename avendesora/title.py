@@ -23,6 +23,7 @@
 from .config import get_setting
 from shlib import Run
 from inform import fatal, log
+from urllib.parse import urlparse
 import re
 
 
@@ -34,34 +35,49 @@ URL_REGEX = r'(?:[^ ]+)://(?:[^ ]+)'
 REGEX_COMPONENTS = {
     'title': labelRegex('title', r'.*'),
     'url': labelRegex('url', URL_REGEX),
-    'browser': labelRegex('browser', r'\w+'),
+    'host': labelRegex('host', URL_REGEX),
+    'browser': labelRegex('browser', r'[\w ]+'),
 }
 
 
 # Title base class {{{1
 class Title:
-    def __init__(self):
-        log('Account Discovery ...')
-        xdotool = get_setting('xdotool_executable')
-        if not xdotool:
-            fatal(
-                "must set xdotool_executable'.",
-                culprit=get_setting('config_file')
-            )
-        try:
-            output = Run(
-                [xdotool, 'getactivewindow', 'getwindowname'],
-                'sOeW'
-            )
-        except OSError as err:
-            fatal(str(err))
-        title = output.stdout.strip()
+    def __init__(self, override=None):
+        if override:
+            title = override
+        else:
+            xdotool = get_setting('xdotool_executable')
+            if not xdotool:
+                fatal(
+                    "must set xdotool_executable'.",
+                    culprit=get_setting('config_file')
+                )
+            try:
+                output = Run(
+                    [xdotool, 'getactivewindow', 'getwindowname'],
+                    'sOeW'
+                )
+            except OSError as err:
+                fatal(str(err))
+            title = output.stdout.strip()
         log('Focused window title: %s' % title)
         data = {'rawtitle': title}
         for sub in Title.__subclasses__():
             sub._process(title, data)
+
+        # split the url into basic components if found
+        url = data.get('url')
+        if url:
+            url = urlparse(url)
+            data['protocol'] = url.scheme
+            data['host'] = url.netloc
+            data['path'] = url.path
+
+        # log the components of the title
+        log('Recognized title components ...')
         for k, v in data.items():
             log('    %s: %s' % (k, v))
+
         self.data = data
 
     def get_data(self):
@@ -79,5 +95,5 @@ class AddURLToWindow(Title):
     # This matches the default pattern produced by AddURLToWindow in Firefox
     # Also matches old HostNameInTitleBar in Firefox
     pattern = re.compile(
-        r'\A{title} - {url}(?: - {browser})?\Z'.format(**REGEX_COMPONENTS)
+        r'\A{title} - {url} - {host} - {browser}\Z'.format(**REGEX_COMPONENTS)
     )

@@ -38,7 +38,7 @@ Use 'avendesora help' for list of available help topics.
 from .command import Command
 from .config import read_config, get_setting
 from .gpg import GnuPG, BufferedFile
-from inform import Inform, Error, fatal, output, terminate, debug
+from inform import Inform, Error, fatal, output, terminate, debug, os_error
 from shlib import to_path
 from docopt import docopt
 import sys

@@ -130,36 +130,34 @@ class Account:
 
     # recognize() {{{2
     @classmethod
-    def recognize(cls, data):
+    def recognize(cls, data, verbose):
         # try the specified recognizers
         discovery = getattr(cls, 'discovery', ())
         for recognizer in values(discovery):
             if isinstance(recognizer, Recognizer):
-                script = recognizer.match(data, cls)
+                script = recognizer.match(data, cls, verbose)
+                name = getattr(recognizer, 'name', None)
                 if script:
-                    return script
+                    yield name, script
         if discovery:
             return
 
         # If no recognizers specified, just check the urls
-        try:
-            urls = split(cls.get_field('urls'))
-            for url in split(cls.get_field('urls')):
-                components = urlparse(url)
-                protocol = components.scheme
-                host = components.netloc
-                if host == data.get('host'):
-                    if (
-                        protocol != data.get('protocol') and
-                        data['protocol'] in get_setting('required_protocols')
-                    ):
-                        msg = 'url matches, but uses wrong protocol.'
-                        notify(msg)
-                        error(msg, culprit=account.get_name())
-                    else:
-                        return True
-        except Error:
-            pass
+        for url in split(cls.get_field('urls', default=[])):
+            components = urlparse(url)
+            protocol = components.scheme
+            host = components.netloc
+            if host == data.get('host'):
+                if (
+                    protocol != data.get('protocol') and
+                    data['protocol'] in get_setting('required_protocols')
+                ):
+                    msg = 'url matches, but uses wrong protocol.'
+                    notify(msg)
+                    raise Error(msg, culprit=account.get_name())
+                else:
+                    yield None, True
+                    return
 
     # initialize() {{{2
     @classmethod
@@ -192,7 +190,10 @@ class Account:
         value = cls.__dict__.get(name)
         if value is None:
             if default is False:
-                raise Error('not found.', culprit=cls.combine_name(name, key))
+                raise Error(
+                    'not found.',
+                    culprit=(cls.get_name(), cls.combine_name(name, key))
+                )
             else:
                 return default
 

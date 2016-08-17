@@ -19,7 +19,7 @@
 # Imports {{{1
 from .config import get_setting, add_setting
 from shlib import Run
-from inform import log, error
+from inform import log, Error
 
 # Editor base class {{{1
 class Editor:
@@ -36,11 +36,14 @@ class GenericEditor(Editor):
             'account': account,
             'section': '{' '{' '{' '1',
         }
-        cmd = get_setting('edit_account' if account else 'edit_template')
-        cmd = [e.format(**args) for e in cmd]
-
         try:
+            editor_setting = 'edit_account' if account else 'edit_template'
+            cmd = get_setting(editor_setting)
+            cmd = [e.format(**args) for e in cmd]
+
             log("running '%s'." % ' '.join(cmd))
             Run(cmd, 'soeW')
         except OSError as err:
-            error(os_error(err))
+            raise Error(os_error(err))
+        except KeyError as err:
+            raise Error('invalid field: %s.' % err, culprit=editor_setting)

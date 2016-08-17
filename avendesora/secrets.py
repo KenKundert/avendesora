@@ -410,7 +410,7 @@ class Question(Passphrase):
 
     # __repr__() {{{2
     def __repr__(self):
-        return "Question('%s', answer=Hidden('%s'))" % (
+        return "Question(%r, answer=Hidden(%r))" % (
             self.question, Obscure.hide(str(self))
         )
 

@@ -25,11 +25,15 @@ from .utilities import two_columns, to_python, items, split
 from .writer import get_writer
 from .__init__ import __version__
 from inform import (
-    Error, error, codicil, output, conjoin, os_error, indent, is_collection
+    Error, error, codicil, output, conjoin, os_error,
+    is_collection, is_str
 )
 from shlib import to_path, mv
 from docopt import docopt
-from textwrap import dedent
+from textwrap import dedent, fill, indent
+    # use indent from textwrap rather than inform
+    # the inform indent removes spaces from the right side, which causes
+    # spurious difference when running changed command
 import re
 import sys
 
@@ -86,7 +90,7 @@ class Add(Command):
     USAGE = dedent("""
         Usage:
             avendesora [options] add [<template>]
-            avendesora [options] a [<template>]
+            avendesora [options] a   [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -211,14 +215,14 @@ class Archive(Command):
         # run the generator
         generator = PasswordGenerator()
 
-        # determine the account and open the URL
+        # get dictionary that fully describes the contents of each account
         entries = []
         for account in generator.all_accounts():
             entry = account.archive()
             if entry:
                 entries.append(indent('%r: %s,' % (
                     account.get_name(), to_python(entry)
-                )))
+                ), '    '))
 
         # build file contents
         from .preferences import ARCHIVE_FILE_CONTENTS
@@ -247,7 +251,7 @@ class Browse(Command):
     USAGE = dedent("""
         Usage:
             avendesora [options] browse <account> [<key>]
-            avendesora [options] b <account> [<key>]
+            avendesora [options] b      <account> [<key>]
 
         Options:
             -b <browser>, --browser <browser>
@@ -380,8 +384,8 @@ class Changed(Command):
                         if str(archive_value[k]) != str(current_value[k]):
                             output(account_name, 'member differs', '%s[%s]' % (field_name, k), sep=': ')
                 else:
-                    if str(archive_value) != str(current_value):
-                        output(account_name, 'field differs:', field_name, sep=': ')
+                    if dedent(str(archive_value)) != dedent(str(current_value)):
+                        output(account_name, 'field differs', field_name, sep=': ')
 
 
 # Conceal {{{1
@@ -391,7 +395,7 @@ class Conceal(Command):
     USAGE = dedent("""
         Usage:
             avendesora [options] conceal [<text>]
-            avendesora [options] c [<text>]
+            avendesora [options] c       [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -450,7 +454,7 @@ class Edit(Command):
     USAGE = dedent("""
         Usage:
             avendesora edit <account>
-            avendesora e <account>
+            avendesora e    <account>
     """).strip()
 
     @classmethod
@@ -486,7 +490,7 @@ class Find(Command):
 
         Usage:
             avendesora find <text>
-            avendesora f <text>
+            avendesora f    <text>
     """).strip()
 
     @classmethod
@@ -524,7 +528,7 @@ class Help(Command):
     USAGE = dedent("""
         Usage:
             avendesora help [<topic>]
-            avendesora h [<topic>]
+            avendesora h    [<topic>]
     """).strip()
 
     @classmethod
@@ -552,7 +556,7 @@ class Initialize(Command):
     USAGE = dedent("""
         Usage:
             avendesora initialize [--gpg-id <id>]... [options]
-            avendesora I [--gpg-id <id>]... [options]
+            avendesora I          [--gpg-id <id>]... [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -595,7 +599,7 @@ class New(Command):
     USAGE = dedent("""
         Usage:
             avendesora new [--gpg-id <id>]... <name>
-            avendesora N [--gpg-id <id>]... <name>
+            avendesora N   [--gpg-id <id>]... <name>
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -635,7 +639,10 @@ class New(Command):
             gpg_ids = get_setting('gpg_ids', [])
 
         # run the generator
-        generator = PasswordGenerator(init=cmdline['<name>'], gpg_ids=gpg_ids)
+        generator = PasswordGenerator(
+            init=cmdline['<name>'], gpg_ids=sorted(set(gpg_ids))
+                # docopt sometimes duplicates the gpg_ids
+        )
 
 
 # Reveal {{{1
@@ -647,7 +654,7 @@ class Reveal(Command):
 
         Usage:
             avendesora [options] reveal [<text>]
-            avendesora [options] r [<text>]
+            avendesora [options] r      [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -708,7 +715,7 @@ class Search(Command):
 
         Usage:
             avendesora search <text>
-            avendesora s <text>
+            avendesora s      <text>
     """).strip()
 
     @classmethod
@@ -748,14 +755,18 @@ class Value(Command):
         temporarily unless --stdout is specified.
 
         Usage:
-            avendesora value [--stdout | --clipboard] [<account> [<field>]]
-            avendesora val [--stdout | --clipboard] [<account> [<field>]]
-            avendesora v [--stdout | --clipboard] [<account> [<field>]]
+            avendesora value [options] [--stdout | --clipboard] [<account> [<field>]]
+            avendesora val   [options] [--stdout | --clipboard] [<account> [<field>]]
+            avendesora v     [options] [--stdout | --clipboard] [<account> [<field>]]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
             -s, --stdout            Write output to the standard output without
                                     any annotation or protections.
+            -v, --verbose           Add additional information to log file to
+                                    help identify issues in account discovery.
+            -t <title>, --title <title>
+                                    Use account discovery on this title.
     """).strip()
 
     @classmethod
@@ -785,7 +796,9 @@ class Value(Command):
             writer.display_field(account, cmdline['<field>'])
         else:
             # use discovery to determine account
-            account_name, script = generator.discover_account()
+            account_name, script = generator.discover_account(
+                title=cmdline['--title'], verbose=cmdline['--verbose']
+            )
             account = generator.get_account(account_name)
             writer.run_script(account, script)
 
@@ -799,8 +812,8 @@ class Values(Command):
 
         Usage:
             avendesora values <account>
-            avendesora vals <account>
-            avendesora V <account>
+            avendesora vals   <account>
+            avendesora V      <account>
     """).strip()
 
     @classmethod
