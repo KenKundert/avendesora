@@ -24,10 +24,16 @@ def test_add():
 
         Options:
             -f <file>, --file <file>
-                                    Add account to specified file.
+                                    Add account to specified accounts file.
 
         The default template is bank. The available templates are:
-        bank, shell and website
+            bank
+            shell
+            website
+
+        The available accounts files are:
+            accounts
+            templates
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
