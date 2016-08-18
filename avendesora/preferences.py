@@ -113,9 +113,9 @@ CONFIG_DEFAULTS = {
                 verbal = Passphrase(length=2)
                 pin = PIN()
                 questions = [
-                    Question('_QUESTION1_'),
-                    Question('_QUESTION2_'),
-                    Question('_QUESTION3_'),
+                    Question("_QUESTION1_?"),
+                    Question("_QUESTION2_?"),
+                    Question("_QUESTION3_?"),
                 ]
                 discovery = RecognizeURL(
                     'https://_URL_',
@@ -471,5 +471,5 @@ ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
 # Fields {{{1
 # Fields reserved for use by Avendesora
 TOOL_FIELDS = [
-    'aliases', 'default', 'master', 'discovery', 'browser', 'default_url'
+    'NAME', 'aliases', 'default', 'master', 'discovery', 'browser', 'default_url'
 ]

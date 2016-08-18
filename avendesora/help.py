@@ -87,7 +87,7 @@ class HelpMessage:
 
 # Abraxas class {{{1
 class Abraxas(HelpMessage):
-    DESCRIPTION = "Exporting accounts from Abraxas"
+    DESCRIPTION = "exporting accounts from Abraxas"
 
     @staticmethod
     def help():
@@ -133,9 +133,133 @@ class Abraxas(HelpMessage):
         return text
 
 
+# Accounts class {{{1
+class Accounts(HelpMessage):
+    DESCRIPTION = "describing an account"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+            Account information is stored in account files. The list of account
+            files is given in ~/.config/avendesora/.accounts_files.  New account
+            files are created using 'avendesora new', but to delete an accounts
+            file, you must remove it from .accounts_files. Once an accounts file
+            exists, you may add accounts to it using 'account add'. Use the -f
+            option to specify which file is to contain the new account.
+
+            An account is basically a collection of attributes organized as a
+            subclass of the Python Account class. For example:
+
+                class NewYorkTimes(Account):
+                    aliases = 'nyt'
+                    username = 'derrickAsh'
+                    email = 'derrickAsh@gmail.com'
+                    passcode = PasswordRecipe('12 2u 2d 2s')
+                    discovery = RecognizeURL(
+                        'https://myaccount.nytimes.com',
+                        script='{email}{tab}{passcode}{return}'
+                    )
+
+            Most of the field values can be retrieved simply by asking for them.
+            For example,
+
+                > avendesora value newyorktimes username
+                username: derrickAsh
+
+            In general, values can be strings, arrays, dictionaries, and special
+            Advendesora classes. For example, you could have an array of
+            security questions:
+
+                questions = [
+                    Question("What is your mother's maiden name?"),
+                    Question("What city were you born?"),
+                    Question("What is first pet's name?"),
+                ]
+
+            Then you can request the answer to a particular question using it
+            index:
+
+                > avendesora value newyorktimes questions.0
+                questions.0 (What is your mother's maiden name?): portrayal tentacle fanlight
+
+            'questions' is the default array field, so you could have shortened
+            your request by using '0' rather than 'questions.0'.  You might be
+            thinking, hey, that is not my mother's maiden name. That is because
+            Question is a 'generated secret'. It produces a seemingly arbitrary
+            answer that is almost impossible to predict. Thus, even family
+            members cannot know the answers to your security questions.
+
+            A dictionary is often used to hold account numbers:
+
+                accounts = [
+                    'checking': '1234-56-7890',
+                    'savings': '0123-45-6789',
+                ]
+
+            You then access its values using:
+
+                > avendesora value newyorktimes accounts.checking 
+                accounts.checking: 1234-56-7890
+
+            You might consider your account numbers as sensitive information. In
+            this case you can hide them with:
+
+                accounts = [
+                    'checking': Hidden('MTIzNC01Ni03ODkw'),
+                    'savings': Hidden('MDEyMy00NS02Nzg5'),
+                ]
+
+            The values are now hidden, but not encrypted. They are simply
+            encoded with base64. Any knowledgable person with the encoded value
+            can decode it back to its original value. Using Hidden makes it
+            harder to recognize and remember the value given only a quick
+            over-the-shoulder glance. It also marks the value as sensitive, so
+            it will only be displayed for a minute. You generate the encoded
+            value using 'avendesora conceal'.
+
+            Any value that is an instance of the Secret class (Password,
+            Passphrase, ...) or the Obscured class (Hidden, GPG, ...) are
+            considered sensitive. They are given out only in a controlled
+            manner. For example, running 'avendesora values' displays all
+            fields, but the values that are sensitive are replaced by
+            instructions on how to view them. They can only be viewed
+            individually:
+
+                > avendesora values newyorktimes
+                names: newyorktimes, nyt
+                email: derrickAsh@gmail.com
+                passcode: <reveal with 'avendesora value newyorktimes passcode'>
+                username: derrickAsh
+
+            The 'aliases' and 'discovery' fields are not shown because they are
+            considered tool fields. Other tool fields include 'NAME', 'default',
+            'master', 'browser', and 'default_url'. For more information on
+            discovery, run 'avendesora help discovery'.  'default' is the name
+            of the default field, which is the field you get if you do not
+            request a particular field. Its value defaults to 'passcode'.
+            'browser' is the default browser to use when opening the account,
+            run 'avendesora help browse' to see a list of available browsers.
+
+            The value of passcode is considered sensitive because it is an
+            instance of PasswordRecipe, which is a subclass of Secret.
+            If we wish to see the passcode, use:
+
+                > avendesora value nyt
+                passcode: TZuk8:u7qY8%
+
+            This value will be displayed for a minute and then hidden. If you
+            would like to hide it early, simply type Ctrl-C.
+
+            For information on how to generate secrets, run 'avendesora help
+            secrets'.  For information on how to conceal or encrypt values, run
+            'avendesora help obscure'.
+        """).strip()
+        return text
+
+
 # Discovery class {{{1
 class Discovery(HelpMessage):
-    DESCRIPTION = "Account discovery"
+    DESCRIPTION = "account discovery"
 
     @staticmethod
     def help():
@@ -150,7 +274,7 @@ class Discovery(HelpMessage):
             which account you wish to use.
 
             To configure an account to trigger when a particular window title is
-            seen, use::
+            seen, use:
 
                 discovery = RecognizeTitle(
                     'Chase Online *',
@@ -165,7 +289,7 @@ class Discovery(HelpMessage):
             Matching window titles can be fragile, especially for websites
             because the titles can vary quite a bit across the site and over
             time. To accommodate this variation, you can give multiple glob
-            patterns::
+            patterns:
 
                 discovery = RecognizeTitle(
                     'CHASE Bank*',
@@ -176,7 +300,7 @@ class Discovery(HelpMessage):
             If you use Firefox, you can install the 'Add URL to Window Title'
             extension. Doing so adds the website URL to the Firefox window
             title, which can make account discovery more robust. In this case
-            you can use::
+            you can use:
 
                 discovery = RecognizeURL(
                     'https://chaseonline.chase.com',
@@ -190,7 +314,7 @@ class Discovery(HelpMessage):
             match of the entire path by specifying exact_path=True to
             RecognizeURL.  If you do not give the protocol, https is assumed.
 
-            The following recognizers are available::
+            The following recognizers are available:
 
                 RecognizeAll(<recognizer>..., [script=<script>])
                 RecognizeAny(<recognizer>..., [script=<script>])
@@ -202,7 +326,7 @@ class Discovery(HelpMessage):
                 RecognizeEnvVar(<name>, <value>, [script=<script>])
 
             RecognizeAll() and RecognizeAny() can be used to combine several
-            recognizers. For example::
+            recognizers. For example:
 
                 discovery = RecognizeAll(
                     RecognizeTitle('sudo *'),
@@ -215,7 +339,7 @@ class Discovery(HelpMessage):
             file. It should show you the window title and the recognized title
             components. You should first assure the title is as expected. If Add
             URL to Window Title generated the title, then the various title
-            components should also be shown.  Then run Avendesora as follows::
+            components should also be shown.  Then run Avendesora as follows:
 
                 avendesora value --verbose --title '<title>'
 
@@ -224,7 +348,7 @@ class Discovery(HelpMessage):
             you can determine which recognizer is failing to trigger.
 
             If the recognizers are given in an array, all are tried. For
-            example::
+            example:
 
                 discovery = [
                     RecognizeURL(
@@ -249,7 +373,7 @@ class Discovery(HelpMessage):
 
 # Entropy class {{{1
 class Entropy(HelpMessage):
-    DESCRIPTION = "How much entropy is enough?"
+    DESCRIPTION = "how much entropy is enough?"
 
     @staticmethod
     def help():

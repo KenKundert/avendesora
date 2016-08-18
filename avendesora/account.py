@@ -328,7 +328,7 @@ class Account:
                 sep = ' '
             else:
                 sep = ''
-            key = str(key).upper().replace('_', ' ')
+            key = str(key).replace('_', ' ')
             leader = level*get_setting('indent')
             return indent(LabelColor(key + ':') + sep + value, leader)
 
@@ -357,8 +357,7 @@ class Account:
 
         for key, value in cls.items():
             if key in TOOL_FIELDS:
-                # is an Avendesora field
-                pass
+                pass  # is an Avendesora field
             elif is_collection(value):
                 lines += extract_collection(key, value)
             elif hasattr(value, 'generate'):

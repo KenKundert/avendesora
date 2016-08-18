@@ -94,7 +94,7 @@ class Add(Command):
 
         Options:
             -f <file>, --file <file>
-                                    Add account to specified file.
+                                    Add account to specified accounts file.
     """).strip()
 
     @classmethod
@@ -106,11 +106,18 @@ class Add(Command):
 
             The default template is {default}. The available templates are:
             {templates}
+
+            The available accounts files are:
+            {files}
         """).strip()
+        def indented_list(l):
+            indent = get_setting('indent')
+            return indent + ('\n'+indent).join(sorted(l))
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
             default=get_setting('default_account_template'),
-            templates=conjoin(sorted(get_setting('account_templates').keys()))
+            templates=indented_list(get_setting('account_templates').keys()),
+            files=indented_list(get_setting('accounts_files', [])),
         )
 
     @classmethod

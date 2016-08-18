@@ -120,22 +120,22 @@ def test_summary():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""\
-        NAMES: mybank, mb
-        ACCOUNTS:
-            CHECKING: <reveal with 'avendesora value mybank accounts.checking'>
-            CREDITCARD: <reveal with 'avendesora value mybank accounts.creditcard'>
-            SAVINGS: <reveal with 'avendesora value mybank accounts.savings'>
-        CUSTOMER SERVICE: 1-866-229-6633
-        EMAIL: pizzaman@pizza.com
-        PASSCODE: <reveal with 'avendesora value mybank passcode'>
-        PIN: <reveal with 'avendesora value mybank pin'>
-        QUESTIONS:
+        names: mybank, mb
+        accounts:
+            checking: <reveal with 'avendesora value mybank accounts.checking'>
+            creditcard: <reveal with 'avendesora value mybank accounts.creditcard'>
+            savings: <reveal with 'avendesora value mybank accounts.savings'>
+        customer service: 1-866-229-6633
+        email: pizzaman@pizza.com
+        passcode: <reveal with 'avendesora value mybank passcode'>
+        pin: <reveal with 'avendesora value mybank pin'>
+        questions:
             0: What city were you born in? <reveal with 'avendesora value mybank questions.0'>
             1: What street did you grow up on? <reveal with 'avendesora value mybank questions.1'>
             2: What was your childhood nickname? <reveal with 'avendesora value mybank questions.2'>
-        URLS: https://mb.com
-        USERNAME: pizzaman
-        VERBAL: <reveal with 'avendesora value mybank verbal'>
+        urls: https://mb.com
+        username: pizzaman
+        verbal: <reveal with 'avendesora value mybank verbal'>
     """)
     assert result == bytes(expected, encoding='ascii')
 

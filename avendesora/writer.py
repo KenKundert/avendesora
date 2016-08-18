@@ -115,7 +115,6 @@ class TTY_Writer(Writer):
         # build output string
         label = account.combine_name(name, key)
         log('Writing to TTY:', label)
-        label = label.upper()
         try:
             alt_name = value.get_key()
             if alt_name:
