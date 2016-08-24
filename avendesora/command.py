@@ -224,7 +224,7 @@ class Archive(Command):
 
         # get dictionary that fully describes the contents of each account
         entries = []
-        for account in generator.all_accounts():
+        for account in generator.all_accounts:
             entry = account.archive()
             if entry:
                 entries.append(indent('%r: %s,' % (
@@ -344,7 +344,7 @@ class Changed(Command):
 
         # determine the account and open the URL
         current_accounts = {}
-        for account in generator.all_accounts():
+        for account in generator.all_accounts:
             entry = account.archive()
             if entry:
                 current_accounts[account.get_name()] = entry

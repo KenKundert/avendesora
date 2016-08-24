@@ -176,7 +176,7 @@ class Accounts(HelpMessage):
                     Question("What is first pet's name?"),
                 ]
 
-            Then you can request the answer to a particular question using it
+            Then you can request the answer to a particular question using its
             index:
 
                 > avendesora value newyorktimes questions.0
@@ -547,6 +547,42 @@ class Overview(HelpMessage):
             passwords back and forth.  It is only necessary to create a shared
             master password in advance. Then new passwords can be created on the
             fly by either party.
+        """).strip()
+        return text
+
+
+# Stealth class {{{1
+class Stealth(HelpMessage):
+    DESCRIPTION = "stealth secrets"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+            Normally Avendesora uses information from an account that is
+            contained in an account file to generate the secrets for that
+            account. In some cases, the presence of the account itself, even
+            though it is contained within an encrypted file can be problematic.
+            The mere presence of an encrypted file may result in you being
+            compelled to open it. For the most damaging secrets, it is best if
+            there is no evidence that the secret exists at all. This is the
+            purpose of stealth accounts.
+
+            Stealth accounts are subclasses of the StealthAccount class. These
+            accounts differ from normal accounts in that they do not contribute
+            seeds to the secrets generators from the file (the master password
+            for the file) or the account name. Instead, the seed is requested
+            directly from the user.  The stealth accounts contain no account
+            specific information. Rather, they only contain information on how
+            to create the secret. The stealth accounts are generally contained
+            in the stealth_accounts file, which also contains the master
+            password used when generating the stealth secrets. Be careful not to
+            change this master password, and it will cause all of your stealth
+            secrets to change as well.
+
+            The stealth accounts have names that are descriptive of the form of
+            the secret they generate, for example Word6 generates a 6-word pass
+            phrase.
+
         """).strip()
         return text
 

@@ -81,6 +81,13 @@ class Account:
         except AttributeError:
             return cls.get_name()
 
+    # add_fileinfo() {{{2
+    @classmethod
+    def add_fileinfo(cls, master, fileinfo):
+        if master and not hasattr(cls, '_%s__NO_MASTER' % cls.__name__):
+            cls.master = master
+        cls._file_info = fileinfo
+
     # matches_exactly() {{{2
     @classmethod
     def matches_exactly(cls, account):

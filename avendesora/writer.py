@@ -155,7 +155,7 @@ class ClipboardWriter(Writer):
         log('Writing to clipboard.')
         try:
             Run(
-                [get_settings('xsel_executable'), '-b', '-i'],
+                [get_setting('xsel_executable'), '-b', '-i'],
                 'soew',
                 stdin=value
             )
@@ -174,7 +174,7 @@ class ClipboardWriter(Writer):
 
             # clear the clipboard
             try:
-                Run([get_settings('xsel_executable'), '-b', '-c'], 'soew')
+                Run([get_setting('xsel_executable'), '-b', '-c'], 'soew')
             except Error as err:
                 err.terminate()
 

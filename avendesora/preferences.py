@@ -248,7 +248,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         RecognizeHost, RecognizeUser, RecognizeEnvVar,
     )
 
-    master_password = Hidden({master_password})
+    master_password = Hidden({master_password}, secure=True)
     gpg_ids = {gpg_ids}
 
     # Accounts
@@ -274,10 +274,10 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
 
         # Secrets
-        Password, PasswordRecipe, Passphrase, PIN, Hidden,
+        Password, PasswordRecipe, Passphrase, PIN, Hidden
     )
 
-    master_password = Hidden({master_password2})
+    master_password = Hidden({master_password}, secure=True)
     gpg_ids = {gpg_ids}
 
     # Accounts

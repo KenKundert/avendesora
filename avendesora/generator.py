@@ -54,15 +54,23 @@ class PasswordGenerator:
             self.initialize(gpg_ids, init)
             terminate()
 
-        # Now open any accounts files found
+        # read the accounts files
+        self.all_accounts = set()
         for filename in get_setting('accounts_files', []):
             try:
                 path = to_path(get_setting('settings_dir'), filename)
                 account_file = PythonFile(path)
                 contents = account_file.run()
-                if 'master_password' in contents:
-                    self.add_master_to_accounts(contents['master_password'])
-                self.add_file_info_to_accounts(account_file)
+                master_password = contents.get('master_password')
+
+                # traverse through all accounts, determine which are new, bind
+                # required information to new accounts, and update account list.
+                for account in Account.all_accounts():
+                    if account not in self.all_accounts:
+                        account.add_fileinfo(master_password, account_file)
+
+                        # save a copy of account so it is not garbage collected
+                        self.all_accounts.add(account)
             except Error as err:
                 err.terminate()
         terminate_if_errors()
@@ -138,16 +146,11 @@ class PasswordGenerator:
         except OSError as err:
             raise Error(os_error(err))
 
-    # all_accounts() {{{2
-    def all_accounts(self):
-        for account in Account.all_accounts():
-            yield account
-
-    # get_acount() {{{2
+    # get_account() {{{2
     def get_account(self, name):
         if not name:
             raise Error('no account specified.')
-        for account in Account.all_accounts():
+        for account in self.all_accounts:
             if account.matches_exactly(name):
                 account.initialize()
                 return account
@@ -155,19 +158,19 @@ class PasswordGenerator:
 
     # find_acounts() {{{2
     def find_accounts(self, target):
-        accounts = []
-        for account in Account.all_accounts():
+        found = []
+        for account in self.all_accounts:
             if account.id_contains(target):
-                accounts.append(account)
-        return accounts
+                found.append(account)
+        return found
 
     # search_acounts() {{{2
     def search_accounts(self, target):
-        accounts = []
-        for account in Account.all_accounts():
+        found = []
+        for account in self.all_accounts:
             if account.account_contains(target):
-                accounts.append(account)
-        return accounts
+                found.append(account)
+        return found
 
     # discover_account() {{{2
     def discover_account(self, title=None, verbose=False):
@@ -177,17 +180,8 @@ class PasswordGenerator:
         data = Title(override=title).get_data()
 
         # sweep through accounts to see if any recognize this title data
-        # recognizer may fund the following fields in data:
-        #     rawdata: the original title
-        #     title: the processed title
-        #     url: the full url
-        #     browser: the name of the browser
-        #     protocol: the url scheme (ex. http, https, ...)
-        #     host: the url host name or IP address
-        #     path: the path component of the url
-        #           does not include options or anchor
         matches = {}
-        for account in Account.all_accounts():
+        for account in self.all_accounts:
             name = account.get_name()
             if verbose:
                 log('Trying:', name)
@@ -207,19 +201,4 @@ class PasswordGenerator:
         else:
             return matches.popitem()[1]
 
-    # add_master_to_accounts() {{{2
-    def add_master_to_accounts(self, master):
-        for account in Account.all_accounts():
-            if hasattr(account, 'master'):
-                continue
-            if hasattr(account, '_%s__NO_MASTER' % account.__name__):
-                continue
-            account.master = master
 
-    # add_file_info_to_accounts() {{{2
-    def add_file_info_to_accounts(self, file_info):
-        for account in Account.all_accounts():
-            # _file_info is used (as opposed to file_info) to prevent this 
-            # attribute from being displayed by showall.
-            if not hasattr(account, '_file_info'):
-                account._file_info = file_info

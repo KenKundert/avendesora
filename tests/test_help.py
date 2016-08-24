@@ -401,7 +401,7 @@ def test_accounts():
                 Question("What is first pet's name?"),
             ]
 
-        Then you can request the answer to a particular question using it
+        Then you can request the answer to a particular question using its
         index:
 
             > avendesora value newyorktimes questions.0
