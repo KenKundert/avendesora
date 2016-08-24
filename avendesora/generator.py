@@ -147,12 +147,12 @@ class PasswordGenerator:
             raise Error(os_error(err))
 
     # get_account() {{{2
-    def get_account(self, name):
+    def get_account(self, name, request_seed=False):
         if not name:
             raise Error('no account specified.')
         for account in self.all_accounts:
             if account.matches_exactly(name):
-                account.initialize()
+                account.initialize(request_seed)
                 return account
         raise Error('not found.', culprit=name)
 

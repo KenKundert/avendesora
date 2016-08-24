@@ -73,17 +73,19 @@ def read_config():
     except Error as err:
         pass
 
-    # This cannot be here because gpg is not yet initialized.
-    # Should go in conceal.Scrypt.
-    # # Now open the user key file
-    # user_key_file = get_setting('user_key_file')
-    # if user_key_file:
-    #     user_key_file = PythonFile(get_setting('user_key_file'), get_setting('gpg_ids))
-    #     try:
-    #         contents = user_key_file.run()
-    #         Config.update({k.lower(): v for k,v in contents.items()})
-    #     except Error as err:
-    #         pass
+    # initilize GPG
+    from .gpg import GnuPG
+    GnuPG.initialize()
+
+    # Now read the user key file
+    user_key_file = get_setting('user_key_file')
+    if user_key_file:
+        user_key_file = PythonFile(get_setting('user_key_file'))
+        try:
+            contents = user_key_file.run()
+            Config.update({k.lower(): v for k,v in contents.items()})
+        except Error as err:
+            pass
 
 def add_setting(name, default):
     CONFIG_DEFAULTS[name] = default

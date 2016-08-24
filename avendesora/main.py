@@ -55,9 +55,6 @@ def main():
         options_first=True
     )
 
-    # initilize GPG
-    GnuPG.initialize()
-
     # start logging
     logfile=BufferedFile(get_setting('log_file'))
     with Inform(logfile=logfile, hanging_indent=False):

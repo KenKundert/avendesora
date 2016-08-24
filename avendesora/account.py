@@ -81,11 +81,21 @@ class Account:
         except AttributeError:
             return cls.get_name()
 
+    # override_master() {{{2
+    @classmethod
+    def request_seed(cls):
+        return getattr(cls, '_interactive_seed', False)
+
+
     # add_fileinfo() {{{2
     @classmethod
     def add_fileinfo(cls, master, fileinfo):
         if master and not hasattr(cls, '_%s__NO_MASTER' % cls.__name__):
-            cls.master = master
+            if not hasattr(cls, 'master'):
+                cls.master = master
+                cls._master_source = 'file'
+            else:
+                cls._master_source = 'account'
         cls._file_info = fileinfo
 
     # matches_exactly() {{{2
@@ -168,7 +178,8 @@ class Account:
 
     # initialize() {{{2
     @classmethod
-    def initialize(cls):
+    def initialize(cls, interactive_seed=False):
+        cls._interactive_seed = interactive_seed
         log('initializing', cls.get_name())
         try:
             if cls.master.is_secure():

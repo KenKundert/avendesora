@@ -6,6 +6,8 @@
 # hashed. The 512 bit hash is then used to generate passwords, passphrases, and 
 # other secrets.
 #
+
+# Ignore {{{1
 """
 The following code should be ignored. It is defined here for the use of the 
 doctests::
@@ -21,9 +23,12 @@ doctests::
 ...          return 'pux'
 ...     def get_seed(self):
 ...          return 'pux'
+...     def request_seed(self):
+...          return False
 >>> account = Account()
 
 """
+
 
 # License {{{1
 # Copyright (C) 2016 Kenneth S. Kundert
@@ -50,7 +55,7 @@ from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
 from .obscure import Obscure
 from .utilities import error_source
-from inform import Error, terminate, warn, output
+from inform import Error, terminate, log, warn, output
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import hashlib
@@ -92,32 +97,56 @@ class Secret:
         account_seed = account.get_seed()
         if self.master is None:
             master = account.get_field('master', default=None)
+            master_source = account.get_field('_master_source', default=None)
         else:
             master = self.master
+            master_source = 'secret'
+        if not master:
+            master = get_setting('user_key')
+            master_source = 'user_key'
         if not master:
             try:
                 try:
                     master = getpass.getpass(
                         'master password for %s: ' % account_name
                     )
+                    master_source = 'user'
                 except EOFError:
                     output()
-                    master = ''
                 if not master:
                     warn("master password is empty.")
             except (EOFError, KeyboardInterrupt):
                 terminate()
+        log('Generating secret, source of master seed:', master_source)
         field_key = self.get_key(field_key)
         if self.version:
             version = self.version
         else:
-            try:
-                version = account.get_field('version')
-            except Error:
-                version = ''
+            version = account.get_field('version', default='')
 
-        assert field_name and account_seed and master
-        seeds = [field_name, field_key, account_seed, master, version]
+        if account.request_seed():
+            try:
+                try:
+                    interactive_seed = getpass.getpass(
+                        'seed for %s: ' % account_name
+                    )
+                except EOFError:
+                    output()
+                if not interactive_seed:
+                    warn("seed is empty.")
+            except (EOFError, KeyboardInterrupt):
+                terminate()
+        else:
+            interactive_seed = ''
+
+        seeds = [
+            master,
+            account_seed,
+            field_name,
+            field_key,
+            version,
+            interactive_seed
+        ]
         key = ' '.join([str(seed) for seed in seeds])
 
         # Convert the key into 512 bit number
@@ -139,7 +168,7 @@ class Secret:
         >>> secret = Secret()
         >>> secret.generate('dux', None, account)
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
-        '72 11 92 60 22 7 7 59 0 64'
+        '89 80 17 20 34 40 79 1 93 42'
 
         """
         max_index = radix-1
@@ -160,18 +189,18 @@ class Secret:
         >>> secret = Secret()
         >>> secret.generate('dux', None, account)
         >>> ' '.join(secret._symbols([str(i) for i in range(100)], 10))
-        '72 11 92 60 22 7 7 59 0 64'
+        '89 80 17 20 34 40 79 1 93 42'
 
         This function can be used to generate a password as follows:
         >>> import string
         >>> alphabet =  alphabet = string.ascii_letters + string.digits
         >>> ''.join(secret._symbols(alphabet, 16))
-        '53ivicA5cXIhE2pu'
+        'O7Dm0vMjJSMX2w30'
 
         This function can be used to generate a passphrase as follows:
         >>> dictionary = ['eeny', 'meeny', 'miny', 'moe']
         >>> ' '.join(secret._symbols(dictionary, 4))
-        'moe miny moe eeny'
+        'eeny eeny moe miny'
 
         """
         radix = len(alphabet)
@@ -193,7 +222,7 @@ class Secret:
         >>> secret = Secret()
         >>> secret.generate('dux', None, account)
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
-        '72 11 92 60 22 7 7 59 0 64'
+        '89 80 17 20 34 40 79 1 93 42'
 
         """
         max_index = radix-1
@@ -215,7 +244,7 @@ class Secret:
         >>> secret = Secret()
         >>> secret.generate('dux', None, account)
         >>> ' '.join([str(secret._get_symbol(range(100))) for i in range(10)])
-        '72 11 92 60 22 7 7 59 0 64'
+        '89 80 17 20 34 40 79 1 93 42'
 
         This function can be used to generate a birth date using:
         >>> def birthdate(secret, year, min_age=18, max_age=80):
@@ -225,7 +254,7 @@ class Secret:
         ...         secret._get_symbol(range(year-max_age, year-min_age))
         ...     )
         >>> birthdate(secret, 2014)
-        '02/05/1940'
+        '11/19/1980'
 
         """
         radix = len(alphabet)
@@ -258,7 +287,7 @@ class Password(Secret):
     >>> secret = Password()
     >>> secret.generate('dux', None, account)
     >>> str(secret)
-    '7zLoNaZ8aJaD'
+    'tvA8mewbbig3'
 
     """
     def __init__(self,
@@ -300,7 +329,7 @@ class Passphrase(Password):
     >>> secret = Passphrase()
     >>> secret.generate('dux', None, account)
     >>> str(secret)
-    'baron session contagion aphid'
+    'graveyard cockle intone provider'
 
     """
     def __init__(self,
@@ -333,7 +362,7 @@ class PIN(Password):
     >>> secret = PIN()
     >>> secret.generate('dux', None, account)
     >>> str(secret)
-    '2259'
+    '9301'
 
     """
     def __init__(self,
@@ -365,7 +394,7 @@ class Question(Passphrase):
     >>> secret = Question('What city were you born in?')
     >>> secret.generate('dux', None, account)
     >>> str(secret)
-    'figment increment stiletto'
+    'dustcart olive label'
 
     """
     # Generally the user will want to give several security questions, which
@@ -436,7 +465,7 @@ class MixedPassword(Secret):
     ... )
     >>> secret.generate('dux', None, account)
     >>> str(secret)
-    'IHrFQCg1kCS7'
+    'ZyW62fvxX0Fg'
 
     """
     def __init__(
@@ -510,12 +539,12 @@ class PasswordRecipe(MixedPassword):
     >>> secret = PasswordRecipe('12 2u 2d 2s')
     >>> secret.generate('pux', None, account)
     >>> str(secret)
-    'HTq64thNN8>;'
+    '*m7Aqj=XBAs7'
 
     >>> secret = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
     >>> secret.generate('bux', None, account)
     >>> str(secret)
-    'WZ4$7F&8kOXz'
+    'YO8K^68J9oC!'
 
     """
 
@@ -572,7 +601,7 @@ class BirthDate(Secret):
     >>> secret = BirthDate(2015, 18, 65)
     >>> secret.generate('dux', None, account)
     >>> str(secret)
-    '1994-09-21'
+    '1970-03-22'
 
     For year, enter the year the entry that contains BirthDate was created.  
     Doing so anchors the age range. In this example, the creation date is 2015,
@@ -586,7 +615,7 @@ class BirthDate(Secret):
     >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
     >>> secret.generate('dux', None, account)
     >>> str(secret)
-    '9/21/94'
+    '3/22/70'
 
     """
     def __init__(

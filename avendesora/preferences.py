@@ -28,10 +28,10 @@ NONCONFIG_SETTINGS = {
     'config_file': 'config',
     'settings_dir': user_config_dir('avendesora'),
     'default_accounts_file': 'accounts.gpg',
-    'default_stealth_accounts_file': 'stealth_accounts.gpg',
+    'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'aa804218068fe3f4760b280539cd61ac',
+    'secrets_hash': '585c08c0aa7834acd8d5d1f2eba1baae',
 }
 
 
@@ -276,9 +276,6 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         # Secrets
         Password, PasswordRecipe, Passphrase, PIN, Hidden
     )
-
-    master_password = Hidden({master_password}, secure=True)
-    gpg_ids = {gpg_ids}
 
     # Accounts
     # Alphanumeric passwords {section}

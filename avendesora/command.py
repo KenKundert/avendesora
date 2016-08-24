@@ -16,7 +16,7 @@
 
 
 # Imports {{{1
-from .config import read_config, get_setting, override_setting
+from .config import get_setting, override_setting
 from .editors import GenericEditor
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
@@ -770,6 +770,8 @@ class Value(Command):
             -c, --clipboard         Write output to clipboard rather than stdout.
             -s, --stdout            Write output to the standard output without
                                     any annotation or protections.
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
             -v, --verbose           Add additional information to log file to
                                     help identify issues in account discovery.
             -t <title>, --title <title>
@@ -799,7 +801,7 @@ class Value(Command):
             bool(account_name), cmdline['--clipboard'], cmdline['--stdout']
         )
         if account_name:
-            account = generator.get_account(account_name)
+            account = generator.get_account(account_name, cmdline['--seed'])
             writer.display_field(account, cmdline['<field>'])
         else:
             # use discovery to determine account

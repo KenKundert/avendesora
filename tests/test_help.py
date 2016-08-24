@@ -272,6 +272,8 @@ def test_value():
             -c, --clipboard         Write output to clipboard rather than stdout.
             -s, --stdout            Write output to the standard output without
                                     any annotation or protections.
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
             -v, --verbose           Add additional information to log file to
                                     help identify issues in account discovery.
             -t <title>, --title <title>
@@ -694,6 +696,50 @@ def test_entropy():
     """).strip()
     assert result == bytes(expected, encoding='utf8')
 
+# test_misdirection() {{{1
+def test_misdirection():
+    try:
+        result = subprocess.check_output('avendesora help misdirection'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        One way to avoid being compelled to disclose a secret is to disavow
+        any knowledge of the secret.  However, the presence of an account in
+        Avendesora that pertains to that secret undercuts this argument.
+        This is the purpose of stealth accounts. They allow you to generate
+        secrets for accounts for which Avendesora has no stored information.
+        In this case Avendesora ask you for the minimal amount of
+        information that it needs to generate the secret. However in some
+        cases, the amount of information that must be retained is simply too
+        much to keep in your head. In that case another approach, referred
+        to as secret misdirection, can be used.
+
+        With secret misdirection, you do not disavow any knowledge of the
+        secret, instead you say your knowledge is out of date. So you would
+        say something like "I changed the password and then forgot it", or
+        "The account is closed". To support this ruse, you must use the
+        --seed (or -S) option to 'avendsora value' when generating your
+        secret (secrets misdirection only works with generated passwords,
+        not stored passwords). This causes Avendesora to ask you for an
+        additional seed at the time you request the secret. If you do not
+        use --seed or you do and give the wrong seed, you will get a
+        different value for your secret.  In effect, using --seed when
+        generating the original value of the secret cause Avendesora to
+        generate the wrong secret by default, allowing you to say "See, I
+        told you it would not work". But when you want it to work, you just
+        interactively provide the right additional seed.
+
+        You would typically only use misdirection for secrets you are
+        worried about being compelled to disclose. So it behooves you to use
+        an unpredictable additional seed for these secrets to reduce the
+        chance someone could guess it.
+
+        Be aware that when you employ misdirection on a secret, the value of
+        the secret stored in in the archive will not be the true value, it
+        will instead be the misdirected value.
+    """).strip()
+    assert result == bytes(expected, encoding='utf8')
+
 # test_overview() {{{1
 def test_overview():
     try:
@@ -769,6 +815,51 @@ def test_overview():
         passwords back and forth.  It is only necessary to create a shared
         master password in advance. Then new passwords can be created on the
         fly by either party.
+    """).strip()
+    assert result == bytes(expected, encoding='utf8')
+
+# test_stealth() {{{1
+def test_stealth():
+    try:
+        result = subprocess.check_output('avendesora help stealth'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Normally Avendesora uses information from an account that is
+        contained in an account file to generate the secrets for that
+        account. In some cases, the presence of the account itself, even
+        though it is contained within an encrypted file can be problematic.
+        The mere presence of an encrypted file may result in you being
+        compelled to open it. For the most damaging secrets, it is best if
+        there is no evidence that the secret exists at all. This is the
+        purpose of stealth accounts. (Misdirection is an alternative to
+        stealth accounts; see 'avendesora help misdirection').
+
+        Generally one uses the predefined stealth accounts, which all  have
+        names that are descriptive of the form of the secret they generate,
+        for example Word6 generates a 6-word pass phrase. The predefined
+        accounts are kept in ~/.config/avendesora/stealth_accounts.
+
+        Stealth accounts are subclasses of the StealthAccount class. These
+        accounts differ from normal accounts in that they do not contribute
+        the account name to the secrets generators for use as a seed.
+        Instead, the user is requested to provide the account name every
+        time the secret is generated. The secret depends strongly
+        on this account name, so it is essential you give precisely the same
+        name each time. The term 'account name' is being use here, but you
+        can enter any text you like.  Best to make this text very difficult
+        to guess if you are concerned about being compelled to disclose your
+        GPG keys.
+
+        The secret generator will combine the account name with the master
+        password before generating the secret. This allows you to use simple
+        predictable account names and still get an unpredictable secret.
+        The master password used is taken from master_password in the file
+        that contains the stealth account if it exists, or the users key if
+        it does not. By default the stealth accounts file does not contain a
+        master password, which makes it difficult to share stealth accounts.
+        You can create additional stealth account files that do contain
+        master passwords that you can share with your associates.
     """).strip()
     assert result == bytes(expected, encoding='utf8')
 

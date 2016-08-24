@@ -15,7 +15,7 @@ def test_mybank():
         result = subprocess.check_output('avendesora value --stdout mybank'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'jFi$TH66w*Fg\n'
+    assert result == b'oU$$w0UMXe74\n'
 
 # test_mb() {{{1
 def test_mb():
@@ -23,7 +23,7 @@ def test_mb():
         result = subprocess.check_output('avendesora value --stdout mb'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'jFi$TH66w*Fg\n'
+    assert result == b'oU$$w0UMXe74\n'
 
 # test_mb_checking() {{{1
 def test_mb_checking():
@@ -47,7 +47,7 @@ def test_alertscc():
         result = subprocess.check_output('avendesora value --stdout alertscc'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'KLwuU8itfect\n'
+    assert result == b'R7ibHyPjWtG2\n'
 
 # test_scc() {{{1
 def test_scc():
@@ -55,7 +55,7 @@ def test_scc():
         result = subprocess.check_output('avendesora value --stdout scc'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'KLwuU8itfect\n'
+    assert result == b'R7ibHyPjWtG2\n'
 
 # test_scc_account() {{{1
 def test_scc_account():
@@ -71,7 +71,7 @@ def test_scc_birthdate():
         result = subprocess.check_output('avendesora value --stdout scc birthdate'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'1963-04-10\n'
+    assert result == b'1986-10-20\n'
 
 # test_scc_email() {{{1
 def test_scc_email():
@@ -87,7 +87,7 @@ def test_scc_q0():
         result = subprocess.check_output('avendesora value --stdout scc 0'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'gyroscope ossify slink\n'
+    assert result == b'natty dipper kitty\n'
 
 # test_scc_q1() {{{1
 def test_scc_q1():
@@ -95,7 +95,7 @@ def test_scc_q1():
         result = subprocess.check_output('avendesora value --stdout scc questions.1'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'placate rocky barge\n'
+    assert result == b'tavern restate dogma\n'
 
 # test_scc_q2() {{{1
 def test_scc_q2():
@@ -103,7 +103,7 @@ def test_scc_q2():
         result = subprocess.check_output('avendesora value --stdout scc questions[2]'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'jigsaw tilde century\n'
+    assert result == b'vestige corny convector\n'
 
 # test_login() {{{1
 def test_login():
@@ -111,7 +111,7 @@ def test_login():
         result = subprocess.check_output('avendesora value --stdout login'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'enthrall sunflower screening order shard rejoin\n'
+    assert result == b'franc hypocrite newsflash dollop migraine amethyst\n'
 
 # test_summary() {{{1
 def test_summary():
