@@ -26,12 +26,34 @@ from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
 from .gpg import GnuPG
 from .utilities import error_source
-from inform import Error, error, log, output, terminate, warn
+from inform import Error, log, output, terminate, warn
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
-import hashlib
-import getpass
-import gnupg
+import scrypt
+import re
+
+# Utilities {{{1
+def chunk(string, length):
+    return (
+        string[0+i:length+i] for i in range(0, len(string), length)
+    )
+
+def decorate_concealed(name, encoded):
+    return '%s(%s)' % (
+        name,
+        '\n    "' + '"\n    "'.join(chunk(encoded, 60)) + '"\n'
+    )
+
+def group(pattern):
+    return '(?:%s)' % pattern
+
+STRING1 = group('"[^ ]+"')
+STRING2 = group("'[^ ]+'")
+STRING = group('{s1}|{s2}'.format(s1=STRING1, s2=STRING2))
+ID = r"\w+"
+DECORATED=re.compile(
+    r"\s*({id})\s*\(\s*((?:{s}\s*)*)\s*\)\s*".format(id=ID, s=STRING)
+)
 
 # Obscure {{{1
 class Obscure:
@@ -57,21 +79,27 @@ class Obscure:
 
     # hide() {{{2
     @classmethod
-    def hide(cls, text, encoding=None):
+    def hide(cls, text, encoding=None, decorate=False):
         encoding = encoding.lower() if encoding else 'base64'
         for obscurer in cls.obscurers():
             if encoding == obscurer.get_name():
-                return obscurer.conceal(text)
+                return obscurer.conceal(text, decorate)
         raise Error('not found.', culprit=encoding)
 
     # show() {{{2
     @classmethod
-    def show(cls, text, encoding='base64'):
-        encoding = encoding.lower() if encoding else 'base64'
-        for obscurer in cls.obscurers():
-            if encoding == obscurer.get_name():
-                return obscurer.reveal(text)
-        error('not found.', culprit=encoding)
+    def show(cls, text):
+        match = DECORATED.match(text)
+        if match:
+            name = match.group(1)
+            text = ''.join([s.strip('"' "'") for s in match.group(2).split()])
+
+            for obscurer in cls.obscurers():
+                if name == obscurer.__name__:
+                    return obscurer.reveal(text)
+            raise Error('not found.', culprit=name)
+        else:
+            raise Error('malformed input.')
 
     # encodings() {{{2
     @classmethod
@@ -111,25 +139,22 @@ class Hidden(Obscure):
         return self.plaintext
 
     @staticmethod
-    def conceal(value, encoding=None):
+    def conceal(plaintext, decorate=False, encoding=None):
         encoding = encoding if encoding else get_setting('encoding')
-        if not value:
-            try:
-                value = getpass.getpass('text to hide: ')
-            except EOFError:
-                value = ''
-        value = value.encode(encoding)
-        return b2a_base64(value).rstrip().decode('ascii')
+        plaintext = plaintext.encode(encoding)
+        encoded = b2a_base64(plaintext).rstrip().decode('ascii')
+        if decorate:
+            return decorate_concealed('Hidden', encoded)
+        else:
+            return encoded
 
     @staticmethod
     def reveal(value, encoding=None):
         encoding = encoding if encoding else get_setting('encoding')
-        if not value:
-            try:
-                value = getpass.getpass('text to hide: ')
-            except EOFError:
-                value = ''
-        value = a2b_base64(value.encode('ascii'))
+        try:
+            value = a2b_base64(value.encode('ascii'))
+        except BinasciiError as err:
+            raise Error('Unable to decode base64 string: %s.' % str(err), culprit=value)
         return value.decode(encoding)
 
 # GPG {{{1
@@ -145,15 +170,6 @@ class GPG(Obscure, GnuPG):
     # individual piece of data, like a master password.
     def __init__(self, ciphertext, secure=True, encoding='utf8'):
         self.ciphertext = ciphertext
-        #gpg_path = get_setting('gpg_path')
-        #gpg_home = get_setting('gpg_home')
-        #gpg_args = {}
-        #if gpg_path:
-        #    gpg_args.update({'gpgbinary': str(gpg_path)})
-        #if gpg_home:
-        #    gpg_args.update({'gnupghome': str(gpg_home)})
-        #self.gpg = gnupg.GPG(**gpg_args)
-
 
     def generate(self, field_name, field_key, account):
         # must do this here in generate rather than in constructor to avoid
@@ -173,4 +189,42 @@ class GPG(Obscure, GnuPG):
     def __str__(self):
         return str(self.plaintext)
 
+
+# Scrypt {{{1
+class Scrypt(Obscure):
+    NAME = 'scrypt'
+    # This decodes a string that is encoded in base64 to hide it from a casual
+    # observer. But it is not encrypted. The original value can be trivially
+    # recovered from the encoded version.
+    def __init__(self, ciphertext, secure=True, encoding='utf8'):
+        self.ciphertext = ciphertext
+        self.encoding = encoding
+
+    def generate(self, field_name, field_key, account):
+        encrypted = a2b_base64(self.ciphertext.encode(self.encoding))
+        self.plaintext = scrypt.decrypt(encrypted, get_setting('user_key'))
+
+    def is_secure(self):
+        return False
+
+    def __str__(self):
+        return str(self.plaintext).strip()
+
+    @staticmethod
+    def conceal(plaintext, decorate=False, encoding=None):
+        encoding = encoding if encoding else get_setting('encoding')
+        plaintext = plaintext.encode(encoding)
+        encrypted = scrypt.encrypt(
+            plaintext, get_setting('user_key'), maxtime=0.25
+        )
+        encoded = b2a_base64(encrypted).rstrip().decode('ascii')
+        if decorate:
+            return decorate_concealed('Scrypt', encoded)
+        else:
+            return encoded
+
+    @staticmethod
+    def reveal(ciphertext, encoding=None):
+        encrypted = a2b_base64(ciphertext)
+        return scrypt.decrypt(encrypted, get_setting('user_key'))
 

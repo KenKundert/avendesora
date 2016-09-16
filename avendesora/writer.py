@@ -125,11 +125,13 @@ class TTY_Writer(Writer):
 
         if is_secret:
             try:
-                cursor.write(text + ' ')
+                cursor.write(text)
+                cursor.conceal()
                 sleep(get_setting('display_time'))
-                cursor.clear()
             except KeyboardInterrupt:
-                cursor.clear()
+                pass
+            cursor.reveal()
+            cursor.clear()
         else:
             output(text)
 
@@ -155,9 +157,9 @@ class ClipboardWriter(Writer):
         log('Writing to clipboard.')
         try:
             Run(
-                [get_setting('xsel_executable'), '-b', '-i'],
+                get_setting('xsel_executable').split() + ['-i'],
                 'soew',
-                stdin=value
+                stdin=value+'\n'
             )
         except Error as err:
             err.terminate()
@@ -174,7 +176,7 @@ class ClipboardWriter(Writer):
 
             # clear the clipboard
             try:
-                Run([get_setting('xsel_executable'), '-b', '-c'], 'soew')
+                Run(get_setting('xsel_executable').split() + ['-c'], 'soew')
             except Error as err:
                 err.terminate()
 
@@ -212,7 +214,7 @@ class KeyboardWriter(Writer):
         def run_xdotool(args):
             try:
                 #[get_setting('xdotool_executable'), 'getactivewindow'] +
-                Run([get_setting('xdotool_executable')] + args, 'soeW')
+                Run(get_setting('xdotool_executable').split() + args, 'soeW')
             except OSError as err:
                 fatal(os_error(err))
 
@@ -261,9 +263,10 @@ class KeyboardWriter(Writer):
                         if out:
                             autotype(''.join(out))
                             out = []
-                        sleep(cmd[1])
+                        sleep(float(cmd[1]))
                         scrubbed.append('<sleep %s>' % cmd[1])
                     except (AssertionError, TypeError):
+                        raise
                         fatal('syntax error in keyboard script.', culprit=term)
                 else:
                     name, key = account.split_name(cmd)

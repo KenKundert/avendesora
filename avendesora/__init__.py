@@ -7,7 +7,7 @@ from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
     BirthDate,
 )
-from .obscure import Hidden, GPG
+from .obscure import Hidden, GPG, Scrypt
 from .recognize import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
     RecognizeHost, RecognizeUser, RecognizeEnvVar

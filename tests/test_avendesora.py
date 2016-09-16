@@ -167,7 +167,7 @@ def test_search():
 # test_reveal() {{{1
 def test_reveal():
     try:
-        result = subprocess.check_output('avendesora reveal MTIzNDU2Nzg='.split())
+        result = subprocess.check_output('avendesora reveal Hidden("MTIzNDU2Nzg=")'.split())
     except OSError as err:
         result = os_error(err)
     assert result == b'12345678\n'
@@ -178,4 +178,8 @@ def test_conceal():
         result = subprocess.check_output('avendesora conceal 12345678'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'MTIzNDU2Nzg=\n'
+    assert result == dedent('''
+        Hidden(
+            "MTIzNDU2Nzg="
+        )
+    ''').lstrip().encode('ascii')

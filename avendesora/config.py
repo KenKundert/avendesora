@@ -46,7 +46,8 @@ def read_config():
                 warn('%s: unknown.' % k, culprit=config_file)
                 continue
             if k.endswith('_executable'):
-                path = to_path(v)
+                argv = v.split() if is_str(v) else list(v)
+                path = to_path(argv[0])
                 if not path.is_absolute():
                     warn(
                         'should use absolute path for executables.',

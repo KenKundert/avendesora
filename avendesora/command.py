@@ -23,12 +23,11 @@ from .gpg import GnuPG, PythonFile
 from .obscure import Obscure
 from .utilities import two_columns, to_python, items, split
 from .writer import get_writer
-from .__init__ import __version__
 from inform import (
     Error, error, codicil, output, conjoin, os_error,
     is_collection, is_str
 )
-from shlib import to_path, mv
+from shlib import chmod, is_file, mv, rm, to_path
 from docopt import docopt
 from textwrap import dedent, fill, indent
     # use indent from textwrap rather than inform
@@ -218,6 +217,16 @@ class Archive(Command):
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        archive_file = get_setting('archive_file')
+
+        # first, save existing archive if it exists
+        try:
+            previous_archive = get_setting('previous_archive_file')
+            if previous_archive and is_file(archive_file):
+                rm(previous_archive)
+                mv(archive_file, previous_archive)
+        except OSError as err:
+            raise Error(os_error(err))
 
         # run the generator
         generator = PasswordGenerator()
@@ -240,12 +249,12 @@ class Archive(Command):
             accounts = '\n\n'.join(entries)
         )
 
-        archive_file = get_setting('archive_file')
         archive = GnuPG(archive_file)
         if not archive.will_encrypt():
             warn('archive file is not encrypted.', culprit=archive_file)
         try:
             archive.save(contents)
+            chmod(0o600, archive_file)
         except OSError as err:
             raise Error(os_error(err), culprit=archive_file)
 
@@ -425,6 +434,10 @@ class Conceal(Command):
                 protect text from observers that get a quick glance of the
                 encoded text, but if they are able to capture it they can easily
                 decode it.
+            scrypt:
+                This encoding fully encrypts the text with your user key. Only
+                you can decrypt it, secrets encoded with scrypt cannot be
+                shared.
 
             Though available as an option for convenience, you should not pass
             the text to be hidden as an argument as it is possible for others to
@@ -444,14 +457,11 @@ class Conceal(Command):
         # get the text
         text = cmdline['<text>']
         if not text:
-            import getpass
-            try:
-                text = getpass.getpass('text: ')
-            except EOFError:
-                return
+            print('Enter text to obscure, type ctrl-d to terminate.')
+            text = sys.stdin.read()[:-1]
 
         # transform and output the string
-        output(Obscure.hide(text, cmdline['--encoding']))
+        output(Obscure.hide(text, cmdline['--encoding'], True))
 
 
 # Edit {{{1
@@ -660,8 +670,8 @@ class Reveal(Command):
         Transform concealed text to reveal its original form.
 
         Usage:
-            avendesora [options] reveal [<text>]
-            avendesora [options] r      [<text>]
+            avendesora reveal [<text>]
+            avendesora r      [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -675,15 +685,6 @@ class Reveal(Command):
             {title}
 
             {usage}
-
-            Possible encodings include:
-            {encodings}
-
-            base64 (default):
-                This encoding obscures but does not encrypt the text. It can
-                protect text from observers that get a quick glance of the
-                encoded text, but if they are able to capture it they can easily
-                decode it.
 
             Though available as an option for convenience, you should not pass
             the text to be revealed as an argument as it is possible for others
@@ -703,14 +704,11 @@ class Reveal(Command):
         # get the text
         text = cmdline['<text>']
         if not text:
-            import getpass
-            try:
-                text = getpass.getpass('hidden text: ')
-            except EOFError:
-                return
+            print('Enter the obscured text, type ctrl-d to terminate.')
+            text = sys.stdin.read()
 
         # transform and output the string
-        output(Obscure.show(text, cmdline['--encoding']))
+        output(Obscure.show(text))
 
 
 # Search {{{1
@@ -745,9 +743,8 @@ class Search(Command):
         # search for accounts that match search criteria
         to_print = []
         for acct in generator.search_accounts(cmdline['<text>']):
-            aliases = split(getattr(acct, 'aliases', []))
-
-            aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
+            aliases = ', '.join(split(getattr(acct, 'aliases', [])))
+            aliases = ' (%s)' % (aliases) if aliases else ''
             to_print += [acct.get_name() + aliases]
         output(cmdline['<text>']+ ':')
         output('    ' + ('\n    '.join(sorted(to_print))))
@@ -870,5 +867,6 @@ class Version(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # output the version
+        from .__init__ import __version__
         output('Avendesora version: %s' % __version__)
 

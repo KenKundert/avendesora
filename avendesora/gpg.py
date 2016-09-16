@@ -93,9 +93,10 @@ class GnuPG:
                 encoded = contents.encode(get_setting('encoding'))
                 encrypted = self.gpg.encrypt(encoded, gpg_ids, armor=use_armor)
                 if not encrypted.ok:
-                    msg = ' '.join(cull(
-                        ['unable to encrypt.', getattr(encrypted, 'stderr')]
-                    ))
+                    msg = ' '.join(cull([
+                        'unable to encrypt.',
+                        getattr(encrypted, 'stderr', None)
+                    ]))
                     raise Error(msg, culprit=path, sep='\n')
                 else:
                     if use_armor:
@@ -116,9 +117,10 @@ class GnuPG:
                 try:
                     decrypted = self.gpg.decrypt_file(f)
                     if not decrypted.ok:
-                        msg = ' '.join(cull(
-                            ['unable to decrypt.', getattr(encrypted, 'stderr')]
-                        ))
+                        msg = ' '.join(cull([
+                            'unable to decrypt.',
+                            getattr(decrypted, 'stderr', None)
+                        ]))
                         raise Error(msg, culprit=path, sep='\n')
                 except ValueError as err:
                     raise Error(str(err), culprit=path)
@@ -177,13 +179,12 @@ class PythonFile(GnuPG):
         self.encrypted = path.suffix in ['.gpg', '.asc']
         log('reading.', culprit=path)
         try:
-            self.code = self.read()
+            code = self.read()
         except OSError as err:
             raise Error(os_error(err))
 
-        contents = {}
         try:
-            compiled = compile(self.code, str(path), 'exec')
+            compiled = compile(code, str(path), 'exec')
         except SyntaxError as err:
             raise Error(
                 err.msg + ':', err.text, (err.offset-1)*' ' + '^',
@@ -193,8 +194,8 @@ class PythonFile(GnuPG):
             #   'g': 'google-chrome %s'
             #      ^
 
+        contents = {}
         exec(compiled, contents)
-        self.contents = contents
         ActiveFile = None
         return contents
 

@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # Set pip variable to select which version of python to use.
 # Use pip3.
-pip=pip3
+pip=pip3.5
+#pip=/usr/bin/pip3
+editable=''   # '--editable'
 
 # Remove build directories from a previous install to assure a clean install.
 rm -rf build dist abraxas.egg-info install.out
 
 # Install avendesora
-$pip --quiet install --user --editable . >& install.out
+$pip --quiet install --user $editable . >& install.out
 if [ $? -ne 0 ] ; then
     echo "Problems found, aborting (see install.out)"
     exit 1
 fi
 
 # Remove build directories, because I like a clean directory.
-./clean
+#./clean -- does not work with --editable

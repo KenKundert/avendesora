@@ -17,7 +17,6 @@ Commands:
 Use 'avendesora help <command>' for information on a specific command.
 Use 'avendesora help' for list of available help topics.
 """
-#    avendesora [options] [--stdout | --clipboard] [<account> [<field>]]
 
 # License {{{1
 # This program is free software: you can redistribute it and/or modify

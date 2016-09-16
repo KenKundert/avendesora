@@ -44,6 +44,7 @@ CONFIG_DEFAULTS = {
     ],
     'account_list_file': '.accounts_files',
     'archive_file': 'archive.gpg',
+    'previous_archive_file': 'archive.prev.gpg',
     'browsers': {
         'f': 'firefox -new-tab {url}',
         'g': 'google-chrome {url}',
@@ -131,7 +132,7 @@ CONFIG_DEFAULTS = {
     'gpg_armor': 'extension',
     'gpg_ids': None,
     'xdotool_executable': '/usr/bin/xdotool',
-    'xsel_executable': '/usr/bin/xsel',
+    'xsel_executable': '/usr/bin/xsel -p',
 
 }
 
@@ -151,6 +152,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # The desired location of the archive file (relative to config director).
     # End the path in .gpg. Use None to disable archiving.
     archive_file = {archive_file}
+    previous_archive_file = {previous_archive_file}
 
     # Various settings
     default_field = {default_field}
@@ -233,7 +235,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
     from avendesora import (
         # Basics
-        Account, StealthAccount, Hidden, GPG,
+        Account, StealthAccount, Hidden, GPG, Scrypt,
 
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,

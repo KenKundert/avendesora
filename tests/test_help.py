@@ -81,12 +81,17 @@ def test_conceal():
 
         Possible encodings include:
             base64
+            scrypt
 
         base64 (default):
             This encoding obscures but does not encrypt the text. It can
             protect text from observers that get a quick glance of the
             encoded text, but if they are able to capture it they can easily
             decode it.
+        scrypt:
+            This encoding fully encrypts the text with your user key. Only
+            you can decrypt it, secrets encoded with scrypt cannot be
+            shared.
 
         Though available as an option for convenience, you should not pass
         the text to be hidden as an argument as it is possible for others to
@@ -210,21 +215,12 @@ def test_reveal():
         Transform concealed text to reveal its original form.
 
         Usage:
-            avendesora [options] reveal [<text>]
-            avendesora [options] r      [<text>]
+            avendesora reveal [<text>]
+            avendesora r      [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
                                     Encoding used when revealing information.
-
-        Possible encodings include:
-            base64
-
-        base64 (default):
-            This encoding obscures but does not encrypt the text. It can
-            protect text from observers that get a quick glance of the
-            encoded text, but if they are able to capture it they can easily
-            decode it.
 
         Though available as an option for convenience, you should not pass
         the text to be revealed as an argument as it is possible for others
