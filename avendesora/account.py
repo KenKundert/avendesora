@@ -27,7 +27,7 @@ from .recognize import Recognizer
 from .secrets import Secret
 from .utilities import items, values, split
 from inform import (
-    Color, conjoin, Error, is_collection, is_str, log, output, warn,
+    Color, conjoin, cull, Error, is_collection, is_str, log, output, warn,
 )
 from textwrap import indent, dedent
 from urllib.parse import urlparse
@@ -432,13 +432,20 @@ class Account:
             if key:
                 raise Error(
                     'keys are not supported with urls on this account.',
-                    culprit=self.get_name()
+                    culprit=key
                 )
         except KeyError:
-            raise Error(
-                'unknown key, choose from %s.' % conjoin(urls.keys()),
-                culprit=key
-            )
+            keys = cull(urls.keys())
+            if keys:
+                raise Error(
+                    'unknown key, choose from %s.' % conjoin(keys),
+                    culprit=key
+                )
+            else:
+                raise Error(
+                    'keys are not supported with urls on this account.',
+                    culprit=key
+                )
         url = next(split(urls))  # use the first url specified
 
         # open the url

@@ -26,6 +26,19 @@ def test_add():
             -f <file>, --file <file>
                                     Add account to specified accounts file.
 
+        Creates a new account starting from a template. The template consists of
+        boilerplate code and fields. The fields take the from _NAME_. They
+        should be replaced by appropriate values or deleted if not needed. If
+        you are using the Vim editor, it is preconfigured to jump to the next
+        field when you press 'n'.  If the field is surrounded by '<<' and '>>',
+        as in '<<_ACCOUNT_NUMBER_>>', the value you enter will be concealed.
+
+        You can create your own templates by adding them to 'account_templates'
+        in the ~/.config/avendesora/config file.
+
+        You can change the editor used when adding account by changing the
+        'edit_template', also found in the ~/.config/avendesora/config file.
+
         The default template is bank. The available templates are:
             bank
             shell
@@ -59,6 +72,18 @@ def test_browse():
             g  google-chrome
             t  torbrowser
             x  xdg-open
+
+        The account is examined for URLS, a URL is chosen, and then that ULR
+        is opened in the chosen browser.  First URLS are gathered from the
+        'urls' account attribute, which can be a string containing one or
+        more URLS, a list, or a dictionary.  If 'urls' is a dictionary, the
+        desired URL can be chosen by entering the key as an argument to the
+        browse command. If a key is not given, then the 'default_url'
+        account attribute is used to specify the key to use by default. If
+        'urls' is not a dictionary, then the first URL specified is used.
+        URLs are also taken from RecognizeURL objects in the 'discovery'
+        account attribute.  If the 'name' argument is specified, the
+        corresponding URL can be chosen using a key.
     """).strip()
     assert result == bytes(expected, encoding='ascii')
 
