@@ -9,7 +9,7 @@ editable=''   # '--editable'
 rm -rf build dist abraxas.egg-info install.out
 
 # Install avendesora
-$pip --quiet install --user $editable . >& install.out
+$pip --quiet install -U --user $editable . >& install.out
 if [ $? -ne 0 ] ; then
     echo "Problems found, aborting (see install.out)"
     exit 1

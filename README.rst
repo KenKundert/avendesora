@@ -3,8 +3,13 @@ Avendesora Collaborative Password Utility
 
 Introduction
 ------------
-Avendesora is currently in alpha. Please report all bugs and suggestions to 
-avendesora@nurdletech.com
+Avendesora is currently in alpha. As a password generator, the generated 
+passwords are very sensitive to changed in the algorithm. As the algorithms are 
+not set, you should not be using Avendesora to generate and hold your persistent 
+passwords.  Instead, Advendesora should only be used to try out the user 
+interface.
+
+Please report all bugs and suggestions to avendesora@nurdletech.com
 
 
 Installation

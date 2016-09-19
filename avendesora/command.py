@@ -221,6 +221,26 @@ class Archive(Command):
             {title}
 
             {usage}
+
+            This command creates an encrypted archive that contains all the
+            information in your accounts files, including the fully generated
+            secrets.  You should never need this file, but its presence protects
+            you in case you lose access to Avendesora. To access your secrets
+            without Avendesora, simply decrypt the archive file with GPG.  The
+            actual secrets will be hidden, but it easy to retrieve them even
+            without Avendesora. When hidden, the secrets are encoded in base64.
+            You can decode it by running 'base64 -d -' and pasting the encoded
+            secret into the terminal.
+
+            When you run this command it overwrites the existing archive. If you
+            have accidentally deleted an account or changed a secret, then
+            replacing the archive could cause the last copy of the original
+            information to be lost. To prevent this from occurring it is a good
+            practice to run the 'changed' command before regenerating the
+            archive.  It describes all of the changes that have occurred since
+            the last time the archive was generated. You should only regenerate
+            the archive once you have convinced yourself all of the changes are
+            as expected.
         """).strip()
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
@@ -270,7 +290,6 @@ class Archive(Command):
             chmod(0o600, archive_file)
         except OSError as err:
             raise Error(os_error(err), culprit=archive_file)
-
 
 
 # Browse {{{1
@@ -340,6 +359,16 @@ class Changed(Command):
         Usage:
             avendesora changed
             avendesora C
+
+        When you run the 'archive' command it overwrites the existing
+        archive. If you have accidentally deleted an account or changed a
+        secret, then replacing the archive could cause the last copy of the
+        original information to be lost. To prevent this from occurring it
+        is a good practice to run the 'changed' command before regenerating
+        the archive.  It describes all of the changes that have occurred
+        since the last time the archive was generated. You should only
+        regenerate the archive once you have convinced yourself all of the
+        changes are as expected.
     """).strip()
 
     @classmethod
@@ -505,6 +534,11 @@ class Edit(Command):
             {title}
 
             {usage}
+
+            Opens an existing account in your editor.
+
+            You can specify the editor by changing the 'edit_account' setting in
+            the config file (~/.config/avendesora/config).
         """).strip()
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
@@ -659,12 +693,12 @@ class New(Command):
             can be decrypted by the same recipients.
 
             Generally you would create a new accounts file for each person or
-            group with which you wish to share accounts. You would use separate
-            files for passwords with different security domains. For example, a
-            high-value passwords might be placed in an encrypted file that would
-            only be placed highly on protected computers. Conversely, low-value
-            passwords might be contained in perhaps an unencrypted file that is
-            found on many computers.
+            group with which you wish to share accounts. You would also use
+            separate files for passwords with different security domains. For
+            example, a high-value passwords might be placed in an encrypted file
+            that would only be placed highly on protected computers. Conversely,
+            low-value passwords might be contained in perhaps an unencrypted
+            file that is found on many computers.
 
             Add a '.gpg' extension to <name> to encrypt the file.
         """).strip()
@@ -798,6 +832,25 @@ class Value(Command):
                                     help identify issues in account discovery.
             -t <title>, --title <title>
                                     Use account discovery on this title.
+
+        You would request a scalar value by specifying its name after the
+        account. For example:
+
+            avendesora value pin
+
+        If is a composite value, you should also specify a key that indicates
+        which of the composite values you want. For example, if the 'accounts'
+        field is a dictionary, you would specify accounts.checking or
+        accounts[checking] to get information on your checking account. If the
+        value is an array, you would give the index of the desired value. For
+        example, questions.0 or questions[0]. If no value is requested, the
+        passcode value is returned (this can be changed by specifying
+        'default_field' in the account or in the config file).  If you only
+        specify a number, then the name is assumed to be 'questions', as in the
+        list of security questions (this can be changed by specifying the
+        desired name as the 'default_vector_field' in the account or the config
+        file).
+
     """).strip()
 
     @classmethod
