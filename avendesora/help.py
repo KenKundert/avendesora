@@ -569,7 +569,7 @@ class Overview(HelpMessage):
             only need to remember the name of the account and it will regenerate
             the password for you. This is perfect for your TrueCrypt hidden
             volume password.  Finally, by securely storing a small amount of
-            infor‐ mation, perhaps on a piece of paper in your safe-deposit box,
+            information, perhaps on a piece of paper in your safe-deposit box,
             you can often recover most if not all of your passwords even if you
             somehow lose your accounts file. You can even recover passwords that
             were created after you created your backup. This is because
@@ -638,6 +638,78 @@ class Stealth(HelpMessage):
             master password, which makes it difficult to share stealth accounts.
             You can create additional stealth account files that do contain
             master passwords that you can share with your associates.
+        """).strip()
+        return text
+
+
+# Questions class {{{1
+class Questions(HelpMessage):
+    DESCRIPTION = "security questions"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+            Security questions are form of security theater imposed upon you by
+            many websites. The claim is that these questions increase the
+            security of your account. In fact they often do the opposite by
+            creating additional avenues of access to your account. Their real
+            purpose is to allow you to regain access to your account in case you
+            lose your password. If you are careful, this is not needed (you do
+            back up your Avendesora accounts, right?). In this case it is better
+            to randomly generate your answers.
+
+            Security questions are handled by adding something like the
+            following to your account:
+
+                questions = [
+                    Question('oldest aunt'),
+                    Question('title of first job'),
+                    Question('oldest uncle'),
+                    Question('savings goal'),
+                    Question('childhood vacation spot'),
+                ]
+
+            The string identifying the question does not need to contain the
+            question verbatim, a abbreviated version is sufficient as long as it
+            allows you to distinguish the question.  The questions are given as
+            an array, and so are accessed with an index that starts at 0. Thus,
+            to get the answer to who is your 'oldest aunt', you would use:
+
+                > avendesora value <accountname> 0
+                questions.0 (oldest aunt): ampere reimburse duster
+
+            You can get a list of your questions so you can identify which index
+            to use with:
+
+                > avenedesora values <accountname>
+                ...
+                questions:
+                    0: oldest aunt <reveal with 'avendesora value <accountname> questions.0'>
+                    1: title of first job <reveal with 'avendesora value <accountname> questions.1'>
+                    2: oldest uncle <reveal with 'avendesora value <accountname> questions.2'>
+                    3: savings goal <reveal with 'avendesora value <accountname> questions.3'>
+                    4: childhood vacation spot <reveal with 'avendesora value <accountname> questions.4'>
+                ...
+
+            By default, Avendesora generates a response that consists of 3
+            random words. This makes it easy to read to a person over the phone
+            if asked to confirm your identity.  Occasionally you will not be
+            able to enter your own answer, but must choose one that is offered
+            to you. In this case, you can specify the answer as part of the
+            question:
+
+                questions = [
+                    Question('favorite fruit', answer='grapes'),
+                    Question('first major city visited', answer='paris'),
+                    Question('favorite subject', answer='history'),
+                ]
+
+            When giving the answers you may want to conceal them to protect them
+            from casual observation.
+
+            Be aware that the question is used as a seed when generating the
+            answer, so if you change the question in any way it changes the
+            answer.
         """).strip()
         return text
 
