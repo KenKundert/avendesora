@@ -1,7 +1,9 @@
 Avendesora Collaborative Password Utility
 =========================================
 
-Avendesora is currently in alpha. As a password generator, the generated 
+"Avendesora, the leaf of the Tree of Life is the key."
+
+Avendesora is currently in beta. As a password generator, the generated 
 passwords are very sensitive to changes in the algorithms. As the algorithms are 
 not set, you should not be using Avendesora to generate and hold your persistent 
 passwords.  Instead, Advendesora should only be used to try out the user 

@@ -45,7 +45,7 @@ setup(
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
         'scrypt',
-        'shlib',
+        'shlib>=0.2',
     ],
     keywords=[
         'avendesora',
@@ -53,7 +53,7 @@ setup(
         'XKCD',
     ],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',

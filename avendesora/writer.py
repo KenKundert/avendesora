@@ -281,7 +281,7 @@ class KeyboardWriter(Writer):
                         err.terminate()
             else:
                 out.append(term)
-        log('Autotyping "%s".' % ''.join(scrubbed))
+        log('Autotyping "%s".' % ''.join(scrubbed).replace('\t', '→').replace('\n', '↲'))
         autotype(''.join(out))
 
 

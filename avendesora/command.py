@@ -16,18 +16,19 @@
 
 
 # Imports {{{1
+from .collection import Collection
 from .config import get_setting, override_setting
 from .editors import GenericEditor
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import Obscure
-from .utilities import two_columns, to_python, items, split
+from .utilities import two_columns, to_python
 from .writer import get_writer
 from inform import (
     Error, error, codicil, output, conjoin, os_error,
     is_collection, is_str
 )
-from shlib import chmod, is_file, mv, rm, to_path
+from shlib import chmod, mv, rm, to_path
 from docopt import docopt
 from textwrap import dedent, fill, indent
     # use indent from textwrap rather than inform
@@ -255,7 +256,7 @@ class Archive(Command):
         # first, save existing archive if it exists
         try:
             previous_archive = get_setting('previous_archive_file')
-            if previous_archive and is_file(archive_file):
+            if previous_archive and archive_file.is_file():
                 rm(previous_archive)
                 mv(archive_file, previous_archive)
         except OSError as err:
@@ -440,8 +441,8 @@ class Changed(Command):
                 archive_value = archive_account[field_name]
                 current_value = current_account[field_name]
                 if is_collection(current_value):
-                    archive_items = items(archive_account[field_name])
-                    current_items = items(current_account[field_name])
+                    archive_items = Collection(archive_account[field_name]).items()
+                    current_items = Collection(current_account[field_name]).items()
                     archive_keys = set(k for k, v in archive_items)
                     current_keys = set(k for k, v in current_items)
                     new = current_keys - archive_keys
@@ -589,7 +590,7 @@ class Find(Command):
         # find accounts whose name matches the criteria
         to_print = []
         for acct in generator.find_accounts(cmdline['<text>']):
-            aliases = split(getattr(acct, 'aliases', []))
+            aliases = Collection(getattr(acct, 'aliases', [])).values()
 
             aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
             to_print += [acct.get_name() + aliases]
@@ -802,7 +803,7 @@ class Search(Command):
         # search for accounts that match search criteria
         to_print = []
         for acct in generator.search_accounts(cmdline['<text>']):
-            aliases = ', '.join(split(getattr(acct, 'aliases', [])))
+            aliases = ', '.join(Collection(getattr(acct, 'aliases', [])).values())
             aliases = ' (%s)' % (aliases) if aliases else ''
             to_print += [acct.get_name() + aliases]
         output(cmdline['<text>']+ ':')

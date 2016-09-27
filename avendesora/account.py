@@ -20,12 +20,12 @@
 
 # Imports {{{1
 from .browsers import StandardBrowser
+from .collection import Collection
 from .config import get_setting
 from .obscure import Obscure
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
-from .utilities import items, values, split
 from inform import (
     Color, conjoin, cull, Error, is_collection, is_str, log, output, warn,
 )
@@ -104,7 +104,7 @@ class Account:
         if account == cls.get_name():
             return True
         try:
-            if account in split(cls.aliases):
+            if account in Collection(cls.aliases):
                 return True
         except AttributeError:
             pass
@@ -117,7 +117,7 @@ class Account:
         if target in cls.get_name().lower():
             return True
         try:
-            for alias in split(cls.aliases):
+            for alias in Collection(cls.aliases):
                 if target in alias.lower():
                     return True
         except AttributeError:
@@ -135,7 +135,7 @@ class Account:
                 continue
             try:
                 if is_collection(value):
-                    for k, v in items(value):
+                    for k, v in Collection(value).items():
                         if target in v.lower():
                             return True
                 elif target in value.lower():
@@ -150,7 +150,7 @@ class Account:
     def recognize(cls, data, verbose):
         # try the specified recognizers
         discovery = getattr(cls, 'discovery', ())
-        for recognizer in values(discovery):
+        for recognizer in Collection(discovery):
             if isinstance(recognizer, Recognizer):
                 script = recognizer.match(data, cls, verbose)
                 name = getattr(recognizer, 'name', None)
@@ -160,7 +160,7 @@ class Account:
             return
 
         # If no recognizers specified, just check the urls
-        for url in split(cls.get_field('urls', default=[])):
+        for url in Collection(cls.get_field('urls', default=[])):
             components = urlparse(url)
             protocol = components.scheme
             host = components.netloc
@@ -217,8 +217,16 @@ class Account:
 
         if key is None:
             if is_collection(value):
+                choices = []
+                for k, v in Collection(value).items():
+                    try:
+                        choices.append('   %s: %s' % (k, v.get_key()))
+                    except AttributeError:
+                        choices.append('   %s:' % k)
                 raise Error(
-                    'composite value found, need key.',
+                    'composite value found, need key. Choose from:',
+                    *choices,
+                    sep='\n',
                     culprit=name,
                     is_collection=True,
                     collection = value
@@ -357,7 +365,7 @@ class Account:
 
         def extract_collection(name, collection):
             lines = [fmt_field(key)]
-            for k, v in items(collection):
+            for k, v in Collection(collection).items():
                 if hasattr(v, 'generate'):
                     # is a secret, get description if available
                     try:
@@ -370,7 +378,7 @@ class Account:
         # preload list with the names associated with this account
         names = [cls.get_name()]
         if hasattr(cls, 'aliases'):
-            names += split(cls.aliases)
+            names += Collection(cls.aliases)
         lines = [fmt_field('names', ', '.join(names))]
 
         for key, value in cls.items():
@@ -422,7 +430,7 @@ class Account:
         # get the urls from the url recognizers
         # currently urls from recognizers dominate over those from attributes
         discovery = getattr(cls, 'discovery', ())
-        for each in values(discovery):
+        for each in Collection(discovery):
             urls.update(each.all_urls())
 
         # select the urls
@@ -446,7 +454,7 @@ class Account:
                     'keys are not supported with urls on this account.',
                     culprit=key
                 )
-        url = next(split(urls))  # use the first url specified
+        url = list(Collection(urls))[0]  # use the first url specified
 
         # open the url
         browser.run(url)

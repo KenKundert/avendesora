@@ -19,12 +19,26 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from .utilities import flatten, gethostname, getusername, split
+from .utilities import gethostname, getusername, error_source
 from shlib import cwd, to_path
-from inform import Error, log, warn, notify
+from inform import Error, is_collection, is_str, log, notify, warn
 from fnmatch import fnmatch
 from urllib.parse import urlparse
 import os
+
+# Utilities {{{1
+# flatten {{{2
+def flatten(collection, split=False):
+    # if split is specified, create list from string by splitting at whitespace
+    if split and is_str(collection):
+        collection = collection.split()
+
+    if is_collection(collection):
+        for each in collection:
+            for e in flatten(each):
+                yield e
+    else:
+        yield collection
 
 # Recognizer Base Class {{{1
 class Recognizer:
@@ -97,7 +111,7 @@ class RecognizeAny(Recognizer):
 # RecognizeTitle {{{1
 class RecognizeTitle(Recognizer):
     def __init__(self, *titles, script=True):
-        self.titles = flatten(titles)
+        self.titles = flatten(titles, split=False)
         self.script = script
 
     def match(self, data, account, verbose=False):
@@ -124,7 +138,7 @@ class RecognizeTitle(Recognizer):
 # RecognizeURL {{{1
 class RecognizeURL(Recognizer):
     def __init__(self, *urls, script=True, name=None, exact_path=False):
-        self.urls = flatten(urls)
+        self.urls = flatten(urls, split=True)
         self.script = script
         self.name = name
         self.exact_path = exact_path
@@ -191,7 +205,7 @@ class RecognizeURL(Recognizer):
 # RecognizeCWD {{{1
 class RecognizeCWD(Recognizer):
     def __init__(self, *dirs, script=True):
-        self.dirs = flatten(dirs)
+        self.dirs = flatten(dirs, split=True)
         self.script = script
 
     def match(self, data, account, verbose=False):
@@ -217,7 +231,7 @@ class RecognizeCWD(Recognizer):
 # RecognizeHost {{{1
 class RecognizeHost(Recognizer):
     def __init__(self, *hosts, script=True):
-        self.hosts = flatten(hosts)
+        self.hosts = flatten(hosts, split=True)
         self.script = script
 
     def match(self, data, account, verbose=False):
@@ -243,7 +257,7 @@ class RecognizeHost(Recognizer):
 # RecognizeUser {{{1
 class RecognizeUser(Recognizer):
     def __init__(self, *users, script=True):
-        self.users = flatten(users)
+        self.users = flatten(users, split=True)
         self.script = script
 
     def match(self, data, account, verbose=False):
