@@ -26,7 +26,9 @@ from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
 from .gpg import GnuPG
 from .utilities import error_source
-from inform import Error, log, output, terminate, warn
+from inform import (
+    debug, Error, log, indent, is_str, output, terminate, warn, full_stop
+)
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import scrypt
@@ -47,12 +49,29 @@ def decorate_concealed(name, encoded):
 def group(pattern):
     return '(?:%s)' % pattern
 
-STRING1 = group('"[^ ]+"')
-STRING2 = group("'[^ ]+'")
-STRING = group('{s1}|{s2}'.format(s1=STRING1, s2=STRING2))
+STRING1 = group('"[^"]+"')
+STRING2 = group("'[^']+'")
+STRING3 = group("'''.+'''")
+STRING4 = group('""".+"""')
+SMPL_STRING = group('{s1}|{s2}'.format(s1=STRING1, s2=STRING2))
+ML_STRING = group('{s3}|{s4}'.format(s3=STRING3, s4=STRING4))
 ID = r"\w+"
-DECORATED=re.compile(
-    r"\s*({id})\s*\(\s*((?:{s}\s*)*)\s*\)\s*".format(id=ID, s=STRING)
+DECORATED_LIST = re.compile(
+    # Matches:
+    #     Scrypt(
+    #         "..."
+    #         "..."
+    #     )
+    r"\s*({id})\s*\(\s*((?:{s}\s*)*)\s*\)\s*".format(id=ID, s=SMPL_STRING)
+)
+DECORATED_TEXT = re.compile(
+    # Matches:
+    #     GPG("""
+    #         ...
+    #         ...
+    #     """)
+    r"\s*({id})\s*\(\s*({s})\s*\)\s*".format(id=ID, s=ML_STRING),
+    re.DOTALL,
 )
 
 # Obscure {{{1
@@ -79,32 +98,48 @@ class Obscure:
 
     # hide() {{{2
     @classmethod
-    def hide(cls, text, encoding=None, decorate=False):
+    def hide(cls, text, encoding=None, decorate=False, symmetric=False):
         encoding = encoding.lower() if encoding else 'base64'
         for obscurer in cls.obscurers():
             if encoding == obscurer.get_name():
-                return obscurer.conceal(text, decorate)
+                return obscurer.conceal(text, decorate, symmetric=symmetric)
         raise Error('not found.', culprit=encoding)
 
     # show() {{{2
     @classmethod
     def show(cls, text):
-        match = DECORATED.match(text)
+        match = DECORATED_LIST.match(text)
         if match:
             name = match.group(1)
-            text = ''.join([s.strip('"' "'") for s in match.group(2).split()])
+            value = ''.join([s.strip('"' "'") for s in match.group(2).split()])
 
             for obscurer in cls.obscurers():
                 if name == obscurer.__name__:
-                    return obscurer.reveal(text)
+                    return obscurer.reveal(value)
             raise Error('not found.', culprit=name)
-        else:
-            raise Error('malformed input.')
+
+        match = DECORATED_TEXT.match(text)
+        if match:
+            name = match.group(1)
+            value = match.group(2)
+
+            for obscurer in cls.obscurers():
+                if name == obscurer.__name__:
+                    return obscurer.reveal(value.strip('"' "'"))
+            raise Error('not found.', culprit=name)
+
+        return Hidden.reveal(text)
 
     # encodings() {{{2
     @classmethod
     def encodings(cls):
-        return [c.get_name() for c in cls.obscurers()]
+        for c in cls.obscurers():
+            yield c.get_name(), dedent(getattr(c, 'DESC', '')).strip()
+
+    # default encoding() {{{2
+    @classmethod
+    def default_encoding(cls):
+        return Hidden.NAME
 
     # __repr__() {{{2
     def __repr__(self):
@@ -112,10 +147,16 @@ class Obscure:
 
 # Hidden {{{1
 class Hidden(Obscure):
-    NAME = 'base64'
     # This decodes a string that is encoded in base64 to hide it from a casual
     # observer. But it is not encrypted. The original value can be trivially
     # recovered from the encoded version.
+    NAME = 'base64'
+    DESC = '''
+        This encoding obscures but does not encrypt the text. It can
+        protect text from observers that get a quick glance of the
+        encoded text, but if they are able to capture it they can easily
+        decode it.
+    '''
     def __init__(self, ciphertext, secure=True, encoding='utf8'):
         self.ciphertext = ciphertext
         try:
@@ -139,9 +180,9 @@ class Hidden(Obscure):
         return self.plaintext
 
     @staticmethod
-    def conceal(plaintext, decorate=False, encoding=None):
+    def conceal(plaintext, decorate=False, encoding=None, symmetric=False):
         encoding = encoding if encoding else get_setting('encoding')
-        plaintext = plaintext.encode(encoding)
+        plaintext = str(plaintext).encode(encoding)
         encoded = b2a_base64(plaintext).rstrip().decode('ascii')
         if decorate:
             return decorate_concealed('Hidden', encoded)
@@ -153,12 +194,19 @@ class Hidden(Obscure):
         encoding = encoding if encoding else get_setting('encoding')
         try:
             value = a2b_base64(value.encode('ascii'))
+            return value.decode(encoding)
         except BinasciiError as err:
-            raise Error('Unable to decode base64 string: %s.' % str(err), culprit=value)
-        return value.decode(encoding)
+            raise Error('Unable to decode base64 string: %s.' % str(err))
+        except UnicodeDecodeError:
+            raise Error('Unable to decode base64 string.')
 
 # GPG {{{1
 class GPG(Obscure, GnuPG):
+    DESC = '''
+        This encoding fully encrypts/decrypts the text with GPG key.
+        By default your GPG key is used, but you can specify symmetric
+        encryption, in which case a passphrase is used.
+    '''
     # This does a full GPG decryption.
     # To generate an entry for the GPG argument, you can use ...
     #     gpg -a -c filename
@@ -184,18 +232,55 @@ class GPG(Obscure, GnuPG):
                 msg += '.'
             raise Error(msg, culprit=error_source())
         self.plaintext = plaintext
-        pass
 
     def __str__(self):
         return str(self.plaintext)
 
+    @classmethod
+    def conceal(cls, plaintext, decorate=False, encoding=None, symmetric=False):
+        encoding = encoding if encoding else get_setting('encoding')
+        plaintext = str(plaintext).encode(encoding)
+        gpg_ids = get_setting('gpg_ids', [])
+        if is_str(gpg_ids):
+            gpg_ids = gpg_ids.split()
+
+        encrypted = cls.gpg.encrypt(
+            plaintext, gpg_ids, armor=True, symmetric=bool(symmetric)
+        )
+        if not encrypted.ok:
+            msg = ' '.join(cull([
+                'unable to encrypt.',
+                getattr(encrypted, 'stderr', None)
+            ]))
+            raise Error(msg)
+        ciphertext = str(encrypted)
+        if decorate:
+            return 'GPG("""\n%s""")' % indent(ciphertext)
+        else:
+            return ciphertext
+
+    @classmethod
+    def reveal(cls, ciphertext, encoding=None):
+        decrypted = cls.gpg.decrypt(dedent(ciphertext))
+        if not decrypted.ok:
+            msg = 'unable to decrypt argument to GPG()'
+            try:
+                msg = '%s: %s' % (msg, decrypted.stderr)
+            except AttributeError:
+                pass
+            raise Error(full_stop(msg))
+        plaintext = str(decrypted)
+        return plaintext
 
 # Scrypt {{{1
 class Scrypt(Obscure):
-    NAME = 'scrypt'
-    # This decodes a string that is encoded in base64 to hide it from a casual
-    # observer. But it is not encrypted. The original value can be trivially
-    # recovered from the encoded version.
+    # This encrypts/decrypts a string with scrypt. The user's key is used as the
+    # passcode for this symmetric encryption.
+    DESC = '''
+        This encoding fully encrypts the text with your user key. Only
+        you can decrypt it, secrets encoded with scrypt cannot be
+        shared.
+    '''
     def __init__(self, ciphertext, secure=True, encoding='utf8'):
         self.ciphertext = ciphertext
         self.encoding = encoding
@@ -211,9 +296,9 @@ class Scrypt(Obscure):
         return str(self.plaintext).strip()
 
     @staticmethod
-    def conceal(plaintext, decorate=False, encoding=None):
+    def conceal(plaintext, decorate=False, encoding=None, symmetric=False):
         encoding = encoding if encoding else get_setting('encoding')
-        plaintext = plaintext.encode(encoding)
+        plaintext = str(plaintext).encode(encoding)
         encrypted = scrypt.encrypt(
             plaintext, get_setting('user_key'), maxtime=0.25
         )

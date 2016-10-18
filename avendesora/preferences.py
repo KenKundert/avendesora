@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '585c08c0aa7834acd8d5d1f2eba1baae',
+    'secrets_hash': '604ab82e4c87dd48fd77125e501e349b',
 }
 
 
@@ -134,6 +134,7 @@ CONFIG_DEFAULTS = {
     'gpg_ids': None,
     'xdotool_executable': '/usr/bin/xdotool',
     'xsel_executable': '/usr/bin/xsel -p',
+    'use_pager': True,
 
 }
 
@@ -172,6 +173,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     verbose = {verbose}
         # normally set to false, if set true it sets --verbose option, which can
         # help when debugging account discovery
+    use_pager = {use_pager}
 
     # Prototype accounts
     default_account_template = {default_account_template}
@@ -345,6 +347,23 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # Extreme passwords {section}
     class Extreme(StealthAccount):
         passcode = Passphrase(length=64, alphabet=PRINTABLE)
+
+    # Hex passwords {section}
+    class Hex4(StealthAccount):
+        passcode = Password(length=4, alphabet=HEXDIGITS, prefix='0x')
+
+    class Hex8(StealthAccount):
+        passcode = Password(length=8, alphabet=HEXDIGITS, prefix='0x')
+
+    class Hex16(StealthAccount):
+        passcode = Password(length=16, alphabet=HEXDIGITS, prefix='0x')
+
+    class Hex32(StealthAccount):
+        passcode = Password(length=32, alphabet=HEXDIGITS, prefix='0x')
+
+    class Hex64(StealthAccount):
+        aliases = 'hex'
+        passcode = Password(length=64, alphabet=HEXDIGITS, prefix='0x')
 
     # PINs {section}
     class Pin4(StealthAccount):

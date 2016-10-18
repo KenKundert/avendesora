@@ -36,7 +36,7 @@ REGEX_COMPONENTS = {
     'title': labelRegex('title', r'.*'),
     'url': labelRegex('url', URL_REGEX),
     'host': labelRegex('host', URL_REGEX),
-    'browser': labelRegex('browser', r'[\w ]+'),
+    'browser': labelRegex('browser', r'[\w ()]+'),
 }
 
 
@@ -64,6 +64,7 @@ class Title:
         data = {'rawtitle': title}
         for sub in sorted(Title.__subclasses__(), key=lambda c: c.PRIORITY):
             matched = sub._process(title, data)
+            log('%s: %s.' % (sub.__name__, 'matched' if matched else 'no match'))
             if matched:
                 break
 
@@ -93,9 +94,9 @@ class Title:
                     return True
 
 
-# AddURLToWindow (Firefox) {{{1
-class AddURLToWindow(Title):
-    # This matches the default pattern produced by AddURLToWindow in Firefox
+# AddURLToWindowTitle (Firefox) {{{1
+class AddURLToWindowTitle(Title):
+    # This matches the default pattern produced by AddURLToWindowTitle in Firefox
     PATTERN = re.compile(
         r'\A{title} - {url} - {host} - {browser}\Z'.format(**REGEX_COMPONENTS)
     )

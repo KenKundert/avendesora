@@ -163,16 +163,22 @@ def test_conceal():
         Options:
             -e <encoding>, --encoding <encoding>
                                     Encoding used when concealing information.
+            -s, --symmetric         Encrypt with a passphrase rather than using your
+                                    GPG key (only appropriate for gpg encodings).
 
-        Possible encodings include:
-            base64
-            scrypt
+        Possible encodings include (default encoding is base64):
 
-        base64 (default):
+        base64:
             This encoding obscures but does not encrypt the text. It can
             protect text from observers that get a quick glance of the
             encoded text, but if they are able to capture it they can easily
             decode it.
+
+        gpg:
+            This encoding fully encrypts/decrypts the text with GPG key.
+            By default your GPG key is used, but you can specify symmetric
+            encryption, in which case a passphrase is used.
+
         scrypt:
             This encoding fully encrypts the text with your user key. Only
             you can decrypt it, secrets encoded with scrypt cannot be

@@ -34,7 +34,6 @@ from .utilities import generate_random_string, validate_componenets, to_python
 from inform import debug, Error, notify, log, terminate, terminate_if_errors
 from shlib import to_path
 from pathlib import Path
-from urllib.parse import urlparse
 
 # PasswordGenerator class{{{1
 class PasswordGenerator:

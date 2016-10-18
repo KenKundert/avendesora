@@ -154,10 +154,11 @@ class GnuPG:
 
 # BufferedFile class {{{1
 class BufferedFile(GnuPG):
-    def __init__(self, path):
+    def __init__(self, path, ignore_errors_on_close=False):
         # file will only be encrypted if path has gpg extension
         self.path = path
         self.stream = io.StringIO()
+        self.ignore_errors_on_close = ignore_errors_on_close
 
     def write(self, content):
         self.stream.write(content)
@@ -167,7 +168,11 @@ class BufferedFile(GnuPG):
 
     def close(self):
         contents = self.stream.getvalue()
-        self.save(contents, get_setting('gpg_ids'))
+        try:
+            self.save(contents, get_setting('gpg_ids'))
+        except Error:
+            if not self.ignore_errors_on_close:
+                raise
 
 
 # PythonFile class {{{1
@@ -179,12 +184,13 @@ class PythonFile(GnuPG):
         self.encrypted = path.suffix in ['.gpg', '.asc']
         log('reading.', culprit=path)
         try:
-            code = self.read()
+            self.code = self.read()
+                # need to save the code for the new command
         except OSError as err:
             raise Error(os_error(err))
 
         try:
-            compiled = compile(code, str(path), 'exec')
+            compiled = compile(self.code, str(path), 'exec')
         except SyntaxError as err:
             raise Error(
                 err.msg + ':', err.text, (err.offset-1)*' ' + '^',

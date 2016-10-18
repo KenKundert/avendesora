@@ -55,7 +55,7 @@ def main():
     )
 
     # start logging
-    logfile=BufferedFile(get_setting('log_file'))
+    logfile = BufferedFile(get_setting('log_file'), True)
     with Inform(logfile=logfile, hanging_indent=False):
         try:
             Command.execute(cmdline['<command>'], cmdline['<args>'])

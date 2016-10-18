@@ -295,7 +295,9 @@ class Password(Secret):
         alphabet=DISTINGUISHABLE,
         master=None,
         version=None,
-        sep=''
+        sep='',
+        prefix='',
+        suffix='',
     ):
         try:
             self.length = int(length)
@@ -307,6 +309,8 @@ class Password(Secret):
         self.master = master
         self.version = version
         self.sep = sep
+        self.prefix = prefix
+        self.suffix = suffix
 
     def __str__(self):
         try:
@@ -314,8 +318,11 @@ class Password(Secret):
         except AttributeError:
             # it is important that this be called only once, because the secret
             # changes each time it is called
-            secret = self.sep.join(self._symbols(self.alphabet, self.length))
-        self.secret = secret
+            secret = self.secret = (
+                self.prefix
+              + self.sep.join(self._symbols(self.alphabet, self.length))
+              + self.suffix
+            )
         return secret
 
 
@@ -337,7 +344,9 @@ class Passphrase(Password):
         alphabet=None,
         master=None,
         version=None,
-        sep=' '
+        sep=' ',
+        prefix='',
+        suffix='',
     ):
         try:
             self.length = int(length)
@@ -349,6 +358,8 @@ class Passphrase(Password):
         self.master = master
         self.version = version
         self.sep = sep
+        self.prefix = prefix
+        self.suffix = suffix
 
 
 # PIN {{{1
@@ -381,6 +392,8 @@ class PIN(Password):
         self.master = master
         self.version = version
         self.sep = ''
+        self.prefix = ''
+        self.suffix = ''
 
 
 # Question {{{1
@@ -415,7 +428,9 @@ class Question(Passphrase):
         master=None,
         version=None,
         sep=' ',
-        answer=None
+        prefix='',
+        suffix='',
+        answer=None,
     ):
         self.question = question
         try:
@@ -428,6 +443,8 @@ class Question(Passphrase):
         self.master = master
         self.version = version
         self.sep = sep
+        self.prefix = prefix
+        self.suffix = suffix
         if answer:
             self.secret = str(answer)
             # answer allows the user to override the generator and simply

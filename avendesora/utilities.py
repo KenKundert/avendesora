@@ -18,7 +18,9 @@
 from .config import get_setting
 from .gpg import get_active_file
 from shlib import Run, to_path
-from inform import codicil, error, fatal, os_error, warn, is_str, is_collection
+from inform import (
+    codicil, fatal, os_error, output, warn, is_str, is_collection
+)
 from textwrap import dedent, wrap, indent
 from pkg_resources import resource_filename
 import hashlib
@@ -92,8 +94,11 @@ def validate_componenets():
             )
 # pager {{{1
 def pager(text):
-    program = os.environ.get('PAGER', 'less')
-    Run([program], stdin=text, modes='Woes')
+    if get_setting('use_pager'):
+        program = os.environ.get('PAGER', 'less')
+        Run([program], stdin=text, modes='Woes')
+    else:
+        output(text)
 
 # two_columns {{{1
 def two_columns(col1, col2, width=16, indent=True):
@@ -110,41 +115,41 @@ def to_python(obj, _level=0):
     """Recursively convert object to string with reasonable formatting"""
     def leader(relative_level=0):
         return (_level+relative_level)*'    '
-    output = []
+    code = []
     if type(obj) == dict:
-        output += ['{']
+        code += ['{']
         for key in sorted(obj.keys()):
             value = obj[key]
-            output += ['%s%r: %s,' % (
+            code += ['%s%r: %s,' % (
                 leader(1), key, to_python(value, _level+1)
             )]
-        output += ['%s}' % (leader(0))]
+        code += ['%s}' % (leader(0))]
     elif type(obj) == list:
-        output += ['[']
+        code += ['[']
         for each in obj:
-            output += ['%s%s,' % (
+            code += ['%s%s,' % (
                 leader(1), to_python(each, _level+1)
             )]
-        output += ['%s]' % (leader(0))]
+        code += ['%s]' % (leader(0))]
     elif type(obj) == tuple:
-        output += ['(']
+        code += ['(']
         for each in obj:
-            output += ['%s%s,' % (
+            code += ['%s%s,' % (
                 leader(1), to_python(each, _level+1)
             )]
-        output += ['%s)' % (leader(0))]
+        code += ['%s)' % (leader(0))]
     elif type(obj) == set:
-        output += ['set([']
+        code += ['set([']
         for each in sorted(obj):
-            output += ['%s%s,' % (
+            code += ['%s%s,' % (
                 leader(1), to_python(each, _level+1)
             )]
-        output += ['%s])' % (leader(0))]
+        code += ['%s])' % (leader(0))]
     elif is_str(obj) and '\n' in obj:
-        output += ['"""' + indent(dedent(obj), leader(1)) + leader(0) + '"""']
+        code += ['"""' + indent(dedent(obj), leader(1)) + leader(0) + '"""']
     else:
-        output += [repr(obj)]
-    return '\n'.join(output)
+        code += [repr(obj)]
+    return '\n'.join(code)
 
 # error_source {{{1
 def error_source(lvl=3):

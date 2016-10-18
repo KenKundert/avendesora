@@ -61,7 +61,6 @@ Gmail accounts. In this case you might want to include your username in the
 account name.
 
 
-
 Installation
 ------------
 
@@ -136,7 +135,7 @@ TODO
 
 1. Must describe how to update gnupg.py to avoid the errors. Specifically add 
    "PROGRESS", ..., "WARNING", "KEY_CONSIDERED" to the list near line 250 that 
-   contains ...
+   contains::
 
         elif key in ("RSA_OR_IDEA", "NODATA", "IMPORT_RES", "PLAINTEXT",
                      "PLAINTEXT_LENGTH", "POLICY_URL", "DECRYPTION_INFO",

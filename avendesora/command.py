@@ -438,25 +438,34 @@ class Changed(Command):
             # for the common fields, report any differences in the values
             shared = archive_account.keys() & current_account.keys()
             for field_name in sorted(shared):
-                archive_value = archive_account[field_name]
-                current_value = current_account[field_name]
-                if is_collection(current_value):
-                    archive_items = Collection(archive_account[field_name]).items()
-                    current_items = Collection(current_account[field_name]).items()
-                    archive_keys = set(k for k, v in archive_items)
-                    current_keys = set(k for k, v in current_items)
-                    new = current_keys - archive_keys
-                    missing = archive_keys - current_keys
-                    for each in sorted(new):
-                        output(account_name, field_name, 'new member', each, sep=': ')
-                    for each in sorted(missing):
-                        output(account_name, field_name, 'missing member', each, sep=': ')
-                    for k in sorted(archive_keys & current_keys):
-                        if str(archive_value[k]) != str(current_value[k]):
-                            output(account_name, 'member differs', '%s[%s]' % (field_name, k), sep=': ')
-                else:
-                    if dedent(str(archive_value)) != dedent(str(current_value)):
-                        output(account_name, 'field differs', field_name, sep=': ')
+                try:
+                    archive_value = archive_account[field_name]
+                    current_value = current_account[field_name]
+                    if is_collection(current_value) != is_collection(archive_value):
+                        output(account_name, 'field dimension differs', field_name, sep=': ')
+                    elif is_collection(current_value):
+                        archive_items = Collection(archive_account[field_name]).items()
+                        current_items = Collection(current_account[field_name]).items()
+                        archive_keys = set(k for k, v in archive_items)
+                        current_keys = set(k for k, v in current_items)
+                        new = current_keys - archive_keys
+                        missing = archive_keys - current_keys
+                        for each in sorted(new):
+                            output(account_name, field_name, 'new member', each, sep=': ')
+                        for each in sorted(missing):
+                            output(account_name, field_name, 'missing member', each, sep=': ')
+                        for k in sorted(archive_keys & current_keys):
+                            if str(archive_value[k]) != str(current_value[k]):
+                                output(account_name, 'member differs', '%s[%s]' % (field_name, k), sep=': ')
+                    else:
+                        if dedent(str(archive_value)) != dedent(str(current_value)):
+                            output(account_name, 'field differs', field_name, sep=': ')
+                except Exception:
+                    error(
+                        'unanticipated situation.',
+                        culprit=(account_name, field_name)
+                    )
+                    raise
 
 
 # Conceal {{{1
@@ -471,28 +480,24 @@ class Conceal(Command):
         Options:
             -e <encoding>, --encoding <encoding>
                                     Encoding used when concealing information.
+            -s, --symmetric         Encrypt with a passphrase rather than using your
+                                    GPG key (only appropriate for gpg encodings).
     """).strip()
 
     @classmethod
     def help(cls):
-        encodings = '    ' + '\n    '.join(Obscure.encodings())
+        encodings = []
+        for name, desc in Obscure.encodings():
+            encodings.append('%s:\n%s' % (name, indent(desc, '    ')))
+        encodings = '\n\n'.join(encodings)
         text = dedent("""
             {title}
 
             {usage}
 
-            Possible encodings include:
-            {encodings}
+            Possible encodings include{default_encoding}:
 
-            base64 (default):
-                This encoding obscures but does not encrypt the text. It can
-                protect text from observers that get a quick glance of the
-                encoded text, but if they are able to capture it they can easily
-                decode it.
-            scrypt:
-                This encoding fully encrypts the text with your user key. Only
-                you can decrypt it, secrets encoded with scrypt cannot be
-                shared.
+            {encodings}
 
             Though available as an option for convenience, you should not pass
             the text to be hidden as an argument as it is possible for others to
@@ -500,8 +505,10 @@ class Conceal(Command):
             sensitive secret, you should simply run 'avendesora conceal' and
             then enter the secret text when prompted.
         """).strip()
+        default_encoding = Obscure.default_encoding()
         return text.format(
-            title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings
+            title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings,
+            default_encoding=' (default encoding is %s)' % default_encoding,
         )
 
     @classmethod
@@ -511,12 +518,13 @@ class Conceal(Command):
 
         # get the text
         text = cmdline['<text>']
+        symmetric = cmdline['--symmetric']
         if not text:
-            print('Enter text to obscure, type ctrl-d to terminate.')
+            output('Enter text to obscure, type ctrl-d to terminate.')
             text = sys.stdin.read()[:-1]
 
         # transform and output the string
-        output(Obscure.hide(text, cmdline['--encoding'], True))
+        output(Obscure.hide(text, cmdline['--encoding'], True, symmetric))
 
 
 # Edit {{{1
@@ -740,7 +748,6 @@ class Reveal(Command):
 
     @classmethod
     def help(cls):
-        encodings = '    ' + '\n    '.join(Obscure.encodings())
         text = dedent("""
             {title}
 
@@ -753,7 +760,7 @@ class Reveal(Command):
             enter the encoded text when prompted.
         """).strip()
         return text.format(
-            title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings
+            title=title(cls.DESCRIPTION), usage=cls.USAGE
         )
 
     @classmethod
@@ -764,7 +771,7 @@ class Reveal(Command):
         # get the text
         text = cmdline['<text>']
         if not text:
-            print('Enter the obscured text, type ctrl-d to terminate.')
+            output('Enter the obscured text, type ctrl-d to terminate.')
             text = sys.stdin.read()
 
         # transform and output the string
