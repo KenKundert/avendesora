@@ -26,7 +26,7 @@ from inform import error, log
 
 
 # Browser base class {{{1
-class Browser:
+class Browser(object):
     pass
 
 

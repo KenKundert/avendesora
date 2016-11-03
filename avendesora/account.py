@@ -27,10 +27,13 @@ from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
 from inform import (
-    Color, conjoin, cull, Error, is_collection, is_str, log, output, warn,
+    Color, conjoin, cull, Error, is_collection, is_str, log, output, warn, indent
 )
-from textwrap import indent, dedent
-from urllib.parse import urlparse
+from textwrap import dedent
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 import re
 import sys
 
@@ -44,7 +47,7 @@ LabelColor = Color(
 )
 
 # Account class {{{1
-class Account:
+class Account(object):
     __NO_MASTER = True
         # prevents master password from being added to this base class
 

@@ -9,7 +9,7 @@ archive_file = 'archive'
 
 # Information used by GPG when encrypting and decrypting files.
 gpg_ids = 'avendesora@nurdletech.com'
-gpg_executable = '/usr/bin/gpg'
+gpg_executable = '/usr/bin/gpg2'
 
 # Include a few unicode characters, but to make sure they work: ±αβγδε
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

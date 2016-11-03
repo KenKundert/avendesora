@@ -23,7 +23,10 @@
 from .config import get_setting
 from shlib import Run
 from inform import Error, log
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 import re
 
 
@@ -41,7 +44,7 @@ REGEX_COMPONENTS = {
 
 
 # Title base class {{{1
-class Title:
+class Title(object):
     def __init__(self, override=None):
         if override:
             title = override

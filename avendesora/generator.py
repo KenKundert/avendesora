@@ -36,7 +36,7 @@ from shlib import to_path
 from pathlib import Path
 
 # PasswordGenerator class{{{1
-class PasswordGenerator:
+class PasswordGenerator(object):
 
     # Constructor {{{2
     def __init__(self, init=False, gpg_ids=None):
@@ -76,19 +76,17 @@ class PasswordGenerator:
 
     # initialize() {{{2
     def initialize(self, gpg_ids, filename):
+        # if filename is True, this is being called as part of the Avendesora
+        # 'initialize' command, in which case all missing files should be created.
+        # if filename is a string, this is being called as part of the
+        # Avendesora 'new' command, in which case a single new account file
+        # should be created.
         def split(s, l=72):
             # Break long string into a series of adjacent shorter strings
             if len(s) < l:
                 return '"%s"' % s
             chunks = ['    "%s"' % s[i:i+l] for i in range(0, len(s), l)]
             return '\n' + '\n'.join(chunks) + '\n'
-
-        def dict_to_str(d):
-            lines = ['{']
-            for k in sorted(d):
-                lines.append("    '%s': '%s'," % (k, d[k]))
-            lines.append('}')
-            return '\n'.join(lines)
 
         # Create dictionary of available substitutions for CONTENTS strings
         fields = {}
@@ -123,6 +121,8 @@ class PasswordGenerator:
                     log('creating initial version.', culprit=path)
                     f = PythonFile(path)
                     f.create(contents.format(**fields), gpg_ids)
+                        # create will not overwrite an existing file, instead it
+                        # reads the file.
         else:
             # Create a new accounts file
             fields['accounts_files'] = get_setting('accounts_files', []) + [filename]
@@ -141,7 +141,11 @@ class PasswordGenerator:
             raise Error('encryption is not supported.', culprit=path)
         try:
             log('writing.', culprit=path)
-            path.write_text(ACCOUNT_LIST_FILE_CONTENTS.format(**fields))
+            path.write_text(
+                ACCOUNT_LIST_FILE_CONTENTS.format(**fields).decode(
+                    get_setting('encoding')
+                )
+            )
         except OSError as err:
             raise Error(os_error(err))
 

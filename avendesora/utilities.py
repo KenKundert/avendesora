@@ -19,9 +19,9 @@ from .config import get_setting
 from .gpg import get_active_file
 from shlib import Run, to_path
 from inform import (
-    codicil, fatal, os_error, output, warn, is_str, is_collection
+    codicil, fatal, os_error, output, warn, is_str, is_collection, indent
 )
-from textwrap import dedent, wrap, indent
+from textwrap import dedent, wrap
 from pkg_resources import resource_filename
 import hashlib
 import os

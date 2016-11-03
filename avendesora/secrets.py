@@ -13,7 +13,7 @@ The following code should be ignored. It is defined here for the use of the
 doctests::
 
 >>> from avendesora.secrets import *
->>> class Account:
+>>> class Account(object):
 ...     def get_field(self, name, default=None):
 ...          if name == 'master':
 ...              return 'fux'
@@ -73,7 +73,7 @@ class SecretExhausted(Exception):
         return "secret exhausted"
 
 # Secret {{{1
-class Secret:
+class Secret(object):
     """Base class for generated secrets"""
 
     def __init__(self):
@@ -151,6 +151,11 @@ class Secret:
 
         # Convert the key into 512 bit number
         digest = hashlib.sha512((key).encode('utf-8')).digest()
+        try:
+            # convert from string to list of integers if this is python2
+            digest = [ord(c) for c in digest]
+        except TypeError:
+            pass
         bits_per_byte = 8
         radix = 1 << bits_per_byte
         bits = 0

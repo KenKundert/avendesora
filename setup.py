@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='avendesora',
-    version='0.13.0',
+    version='0.12.0',
     author='Ken Kundert and Kale Kundert',
     author_email='avendesora@nurdletech.com',
     description='An XKCD-style password generator.',
@@ -45,7 +45,7 @@ setup(
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
         'scrypt',
-        'shlib>=0.2',
+        'shlib>=0.3.1',
     ],
     keywords=[
         'avendesora',
@@ -59,6 +59,8 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Natural Language :: English',
         'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Topic :: Security :: Cryptography',
         'Topic :: Utilities',

@@ -36,7 +36,7 @@ from inform import error, output
 from textwrap import dedent
 
 # HelpMessage base class {{{1
-class HelpMessage:
+class HelpMessage(object):
     # get_name() {{{2
     @classmethod
     def get_name(cls):
@@ -573,8 +573,8 @@ class Overview(HelpMessage):
             you can often recover most if not all of your passwords even if you
             somehow lose your accounts file. You can even recover passwords that
             were created after you created your backup. This is because
-            Avendesora combines the master password with some easily recon‐
-            structed information, such as the account name, to create the
+            Avendesora combines the master password with some easily
+            reconstructed information, such as the account name, to create the
             password. If you save the master password, the rest should be
             recoverable.
 

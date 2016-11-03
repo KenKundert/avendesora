@@ -23,7 +23,10 @@ from .utilities import gethostname, getusername, error_source
 from shlib import cwd, to_path
 from inform import Error, is_collection, is_str, log, notify, warn
 from fnmatch import fnmatch
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 import os
 
 # Utilities {{{1
@@ -41,7 +44,7 @@ def flatten(collection, split=False):
         yield collection
 
 # Recognizer Base Class {{{1
-class Recognizer:
+class Recognizer(object):
     def all_urls(self):
         urls = {}
         if hasattr(self, 'recognizers'):
@@ -56,9 +59,9 @@ class Recognizer:
 
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):
-    def __init__(self, *recognizers, script=True):
+    def __init__(self, *recognizers, **kwargs):
         self.recognizers = recognizers
-        self.script = script
+        self.script = kwargs.get('script', True)
 
     def match(self, data, account, verbose=False):
         try:
@@ -83,9 +86,9 @@ class RecognizeAll(Recognizer):
 
 # RecognizeAny {{{1
 class RecognizeAny(Recognizer):
-    def __init__(self, *recognizers, script=True):
+    def __init__(self, *recognizers, **kwargs):
         self.recognizers = recognizers
-        self.script = script
+        self.script = kwargs.get('script', True)
 
     def match(self, data, account, verbose=False):
         try:
@@ -110,9 +113,9 @@ class RecognizeAny(Recognizer):
 
 # RecognizeTitle {{{1
 class RecognizeTitle(Recognizer):
-    def __init__(self, *titles, script=True):
+    def __init__(self, *titles, **kwargs):
         self.titles = flatten(titles, split=False)
-        self.script = script
+        self.script = kwargs.get('script', True)
 
     def match(self, data, account, verbose=False):
         try:
@@ -137,11 +140,11 @@ class RecognizeTitle(Recognizer):
 
 # RecognizeURL {{{1
 class RecognizeURL(Recognizer):
-    def __init__(self, *urls, script=True, name=None, exact_path=False):
+    def __init__(self, *urls, **kwargs):
         self.urls = flatten(urls, split=True)
-        self.script = script
-        self.name = name
-        self.exact_path = exact_path
+        self.script = kwargs.get('script', True)
+        self.name = kwargs.get('name', None)
+        self.exact_path = kwargs.get('exact_path', False)
 
     def match(self, data, account, verbose=False):
         try:
@@ -204,9 +207,9 @@ class RecognizeURL(Recognizer):
 
 # RecognizeCWD {{{1
 class RecognizeCWD(Recognizer):
-    def __init__(self, *dirs, script=True):
+    def __init__(self, *dirs, **kwargs):
         self.dirs = flatten(dirs, split=True)
-        self.script = script
+        self.script = kwargs.get('script', True)
 
     def match(self, data, account, verbose=False):
         try:
@@ -230,9 +233,9 @@ class RecognizeCWD(Recognizer):
 
 # RecognizeHost {{{1
 class RecognizeHost(Recognizer):
-    def __init__(self, *hosts, script=True):
+    def __init__(self, *hosts, **kwargs):
         self.hosts = flatten(hosts, split=True)
-        self.script = script
+        self.script = kwargs.get('script', True)
 
     def match(self, data, account, verbose=False):
         try:
@@ -256,9 +259,9 @@ class RecognizeHost(Recognizer):
 
 # RecognizeUser {{{1
 class RecognizeUser(Recognizer):
-    def __init__(self, *users, script=True):
+    def __init__(self, *users, **kwargs):
         self.users = flatten(users, split=True)
-        self.script = script
+        self.script = kwargs.get('script', True)
 
     def match(self, data, account, verbose=False):
         try:

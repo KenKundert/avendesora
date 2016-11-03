@@ -23,12 +23,15 @@
 
 # Imports {{{1
 from .config import get_setting, override_setting
-from shlib import to_path, mv
+from shlib import to_path, mv, mkdir
 from inform import (
-    conjoin, cull, display, Error, log, narrate, os_error, warn, is_str
+    conjoin, cull, display, Error, log, narrate, os_error, warn, is_str, full_stop
 )
 import gnupg
-import io
+try:
+    from StringIO import StringIO   # python2
+except ImportError:
+    from io import StringIO         # python3
 
 # Globals {{{1
 GPG_EXTENSIONS = ['.gpg', '.asc']
@@ -40,7 +43,7 @@ def get_active_file():
     return ActiveFile
 
 # GnuPG class {{{1
-class GnuPG:
+class GnuPG(object):
     def __init__(self, path):
         self.path = to_path(path)
 
@@ -106,15 +109,15 @@ class GnuPG:
             except ValueError as err:
                 raise Error(str(err), culprit=path)
         else:
-            path.write_text(contents, get_setting('encoding'))
+            path.write_text(contents, encoding=get_setting('encoding'))
         path.chmod(0o600)
 
     def read(self):
         path = self.path
         # file is only assumed to be encrypted if path has gpg extension
         if path.suffix.lower() in GPG_EXTENSIONS:
-            with path.open('rb') as f:
-                try:
+            try:
+                with path.open('rb') as f:
                     decrypted = self.gpg.decrypt_file(f)
                     if not decrypted.ok:
                         msg = ' '.join(cull([
@@ -122,12 +125,13 @@ class GnuPG:
                             getattr(decrypted, 'stderr', None)
                         ]))
                         raise Error(msg, culprit=path, sep='\n')
-                except ValueError as err:
-                    raise Error(str(err), culprit=path)
-            return decrypted.data.decode(get_setting('encoding'))
-
+            except ValueError as err:
+                raise Error(str(err), culprit=path)
+            except (IOError, OSError) as err:
+                raise Error(os_error(err))
+            return decrypted.data
         else:
-            return path.read_text(encoding=get_setting('encoding'))
+            return path.read_text()
 
     def _choices(self):
         extension = self.path.suffix.lower()
@@ -157,7 +161,7 @@ class BufferedFile(GnuPG):
     def __init__(self, path, ignore_errors_on_close=False):
         # file will only be encrypted if path has gpg extension
         self.path = path
-        self.stream = io.StringIO()
+        self.stream = StringIO()
         self.ignore_errors_on_close = ignore_errors_on_close
 
     def write(self, content):
@@ -192,13 +196,17 @@ class PythonFile(GnuPG):
         try:
             compiled = compile(self.code, str(path), 'exec')
         except SyntaxError as err:
-            raise Error(
-                err.msg + ':', err.text, (err.offset-1)*' ' + '^',
-                culprit=(err.filename, err.lineno), sep='\n'
-            )
-            # File "/home/ken/.config/avendesora/config", line 18
-            #   'g': 'google-chrome %s'
-            #      ^
+            culprit = (err.filename, err.lineno)
+            if err.text is None or err.offset is None:
+                raise Error(full_stop(err.msg), culprit=culprit)
+            else:
+                raise Error(
+                    err.msg + ':', err.text, (err.offset-1)*' ' + '^',
+                    culprit=culprit, sep='\n'
+                )
+                # File "/home/ken/.config/avendesora/config", line 18
+                #   'g': 'google-chrome %s'
+                #      ^
 
         contents = {}
         exec(compiled, contents)
@@ -208,7 +216,7 @@ class PythonFile(GnuPG):
     def create(self, contents, gpg_ids):
         path = self.path
         try:
-            to_path(get_setting('settings_dir')).mkdir(parents=True, exist_ok=True)
+            mkdir(get_setting('settings_dir'))
             if path.exists():
                 # file creation (init) requested, but file already exists
                 # don't overwrite the file, instead read it so the information 
@@ -225,7 +233,7 @@ class PythonFile(GnuPG):
                 narrate('not encrypting.', culprit=path)
                 # file is not encrypted
                 with path.open('w') as f:
-                    f.write(contents)
+                    f.write(contents.encode(get_setting('encoding')))
         except OSError as err:
             raise Error(os_error(err))
 

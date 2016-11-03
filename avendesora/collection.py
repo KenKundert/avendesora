@@ -23,7 +23,7 @@
 from inform import is_str, is_collection
 
 # Collection {{{1
-class Collection:
+class Collection(object):
     def __init__(self, collection):
         if is_str(collection):
             self.collection = collection.split()

@@ -31,13 +31,14 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '604ab82e4c87dd48fd77125e501e349b',
+    'secrets_hash': '45fabadad98e2ce50c076a371fd90588',
 }
 
 
 # Config Settings {{{1
 # These are the default values for settings that may be found in the config file
 CONFIG_DEFAULTS = {
+    'default_command': 'value',
     'accounts_files': [
         NONCONFIG_SETTINGS['default_accounts_file'],
         NONCONFIG_SETTINGS['default_stealth_accounts_file'],
@@ -45,13 +46,14 @@ CONFIG_DEFAULTS = {
     'account_list_file': '.accounts_files',
     'archive_file': 'archive.gpg',
     'previous_archive_file': 'archive.prev.gpg',
+    'label_color': 'blue',
+    'color_scheme': 'dark',
     'browsers': {
         'f': 'firefox -new-tab {url}',
         'g': 'google-chrome {url}',
         't': 'torbrowser {url}',
         'x': 'xdg-open {url}', # system default browser
     },
-    'color_scheme': 'dark',
     'default_browser': 'x',
     'default_field': 'passcode',
     'default_vector_field': 'questions',
@@ -73,7 +75,6 @@ CONFIG_DEFAULTS = {
     ),
     'hashes_file': '.hashes',
     'indent': '    ',
-    'label_color': 'blue',
     'log_file': 'log.gpg',
     'required_protocols': ['https'],
     'user_key_file': '.key.gpg',
@@ -135,7 +136,6 @@ CONFIG_DEFAULTS = {
     'xdotool_executable': '/usr/bin/xdotool',
     'xsel_executable': '/usr/bin/xsel -p',
     'use_pager': True,
-
 }
 
 # the following could be config settings, but they do not seem worth promoting
@@ -157,6 +157,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     previous_archive_file = {previous_archive_file}
 
     # Various settings
+    default_command = {default_command}
     default_field = {default_field}
     default_vector_field = {default_vector_field}
     display_time = {display_time}

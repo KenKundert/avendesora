@@ -137,7 +137,7 @@ def test_summary():
         username: pizzaman
         verbal: <reveal with 'avendesora value mybank verbal'>
     """)
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_find() {{{1
 def test_find():
@@ -149,7 +149,7 @@ def test_find():
         bank:
             mybank (mb)
     """)
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_search() {{{1
 def test_search():
@@ -162,7 +162,7 @@ def test_search():
             alertscc (scc)
             mybank (mb)
     """)
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_reveal() {{{1
 def test_reveal():

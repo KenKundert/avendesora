@@ -24,9 +24,9 @@ from . import cursor
 from .config import get_setting
 from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
-from inform import Color, Error, error, fatal, log, output, warn
+from inform import Color, Error, error, fatal, log, output, warn, indent
 from time import sleep
-from textwrap import indent, dedent
+from textwrap import dedent
 import string
 import re
 
@@ -85,7 +85,7 @@ def get_writer(display=True, clipboard=False, stdout=False):
     return TTY_Writer()
 
 # Writer base class {{{1
-class Writer:
+class Writer(object):
     pass
 
 
@@ -200,7 +200,7 @@ class StdoutWriter(Writer):
 
     def display_field(self, account, field):
         try:
-            print(dedent(str(account.get_value(field))).strip())
+            output(dedent(str(account.get_value(field))).strip())
         except Error as err:
             err.terminate()
 

@@ -22,7 +22,7 @@ from shlib import Run
 from inform import log, Error
 
 # Editor base class {{{1
-class Editor:
+class Editor(object):
     pass
 
 # GenericEditor class {{{1

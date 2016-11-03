@@ -27,7 +27,7 @@ from textwrap import dedent, wrap
 import hashlib
 
 
-class Dictionary:
+class Dictionary(object):
     """Read Dictionary"""
     def __init__(self, path):
         # find the dictionary, initially look in the settings directory

@@ -1,3 +1,4 @@
+# vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding=utf8 :
 import pytest
 from inform import os_error
 from textwrap import dedent
@@ -48,7 +49,7 @@ def test_add():
             accounts
             templates
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_archive() {{{1
 def test_archive():
@@ -83,7 +84,7 @@ def test_archive():
         the archive once you have convinced yourself all of the changes are
         as expected.
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_browse() {{{1
 def test_browse():
@@ -120,7 +121,7 @@ def test_browse():
         account attribute.  If the 'name' argument is specified, the
         corresponding URL can be chosen using a key.
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_changed() {{{1
 def test_changed():
@@ -145,7 +146,7 @@ def test_changed():
         regenerate the archive once you have convinced yourself all of the
         changes are as expected.
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_conceal() {{{1
 def test_conceal():
@@ -190,7 +191,7 @@ def test_conceal():
         sensitive secret, you should simply run 'avendesora conceal' and
         then enter the secret text when prompted.
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_edit() {{{1
 def test_edit():
@@ -210,7 +211,7 @@ def test_edit():
         You can specify the editor by changing the 'edit_account' setting in
         the config file (~/.config/avendesora/config).
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_find() {{{1
 def test_find():
@@ -227,7 +228,7 @@ def test_find():
             avendesora find <text>
             avendesora f    <text>
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_help() {{{1
 def test_help():
@@ -242,7 +243,7 @@ def test_help():
             avendesora help [<topic>]
             avendesora h    [<topic>]
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_initialize() {{{1
 def test_initialize():
@@ -262,10 +263,14 @@ def test_initialize():
             -h <path>, --gpg-home <path>
                                     GPG home directory (default is ~/.gnupg).
 
-        Initial configuration and accounts files are created only if they
-        do not already exist.  Existing files are not modified.
+        Create Avendesora data directory (~/.config/avendesora) and populate
+        it with initial versions of all essential files.
+
+        It is safe to run this command even after the data directory and
+        files have been created. Doing so will simply recreate any missing
+        files.  Existing files are not modified.
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_new() {{{1
 def test_new():
@@ -297,7 +302,7 @@ def test_new():
 
         Add a '.gpg' extension to <name> to encrypt the file.
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_reveal() {{{1
 def test_reveal():
@@ -324,7 +329,7 @@ def test_reveal():
         sensitive secret, you should simply run 'avendesora reveal' and then
         enter the encoded text when prompted.
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_search() {{{1
 def test_search():
@@ -341,7 +346,7 @@ def test_search():
             avendesora search <text>
             avendesora s      <text>
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_value() {{{1
 def test_value():
@@ -389,7 +394,7 @@ def test_value():
         desired name as the 'default_vector_field' in the account or the config
         file).
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_values() {{{1
 def test_values():
@@ -407,7 +412,7 @@ def test_values():
             avendesora vals   <account>
             avendesora V      <account>
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_version() {{{1
 def test_version():
@@ -421,7 +426,7 @@ def test_version():
         Usage:
             avendesora version
     """).strip()
-    assert result == bytes(expected, encoding='ascii')
+    assert result.decode('utf-8') == expected
 
 # test_abraxas() {{{1
 def test_abraxas():
@@ -468,7 +473,7 @@ def test_abraxas():
         it does not exist, then add the account name to this file, and
         reexport your accounts from Abraxas.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 
 # test_accounts() {{{1
 def test_accounts():
@@ -591,7 +596,7 @@ def test_accounts():
         secrets'.  For information on how to conceal or encrypt values, run
         'avendesora help obscure'.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 
 # test_discovery() {{{1
 def test_discovery():
@@ -704,7 +709,7 @@ def test_discovery():
         script. The name allows the user to distinguish the available
         choices.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 
 # test_entropy() {{{1
 def test_entropy():
@@ -804,7 +809,7 @@ def test_entropy():
         sensitive accounts from your home machine and not from any machine
         that you do not control.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 
 # test_misdirection() {{{1
 def test_misdirection():
@@ -848,7 +853,7 @@ def test_misdirection():
         the secret stored in in the archive will not be the true value, it
         will instead be the misdirected value.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 
 # test_overview() {{{1
 def test_overview():
@@ -906,8 +911,8 @@ def test_overview():
         you can often recover most if not all of your passwords even if you
         somehow lose your accounts file. You can even recover passwords that
         were created after you created your backup. This is because
-        Avendesora combines the master password with some easily recon‐
-        structed information, such as the account name, to create the
+        Avendesora combines the master password with some easily
+        reconstructed information, such as the account name, to create the
         password. If you save the master password, the rest should be
         recoverable.
 
@@ -926,7 +931,7 @@ def test_overview():
         master password in advance. Then new passwords can be created on the
         fly by either party.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 
 # test_stealth() {{{1
 def test_stealth():
@@ -971,9 +976,9 @@ def test_stealth():
         You can create additional stealth account files that do contain
         master passwords that you can share with your associates.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 
-# test_stealth() {{{1
+# test_security_questions() {{{1
 def test_security_questions():
     try:
         result = subprocess.check_output('avendesora help questions'.split())
@@ -1042,5 +1047,5 @@ def test_security_questions():
         answer, so if you change the question in any way it changes the
         answer.
     """).strip()
-    assert result == bytes(expected, encoding='utf8')
+    assert result.decode('utf-8') == expected
 

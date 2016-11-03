@@ -26,14 +26,11 @@ from .utilities import two_columns, to_python
 from .writer import get_writer
 from inform import (
     Error, error, codicil, output, conjoin, os_error,
-    is_collection, is_str
+    is_collection, is_str, indent
 )
 from shlib import chmod, mv, rm, to_path
 from docopt import docopt
-from textwrap import dedent, fill, indent
-    # use indent from textwrap rather than inform
-    # the inform indent removes spaces from the right side, which causes
-    # spurious difference when running changed command
+from textwrap import dedent, fill
 import re
 import sys
 
@@ -43,7 +40,7 @@ def title(text):
     return text[0].upper() + text[1:] + '.'
 
 # Command base class {{{1
-class Command:
+class Command(object):
     @classmethod
     def commands(cls):
         for cmd in cls.__subclasses__():
@@ -64,12 +61,19 @@ class Command:
 
     @classmethod
     def execute(cls, name, args):
+        if args is None:
+            args = []
         command = cls.find(name)
-        if command:
-            command.run(name, args if args else [])
-        else:
-            error('unknown command.', culprit=name)
-            codicil("Use 'avendesora help' for list of available commands."),
+        if not command:
+            # assume they simply neglected to specify the command explicitly
+            args = [name] + args
+            name = get_setting('default_command')
+            command = cls.find(name)
+            if not command:
+                error('unknown command.', culprit=name)
+                codicil("Use 'avendesora help' for list of available commands."),
+                return
+        command.run(name, args if args else [])
 
     @classmethod
     def summarize(cls, width=16):
@@ -414,29 +418,29 @@ class Changed(Command):
                 current_accounts[account.get_name()] = entry
 
         # report any new or missing accounts
-        new = current_accounts.keys() - archive_accounts.keys()
-        missing = archive_accounts.keys() - current_accounts.keys()
+        new = set(current_accounts.keys()) - set(archive_accounts.keys())
+        missing = set(archive_accounts.keys()) - set(current_accounts.keys())
         for each in sorted(new):
             output('new account:', each)
         for each in sorted(missing):
             output('missing account:', each)
 
         # for the common accounts, report any differences in the fields
-        common = archive_accounts.keys() & current_accounts.keys()
+        common = set(archive_accounts.keys()) & set(current_accounts.keys())
         for account_name in sorted(common):
             archive_account = archive_accounts[account_name]
             current_account = current_accounts[account_name]
 
             # report any new or missing fields
-            new = current_account.keys() - archive_account.keys()
-            missing = archive_account.keys() - current_account.keys()
+            new = set(current_account.keys()) - set(archive_account.keys())
+            missing = set(archive_account.keys()) - set(current_account.keys())
             for each in sorted(new):
                 output(account_name, 'new field', each, sep=': ')
             for each in sorted(missing):
                 output(account_name, 'new field', each, sep=': ')
 
             # for the common fields, report any differences in the values
-            shared = archive_account.keys() & current_account.keys()
+            shared = set(archive_account.keys()) & set(current_account.keys())
             for field_name in sorted(shared):
                 try:
                     archive_value = archive_account[field_name]
@@ -656,8 +660,12 @@ class Initialize(Command):
 
             {usage}
 
-            Initial configuration and accounts files are created only if they
-            do not already exist.  Existing files are not modified.
+            Create Avendesora data directory (~/.config/avendesora) and populate
+            it with initial versions of all essential files.
+
+            It is safe to run this command even after the data directory and
+            files have been created. Doing so will simply recreate any missing
+            files.  Existing files are not modified.
         """).strip()
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 

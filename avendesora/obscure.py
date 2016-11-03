@@ -75,7 +75,7 @@ DECORATED_TEXT = re.compile(
 )
 
 # Obscure {{{1
-class Obscure:
+class Obscure(object):
     # obscurers() {{{2
     @classmethod
     def obscurers(cls):

@@ -68,8 +68,21 @@ Install with::
 
     pip3 install --user avendesora
 
-.. image:: https://travis-ci.org/KenKundert/avendesora.svg?branch=master
+.. image:: https://img.shields.io/travis/KenKundert/avendesora/master.svg
     :target: https://travis-ci.org/KenKundert/avendesora
+
+.. image:: https://img.shields.io/coveralls/KenKundert/avendesora.svg
+    :target: https://coveralls.io/r/KenKundert/avendesora
+
+.. image:: https://img.shields.io/pypi/v/avendesora.svg
+    :target: https://pypi.python.org/pypi/avendesora
+
+.. image:: https://img.shields.io/pypi/pyversions/avendesora.svg
+    :target: https://pypi.python.org/pypi/avendesora/
+
+.. image:: https://img.shields.io/pypi/dd/avendesora.svg
+    :target: https://pypi.python.org/pypi/avendesora/
+
 
 
 Upgrading
