@@ -31,7 +31,7 @@ class Collection(object):
             self.collection = collection
         else:
             # is scalar
-            self.collection = {None, collection}
+            self.collection = {None: collection}
 
     def keys(self):
         try:
