@@ -237,54 +237,54 @@ Each attribute represents a piece of information that can be requested. For
 example, a summary of all information can be requested with::
 
     > avendesora all bb
-    NAMES: bigbank, bb
-    ACCOUNTS:
-        CHECKING: <reveal with 'avendesora show bigbank accounts.checking'>
-        CREDITCARD: <reveal with 'avendesora show bigbank accounts.creditcard'>
-        SAVINGS: <reveal with 'avendesora show bigbank accounts.savings'>
-    CUSTOMER SERVICE: 1-866-229-6633
-    EMAIL: gman33@pizza.com
-    PASSCODE: <reveal with 'avendesora show bigbank passcode'>
-    PIN: <reveal with 'avendesora show bigbank pin'>
-    QUESTIONS:
+    names: bigbank, bb
+    accounts:
+        checking: <reveal with 'avendesora show bigbank accounts.checking'>
+        creditcard: <reveal with 'avendesora show bigbank accounts.creditcard'>
+        savings: <reveal with 'avendesora show bigbank accounts.savings'>
+    customer service: 1-866-229-6633
+    email: gman33@pizza.com
+    passcode: <reveal with 'avendesora show bigbank passcode'>
+    pin: <reveal with 'avendesora show bigbank pin'>
+    questions:
         0: What city were you born in? <reveal with 'avendesora show bigbank questions.0'>
         1: What street did you grow up on? <reveal with 'avendesora show bigbank questions.1'>
         2: What was your childhood nickname? <reveal with 'avendesora show bigbank questions.2'>
-    URL: https://bigbank.com/login
-    USERNAME: gman33
-    VERBAL: <reveal with 'avendesora show bigbank verbal'>
+    url: https://bigbank.com/login
+    username: gman33
+    verbal: <reveal with 'avendesora show bigbank verbal'>
 
 The attributes have various levels of confidentiality.  Simple strings are not 
 considered sensitive. Those values provided by Python classes inherit the 
 confidentiality of the class.  Hidden() provides simple concealment. GPG()
 provides full encryption. And classes like Password(), Passphrase(), PIN() and 
-Question generates secrets.  Attributes that are considered sensitive are not 
+Question generate secrets.  Attributes that are considered sensitive are not 
 shown in the above summary, but can be requested individually::
 
     > avendesora show bb pin
-    PIN: 7784
+    pin: 7784
 
 Attributes can be simple scalars, such as PIN. They can be array memberss, such 
 as questions::
 
     > avendesora show bigbank questions.1
-    QUESTIONS.1: contact insulator crumb
+    questions.1 (What street did you grow up on?): lockout insulator crumb
 
 Or they can be dictionary members::
 
     > avendesora show bb accounts.checking
-    ACCOUNTS.CHECKING (base64): 12345678
+    accounts.checking: 12345678
 
 The passcode attribute is the default scalar attribute::
 
     > avendesora show bb
-    PASSCODE: Nj3gpqHNfiie
+    passcode: Nj3gpqHNfiie
 
 The questions attribute is the default array attribute, which is used if the 
 requested field is a number::
 
     > avendesora show bb 0
-    QUESTIONS.0: muffin favorite boyfriend
+    questions.0: muffin favorite boyfriend
 
 
 Adding And Editing Accounts
