@@ -102,10 +102,7 @@ class GnuPG(object):
                     ]))
                     raise Error(msg, culprit=path, sep='\n')
                 else:
-                    if use_armor:
-                        path.write_text(str(encrypted))
-                    else:
-                        path.write_bytes(encrypted.data)
+                    path.write_bytes(encrypted.data)
             except ValueError as err:
                 raise Error(str(err), culprit=path)
         else:
@@ -129,9 +126,9 @@ class GnuPG(object):
                 raise Error(str(err), culprit=path)
             except (IOError, OSError) as err:
                 raise Error(os_error(err))
-            return decrypted.data
+            return decrypted.data.decode(get_setting('encoding'))
         else:
-            return path.read_text()
+            return path.read_text(encoding=get_setting('encoding'))
 
     def _choices(self):
         extension = self.path.suffix.lower()

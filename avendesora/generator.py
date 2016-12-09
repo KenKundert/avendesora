@@ -202,7 +202,8 @@ class PasswordGenerator(object):
             raise Error(msg)
         if len(matches) > 1:
             choice = show_list_dialog(sorted(matches.keys()))
-            return matches[choice]
+            if choice:
+                return matches[choice]
         else:
             return matches.popitem()[1]
 
