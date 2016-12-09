@@ -3,11 +3,8 @@ Avendesora Collaborative Password Utility
 
 "Avendesora, the leaf of the Tree of Life is the key."
 
-Avendesora is currently in beta. As a password generator, the generated 
-passwords are very sensitive to changes in the algorithms. As the algorithms are 
-not set, you should not be using Avendesora to generate and hold your persistent 
-passwords.  Instead, Advendesora should only be used to try out the user 
-interface.
+Avendesora is currently in beta. However it is reasonably stable and so you 
+should feel comfortable using it.
 
 Please report all bugs and suggestions to avendesora@nurdletech.com
 
@@ -332,8 +329,6 @@ name or aliases contains a text fragment. For example::
 Second, you can list any accounts that contain a text fragment in any non-secret 
 field. For example::
 
-
     > avendesora find 4408
     4408:
         bankofamerica (boa)
-
