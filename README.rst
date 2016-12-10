@@ -91,6 +91,11 @@ If using Python3 you might also have to install::
 It has been left out of the dependencies in the setup.py file because it appears 
 to be broken the pypi. See the setup.py file for more information.
 
+If you would like to use scrypt as a way of encrypting fields, you will need to 
+install scrypt by hand using::
+
+   pip3 install --user scrypt
+
 
 Upgrading
 ---------
