@@ -634,7 +634,7 @@ class Stealth(HelpMessage):
             predictable account names and still get an unpredictable secret.
             The master password used is taken from master_password in the file
             that contains the stealth account if it exists, or the users key if
-            it does not. By default the stealth accounts file do not contain a
+            it does not. By default the stealth accounts file does not contain a
             master password, which makes it difficult to share stealth accounts.
             You can create additional stealth account files that do contain
             master passwords that you can share with your associates.
