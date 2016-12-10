@@ -9,6 +9,7 @@ addons:
     packages:
       - gnupg
 install:
+  - pip install scrypt
   - pip install .
   - chmod -R go-rwx tests/home/gnupg
 script: 
