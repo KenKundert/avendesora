@@ -1,7 +1,7 @@
 Avendesora Collaborative Password Utility
 =========================================
 
-"Avendesora, the leaf of the Tree of Life is the key."
+*Avendesora, the leaf of the Tree of Life is the key.*
 
 Avendesora is currently in beta. However it is reasonably stable and so you 
 should feel comfortable using it.
@@ -91,6 +91,7 @@ If using Python3 you might also have to install::
 It has been left out of the dependencies in the setup.py file because it appears 
 to be broken the pypi. See the setup.py file for more information.
 
+
 Upgrading
 ---------
 
@@ -174,7 +175,6 @@ For example::
 
     avendesora init -g bob@nurdletech.com
 
-
 or::
 
     avendesora init -g 1B2AFA1C
@@ -191,7 +191,7 @@ particular, you should see at least an initial accounts files and a config file.
 Configuration
 -------------
 
-The config file (~/.config/avendesora/config) allow you to personalize 
+The config file (~/.config/avendesora/config) allows you to personalize 
 Avendesora to your needs. After initializing you account you should take the 
 time to review the config file and adjust it to fit your needs. You should be 
 very thoughtful in this initial configuration, because some decisions (or 
@@ -271,16 +271,16 @@ example, a summary of all information can be requested with::
 
 The attributes have various levels of confidentiality.  Simple strings are not 
 considered sensitive. Those values provided by Python classes inherit the 
-confidentiality of the class.  Hidden() provides simple concealment. GPG()
-provides full encryption. And classes like Password(), Passphrase(), PIN() and 
-Question generate secrets.  Attributes that are considered sensitive are not 
-shown in the above summary, but can be requested individually::
+confidentiality of the class.  Hidden() provides simple concealment. GPG() and 
+Scrypt() provides full encryption. And classes like Password(), Passphrase(), 
+PIN() and Question() generate secrets.  Attributes that are considered sensitive 
+are not shown in the above summary, but can be requested individually::
 
     > avendesora show bb pin
     pin: 7784
 
-Attributes can be simple scalars, such as PIN. They can be array memberss, such 
-as questions::
+Attributes can be simple scalars, such as *pin*. They can be array members, such 
+as *questions*::
 
     > avendesora show bigbank questions.1
     questions.1 (What street did you grow up on?): lockout insulator crumb
@@ -299,7 +299,7 @@ The questions attribute is the default array attribute, which is used if the
 requested field is a number::
 
     > avendesora show bb 0
-    questions.0: muffin favorite boyfriend
+    questions.0 (What city were you born in?): muffin favorite boyfriend
 
 
 Adding And Editing Accounts
@@ -376,7 +376,7 @@ that should be used to produce the required information. Generally the script
 would be to enter the account name, then tab, then the password, and finally 
 return, but you can configure the script as you choose. This is all done as part 
 of configuring discovery. The method for associating Advendesora to a particular 
-hot key is dependent on your window manager. With Gnome, it requires that you␣
+hot key is dependent on your window manager. With Gnome, it requires that you 
 open your Keyboard Shortcuts preferences and create a new shortcut. When you do 
 this, choose 'avendesora value' as the command to run.
 
@@ -394,3 +394,6 @@ To get a list of available commands and topics, and then::
     avendesora help <topic>
 
 for information on a specific command or topic.
+
+It is worth browsing all of the available topics at least once to get a sense of 
+all that Avendesora can do.
