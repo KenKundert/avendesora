@@ -484,7 +484,7 @@ class Misdirection(HelpMessage):
             Avendesora that pertains to that secret undercuts this argument.
             This is the purpose of stealth accounts. They allow you to generate
             secrets for accounts for which Avendesora has no stored information.
-            In this case Avendesora ask you for the minimal amount of
+            In this case Avendesora asks you for the minimal amount of
             information that it needs to generate the secret. However in some
             cases, the amount of information that must be retained is simply too
             much to keep in your head. In that case another approach, referred
@@ -500,10 +500,10 @@ class Misdirection(HelpMessage):
             additional seed at the time you request the secret. If you do not
             use --seed or you do and give the wrong seed, you will get a
             different value for your secret.  In effect, using --seed when
-            generating the original value of the secret cause Avendesora to
+            generating the original value of the secret causes Avendesora to
             generate the wrong secret by default, allowing you to say "See, I
             told you it would not work". But when you want it to work, you just
-            interactively provide the right additional seed.
+            interactively provide the correct seed.
 
             You would typically only use misdirection for secrets you are
             worried about being compelled to disclose. So it behooves you to use
@@ -613,7 +613,7 @@ class Stealth(HelpMessage):
             purpose of stealth accounts. (Misdirection is an alternative to
             stealth accounts; see 'avendesora help misdirection').
 
-            Generally one uses the predefined stealth accounts, which all  have
+            Generally one uses the predefined stealth accounts, which all have
             names that are descriptive of the form of the secret they generate,
             for example Word6 generates a 6-word pass phrase. The predefined
             accounts are kept in ~/.config/avendesora/stealth_accounts.
@@ -634,7 +634,7 @@ class Stealth(HelpMessage):
             predictable account names and still get an unpredictable secret.
             The master password used is taken from master_password in the file
             that contains the stealth account if it exists, or the users key if
-            it does not. By default the stealth accounts file does not contain a
+            it does not. By default the stealth accounts file do not contain a
             master password, which makes it difficult to share stealth accounts.
             You can create additional stealth account files that do contain
             master passwords that you can share with your associates.

@@ -80,7 +80,16 @@ Install with::
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
+You will also need to install some operating system commands. On Fedora use::
 
+   yum install gnupg2 xdotool xsel
+
+If using Python3 you might also have to install::
+
+   yum install python3-gobject
+
+It has been left out of the dependencies in the setup.py file because it appears 
+to be broken the pypi. See the setup.py file for more information.
 
 Upgrading
 ---------
@@ -108,9 +117,48 @@ to confirm that none of your generated passwords have changed.
 Requirements
 ------------
 
+GPG
+"""
 To use Avendesora, you will need GPG and you will need a GPG ID that is 
 associated with a private key. That GPG ID could be in the form of an email 
 address or an ID string that can be found using 'gpg --list-keys'.
+
+If you do not yet have a GPG key, you can get one using::
+
+   $ gpg --gen-key
+
+You should probably choose 4096 RSA keys. Now, edit ~/.gnupg/gpg-conf and add 
+the line::
+
+   use-agent
+
+That way, you generally only need give your GPG key pass phrase once per login 
+session.
+
+The ultimate in convenience is to use Gnome Keyring to act as the GPG agent 
+because it allows you to unlock the agent simply by logging in.  To do so, make 
+sure Keyring is installed::
+
+   yum install gnome-keyring gnome-keyring-pam
+
+If you are using Gnome, it will start Keyring for you. Otherwise, you should 
+modify your .xinitrc or .xsession file to add the following::
+
+    # Set ssh and gpg agent environment variables
+    export $(gnome-keyring-daemon --start)
+
+
+Vim
+"""
+
+If you use Vim, it is very helpful for you to install GPG support in Vim. To do 
+so first download::
+
+    http://www.vim.org/scripts/script.php?script_id=3645
+
+Then copy the file into your Vim configuration hierarchy::
+
+    cp gnupg.vim ~/.vim/plugin
 
 
 Initialization
@@ -138,39 +186,6 @@ give GPG IDs for everyone::
 
 After initialization, there should be several files in ~/.config/avendesora. In 
 particular, you should see at least an initial accounts files and a config file.
-
-####
-TODO
-####
-
-1. Must describe how to update gnupg.py to avoid the errors. Specifically add 
-   "PROGRESS", ..., "WARNING", "KEY_CONSIDERED" to the list near line 250 that 
-   contains::
-
-        elif key in ("RSA_OR_IDEA", "NODATA", "IMPORT_RES", "PLAINTEXT",
-                     "PLAINTEXT_LENGTH", "POLICY_URL", "DECRYPTION_INFO",
-                     "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
-                     "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
-                     "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA",
-                     "IMPORT_OK", "PROGRESS", "PINENTRY_LAUNCHED", "NEWSIG",
-                     "WARNING", "KEY_CONSIDERED"):
-            pass
-
-2. Must describe how to add GPG support to VIM.
-
-    Download::
-
-        http://www.vim.org/scripts/script.php?script_id=3645
-
-    Copy into::
-
-        cp gnupg.vim ~/.vim/plugin
-
-3. Must install linux utilities::
-
-        dnf install xdotool xsel
-
-3. Must describe how to create a gpg key and how to configure gpg-agent
 
 
 Configuration
@@ -332,3 +347,50 @@ field. For example::
     > avendesora find 4408
     4408:
         bankofamerica (boa)
+
+
+Autotyping Passwords
+--------------------
+
+There are a couple of things that must be done to enable autotyping of 
+passwords. First, at least some secrets must be configured for discovery.  
+Discovery allows secrets to determine whether they are good candidates for use 
+in a particular situation based on the environment. The environment includes 
+such things as with title of the active window, the user name, the host name, 
+etc.  If multiple secrets are suitable, a small window pops up and lets you 
+choose between them. To see how to configure secrets for discovery, run 
+'avendesora help discovery'.
+
+To make secret discovery easier and more robust it is helpful to add a plugin to 
+your web browser to make its title more informative. For Firefox, the best 
+plugin to use is AddURLToWindowTitle. For Chrome it is URLinTitle. It is 
+recommended that you install the appropriate one into your browser.
+
+Finally, you need to configure your window manager to run Avendesora when you 
+type a special hot key, such as ``Alt p``.  The idea is that you are in 
+a situation where you need a secret, such as visiting your bank's website in 
+your browser, then you click on the account name field with your mouse and type 
+your hot key. This runs Avendesora without an account name. In this case, 
+Avendesora uses secret discovery to determine which secret to use and the script 
+that should be used to produce the required information. Generally the script 
+would be to enter the account name, then tab, then the password, and finally 
+return, but you can configure the script as you choose. This is all done as part 
+of configuring discovery. The method for associating Advendesora to a particular 
+hot key is dependent on your window manager. With Gnome, it requires that you␣
+open your Keyboard Shortcuts preferences and create a new shortcut. When you do 
+this, choose 'avendesora value' as the command to run.
+
+
+Getting Help
+------------
+
+Avendesora has information on how to use it features built-in that is accessible 
+using the *help* command. Use::
+
+    avendesora help
+
+To get a list of available commands and topics, and then::
+
+    avendesora help <topic>
+
+for information on a specific command or topic.
