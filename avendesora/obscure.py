@@ -31,7 +31,6 @@ from inform import (
 )
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
-import scrypt
 import re
 
 # Utilities {{{1
@@ -273,43 +272,47 @@ class GPG(Obscure, GnuPG):
         return plaintext
 
 # Scrypt {{{1
-class Scrypt(Obscure):
-    # This encrypts/decrypts a string with scrypt. The user's key is used as the
-    # passcode for this symmetric encryption.
-    DESC = '''
-        This encoding fully encrypts the text with your user key. Only
-        you can decrypt it, secrets encoded with scrypt cannot be
-        shared.
-    '''
-    def __init__(self, ciphertext, secure=True, encoding='utf8'):
-        self.ciphertext = ciphertext
-        self.encoding = encoding
+try:
+    import scrypt
+    class Scrypt(Obscure):
+        # This encrypts/decrypts a string with scrypt. The user's key is used as the
+        # passcode for this symmetric encryption.
+        DESC = '''
+            This encoding fully encrypts the text with your user key. Only
+            you can decrypt it, secrets encoded with scrypt cannot be
+            shared.
+        '''
+        def __init__(self, ciphertext, secure=True, encoding='utf8'):
+            self.ciphertext = ciphertext
+            self.encoding = encoding
 
-    def generate(self, field_name, field_key, account):
-        encrypted = a2b_base64(self.ciphertext.encode(self.encoding))
-        self.plaintext = scrypt.decrypt(encrypted, get_setting('user_key'))
+        def generate(self, field_name, field_key, account):
+            encrypted = a2b_base64(self.ciphertext.encode(self.encoding))
+            self.plaintext = scrypt.decrypt(encrypted, get_setting('user_key'))
 
-    def is_secure(self):
-        return False
+        def is_secure(self):
+            return False
 
-    def __str__(self):
-        return str(self.plaintext).strip()
+        def __str__(self):
+            return str(self.plaintext).strip()
 
-    @staticmethod
-    def conceal(plaintext, decorate=False, encoding=None, symmetric=False):
-        encoding = encoding if encoding else get_setting('encoding')
-        plaintext = str(plaintext).encode(encoding)
-        encrypted = scrypt.encrypt(
-            plaintext, get_setting('user_key'), maxtime=0.25
-        )
-        encoded = b2a_base64(encrypted).rstrip().decode('ascii')
-        if decorate:
-            return decorate_concealed('Scrypt', encoded)
-        else:
-            return encoded
+        @staticmethod
+        def conceal(plaintext, decorate=False, encoding=None, symmetric=False):
+            encoding = encoding if encoding else get_setting('encoding')
+            plaintext = str(plaintext).encode(encoding)
+            encrypted = scrypt.encrypt(
+                plaintext, get_setting('user_key'), maxtime=0.25
+            )
+            encoded = b2a_base64(encrypted).rstrip().decode('ascii')
+            if decorate:
+                return decorate_concealed('Scrypt', encoded)
+            else:
+                return encoded
 
-    @staticmethod
-    def reveal(ciphertext, encoding=None):
-        encrypted = a2b_base64(ciphertext)
-        return scrypt.decrypt(encrypted, get_setting('user_key'))
+        @staticmethod
+        def reveal(ciphertext, encoding=None):
+            encrypted = a2b_base64(ciphertext)
+            return scrypt.decrypt(encrypted, get_setting('user_key'))
 
+except ImportError:
+    pass

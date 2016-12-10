@@ -256,6 +256,11 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
         RecognizeHost, RecognizeUser, RecognizeEnvVar,
     )
+    try:
+        # You need to install scrypt using 'pip install scrypt' to use Scrypt
+        import Scrypt
+    except ImportError:
+        pass
 
     master_password = Hidden({master_password}, secure=True)
     gpg_ids = {gpg_ids}

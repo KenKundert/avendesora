@@ -44,7 +44,10 @@ setup(
             # Be careful.  There's a package called 'gnupg' that's an 
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
-        'scrypt',
+        #'scrypt',
+            # scrypt is optional. If you install it then Avendesora will offer
+            # it. It is not required because it involves compiling C code and so
+            # significant additional dependencies such as gcc.
         'shlib>=0.3.1',
     ],
     keywords=[
