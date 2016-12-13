@@ -369,7 +369,16 @@ choose between them. To see how to configure secrets for discovery, run
 To make secret discovery easier and more robust it is helpful to add a plugin to 
 your web browser to make its title more informative. For Firefox, the best 
 plugin to use is AddURLToWindowTitle. For Chrome it is URLinTitle. It is 
-recommended that you install the appropriate one into your browser.
+recommended that you install the appropriate one into your browser. For 
+AddURLToWindowTitle, set the following options:
+
+  | show full URL = yes
+  | separator string = '-'
+  | show field attributes = no
+
+For URLinTitle, set:
+
+  | tab title format = '{title} - {protocol}://{hostname}{port}/{path}'
 
 Finally, you need to configure your window manager to run Avendesora when you 
 type a special hot key, such as ``Alt p``.  The idea is that you are in 
