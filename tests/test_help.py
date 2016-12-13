@@ -675,6 +675,21 @@ def test_discovery():
                 script='{passcode}{return}'
             )
 
+        To make secret discovery easier and more robust it is helpful to add
+        a plugin to your web browser to make its title more informative. For
+        Firefox, the best plugin to use is AddURLToWindowTitle. For Chrome
+        it is URLinTitle. It is recommended that you install the appropriate
+        one into your browser.  For AddURLToWindowTitle, set the following
+        options:
+
+            show full URL = yes
+            separator string = '-'
+            show field attributes = no
+
+        For URLinTitle, set:
+
+            tab title format = '{title} - {protocol}://{hostname}{port}/{path}'
+
         When account discovery fails it can be difficult to determine what
         is going wrong. When this occurs, you should first examine the log
         file. It should show you the window title and the recognized title

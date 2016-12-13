@@ -117,4 +117,3 @@ class URLinTitle(Title):
         r'\A{title} - {url} - {browser}\Z'.format(**REGEX_COMPONENTS)
     )
     PRIORITY = 2
-
