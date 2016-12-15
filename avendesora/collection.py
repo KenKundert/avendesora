@@ -24,9 +24,9 @@ from inform import is_str, is_collection
 
 # Collection {{{1
 class Collection(object):
-    def __init__(self, collection):
+    def __init__(self, collection, splitter=None):
         if is_str(collection):
-            self.collection = collection.split()
+            self.collection = collection.split(splitter)
         elif is_collection(collection):
             self.collection = collection
         else:
@@ -56,4 +56,3 @@ class Collection(object):
 
     def __iter__(self):
         return iter(self.values())
-

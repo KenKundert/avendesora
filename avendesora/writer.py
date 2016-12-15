@@ -24,7 +24,7 @@ from . import cursor
 from .config import get_setting
 from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
-from inform import Color, Error, error, fatal, log, output, warn, indent
+from inform import Color, Error, cull, error, fatal, log, output, warn, indent
 from time import sleep
 from textwrap import dedent
 import string
@@ -86,7 +86,59 @@ def get_writer(display=True, clipboard=False, stdout=False):
 
 # Writer base class {{{1
 class Writer(object):
-    pass
+
+    @staticmethod
+    def expand_script(account, field):
+
+        # if field was not given
+        if not field:
+            name, key = account.split_name(field)
+            field = '.'.join(cull([name, key]))
+
+        # treat field as name rather than script if it there are not attributes
+        if '{' not in field:
+            name, key = account.split_name(field)
+            try:
+                value = account.get_field(name, key)
+            except Error as err:
+                err.terminate()
+            is_secret = account.is_secret(name, key)
+            label = account.combine_name(name, key)
+            try:
+                alt_name = value.get_key()
+                if alt_name:
+                    label += ' (%s)' % alt_name
+            except AttributeError:
+                pass
+            return dedent( str(value)).strip(), is_secret, label
+        script = field
+
+        # Run the script
+        regex = re.compile(r'({[\w. ]+})')
+        out = []
+        is_secret = False
+        for term in regex.split(script):
+            if term and term[0] == '{' and term[-1] == '}':
+                # we have found a command
+                cmd = term[1:-1].lower()
+                if cmd == 'tab':
+                    out.append('\t')
+                elif cmd == 'return':
+                    out.append('\n')
+                elif cmd.startswith('sleep '):
+                    pass
+                else:
+                    name, key = account.split_name(cmd)
+                    try:
+                        value = dedent(str(account.get_field(name, key))).strip()
+                        out.append(value)
+                        if account.is_secret(name, key):
+                            is_secret = True
+                    except Error as err:
+                        err.terminate()
+            else:
+                out.append(term)
+        return ''.join(out), is_secret, None
 
 
 # TTY_Writer class {{{1
@@ -94,34 +146,25 @@ class TTY_Writer(Writer):
     """Writes output to the user's TTY."""
 
     def display_field(self, account, field):
-        name, key = account.split_name(field)
-        is_secret = account.is_secret(name, key)
-        try:
-            value = account.get_field(name, key)
-            tvalue = dedent(str(value)).strip()
-        except Error as err:
-            err.terminate()
+
+        # get string to display
+        value, is_secret, label = self.expand_script(account, field)
+
+        # indent multiline outputs
         sep = ' '
-        if '\n' in tvalue:
+        if '\n' in value:
             if is_secret:
-                warn(
-                    'secret contains newlines, will not be fully concealed.',
-                    culprit=key
-                )
+                warn('secret contains newlines, will not be fully concealed.')
             else:
-                tvalue = indent(dedent(tvalue), get_setting('indent')).strip('\n')
+                value = indent(dedent(value), get_setting('indent')).strip('\n')
                 sep = '\n'
 
-        # build output string
-        label = account.combine_name(name, key)
+        if label:
+            text = LabelColor(label + ':') + sep + value
+        else:
+            text = value
+            label = field
         log('Writing to TTY:', label)
-        try:
-            alt_name = value.get_key()
-            if alt_name:
-                label += ' (%s)' % alt_name
-        except AttributeError:
-            pass
-        text = LabelColor(label + ':') + sep + tvalue
 
         if is_secret:
             try:
@@ -141,12 +184,9 @@ class ClipboardWriter(Writer):
     """Writes output to the system clipboard."""
 
     def display_field(self, account, field):
-        name, key = account.split_name(field)
-        is_secret = account.is_secret(name, key)
-        try:
-            value = dedent(str(account.get_field(name, key))).strip()
-        except Error as err:
-            err.terminate()
+
+        # get string to display
+        value, is_secret, label = self.expand_script(account, field)
 
         # Use 'xsel' to put the information on the clipboard.
         # This represents a vulnerability, if someone were to replace xsel they
@@ -199,8 +239,11 @@ class StdoutWriter(Writer):
     """Writes to the standard output."""
 
     def display_field(self, account, field):
+        # get string to display
+        value, is_secret, label = self.expand_script(account, field)
+
         try:
-            output(dedent(str(account.get_value(field))).strip())
+            output(value)
         except Error as err:
             err.terminate()
 
@@ -241,10 +284,10 @@ class KeyboardWriter(Writer):
             script = "{%s}{return}" % name
 
         # Run the script
-        regex = re.compile(r'({\w+})')
         out = []
         scrubbed = []
         sleep(INITIAL_AUTOTYPE_DELAY)
+        regex = re.compile(r'({[\w. ]+})')
         for term in regex.split(script):
             if term and term[0] == '{' and term[-1] == '}':
                 # we have found a command
@@ -281,7 +324,6 @@ class KeyboardWriter(Writer):
                         err.terminate()
             else:
                 out.append(term)
+
         log('Autotyping "%s".' % ''.join(scrubbed).replace('\t', '→').replace('\n', '↲'))
         autotype(''.join(out))
-
-

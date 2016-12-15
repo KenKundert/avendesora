@@ -47,7 +47,23 @@ def test_alertscc():
         result = subprocess.check_output('avendesora value --stdout alertscc'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'R7ibHyPjWtG2\n'
+    assert result == b'email is pizzaman@pizza.com, password is R7ibHyPjWtG2\n'
+
+# test_alertscc_discovery() {{{1
+def test_alertscc_discovery():
+    try:
+        result = subprocess.check_output('avendesora value --title https://alertscc.bbcportal.com --stdout alertscc'.split())
+    except OSError as err:
+        result = os_error(err)
+    assert result == b'email is pizzaman@pizza.com, password is R7ibHyPjWtG2\n'
+
+# test_alertscc_script() {{{1
+def test_alertscc_script():
+    try:
+        result = subprocess.check_output('avendesora value --stdout alertscc {email}#{password}'.split())
+    except OSError as err:
+        result = os_error(err)
+    assert result == b'pizzaman@pizza.com#R7ibHyPjWtG2\n'
 
 # test_scc() {{{1
 def test_scc():
@@ -55,7 +71,7 @@ def test_scc():
         result = subprocess.check_output('avendesora value --stdout scc'.split())
     except OSError as err:
         result = os_error(err)
-    assert result == b'R7ibHyPjWtG2\n'
+    assert result == b'email is pizzaman@pizza.com, password is R7ibHyPjWtG2\n'
 
 # test_scc_account() {{{1
 def test_scc_account():

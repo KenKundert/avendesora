@@ -22,11 +22,11 @@ from .editors import GenericEditor
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import Obscure
-from .utilities import two_columns, to_python
+from .utilities import two_columns
 from .writer import get_writer
 from inform import (
     Error, error, codicil, output, conjoin, os_error,
-    is_collection, is_str, indent
+    is_collection, is_str, indent, render,
 )
 from shlib import chmod, mv, rm, to_path
 from docopt import docopt
@@ -275,7 +275,7 @@ class Archive(Command):
             entry = account.archive()
             if entry:
                 entries.append(indent('%r: %s,' % (
-                    account.get_name(), to_python(entry)
+                    account.get_name(), render(entry)
                 ), '    '))
 
         # build file contents

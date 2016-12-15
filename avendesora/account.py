@@ -204,11 +204,8 @@ class Account(object):
     # get_field() {{{2
     @classmethod
     def get_field(cls, name, key=None, default=False):
-        """Get Field Value
-
-        Return value from the account given a field name and key.
-        """
-        value = cls.__dict__.get(name)
+        "Get field Value given a field name and key"
+        value = getattr(cls, name, None)
         if value is None:
             if default is False:
                 raise Error(

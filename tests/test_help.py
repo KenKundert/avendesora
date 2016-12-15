@@ -948,6 +948,68 @@ def test_overview():
     """).strip()
     assert result.decode('utf-8') == expected
 
+# test_scripts() {{{1
+def test_scripts():
+    try:
+        result = subprocess.check_output('avendesora help scripts'.split())
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        You can use simple scripts for controlling the output. Scripts take
+        the form of text strings with embedded attributes. For example:
+
+            'username: {username}, password: {passcode}'
+
+        This string is printed as is except that the attributes are replaced
+        by their value from the chosen account.  For example, this script
+        might produce:
+
+            username: jman, password: R7ibHyPjWtG2
+
+        There are several situations where scripts can be used. You can give
+        a script rather than a field when running the value command:
+
+            > avendesora value scc 'username: {username}, password: {passcode}'
+            username: jman, password: R7ibHyPjWtG2
+
+        You can also create an account where default is given as a script:
+
+            class SCC(Acount):
+                aliases = 'scc'
+                username = 'jman'
+                password = Password()
+                default = 'username: {username}, password: {passcode}'
+
+        Then you can access the script by simply not providing a field.
+
+            > avendesora value scc
+            username: jman, password: R7ibHyPjWtG2
+
+        Finally, you pass a script to the account discovery recognizers.
+        They specify the action that should be taken when particular
+        recognizer triggers. For example, this recognizer could be used to
+        recognize Gmail:
+
+            discovery = [
+                RecognizeURL(
+                    'https://accounts.google.com/ServiceLogin',
+                    script='{username}{return}{sleep 1.5}{passcode}{return}'
+                ),
+                RecognizeURL(
+                    'https://accounts.google.com/signin/challenge',
+                    script='{questions.0}{return}'
+                ),
+            ]
+
+        Besides the account attributes, you can use several other special
+        attributes including: {tab}, {return}, and {sleep N}.  {tab} is
+        replaced by a tab character, {return} is replaced by a carriage
+        return character, and {sleep N} causes a pause of N seconds. The
+        sleep function is only active when autotyping after account
+        discovery.
+    """).strip()
+    assert result.decode('utf-8') == expected
+
 # test_stealth() {{{1
 def test_stealth():
     try:

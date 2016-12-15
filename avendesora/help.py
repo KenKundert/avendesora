@@ -611,52 +611,6 @@ class Overview(HelpMessage):
         return text
 
 
-# Stealth class {{{1
-class Stealth(HelpMessage):
-    DESCRIPTION = "stealth secrets"
-
-    @staticmethod
-    def help():
-        text = dedent("""
-            Normally Avendesora uses information from an account that is
-            contained in an account file to generate the secrets for that
-            account. In some cases, the presence of the account itself, even
-            though it is contained within an encrypted file can be problematic.
-            The mere presence of an encrypted file may result in you being
-            compelled to open it. For the most damaging secrets, it is best if
-            there is no evidence that the secret exists at all. This is the
-            purpose of stealth accounts. (Misdirection is an alternative to
-            stealth accounts; see 'avendesora help misdirection').
-
-            Generally one uses the predefined stealth accounts, which all have
-            names that are descriptive of the form of the secret they generate,
-            for example Word6 generates a 6-word pass phrase. The predefined
-            accounts are kept in ~/.config/avendesora/stealth_accounts.
-
-            Stealth accounts are subclasses of the StealthAccount class. These
-            accounts differ from normal accounts in that they do not contribute
-            the account name to the secrets generators for use as a seed.
-            Instead, the user is requested to provide the account name every
-            time the secret is generated. The secret depends strongly
-            on this account name, so it is essential you give precisely the same
-            name each time. The term 'account name' is being use here, but you
-            can enter any text you like.  Best to make this text very difficult
-            to guess if you are concerned about being compelled to disclose your
-            GPG keys.
-
-            The secret generator will combine the account name with the master
-            password before generating the secret. This allows you to use simple
-            predictable account names and still get an unpredictable secret.
-            The master password used is taken from master_password in the file
-            that contains the stealth account if it exists, or the users key if
-            it does not. By default the stealth accounts file does not contain a
-            master password, which makes it difficult to share stealth accounts.
-            You can create additional stealth account files that do contain
-            master passwords that you can share with your associates.
-        """).strip()
-        return text
-
-
 # Questions class {{{1
 class Questions(HelpMessage):
     DESCRIPTION = "security questions"
@@ -725,6 +679,115 @@ class Questions(HelpMessage):
             Be aware that the question is used as a seed when generating the
             answer, so if you change the question in any way it changes the
             answer.
+        """).strip()
+        return text
+
+
+# Scripts class {{{1
+class Scripts(HelpMessage):
+    DESCRIPTION = "scripts"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+            You can use simple scripts for controlling the output. Scripts take
+            the form of text strings with embedded attributes. For example:
+
+                'username: {username}, password: {passcode}'
+
+            This string is printed as is except that the attributes are replaced
+            by their value from the chosen account.  For example, this script
+            might produce:
+
+                username: jman, password: R7ibHyPjWtG2
+
+            There are several situations where scripts can be used. You can give
+            a script rather than a field when running the value command:
+
+                > avendesora value scc 'username: {username}, password: {passcode}'
+                username: jman, password: R7ibHyPjWtG2
+
+            You can also create an account where default is given as a script:
+
+                class SCC(Acount):
+                    aliases = 'scc'
+                    username = 'jman'
+                    password = Password()
+                    default = 'username: {username}, password: {passcode}'
+
+            Then you can access the script by simply not providing a field.
+
+                > avendesora value scc
+                username: jman, password: R7ibHyPjWtG2
+
+            Finally, you pass a script to the account discovery recognizers.
+            They specify the action that should be taken when particular
+            recognizer triggers. For example, this recognizer could be used to
+            recognize Gmail:
+
+                discovery = [
+                    RecognizeURL(
+                        'https://accounts.google.com/ServiceLogin',
+                        script='{username}{return}{sleep 1.5}{passcode}{return}'
+                    ),
+                    RecognizeURL(
+                        'https://accounts.google.com/signin/challenge',
+                        script='{questions.0}{return}'
+                    ),
+                ]
+
+            Besides the account attributes, you can use several other special
+            attributes including: {tab}, {return}, and {sleep N}.  {tab} is
+            replaced by a tab character, {return} is replaced by a carriage
+            return character, and {sleep N} causes a pause of N seconds. The
+            sleep function is only active when autotyping after account
+            discovery.
+        """).strip()
+        return text
+
+
+# Stealth class {{{1
+class Stealth(HelpMessage):
+    DESCRIPTION = "stealth secrets"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+            Normally Avendesora uses information from an account that is
+            contained in an account file to generate the secrets for that
+            account. In some cases, the presence of the account itself, even
+            though it is contained within an encrypted file can be problematic.
+            The mere presence of an encrypted file may result in you being
+            compelled to open it. For the most damaging secrets, it is best if
+            there is no evidence that the secret exists at all. This is the
+            purpose of stealth accounts. (Misdirection is an alternative to
+            stealth accounts; see 'avendesora help misdirection').
+
+            Generally one uses the predefined stealth accounts, which all have
+            names that are descriptive of the form of the secret they generate,
+            for example Word6 generates a 6-word pass phrase. The predefined
+            accounts are kept in ~/.config/avendesora/stealth_accounts.
+
+            Stealth accounts are subclasses of the StealthAccount class. These
+            accounts differ from normal accounts in that they do not contribute
+            the account name to the secrets generators for use as a seed.
+            Instead, the user is requested to provide the account name every
+            time the secret is generated. The secret depends strongly
+            on this account name, so it is essential you give precisely the same
+            name each time. The term 'account name' is being use here, but you
+            can enter any text you like.  Best to make this text very difficult
+            to guess if you are concerned about being compelled to disclose your
+            GPG keys.
+
+            The secret generator will combine the account name with the master
+            password before generating the secret. This allows you to use simple
+            predictable account names and still get an unpredictable secret.
+            The master password used is taken from master_password in the file
+            that contains the stealth account if it exists, or the users key if
+            it does not. By default the stealth accounts file does not contain a
+            master password, which makes it difficult to share stealth accounts.
+            You can create additional stealth account files that do contain
+            master passwords that you can share with your associates.
         """).strip()
         return text
 

@@ -47,7 +47,7 @@ class AlertSCC(Account):
         covernment.
     '''
     master = ken
-    default  = 'password'
+    default  = 'email is {email}, password is {password}'
     password = Password()
     account = Hidden('MTIzNDU2LTc4OTA=')
     birthdate = BirthDate(2016, 25, 55)

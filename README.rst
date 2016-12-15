@@ -55,15 +55,12 @@ So you should be careful when you first create your account to name it
 appropriately so you don't feel the need to change it in the future. For 
 example, 'gmail' might not be a good account name if you expect to have multiple 
 Gmail accounts. In this case you might want to include your username in the 
-account name.
+account name. You can always make the shorter 'gmail' as an account alias to you 
+can still access the account quickly.
 
 
 Installation
 ------------
-
-Install with::
-
-    pip3 install --user avendesora
 
 .. image:: https://img.shields.io/travis/KenKundert/avendesora/master.svg
     :target: https://travis-ci.org/KenKundert/avendesora
@@ -79,6 +76,10 @@ Install with::
 
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
+
+Install with::
+
+    pip3 install --user avendesora
 
 You will also need to install some operating system commands. On Fedora use::
 
@@ -138,8 +139,10 @@ the line::
 
    use-agent
 
-That way, you generally only need give your GPG key pass phrase once per login 
-session.
+That way, you generally need to give your GPG key pass phrase less often. The 
+agent remembers the passphrase for you for a time. So if you use the agent, be 
+sure to also use screen locking so your passwords are secure when you walk away 
+from your computer.
 
 The ultimate in convenience is to use Gnome Keyring to act as the GPG agent 
 because it allows you to unlock the agent simply by logging in.  To do so, make 
@@ -197,7 +200,7 @@ Configuration
 -------------
 
 The config file (~/.config/avendesora/config) allows you to personalize 
-Avendesora to your needs. After initializing you account you should take the 
+Avendesora to your needs. After initializing your account you should take the 
 time to review the config file and adjust it to fit your needs. You should be 
 very thoughtful in this initial configuration, because some decisions (or 
 nondecision) you make can be very difficult to change later.  The reason for 
@@ -234,7 +237,7 @@ a particular account is contained in the attributes of a class that is created
 for that account. For example::
 
     class BigBank(Account):
-        aliases = ['bb']
+        aliases = 'bb'
         username = 'gman33'
         email = 'gman33@pizza.com'
         url = 'https://bigbank.com/login'
@@ -256,7 +259,7 @@ for that account. For example::
 Each attribute represents a piece of information that can be requested. For 
 example, a summary of all information can be requested with::
 
-    > avendesora all bb
+    > avendesora values bb
     names: bigbank, bb
     accounts:
         checking: <reveal with 'avendesora show bigbank accounts.checking'>
@@ -281,30 +284,42 @@ Scrypt() provides full encryption. And classes like Password(), Passphrase(),
 PIN() and Question() generate secrets.  Attributes that are considered sensitive 
 are not shown in the above summary, but can be requested individually::
 
-    > avendesora show bb pin
+    > avendesora value bb pin
     pin: 7784
 
 Attributes can be simple scalars, such as *pin*. They can be array members, such 
 as *questions*::
 
-    > avendesora show bigbank questions.1
+    > avendesora value bigbank questions.1
     questions.1 (What street did you grow up on?): lockout insulator crumb
 
 Or they can be dictionary members::
 
-    > avendesora show bb accounts.checking
+    > avendesora value bb accounts.checking
     accounts.checking: 12345678
 
 The passcode attribute is the default scalar attribute::
 
-    > avendesora show bb
+    > avendesora value bb
     passcode: Nj3gpqHNfiie
 
 The questions attribute is the default array attribute, which is used if the 
 requested field is a number::
 
-    > avendesora show bb 0
+    > avendesora value bb 0
     questions.0 (What city were you born in?): muffin favorite boyfriend
+
+You can also use simple scripts as the requested value::
+
+    > avendesora value 'username: {username}, password: {passcode}'
+    username: gman33, password: Nj3gpqHNfiie
+
+Finally, you can use a script for the value of the *default* attribute on the 
+account, then the script is used to generate the output when no attribute is 
+requested:
+
+    > avendesora value
+    username: gman33, password: Nj3gpqHNfiie
 
 
 Adding And Editing Accounts

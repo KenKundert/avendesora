@@ -39,13 +39,10 @@ def test_alertscc():
     try:
         pw = PasswordGenerator()
         account = pw.get_account('alertscc')
-        password = account.get_value()
-        password2 = account.get_value()
+        password = account.get_value('password')
     except Error as err:
         password = str(err)
-        password2 = str(err)
     assert password == 'R7ibHyPjWtG2'
-    assert password2 == 'R7ibHyPjWtG2'
 
 def test_alertscc_question1():
     try:

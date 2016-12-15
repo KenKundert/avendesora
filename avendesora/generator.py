@@ -30,8 +30,10 @@ from .preferences import (
     ACCOUNT_LIST_FILE_CONTENTS,
 )
 from .title import Title
-from .utilities import generate_random_string, validate_componenets, to_python
-from inform import debug, Error, notify, log, terminate, terminate_if_errors
+from .utilities import generate_random_string, validate_componenets
+from inform import (
+    debug, Error, notify, log, render, terminate, terminate_if_errors
+)
 from shlib import to_path
 from pathlib import Path
 
@@ -92,11 +94,11 @@ class PasswordGenerator(object):
         fields = {}
         for key in CONFIG_DEFAULTS:
             value = get_setting(key, expand=False)
-            value = to_python(str(value) if isinstance(value, Path) else value)
+            value = render(str(value) if isinstance(value, Path) else value)
             fields.update({key: value})
         for key in NONCONFIG_SETTINGS:
             value = get_setting(key, expand=False)
-            value = to_python(str(value) if isinstance(value, Path) else value)
+            value = render(str(value) if isinstance(value, Path) else value)
             fields.update({key: value})
         gpg_ids = gpg_ids if gpg_ids else get_setting('gpg_ids', [])
         fields.update({
