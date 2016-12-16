@@ -3,6 +3,25 @@ Avendesora Collaborative Password Utility
 
 *Avendesora, the leaf of the Tree of Life is the key.*
 
+.. image:: https://img.shields.io/travis/KenKundert/avendesora/master.svg
+    :target: https://travis-ci.org/KenKundert/avendesora
+
+.. image:: https://img.shields.io/coveralls/KenKundert/avendesora.svg
+    :target: https://coveralls.io/r/KenKundert/avendesora
+
+.. image:: https://img.shields.io/pypi/v/avendesora.svg
+    :target: https://pypi.python.org/pypi/avendesora
+
+.. image:: https://img.shields.io/pypi/pyversions/avendesora.svg
+    :target: https://pypi.python.org/pypi/avendesora/
+
+.. image:: https://img.shields.io/pypi/dd/avendesora.svg
+    :target: https://pypi.python.org/pypi/avendesora/
+
+| Version: 0.15.6
+| Released: 2016-12-16
+|
+
 Avendesora is currently in beta. However it is reasonably stable and so you 
 should feel comfortable using it.
 
@@ -61,21 +80,6 @@ can still access the account quickly.
 
 Installation
 ------------
-
-.. image:: https://img.shields.io/travis/KenKundert/avendesora/master.svg
-    :target: https://travis-ci.org/KenKundert/avendesora
-
-.. image:: https://img.shields.io/coveralls/KenKundert/avendesora.svg
-    :target: https://coveralls.io/r/KenKundert/avendesora
-
-.. image:: https://img.shields.io/pypi/v/avendesora.svg
-    :target: https://pypi.python.org/pypi/avendesora
-
-.. image:: https://img.shields.io/pypi/pyversions/avendesora.svg
-    :target: https://pypi.python.org/pypi/avendesora/
-
-.. image:: https://img.shields.io/pypi/dd/avendesora.svg
-    :target: https://pypi.python.org/pypi/avendesora/
 
 Install with::
 

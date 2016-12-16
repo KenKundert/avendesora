@@ -982,6 +982,6 @@ class Version(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # output the version
-        from .__init__ import __version__
-        output('Avendesora version: %s' % __version__)
+        from .__init__ import __version__, __released__
+        output('Avendesora version: %s (%s).' % (__version__, __released__))
 
