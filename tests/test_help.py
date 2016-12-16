@@ -104,12 +104,12 @@ def test_browse():
                                     Open account in specified browser.
 
         The default browser is x. The available browsers are:
+            c  google-chrome
             f  firefox
-            g  google-chrome
             t  torbrowser
             x  xdg-open
 
-        The account is examined for URLS, a URL is chosen, and then that ULR
+        The account is examined for URLS, a URL is chosen, and then that URL
         is opened in the chosen browser.  First URLS are gathered from the
         'urls' account attribute, which can be a string containing one or
         more URLS, a list, or a dictionary.  If 'urls' is a dictionary, the
@@ -527,9 +527,9 @@ def test_accounts():
         'questions' is the default array field, so you could have shortened
         your request by using '0' rather than 'questions.0'.  You might be
         thinking, hey, that is not my mother's maiden name. That is because
-        Question is a 'generated secret'. It produces a seemingly arbitrary
-        answer that is almost impossible to predict. Thus, even family
-        members cannot know the answers to your security questions.
+        Question is a 'generated secret'.  It produces a completely arbitrary
+        answer that is impossible to predict. Thus, even family members
+        cannot know the answers to your security questions.
 
         A dictionary is often used to hold account numbers:
 
@@ -560,7 +560,7 @@ def test_accounts():
         value using 'avendesora conceal'.
 
         Any value that is an instance of the Secret class (Password,
-        Passphrase, ...) or the Obscured class (Hidden, GPG, ...) are
+        Passphrase, ...) or the Obscure class (Hidden, GPG, ...) are
         considered sensitive. They are given out only in a controlled
         manner. For example, running 'avendesora values' displays all
         fields, but the values that are sensitive are replaced by
@@ -578,9 +578,19 @@ def test_accounts():
         'master', 'browser', and 'default_url'. For more information on
         discovery, run 'avendesora help discovery'.  'default' is the name
         of the default field, which is the field you get if you do not
-        request a particular field. Its value defaults to 'passcode'.
-        'browser' is the default browser to use when opening the account,
-        run 'avendesora help browse' to see a list of available browsers.
+        request a particular field. Its value defaults to 'passcode' but it
+        can be set to any account attribute name or it can be a script (see
+        'avendesora help scripts').  'browser' is the default browser to use
+        when opening the account, run 'avendesora help browse' to see a list
+        of available browsers. An example of when you would specify the
+        browser in an account would be an account associated with Tor hidden
+        service, which can only be accessed using torbrowser:
+
+            class SilkRoad(Account):
+                passcode = Passphrase()
+                username = 'viscount-placebo'
+                url = 'http://silkroad6ownowfk.onion'
+                browser = 't'
 
         The value of passcode is considered sensitive because it is an
         instance of PasswordRecipe, which is a subclass of Secret.
@@ -591,6 +601,12 @@ def test_accounts():
 
         This value will be displayed for a minute and then hidden. If you
         would like to hide it early, simply type Ctrl-C.
+
+        Use of Avendesora classes (Secret or Obscure) is confined to the top
+        two levels of account attributes, meaning that they can be the value
+        of the top-level attributes, or the top-level attributes may be
+        arrays or dictionaries that contain objects of these classes, but it
+        can go no further.
 
         For information on how to generate secrets, run 'avendesora help
         secrets'.  For information on how to conceal or encrypt values, run
@@ -625,7 +641,8 @@ def test_discovery():
         The title is a glob string, meaning that '*' matches any combination
         of characters. The script describes what Avendesora should output
         when their is a match. In this case it outputs the username field,
-        then a tab, then the passcode field, then a return.
+        then a tab, then the passcode field, then a return (see 'avendesora
+        help scripts').
 
         Matching window titles can be fragile, especially for websites
         because the titles can vary quite a bit across the site and over

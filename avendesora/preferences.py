@@ -32,6 +32,7 @@ NONCONFIG_SETTINGS = {
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
     'secrets_hash': '45fabadad98e2ce50c076a371fd90588',
+    'discard_logfile': False,
 }
 
 
@@ -50,7 +51,7 @@ CONFIG_DEFAULTS = {
     'color_scheme': 'dark',
     'browsers': {
         'f': 'firefox -new-tab {url}',
-        'g': 'google-chrome {url}',
+        'c': 'google-chrome {url}',
         't': 'torbrowser {url}',
         'x': 'xdg-open {url}', # system default browser
     },
@@ -87,6 +88,7 @@ CONFIG_DEFAULTS = {
                 username = '_USERNAME_'
                 email = '_EMAIL_'
                 passcode = PasswordRecipe('12 2u 2d 2s')
+                default = 'username: {email}, password: {passcode}'
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
@@ -115,6 +117,7 @@ CONFIG_DEFAULTS = {
                 passcode = PasswordRecipe('12 2u 2d 2s')
                 verbal = Passphrase(length=2)
                 pin = PIN()
+                default = 'username: {username}, password: {passcode}'
                 questions = [
                     Question("_QUESTION1_?"),
                     Question("_QUESTION2_?"),

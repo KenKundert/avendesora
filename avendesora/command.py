@@ -327,7 +327,7 @@ class Browse(Command):
             The default browser is {default}. The available browsers are:
             {browsers}
 
-            The account is examined for URLS, a URL is chosen, and then that ULR
+            The account is examined for URLS, a URL is chosen, and then that URL
             is opened in the chosen browser.  First URLS are gathered from the
             'urls' account attribute, which can be a string containing one or
             more URLS, a list, or a dictionary.  If 'urls' is a dictionary, the
@@ -633,6 +633,9 @@ class Help(Command):
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # in this case we don't need to bother with a possibly encrypted logfile
+        override_setting('discard_logfile', True)
 
         from .help import HelpMessage
         HelpMessage.show(cmdline['<topic>'])

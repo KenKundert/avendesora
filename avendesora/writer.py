@@ -88,7 +88,7 @@ def get_writer(display=True, clipboard=False, stdout=False):
 class Writer(object):
 
     @staticmethod
-    def expand_script(account, field):
+    def render_script(account, field):
 
         # if field was not given
         if not field:
@@ -148,7 +148,7 @@ class TTY_Writer(Writer):
     def display_field(self, account, field):
 
         # get string to display
-        value, is_secret, label = self.expand_script(account, field)
+        value, is_secret, label = self.render_script(account, field)
 
         # indent multiline outputs
         sep = ' '
@@ -186,7 +186,7 @@ class ClipboardWriter(Writer):
     def display_field(self, account, field):
 
         # get string to display
-        value, is_secret, label = self.expand_script(account, field)
+        value, is_secret, label = self.render_script(account, field)
 
         # Use 'xsel' to put the information on the clipboard.
         # This represents a vulnerability, if someone were to replace xsel they
@@ -240,7 +240,7 @@ class StdoutWriter(Writer):
 
     def display_field(self, account, field):
         # get string to display
-        value, is_secret, label = self.expand_script(account, field)
+        value, is_secret, label = self.render_script(account, field)
 
         try:
             output(value)

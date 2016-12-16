@@ -168,6 +168,12 @@ class BufferedFile(GnuPG):
         pass
 
     def close(self):
+
+        if get_setting('discard_logfile'):
+            # this is the case when the output would be uninteresting (such as
+            # with help messages) and running GPG (and thus risk requiring the
+            # user to type in the passphrase) is silly.
+            return
         contents = self.stream.getvalue()
         try:
             self.save(contents, get_setting('gpg_ids'))
@@ -202,7 +208,7 @@ class PythonFile(GnuPG):
                     culprit=culprit, sep='\n'
                 )
                 # File "/home/ken/.config/avendesora/config", line 18
-                #   'g': 'google-chrome %s'
+                #   'c': 'google-chrome %s'
                 #      ^
 
         contents = {}

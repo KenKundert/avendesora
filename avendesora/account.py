@@ -413,10 +413,10 @@ class Account(object):
 
     # open_browser() {{{2
     @classmethod
-    def open_browser(cls, name, key=None):
-        browser = cls.get_field('browser', default=None)
-        if browser is None or is_str(browser):
-            browser = StandardBrowser(name)
+    def open_browser(cls, browser_name, key=None):
+        if not browser_name:
+            browser_name = cls.get_field('browser', default=None)
+        browser = StandardBrowser(browser_name)
 
         # get the urls from the urls attribute
         if not key:
