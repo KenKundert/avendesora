@@ -103,12 +103,6 @@ def test_browse():
             -b <browser>, --browser <browser>
                                     Open account in specified browser.
 
-        The default browser is x. The available browsers are:
-            c  google-chrome
-            f  firefox
-            t  torbrowser
-            x  xdg-open
-
         The account is examined for URLS, a URL is chosen, and then that URL
         is opened in the chosen browser.  First URLS are gathered from the
         'urls' account attribute, which can be a string containing one or
@@ -120,6 +114,24 @@ def test_browse():
         URLs are also taken from RecognizeURL objects in the 'discovery'
         account attribute.  If the 'name' argument is specified, the
         corresponding URL can be chosen using a key.
+
+        The default browser is x. You can override the default
+        browser on a per-account basis by adding an attribute named
+        'browser' to the account.  An example of when you would specify the
+        browser in an account would be an account associated with Tor hidden
+        service, which generally can only be accessed using torbrowser:
+
+            class SilkRoad(Account):
+                passcode = Passphrase()
+                username = 'viscount-placebo'
+                url = 'http://silkroad6ownowfk.onion'
+                browser = 't'
+
+        The available browsers are:
+            c  google-chrome
+            f  firefox
+            t  torbrowser
+            x  xdg-open
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -386,13 +398,20 @@ def test_value():
         field is a dictionary, you would specify accounts.checking or
         accounts[checking] to get information on your checking account. If the
         value is an array, you would give the index of the desired value. For
-        example, questions.0 or questions[0]. If no value is requested, the
-        passcode value is returned (this can be changed by specifying
-        'default_field' in the account or in the config file).  If you only
-        specify a number, then the name is assumed to be 'questions', as in the
-        list of security questions (this can be changed by specifying the
-        desired name as the 'default_vector_field' in the account or the config
-        file).
+        example, questions.0 or questions[0]. If you only specify a number, then
+        the name is assumed to be 'questions', as in the list of security
+        questions (this can be changed by specifying the desired name as the
+        'default_vector_field' in the account or the config file).
+
+        If no value is requested the result produced is determined by the value
+        of the 'default' attribute. If no value is given for 'default', then the
+        'passcode' attribute is produced (this can be changed by specifying
+        'default_field' in the config file).  If 'default' is a script (see
+        'avendesora help scripts') then the script is executed. A typical script
+        might be 'username: {username}, password: {passcode}'. It is best if the
+        script produces a one line output if it contains secrets. If not a
+        script, the value of 'default' should be the name of another attribute,
+        and the value of that attribute is shown.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -582,15 +601,7 @@ def test_accounts():
         can be set to any account attribute name or it can be a script (see
         'avendesora help scripts').  'browser' is the default browser to use
         when opening the account, run 'avendesora help browse' to see a list
-        of available browsers. An example of when you would specify the
-        browser in an account would be an account associated with Tor hidden
-        service, which can only be accessed using torbrowser:
-
-            class SilkRoad(Account):
-                passcode = Passphrase()
-                username = 'viscount-placebo'
-                url = 'http://silkroad6ownowfk.onion'
-                browser = 't'
+        of available browsers.
 
         The value of passcode is considered sensitive because it is an
         instance of PasswordRecipe, which is a subclass of Secret.

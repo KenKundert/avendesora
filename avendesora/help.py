@@ -240,15 +240,7 @@ class Accounts(HelpMessage):
             can be set to any account attribute name or it can be a script (see
             'avendesora help scripts').  'browser' is the default browser to use
             when opening the account, run 'avendesora help browse' to see a list
-            of available browsers. An example of when you would specify the
-            browser in an account would be an account associated with Tor hidden
-            service, which can only be accessed using torbrowser:
-
-                class SilkRoad(Account):
-                    passcode = Passphrase()
-                    username = 'viscount-placebo'
-                    url = 'http://silkroad6ownowfk.onion'
-                    browser = 't'
+            of available browsers.
 
             The value of passcode is considered sensitive because it is an
             instance of PasswordRecipe, which is a subclass of Secret.
