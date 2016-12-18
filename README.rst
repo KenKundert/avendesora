@@ -18,12 +18,15 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 0.15.6
-| Released: 2016-12-16
+| Version: 0.15.7
+| Released: 2016-12-18
 |
 
 Avendesora is currently in beta. However it is reasonably stable and so you 
 should feel comfortable using it.
+
+Avendesora replaces the Abraxas, which are both alternatives to the traditional 
+password vault.
 
 Please report all bugs and suggestions to avendesora@nurdletech.com
 
@@ -47,22 +50,19 @@ when cracking passwords.  Second, if the root secret is shared with another
 trusted party, then you both can generate new shared secrets without passing any 
 further secrets.
 
-Avendesora replaces the Abraxas, which are both alternatives to the traditional 
-password vault.  While Avendesora can securely store passwords like a password 
-vault, the intent is to regenerate passwords or other secrets when needed rather 
-than to store them.  Secrets are generated from a collection of seeds, one of 
-which must be random with a very high degree of entropy. The random seed is 
-referred to as the 'master password'.  It is extremely important that the master 
-password remain completely secure.  Never disclose a master password to anyone 
-except for a person you wish to collaborate with, and then only used the shared 
-master password for shared secrets.  All of your private secrets should be 
-generated from private master passwords. The seeds generally include the master 
-password, the account name, the secret name, and perhaps a version name.  For 
-example, imagine having a Gmail account, then the account name might simply be 
-'gmail', and the secret name might be 'passcode'. In this case, your master 
-password is combined with the words 'gmail' and 'passcode', the combination is 
-hashed, and then password is generated with an appropriate recipe that you 
-specify.  There are recipes for passwords, pass phrases, PINs, etc.  The 
+Secrets are generated from a collection of seeds, one of which must be random 
+with a very high degree of entropy. The random seed is referred to as the 
+'master password'.  It is extremely important that the master password remain 
+completely secure.  Never disclose a master password to anyone except for 
+a person you wish to collaborate with, and then only used the shared master 
+password for shared secrets.  All of your private secrets should be generated 
+from private master passwords. The seeds generally include the master password, 
+the account name, the secret name, and perhaps a version name.  For example, 
+imagine having a Gmail account, then the account name might simply be 'gmail', 
+and the secret name might be 'passcode'. In this case, your master password is 
+combined with the words 'gmail' and 'passcode', the combination is hashed, and 
+then password is generated with an appropriate recipe that you specify.  There 
+are recipes for passwords, pass phrases, PINs, security questions, etc.  The 
 password itself is not stored, rather it is the seeds that are stored and the 
 password is regenerated when needed. Notice that all the seeds except the master 
 password need not be kept secure. Thus, once you have shared a master password 
@@ -238,7 +238,9 @@ Avendesora holds information about your accounts in accounts files. The list of
 current accounts files is contained in ~/.config/avendesora/.accounts_files.  
 Each is a possibly encrypted Python file. All information known about 
 a particular account is contained in the attributes of a class that is created 
-for that account. For example::
+for that account. For example:
+
+.. code-block:: python
 
     class BigBank(Account):
         aliases = 'bb'
@@ -412,6 +414,61 @@ of configuring discovery. The method for associating Advendesora to a particular
 hot key is dependent on your window manager. With Gnome, it requires that you 
 open your Keyboard Shortcuts preferences and create a new shortcut. When you do 
 this, choose 'avendesora value' as the command to run.
+
+
+Python API
+----------
+
+You can access account information from Avendesora using Python using a simple 
+relatively high-level interface as shown in this example:
+
+.. code-block:: python
+
+    from avendesora import PasswordGenerator, PasswordError
+
+    try:
+        pw = PasswordGenerator()
+        account = pw.get_account('mybank')
+        passcode = account.get_value()
+        username = account.get_value('username')
+    except PasswordError as err:
+        passphrase = str(err)
+
+    print(username.render())
+    print(passcode.render())
+
+PasswordGenerator:
+
+    Initializes the password generator.
+
+get_account:
+
+    Accesses a particular account. Takes a string for the account name or alias.  
+    Optionally takes a second string that is used as an additional seed.
+
+get_value:
+
+    Returns the value of a particular account attribute given a user-oriented 
+    string that describes the desired attribute.  The value requested must be 
+    a scalar value, meaning that you must individually request members of arrays 
+    or dictionary attibutes. Here are some examples that demonstrate the various 
+    ways of accessing the various kinds of attributes::
+
+        passcode = account.get_value()
+        username = account.get_value('username')
+        both = account.get_value('username: {username}, password: {passcode}')
+        checking = account.get_value('accounts.checking')
+        savings = account.get_value('accounts[checking]')
+        answer0 = account.get_value(0)
+        answer1 = account.get_field('questions.1')
+        answer2 = account.get_value('questions[2]')
+
+    The value is returned as an object that contains three attributes, value 
+    (the actual value), is_secret (whether the value is secret or contains 
+    a secret) and label (a descriptive name for the value if the value of 
+    a simple field is requested). Converting the object to a string returns the 
+    value rendered as a string. There is also a render method that returns 
+    a string that combines the label with the value.
 
 
 Getting Help

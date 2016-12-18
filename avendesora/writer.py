@@ -130,8 +130,8 @@ class Writer(object):
                 else:
                     name, key = account.split_name(cmd)
                     try:
-                        value = dedent(str(account.get_field(name, key))).strip()
-                        out.append(value)
+                        value = account.get_field(name, key)
+                        out.append(dedent(str(value)).strip())
                         if account.is_secret(name, key):
                             is_secret = True
                     except Error as err:
@@ -148,7 +148,7 @@ class TTY_Writer(Writer):
     def display_field(self, account, field):
 
         # get string to display
-        value, is_secret, label = self.render_script(account, field)
+        value, is_secret, label = tuple(account.get_value(field))
 
         # indent multiline outputs
         sep = ' '
@@ -186,7 +186,7 @@ class ClipboardWriter(Writer):
     def display_field(self, account, field):
 
         # get string to display
-        value, is_secret, label = self.render_script(account, field)
+        value, is_secret, label = tuple(account.get_value(field))
 
         # Use 'xsel' to put the information on the clipboard.
         # This represents a vulnerability, if someone were to replace xsel they
@@ -240,10 +240,10 @@ class StdoutWriter(Writer):
 
     def display_field(self, account, field):
         # get string to display
-        value, is_secret, label = self.render_script(account, field)
+        value = account.get_value(field)
 
         try:
-            output(value)
+            output(str(value))
         except Error as err:
             err.terminate()
 

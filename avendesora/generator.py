@@ -56,7 +56,7 @@ class PasswordGenerator(object):
             terminate()
 
         # read the accounts files
-        self.all_accounts = set()
+        self.accounts = set()
         for filename in get_setting('accounts_files', []):
             try:
                 path = to_path(get_setting('settings_dir'), filename)
@@ -67,11 +67,11 @@ class PasswordGenerator(object):
                 # traverse through all accounts, determine which are new, bind
                 # required information to new accounts, and update account list.
                 for account in Account.all_accounts():
-                    if account not in self.all_accounts:
+                    if account not in self.accounts:
                         account.add_fileinfo(master_password, account_file)
 
                         # save a copy of account so it is not garbage collected
-                        self.all_accounts.add(account)
+                        self.accounts.add(account)
             except Error as err:
                 err.terminate()
         terminate_if_errors()
@@ -155,27 +155,11 @@ class PasswordGenerator(object):
     def get_account(self, name, request_seed=False):
         if not name:
             raise Error('no account specified.')
-        for account in self.all_accounts:
+        for account in self.all_accounts():
             if account.matches_exactly(name):
                 account.initialize(request_seed)
                 return account
         raise Error('not found.', culprit=name)
-
-    # find_acounts() {{{2
-    def find_accounts(self, target):
-        found = []
-        for account in self.all_accounts:
-            if account.id_contains(target):
-                found.append(account)
-        return found
-
-    # search_acounts() {{{2
-    def search_accounts(self, target):
-        found = []
-        for account in self.all_accounts:
-            if account.account_contains(target):
-                found.append(account)
-        return found
 
     # discover_account() {{{2
     def discover_account(self, title=None, verbose=False):
@@ -188,7 +172,7 @@ class PasswordGenerator(object):
 
         # sweep through accounts to see if any recognize this title data
         matches = {}
-        for account in self.all_accounts:
+        for account in self.all_accounts():
             name = account.get_name()
             if verbose:
                 log('Trying:', name)
@@ -209,4 +193,21 @@ class PasswordGenerator(object):
         else:
             return matches.popitem()[1]
 
+
+    # all_accounts() {{{2
+    def all_accounts(self):
+        for account in self.accounts:
+            yield account
+
+    # find_acounts() {{{2
+    def find_accounts(self, target):
+        for account in self.all_accounts():
+            if account.id_contains(target):
+                yield account
+
+    # search_acounts() {{{2
+    def search_accounts(self, target):
+        for account in self.all_accounts():
+            if account.account_contains(target):
+                yield account
 

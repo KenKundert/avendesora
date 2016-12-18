@@ -17,7 +17,7 @@ from .recognize import (
     RecognizeHost, RecognizeUser, RecognizeEnvVar
 )
 from .generator import PasswordGenerator
-from inform import Error
+from inform import Error as PasswordError
 
-__version__ = '0.15.6'
-__released__ = '2016-12-16'
+__version__ = '0.15.7'
+__released__ = '2016-12-18'

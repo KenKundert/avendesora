@@ -46,6 +46,32 @@ LabelColor = Color(
     enable=Color.isTTY()
 )
 
+# AccountValue class {{{1
+class AccountValue:
+    """An Account Value
+
+    Contains three attributes:
+        value: the actual value
+        is_secret: whether the value is secret or contains a secret
+        label: a descriptive name for the value if the value of a  simple field is requested
+    """
+    def __init__(self, value, is_secret, label=None):
+        self.value = value
+        self.is_secret = is_secret
+        self.label = label
+
+    def __str__(self):
+        return str(self.value)
+
+    def render(self, sep=': '):
+        if self.label is not None:
+            return self.label + sep + str(self.value)
+        return str(self.value)
+
+    def __iter__(self):
+        for each in [self.value, self.is_secret, self.label]:
+            yield each
+
 # Account class {{{1
 class Account(object):
     __NO_MASTER = True
@@ -326,20 +352,75 @@ class Account(object):
 
     # get_value() {{{2
     @classmethod
-    def get_value(cls, name=None):
+    def get_value(cls, field=None):
         """Get Account Value
 
-        Return value from the account given a user friendly identifier. User
-        friendly identifiers include:
+        Return value from the account given a user friendly identifier or
+        script. User friendly identifiers include:
+            None: value of default attribute
             name: scalar value
             name.key or name[key]:
-                member of a dict or array
-                dict if key is string, array if key is number
+                member of a dictionary or array
+                key is string for dictionary, integer for array
+        Scripts are simply strings with embedded attributes. Ex:
+            'username: {username}, password: {passcode}'
+        Returns a tuple: value, is_secret, label
         """
-        value = cls.get_field(*cls.split_name(name))
-        if isinstance(value, Secret) or isinstance(value, Obscure):
-            value = str(value)
-        return value
+
+        # get default if field was not given
+        if not field:
+            name, key = cls.split_name(field)
+            field = '.'.join(cull([name, key]))
+
+        not_script = not (is_str(field) and '{' in field)
+
+        # treat field as name rather than script if it there are no attributes
+        if not_script:
+            name, key = cls.split_name(field)
+            try:
+                value = cls.get_field(name, key)
+            except Error as err:
+                err.terminate()
+            is_secret = cls.is_secret(name, key)
+            label = cls.combine_name(name, key)
+            try:
+                alt_name = value.get_key()
+                if alt_name:
+                    label += ' (%s)' % alt_name
+            except AttributeError:
+                pass
+            if isinstance(value, Secret) or isinstance(value, Obscure):
+                value = str(value)
+            value =  dedent(value).strip() if is_str(value) else value
+            return AccountValue(value, is_secret, label)
+
+        # run the script
+        script = field
+        regex = re.compile(r'({[\w. ]+})')
+        out = []
+        is_secret = False
+        for term in regex.split(script):
+            if term and term[0] == '{' and term[-1] == '}':
+                # we have found a command
+                cmd = term[1:-1].lower()
+                if cmd == 'tab':
+                    out.append('\t')
+                elif cmd == 'return':
+                    out.append('\n')
+                elif cmd.startswith('sleep '):
+                    pass
+                else:
+                    name, key = cls.split_name(cmd)
+                    try:
+                        value = cls.get_field(name, key)
+                        out.append(dedent(str(value)).strip())
+                        if cls.is_secret(name, key):
+                            is_secret = True
+                    except Error as err:
+                        err.terminate()
+            else:
+                out.append(term)
+        return AccountValue(''.join(out), is_secret)
 
     # write_summary() {{{2
     @classmethod
