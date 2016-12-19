@@ -10,13 +10,15 @@ addons:
     packages:
       - gnupg
 install:
-  - pip install scrypt
+  - pip install scrypt coveralls
   - pip install .
   - chmod -R go-rwx tests/home/gnupg
-script: 
+script:
   - cd tests; py.test
 deploy:
     provider: pypi
     user: avendesora
     on:
         tags: true
+after_success:
+  - coveralls
