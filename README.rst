@@ -18,8 +18,8 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 0.15.7
-| Released: 2016-12-18
+| Version: 0.15.8
+| Released: 2016-12-19
 |
 
 Avendesora is currently in beta. However it is reasonably stable and so you 
@@ -324,7 +324,7 @@ You can also use simple scripts as the requested value::
 
 Finally, you can use a script for the value of the *default* attribute on the 
 account, then the script is used to generate the output when no attribute is 
-requested:
+requested::
 
     > avendesora value
     username: gman33, password: Nj3gpqHNfiie
@@ -427,17 +427,26 @@ relatively high-level interface as shown in this example:
 .. code-block:: python
 
     from avendesora import PasswordGenerator, PasswordError
+    from inform import display, fatal, os_error
+    from shlib import Run
+    from pathlib import Path
 
     try:
         pw = PasswordGenerator()
         account = pw.get_account('mybank')
-        passcode = account.get_value()
+        name = account.get_value('NAME')
         username = account.get_value('username')
+        passcode = account.get_value('passcode')
+        url = account.get_value('ofxurl')
     except PasswordError as err:
-        passphrase = str(err)
+        fatal(err)
 
-    print(username.render())
-    print(passcode.render())
+    try:
+        curl = Run(f'curl --user {username!s}:{passcode!s} {url!s}', 'sOEW0')
+        Path(f'{name!s}.ofx').write_text(curl.stdout)
+    except OSError as err:
+        fatal(os_error(err))
+
 
 PasswordGenerator:
 
