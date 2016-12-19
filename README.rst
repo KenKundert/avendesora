@@ -85,6 +85,8 @@ Install with::
 
     pip3 install --user avendesora
 
+This will place avendesora in ~/.local/bin, which should be added to your path.
+
 You will also need to install some operating system commands. On Fedora use::
 
    yum install gnupg2 xdotool xsel
