@@ -14,10 +14,18 @@ cwd = os.getcwd()
 if not cwd.endswith('/tests'):
     os.chdir('tests')
 
+# Run avendesora
+# Cannot determine whether coverage analysis is needed, so simply always do it
+# Whoops, not so fast. The python coverage analysis is broken when it comes to
+# the exit status, it always returns 1. So instead, never do it.
+def run(args):
+    #return subprocess.check_output(['coverage', 'run', '-m'] + args.split())
+    return subprocess.check_output(args.split())
+
 # test_add() {{{1
 def test_add():
     try:
-        result = subprocess.check_output('avendesora help add'.split())
+        result = run('avendesora help add')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -58,7 +66,7 @@ def test_add():
 # test_archive() {{{1
 def test_archive():
     try:
-        result = subprocess.check_output('avendesora help archive'.split())
+        result = run('avendesora help archive')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -93,7 +101,7 @@ def test_archive():
 # test_browse() {{{1
 def test_browse():
     try:
-        result = subprocess.check_output('avendesora help browse'.split())
+        result = run('avendesora help browse')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -142,7 +150,7 @@ def test_browse():
 # test_changed() {{{1
 def test_changed():
     try:
-        result = subprocess.check_output('avendesora help changed'.split())
+        result = run('avendesora help changed')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -167,7 +175,7 @@ def test_changed():
 # test_conceal() {{{1
 def test_conceal():
     try:
-        result = subprocess.check_output('avendesora help conceal'.split())
+        result = run('avendesora help conceal')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -212,7 +220,7 @@ def test_conceal():
 # test_edit() {{{1
 def test_edit():
     try:
-        result = subprocess.check_output('avendesora help edit'.split())
+        result = run('avendesora help edit')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -232,7 +240,7 @@ def test_edit():
 # test_find() {{{1
 def test_find():
     try:
-        result = subprocess.check_output('avendesora help find'.split())
+        result = run('avendesora help find')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -249,7 +257,7 @@ def test_find():
 # test_help() {{{1
 def test_help():
     try:
-        result = subprocess.check_output('avendesora help help'.split())
+        result = run('avendesora help help')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -264,7 +272,7 @@ def test_help():
 # test_initialize() {{{1
 def test_initialize():
     try:
-        result = subprocess.check_output('avendesora help initialize'.split())
+        result = run('avendesora help initialize')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -291,7 +299,7 @@ def test_initialize():
 # test_new() {{{1
 def test_new():
     try:
-        result = subprocess.check_output('avendesora help new'.split())
+        result = run('avendesora help new')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -323,7 +331,7 @@ def test_new():
 # test_reveal() {{{1
 def test_reveal():
     try:
-        result = subprocess.check_output('avendesora help reveal'.split())
+        result = run('avendesora help reveal')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -350,7 +358,7 @@ def test_reveal():
 # test_search() {{{1
 def test_search():
     try:
-        result = subprocess.check_output('avendesora help search'.split())
+        result = run('avendesora help search')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -367,7 +375,7 @@ def test_search():
 # test_value() {{{1
 def test_value():
     try:
-        result = subprocess.check_output('avendesora help value'.split())
+        result = run('avendesora help value')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -422,7 +430,7 @@ def test_value():
 # test_values() {{{1
 def test_values():
     try:
-        result = subprocess.check_output('avendesora help values'.split())
+        result = run('avendesora help values')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -440,7 +448,7 @@ def test_values():
 # test_version() {{{1
 def test_version():
     try:
-        result = subprocess.check_output('avendesora help version'.split())
+        result = run('avendesora help version')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -454,7 +462,7 @@ def test_version():
 # test_abraxas() {{{1
 def test_abraxas():
     try:
-        result = subprocess.check_output('avendesora help abraxas'.split())
+        result = run('avendesora help abraxas')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -501,7 +509,7 @@ def test_abraxas():
 # test_accounts() {{{1
 def test_accounts():
     try:
-        result = subprocess.check_output('avendesora help accounts'.split())
+        result = run('avendesora help accounts')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -632,7 +640,7 @@ def test_accounts():
 # test_discovery() {{{1
 def test_discovery():
     try:
-        result = subprocess.check_output('avendesora help discovery'.split())
+        result = run('avendesora help discovery')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -761,7 +769,7 @@ def test_discovery():
 # test_entropy() {{{1
 def test_entropy():
     try:
-        result = subprocess.check_output('avendesora help entropy'.split())
+        result = run('avendesora help entropy')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -861,7 +869,7 @@ def test_entropy():
 # test_misdirection() {{{1
 def test_misdirection():
     try:
-        result = subprocess.check_output('avendesora help misdirection'.split())
+        result = run('avendesora help misdirection')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -905,7 +913,7 @@ def test_misdirection():
 # test_overview() {{{1
 def test_overview():
     try:
-        result = subprocess.check_output('avendesora help overview'.split())
+        result = run('avendesora help overview')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -983,7 +991,7 @@ def test_overview():
 # test_scripts() {{{1
 def test_scripts():
     try:
-        result = subprocess.check_output('avendesora help scripts'.split())
+        result = run('avendesora help scripts')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -1045,7 +1053,7 @@ def test_scripts():
 # test_stealth() {{{1
 def test_stealth():
     try:
-        result = subprocess.check_output('avendesora help stealth'.split())
+        result = run('avendesora help stealth')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
@@ -1090,7 +1098,7 @@ def test_stealth():
 # test_security_questions() {{{1
 def test_security_questions():
     try:
-        result = subprocess.check_output('avendesora help questions'.split())
+        result = run('avendesora help questions')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
