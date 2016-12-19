@@ -14,7 +14,7 @@ install:
   - pip install .
   - chmod -R go-rwx tests/home/gnupg
 script:
-  - cd tests; coverage run --include '../avendesora/*.py' -m py.test
+  - coverage run -m py.test
 deploy:
     provider: pypi
     user: avendesora

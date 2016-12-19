@@ -10,7 +10,7 @@ from .secrets import (
 from .obscure import Hidden, GPG
 try:
     from .obscure import Scrypt
-except ImportError:
+except ImportError:  # no cover
     pass
 from .recognize import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,

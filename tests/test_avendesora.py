@@ -6,8 +6,12 @@ import os
 
 # set various environment variables so avendesora uses local gpg key and config
 # directory rather than the users.
-
 os.environ['HOME'] = 'home'
+
+# change the current working directory to the test directory
+cwd = os.getcwd()
+if not cwd.endswith('/tests'):
+    os.chdir('tests')
 
 # test_mybank() {{{1
 def test_mybank():
