@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 set nonomatch
 
 # the rest is common to all python directories
-rm -f *.pyc *.pyo .test*.sum expected result install.out
-rm -rf build *.egg-info dist **/__pycache__ .coverage .coverage-html htmlcov
+rm -f *.pyc *.pyo */*.pyc */*.pyo .test*.sum expected result install.out
+rm -rf build *.egg-info dist __pycache__ */__pycache__ .coverage .coverage-html htmlcov
 rm -rf home/.python-eggs
