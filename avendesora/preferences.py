@@ -139,6 +139,7 @@ CONFIG_DEFAULTS = {
     'xdotool_executable': '/usr/bin/xdotool',
     'xsel_executable': '/usr/bin/xsel -p',
     'use_pager': True,
+    'arp_executable': '/sbin/arp',
 }
 
 # the following could be config settings, but they do not seem worth promoting
@@ -245,7 +246,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
     from avendesora import (
         # Basics
-        Account, StealthAccount, Hidden, GPG, Scrypt,
+ guests       Account, StealthAccount, Hidden, GPG, Scrypt, Script,
 
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
@@ -257,7 +258,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
         # Account Discovery
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
-        RecognizeHost, RecognizeUser, RecognizeEnvVar,
+        RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
     )
     try:
         # You need to install scrypt using 'pip install scrypt' to use Scrypt

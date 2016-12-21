@@ -19,8 +19,9 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
+from .config import get_setting
 from .utilities import gethostname, getusername, error_source
-from shlib import cwd, to_path
+from shlib import cwd, to_path, Run
 from inform import Error, is_collection, is_str, log, notify, warn
 from fnmatch import fnmatch
 try:
@@ -304,3 +305,39 @@ class RecognizeEnvVar(Recognizer):
             repr(each) for each in [self.name, self.value, self.script]
         ]))
 
+# RecognizeNetwork {{{1
+class RecognizeNetwork(Recognizer):
+    """RecognizeNetwork from MAC address
+
+    Matches if any of the MAC addresses reported by /sbin/arp match any of those
+    given as an argument.
+    """
+    def __init__(self, *macs, **kwargs):
+        self.macs = flatten(macs, split=True)
+        self.script = kwargs.get('script', True)
+
+    def match(self, data, account, verbose=False):
+        # should modify this so that 'ip neigh' can be used in lieu of arp,
+        # after all, arp is supposedly obsolete.
+        try:
+            arp = Run([get_setting('arp_executable')], 'sOeW')
+            lines = arp.stdout.strip().split('\n')
+            macs = [field.split()[2] for field in lines[1:]]
+
+            found = set([mac.lower() for mac in macs])
+            expected = set([mac.lower() for mac in self.macs])
+            if found & expected:
+                if verbose:
+                    log('    %s: matches.' % self.get_name())
+                return self.script
+        except OSError as err:
+            warn(os_error())
+            return
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        args = [repr(each) for each in self.macs]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))

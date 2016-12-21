@@ -2,7 +2,7 @@ from .charsets import (
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
     HEXDIGITS, PUNCTUATION, SYMBOLS, WHITESPACE, PRINTABLE, DISTINGUISHABLE
 )
-from .account import Account, StealthAccount
+from .account import Account, StealthAccount, Script
 from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
     BirthDate,
@@ -14,7 +14,7 @@ except ImportError:  # no cover
     pass
 from .recognize import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
-    RecognizeHost, RecognizeUser, RecognizeEnvVar
+    RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
 )
 from .generator import PasswordGenerator
 from inform import Error as PasswordError

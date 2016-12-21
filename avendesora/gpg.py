@@ -25,7 +25,8 @@
 from .config import get_setting, override_setting
 from shlib import to_path, mv, mkdir
 from inform import (
-    conjoin, cull, display, Error, log, narrate, os_error, warn, is_str, full_stop
+    conjoin, cull, display, Error, log, narrate, os_error, warn, is_str,
+    full_stop
 )
 import gnupg
 try:
@@ -104,7 +105,7 @@ class GnuPG(object):
                 else:
                     path.write_bytes(encrypted.data)
             except ValueError as err:
-                raise Error(str(err), culprit=path)
+                raise Error(full_stop(err), culprit=path)
         else:
             path.write_text(contents, encoding=get_setting('encoding'))
         path.chmod(0o600)
@@ -123,7 +124,7 @@ class GnuPG(object):
                         ]))
                         raise Error(msg, culprit=path, sep='\n')
             except ValueError as err:
-                raise Error(str(err), culprit=path)
+                raise Error(full_stop(err), culprit=path)
             except (IOError, OSError) as err:
                 raise Error(os_error(err))
             return decrypted.data.decode(get_setting('encoding'))
@@ -212,7 +213,11 @@ class PythonFile(GnuPG):
                 #      ^
 
         contents = {}
-        exec(compiled, contents)
+        try:
+            exec(compiled, contents)
+        except Exception as err:
+            from .utilities import error_source
+            raise Error(full_stop(err), culprit=error_source())
         ActiveFile = None
         return contents
 

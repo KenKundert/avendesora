@@ -252,11 +252,35 @@ class Accounts(HelpMessage):
             This value will be displayed for a minute and then hidden. If you
             would like to hide it early, simply type Ctrl-C.
 
-            Use of Avendesora classes (Secret or Obscure) is confined to the top
-            two levels of account attributes, meaning that they can be the value
-            of the top-level attributes, or the top-level attributes may be
-            arrays or dictionaries that contain objects of these classes, but it
-            can go no further.
+            An attribute value can incorporate other attribute values through
+            use of the Script class. For example, consider an account for your
+            wireless router that contains the following:
+
+                ssid = {
+                    'huron_guests': Passphrase(),
+                    'huron_drugs': Passphrase(),
+                }
+                guest = Script('SSID: huron_guests, password: {ssid.huron_guests}')
+                privileged = Script('SSID: huron_drugs, password: {ssid.huron_drugs}')
+
+            The ssid field is a dictionary that contains the SSID and pass
+            phrases for each of the wireless networks provided by the router.
+            This is a natural an compact representation for this information,
+            but accessing it as a user in this form would require two steps to
+            access the information, one to get the SSID and another to get the
+            passphrase. This issue is addressed by adding the guest and
+            privileged attributes. The guest and privileged attributes are a
+            script that gives the SSID and interpolate the pass phrase. Now both
+            can easily accessed at once with:
+
+                > avendesora value wifi guest
+                SSID: huron_guests, password: delimit ballcock fibber levitate
+
+            Use of Avendesora classes (Secret, Obscure, or Script) is confined
+            to the top two levels of account attributes, meaning that they can
+            be the value of the top-level attributes, or the top-level
+            attributes may be arrays or dictionaries that contain objects of
+            these classes, but it can go no further.
 
             For information on how to generate secrets, run 'avendesora help
             secrets'.  For information on how to conceal or encrypt values, run
@@ -333,6 +357,7 @@ class Discovery(HelpMessage):
                 RecognizeUser(<user>..., [script=<script>])
                 RecognizeCWD(<cwd>..., [script=<script>])
                 RecognizeEnvVar(<name>, <value>, [script=<script>])
+                RecognizeNetwork(<mac>..., [script=<script>])
 
             RecognizeAll() and RecognizeAny() can be used to combine several
             recognizers. For example:
@@ -699,40 +724,73 @@ class Scripts(HelpMessage):
     @staticmethod
     def help():
         text = dedent("""
-            You can use simple scripts for controlling the output. Scripts take
-            the form of text strings with embedded attributes. For example:
+            Scripts are strings that contain embedded account attributes.  For
+            example:
 
                 'username: {username}, password: {passcode}'
 
-            This string is printed as is except that the attributes are replaced
-            by their value from the chosen account.  For example, this script
-            might produce:
+            When processed by Advendesora the attributes are replaced by their
+            value from the chosen account.  For example, this script might
+            be rendered as:
 
                 username: jman, password: R7ibHyPjWtG2
 
-            There are several situations where scripts can be used. You can give
-            a script rather than a field when running the value command:
+            Scripts are useful if you need to combine an account value with
+            other text, if you need to combine more than one account value, or
+            if you want quick access to something that would otherwise need an
+            additional key.
 
-                > avendesora value scc 'username: {username}, password: {passcode}'
-                username: jman, password: R7ibHyPjWtG2
+            For example, consider an account for your wireless router, which
+            might hold several passwords, one for administrative access and one
+            or more for the network passwords.  Such an account might look like:
 
-            You can also create an account where default is given as a script:
+                class WiFi(Account):
+                    username = 'admin'
+                    passcode = Passphrase()
+                    networks = ["Occam's Router", "Occam's Router (guest)"]
+                    network_passwords = [Passphrase(), Passphrase()]
+                    privileged = Script('SSID: {networks.0}, password: {network_passwords.0}')
+                    guest = Script('SSID: {networks.1}, password: {network_passwords.1}')
+
+            Now the credentials for the privileged network are accessed with:
+
+                > avendesora value wifi privileged
+                SSID: Occam's Router, password: overdraw cactus devotion saying
+
+            Most account attributes that expect a string can also accept a
+            script given in this manner.
+
+            You can also give a script rather than a field on the command line
+            when running the value command:
+
+                > avendesora value scc '{username}: {passcode}'
+                jman: R7ibHyPjWtG2
+
+            It is also possible to specify a script for the value of the
+            *default* attribute. This attribute allows you to specify the
+            default field (which attribute name and key to use if one is not
+            given on the command line).  It also accepts a script rather than a
+            field, but in this case it should be a simple string and not an
+            instance of the Script class.  If you passed it as a Script, it
+            would be expanded before being interpreted as a field name, and so
+            would result in a 'not found' error.
 
                 class SCC(Acount):
                     aliases = 'scc'
                     username = 'jman'
-                    password = Password()
-                    default = 'username: {username}, password: {passcode}'
+                    password = PasswordRecipe('12 2u 2d 2s')
+                    default = 'username: {username}, password: {password}'
 
-            Then you can access the script by simply not providing a field.
+            You can access the script by simply not providing a field.
 
                 > avendesora value scc
-                username: jman, password: R7ibHyPjWtG2
+                username: jman, password: *m7Aqj=XBAs7
 
             Finally, you pass a script to the account discovery recognizers.
-            They specify the action that should be taken when particular
-            recognizer triggers. For example, this recognizer could be used to
-            recognize Gmail:
+            They specify the action that should be taken when a particular
+            recognizer triggers. These scripts would also be simple strings and
+            not instances of the Script class. For example, this recognizer
+            could be used to recognize Gmail:
 
                 discovery = [
                     RecognizeURL(

@@ -16,7 +16,6 @@
 
 # Imports {{{1
 from .config import get_setting
-from .gpg import get_active_file
 from shlib import Run, to_path
 from inform import (
     codicil, fatal, os_error, output, warn, is_str, is_collection, indent
@@ -167,5 +166,6 @@ def error_source(lvl=3):
         # because the function tries to read the file and sees binary data. This
         # is not a problem with ascii encrypted files as we don't actually show
         # code, which is gibberish, but does not require an encoding.
+        from .gpg import get_active_file
         return get_active_file()
 

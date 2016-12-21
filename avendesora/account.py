@@ -27,7 +27,8 @@ from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
 from inform import (
-    Color, conjoin, cull, Error, is_collection, is_str, log, output, warn, indent
+    Color, conjoin, cull, debug, Error, is_collection, is_str, log, output,
+    warn, indent
 )
 from textwrap import dedent
 try:
@@ -71,6 +72,24 @@ class AccountValue:
     def __iter__(self):
         for each in [self.value, self.is_secret, self.label]:
             yield each
+
+# Script class {{{1
+class Script:
+    """Script
+
+    Takes a string that contains attributes. Those attributes are expanded
+    before being output. For example, 'username: {username}, password:
+    {passcode}' (this happens to be the default if no script is given. In this
+    case, {username} and {passcode} are replaced by with the value of the
+    corresponding account attribute. In addition to the account attributes,
+    {tab} and {return} are replaced by a tab or carriage return character.
+    """
+    def __init__(self, script = 'username: {username}, password: {passcode}'):
+        self.script = script
+
+    def render(self, account):
+        return str(account.get_value(self.script))
+
 
 # Account class {{{1
 class Account(object):
@@ -233,21 +252,26 @@ class Account(object):
         "Get field Value given a field name and key"
         value = getattr(cls, name, None)
         if value is None:
+            if name == 'NAME':
+                return self.get_name()
             if default is False:
                 raise Error(
                     'not found.',
                     culprit=(cls.get_name(), cls.combine_name(name, key))
                 )
-            else:
-                return default
+            return default
 
         if key is None:
             if is_collection(value):
                 choices = []
                 for k, v in Collection(value).items():
                     try:
-                        choices.append('   %s: %s' % (k, v.get_key()))
+                        desc = v.get_key()
                     except AttributeError:
+                        desc = None
+                    if desc:
+                        choices.append('   %s: %s' % (k, desc))
+                    else:
                         choices.append('   %s:' % k)
                 raise Error(
                     'composite value found, need key. Choose from:',
@@ -268,10 +292,13 @@ class Account(object):
                 raise Error('not found.', culprit=cls.combine_name(name, key))
 
         # generate the value if needed
-        try:
-            value.generate(name, key, cls)
-        except AttributeError as err:
-            pass
+        if isinstance(value, Script):
+            value = value.render(cls)
+        else:
+            try:
+                value.generate(name, key, cls)
+            except AttributeError as err:
+                pass
         return value
 
     # is_secret() {{{2
@@ -372,10 +399,11 @@ class Account(object):
             name, key = cls.split_name(field)
             field = '.'.join(cull([name, key]))
 
-        not_script = not (is_str(field) and '{' in field)
+        # determine whether field is actually a script
+        is_script = is_str(field) and '{' in field and '}' in field
 
         # treat field as name rather than script if it there are no attributes
-        if not_script:
+        if not is_script:
             name, key = cls.split_name(field)
             try:
                 value = cls.get_field(name, key)
@@ -450,7 +478,7 @@ class Account(object):
                 if hasattr(v, 'generate'):
                     # is a secret, get description if available
                     try:
-                        v = '%s %s' % (v.get_key(), reveal(name, k))
+                        v = ' '.join(cull([v.get_key(), reveal(name, k)]))
                     except AttributeError:
                         v = reveal(name, k)
                 lines.append(fmt_field(k, v, level=1))
@@ -469,6 +497,8 @@ class Account(object):
                 lines += extract_collection(key, value)
             elif hasattr(value, 'generate'):
                 lines.append(fmt_field(key, reveal(key)))
+            elif hasattr(value, 'render'):
+                lines.append(fmt_field(key, '<%s>' % value.script))
             else:
                 lines.append(fmt_field(key, value))
         output(*lines, sep='\n')
