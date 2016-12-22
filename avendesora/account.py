@@ -265,23 +265,23 @@ class Account(object):
 
         if key is None:
             if is_collection(value):
-                choices = []
+                choices = {}
                 for k, v in Collection(value).items():
                     try:
                         desc = v.get_key()
                     except AttributeError:
                         desc = None
                     if desc:
-                        choices.append('   %s: %s' % (k, desc))
+                        choices['   %s: %s' % (k, desc)] = k
                     else:
-                        choices.append('   %s:' % k)
+                        choices['   %s:' % k] = k
                 raise Error(
                     'composite value found, need key. Choose from:',
-                    *choices,
-                    sep='\n',
-                    culprit=name,
-                    is_collection=True,
-                    collection = value
+                    *sorted(choices.keys()),
+                    sep = '\n',
+                    culprit = name,
+                    is_collection = True,
+                    collection = choices
                 )
         else:
             try:

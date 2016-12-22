@@ -481,7 +481,7 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
     from avendesora import (
         Hidden, Question, Script,
         RecognizeAll, RecognizeTitle, RecognizeURL, RecognizeCWD, RecognizeHost,
-        RecognizeUser, RecognizeEnvVar
+        RecognizeUser, RecognizeEnvVar, RecognizeNetwork
     )
 
     CREATED = '{date}'

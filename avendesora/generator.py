@@ -185,7 +185,7 @@ class PasswordGenerator(object):
             notify(msg)
             raise Error(msg)
         if len(matches) > 1:
-            choice = show_list_dialog(sorted(matches.keys()))
+            choice = show_list_dialog('Choose Account', sorted(matches.keys()))
             if choice:
                 return matches[choice]
         else:

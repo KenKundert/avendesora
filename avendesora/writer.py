@@ -23,6 +23,7 @@
 # Imports {{{1
 from . import cursor
 from .config import get_setting
+from .dialog import show_list_dialog
 from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
 from inform import Color, Error, cull, error, fatal, log, output, warn, indent
@@ -315,14 +316,31 @@ class KeyboardWriter(Writer):
                 else:
                     name, key = account.split_name(cmd)
                     try:
-                        value = dedent(str(account.get_field(name, key))).strip()
-                        out.append(value)
-                        if account.is_secret(name, key):
-                            scrubbed.append('<%s>' % cmd)
-                        else:
-                            scrubbed.append('%s' % value)
+                        value = account.get_field(name, key)
                     except Error as err:
-                        err.terminate()
+                        if err.is_collection and len(err.collection):
+                            # is composite value, ask user which one is desired
+                            choices = err.collection
+                            if len(choices) == 1:
+                                choice = choices.keys()[0]
+                            else:
+                                choice = show_list_dialog(
+                                    'Choose from %s' % name,
+                                    sorted(choices.keys())
+                                )
+                            try:
+                                key = choices[choice]
+                                value = account.get_field(name, key)
+                            except Error as err:
+                                err.terminate()
+                        else:
+                            err.terminate()
+                    value = dedent(str(value)).strip()
+                    out.append(value)
+                    if account.is_secret(name, key):
+                        scrubbed.append('<%s>' % cmd)
+                    else:
+                        scrubbed.append('%s' % value)
             else:
                 out.append(term)
 

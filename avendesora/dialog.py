@@ -10,7 +10,7 @@ try:
     from gi.repository import Gdk as gdk
 
     class ListDialog (gtk.Window):
-        def __init__(self, options):
+        def __init__(self, title, choices):
             gtk.Window.__init__(self)
             self.set_type_hint(gdk.WindowTypeHint.DIALOG)
             self.connect('key_press_event', self.on_hotkey)
@@ -21,15 +21,15 @@ try:
             self.view.connect('button_press_event', self.on_mouse)
 
             cell = gtk.CellRendererText()
-            column = gtk.TreeViewColumn("Account", cell, text=0)
+            column = gtk.TreeViewColumn(title, cell, text=0)
             self.view.append_column(column)
 
             self.choice = None
-            self.options = options
+            self.choices = choices
 
-            for account in options:
+            for choice in choices:
                 row = self.model.append()
-                self.model.set(row, 0, account)
+                self.model.set(row, 0, choice)
 
             self.add(self.view)
 
@@ -57,7 +57,7 @@ try:
             model, iter = selection.get_selected()
             path = self.model.get_path(iter)
 
-            scroll = lambda path, dx: (path[0] + dx) % len(self.options)
+            scroll = lambda path, dx: (path[0] + dx) % len(self.choices)
 
             if key in ['j', 'Down']:
                 self.view.set_cursor(scroll(path, 1))
@@ -88,8 +88,8 @@ try:
                 self.format_secondary_text(description)
 
 
-    def show_list_dialog(options):
-        dialog = ListDialog(options)
+    def show_list_dialog(title, choices):
+        dialog = ListDialog(title, choices)
         return dialog.run()
 
     def show_error_dialog(message):
@@ -97,7 +97,7 @@ try:
         return dialog.run()
 
 except ImportError:
-    def show_list_dialog(options):
+    def show_list_dialog(title, choices):
         msg = 'selection dialog not available, you must install python3-gobject.'
         notify(msg)
         fatal(msg)

@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='avendesora',
-    version='0.16.1',
+    version='0.16.2',
     author='Ken Kundert and Kale Kundert',
     author_email='avendesora@nurdletech.com',
     description='An XKCD-style password generator.',
@@ -25,7 +25,7 @@ setup(
     install_requires=[
         'appdirs',
         'docopt',
-        'inform>=1.5',
+        'inform>=1.6',
         #'pygobject',
             # pygobject seems broken in pypi. Instead, do the following:
             # git clone git://git.gnome.org/pygobject
