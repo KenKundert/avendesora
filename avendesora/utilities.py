@@ -153,7 +153,7 @@ def to_python(obj, _level=0):
 # error_source {{{1
 def error_source(lvl=3):
     """Source of error
-    Reads stack trace to determine filename and lineno of error.
+    Reads stack trace to determine filename and line number of error.
     """
     import traceback
     try:

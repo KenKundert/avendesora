@@ -28,7 +28,7 @@ from avendesora import (
     RecognizeHost, RecognizeUser, RecognizeEnvVar,
 )
 
-master_password = Hidden(
+master_seed = Hidden(
     'c2VjcmV0IG1lc3NhZ2UsIHN1Y2Nlc3NmdWxseSBkZWNvZGVkIQ==',
     secure=False
 )

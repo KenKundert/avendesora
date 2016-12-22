@@ -62,13 +62,13 @@ class PasswordGenerator(object):
                 path = to_path(get_setting('settings_dir'), filename)
                 account_file = PythonFile(path)
                 contents = account_file.run()
-                master_password = contents.get('master_password')
+                master_seed = contents.get('master_seed')
 
                 # traverse through all accounts, determine which are new, bind
                 # required information to new accounts, and update account list.
                 for account in Account.all_accounts():
                     if account not in self.accounts:
-                        account.add_fileinfo(master_password, account_file)
+                        account.add_fileinfo(master_seed, account_file)
 
                         # save a copy of account so it is not garbage collected
                         self.accounts.add(account)
@@ -103,8 +103,7 @@ class PasswordGenerator(object):
         gpg_ids = gpg_ids if gpg_ids else get_setting('gpg_ids', [])
         fields.update({
             'section': '{''{''{''1',
-            'master_password': split(Hidden.conceal(generate_random_string(72))),
-            'master_password2': split(Hidden.conceal(generate_random_string(72))),
+            'master_seed': split(Hidden.conceal(generate_random_string(72))),
             'user_key': split(Hidden.conceal(generate_random_string(72))),
             'gpg_ids': repr(' '.join(gpg_ids)),
         })
@@ -144,9 +143,8 @@ class PasswordGenerator(object):
         try:
             log('writing.', culprit=path)
             path.write_text(
-                ACCOUNT_LIST_FILE_CONTENTS.format(**fields).decode(
-                    get_setting('encoding')
-                )
+                ACCOUNT_LIST_FILE_CONTENTS.format(**fields),
+                get_setting('encoding')
             )
         except OSError as err:
             raise Error(os_error(err))

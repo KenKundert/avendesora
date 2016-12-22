@@ -108,13 +108,13 @@ class Secret(object):
             try:
                 try:
                     master = getpass.getpass(
-                        'master password for %s: ' % account_name
+                        'master seed for %s: ' % account_name
                     )
                     master_source = 'user'
                 except EOFError:
                     output()
                 if not master:
-                    warn("master password is empty.")
+                    warn("master seed is empty.")
             except (EOFError, KeyboardInterrupt):
                 terminate()
         log('Generating secret, source of master seed:', master_source)
@@ -304,6 +304,37 @@ class Password(Secret):
         prefix='',
         suffix='',
     ):
+        """Generate password
+
+        Generates an arbitrary password by selecting symbols from the given
+        alphabet at random. The entropy of the generated password is
+        length*log2(len(alphabet)).
+
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            password.
+        alphabet (str):
+            The reservoir of legal symbols to use when creating the password. By
+            default the set of easily distinguished alphanumeric characters are
+            used. Typically you would use the pre-imported character sets to
+            construct the alphabet. For example, you might pass:
+                ALPHANUMERIC + '+=_&%#@'
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
+        """
         try:
             self.length = int(length)
         except ValueError:
@@ -353,6 +384,33 @@ class Passphrase(Password):
         prefix='',
         suffix='',
     ):
+        """Generate passphrase
+
+        Similar to Password in that it generates an arbitrary pass phrase by
+        selecting symbols from the given alphabet at random, but in this case
+        the default alphabet is a dictionary containing about 10,000 words.
+
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            password.
+        alphabet (list of strs):
+            The reservoir of legal symbols to use when creating the password.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
+        """
         try:
             self.length = int(length)
         except ValueError:
@@ -387,6 +445,33 @@ class PIN(Password):
         master=None,
         version=None,
     ):
+        """Generate PIN
+
+        Similar to Password in that it generates an arbitrary PIN by
+        selecting symbols from the given alphabet at random, but in this case
+        the default alphabet is the set of digits (0-9).
+
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            password.
+        alphabet (str):
+            The reservoir of legal symbols to use when creating the password.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
+        """
         try:
             self.length = int(length)
         except ValueError:
@@ -437,6 +522,39 @@ class Question(Passphrase):
         suffix='',
         answer=None,
     ):
+        """Generate arbitrary answer to a given question
+
+        Similar to Passphrase() except a question must be specified when created
+        and it is taken to be the security question. The question is used rather
+        than the field name when generating the secret.
+
+        question (str):
+            The question to be answered. Be careful. Changing the question in
+            any way will change the resulting answer.
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            password.
+        alphabet (list of strs):
+            The reservoir of legal symbols to use when creating the password.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
+        answer:
+            The answer. If provided, this would override the generated answer.
+            May be a string, or it may be an Obscured object.
+        """
         self.question = question
         try:
             self.length = int(length)
@@ -468,7 +586,7 @@ class Question(Passphrase):
 # MixedPassword {{{1
 class MixedPassword(Secret):
     """
-    A relatively high level method that is used to generate passwords from 
+    A relatively low level method that is used to generate passwords from 
     a heterogeneous collection of alphabets. This is used to satisfy the 
     character type count requirements of many websites.  *requirements* is 
     a list of pairs. Each pair consists of an alphabet and the number of 
@@ -498,6 +616,27 @@ class MixedPassword(Secret):
         master=None,
         version=None,
     ):
+        """Mixed Password
+
+        length (int):
+            The number of items to draw from the various alphabets when creating
+            the password.
+        def_alphabet (list of strs):
+            The alphabet to use when filling up the password after all the
+            constraints are satisfied.
+        requirements (list of tuples):
+            Each tuple has two members, the first is a string or list that is
+            used as an alphabet, and the second is a number that indicates how
+            many symbols should be drawn from that alphabet.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            answer.
+        """
         try:
             self.length = int(length)
         except ValueError:
@@ -586,6 +725,23 @@ class PasswordRecipe(MixedPassword):
         master=None,
         version=None,
     ):
+        """Password Recipe
+
+        recipe (str):
+            A string that describes how the password should be constructed.
+        def_alphabet (list of strs):
+            The alphabet to use when filling up the password after all the
+            constraints are satisfied.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            answer.
+        """
+
         requirements = []
         try:
             parts = recipe.split()
@@ -618,7 +774,7 @@ class PasswordRecipe(MixedPassword):
 # BirthDate {{{1
 class BirthDate(Secret):
     """
-    This function can be used to generate a birth date using::
+    This function can be used to generate an arbitrary date using::
 
     >>> secret = BirthDate(2015, 18, 65)
     >>> secret.generate('dux', None, account)
@@ -649,6 +805,29 @@ class BirthDate(Secret):
         master=None,
         version=None,
     ):
+        """Generates an arbitrary birthdate for someone in a specified age range
+
+        year (int):
+            The year the age range was established.
+        min_age (int):
+            The lower bound of the age range.
+        max_age (int):
+            The upper bound of the age range.
+        fmt (str):
+            Specifies the way the date is formatted. Consider an example date of
+            6 July 1969. YY and YYYY are replaced by the year (69 or 1969). M,
+            MM, MMM, and MMMM are replaced by the month (7, 07, Jul, or July). D
+            and DD are replaced by the day (6 or 06).
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            answer.
+        """
+
         self.fmt = fmt
         self.last_year = year-min_age
         self.first_year = year-max_age

@@ -18,8 +18,8 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 0.16.0
-| Released: 2016-12-20
+| Version: 0.16.1
+| Released: 2016-12-21
 |
 
 Avendesora is currently in beta. However it is reasonably stable and so you 
@@ -125,6 +125,19 @@ Finally, run::
     avendesora changed
 
 to confirm that none of your generated passwords have changed.
+
+It is a good idea to run 'avendesora changed' and 'avendesora archive' on 
+a routine basis to keep your archive up to date.
+
+Upon updating you may find that Avendesora produces a message that a 'hash' has 
+changed.  This is an indication that something has changed in the program that 
+could affect the generated secrets.  Again, care is taken when developing 
+Avendesora to prevent this from happening.  But it is an indication that you 
+should take extra care.  Specifically you should follow the above procedure to 
+assure that the value of your generated secrets have not changed.  Once you have 
+confirmed that the upgrade has not affected your generated secrets, you should 
+follow the directions given in the warning and update the appropriate hash 
+contained in ~/.config/avendesora/.hashes.
 
 
 Requirements

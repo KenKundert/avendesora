@@ -37,6 +37,9 @@ def read_config():
     path = get_setting('config_file')
     assert path.suffix.lower() not in ['.gpg', '.asc']
     config_file = PythonFile(path)
+    if not config_file.exists():
+        # have not yet initialized this account
+        return
     try:
         contents = config_file.run()
         for k, v in contents.items():

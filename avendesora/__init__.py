@@ -7,7 +7,7 @@ from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
     BirthDate,
 )
-from .obscure import Hidden, GPG
+from .obscure import Hide, Hidden, GPG
 try:
     from .obscure import Scrypt
 except ImportError:  # no cover
@@ -19,5 +19,5 @@ from .recognize import (
 from .generator import PasswordGenerator
 from inform import Error as PasswordError
 
-__version__ = '0.16.0'
-__released__ = '2016-12-20'
+__version__ = '0.16.1'
+__released__ = '2016-12-21'

@@ -217,6 +217,9 @@ class Accounts(HelpMessage):
             it will only be displayed for a minute. You generate the encoded
             value using 'avendesora conceal'.
 
+            You can find the specifics of how to specify or generate your
+            secrets by running 'avendesora help secrets'.
+
             Any value that is an instance of the Secret class (Password,
             Passphrase, ...) or the Obscure class (Hidden, GPG, ...) are
             considered sensitive. They are given out only in a controlled
@@ -243,8 +246,8 @@ class Accounts(HelpMessage):
             of available browsers.
 
             The value of passcode is considered sensitive because it is an
-            instance of PasswordRecipe, which is a subclass of Secret.
-            If we wish to see the passcode, use:
+            instance of PasswordRecipe, which is a subclass of Secret.  If we
+            wish to see the passcode, use:
 
                 > avendesora value nyt
                 passcode: TZuk8:u7qY8%
@@ -281,10 +284,6 @@ class Accounts(HelpMessage):
             be the value of the top-level attributes, or the top-level
             attributes may be arrays or dictionaries that contain objects of
             these classes, but it can go no further.
-
-            For information on how to generate secrets, run 'avendesora help
-            secrets'.  For information on how to conceal or encrypt values, run
-            'avendesora help obscure'.
         """).strip()
         return text
 
@@ -588,58 +587,57 @@ class Overview(HelpMessage):
             each word is drawn from a dictionary of 10,000 words.  Thus, even if
             a bad guy knew that four lower case words were being used for your
             pass phrase, there are still 10,000,000,000,000,000 possible
-            combinations for him to try (this represents a minimum entropy of
-            53 bits).  Using six words results in 80 bits of entropy, which
-            meets the threshold recommended by NIST for the most secure pass
-            phrases. For more on this, see 'avendesora help entropy' below.
+            combinations for him to try (this represents a minimum entropy of 53
+            bits).  Using six words results in 80 bits of entropy, which meets
+            the threshold recommended by NIST for the most secure pass phrases.
+            For more on this, see 'avendesora help entropy' below.
 
             For another perspective on the attractiveness of pass phrases, see
             http://xkcd.com/936/.
 
             Unlike password vaults, Avendesora produces a highly unpredictable
-            password from a master password and the name of the account for
-            which the password is to be used. The process is completely
-            repeatable. If you give the same master password and account name,
-            you will get the same password. As such, the passwords do not have
-            to be saved; instead they are regenerated on the fly.
+            password from a master seed and the name of the account for which
+            the password is to be used. The process is completely repeatable. If
+            you give the same master seed and account name, you will get the
+            same password. As such, the passwords do not have to be saved;
+            instead they are regenerated on the fly.
 
             As a password generator, Avendesora provides three important
             advantages over conventional password vaults.  First, it allows
             groups of people to share access to accounts without having to
             securely share each password.  Instead, one member of the group
-            creates a master password that is securely shared with the group
-            once.  From then on any member of the group can create a new
-            account, share the name of the account, and all members will know
-            the password needed to access the account. The second advantage is
-            that it opens up the possibility of using high-quality passwords for
-            stealth accounts, which are accounts where you remember the name of
-            the account but do not store any information about even the
-            existence of the account on your computer.  With Avendesora, you
-            only need to remember the name of the account and it will regenerate
-            the password for you. This is perfect for your TrueCrypt hidden
-            volume password.  Finally, by securely storing a small amount of
-            information, perhaps on a piece of paper in your safe-deposit box,
-            you can often recover most if not all of your passwords even if you
-            somehow lose your accounts file. You can even recover passwords that
-            were created after you created your backup. This is because
-            Avendesora combines the master password with some easily
-            reconstructed information, such as the account name, to create the
-            password. If you save the master password, the rest should be
-            recoverable.
+            creates a master seed that is securely shared with the group once.
+            From then on any member of the group can create a new account, share
+            the name of the account, and all members will know the password
+            needed to access the account. The second advantage is that it opens
+            up the possibility of using high-quality passwords for stealth
+            accounts, which are accounts where you remember the name of the
+            account but do not store any information about even the existence of
+            the account on your computer.  With Avendesora, you only need to
+            remember the name of the account and it will regenerate the password
+            for you. This is perfect for your TrueCrypt hidden volume password.
+            Finally, by securely storing a small amount of information, perhaps
+            on a piece of paper in your safe-deposit box, you can often recover
+            most if not all of your passwords even if you somehow lose your
+            accounts file. You can even recover passwords that were created
+            after you created your backup. This is because Avendesora combines
+            the master seed with some easily reconstructed information, such as
+            the account name, to create the password. If you save the master
+            seed, the rest should be recoverable.
 
             To use it, one creates a file that contains information about each
             of his or her non-stealth accounts.  Among that information would be
             information that controls how the passwords are generated. This file
             is generally not encrypted, though you can encrypt it if you like).
-            Another file is created that contains one or more master passwords.
+            Another file is created that contains one or more master seeds.
             This file is always GPG encrypted.
 
             The intent is for these files to not include the passwords for your
             accounts.  Rather, the passwords are regenerated when needed from
-            the account information and from the master password. This makes it
+            the account information and from the master seed. This makes it
             easy to share passwords with others without having to pass the
             passwords back and forth.  It is only necessary to create a shared
-            master password in advance. Then new passwords can be created on the
+            master seed in advance. Then new passwords can be created on the
             fly by either party.
         """).strip()
         return text
@@ -813,6 +811,423 @@ class Scripts(HelpMessage):
         return text
 
 
+# Secrets class {{{1
+class Secrets(HelpMessage):
+    DESCRIPTION = "secrets"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+        Secrets can either by obscured or generated.
+
+        Obscured Secrets
+        ================
+
+        Obscured secrets are secrets that are those that are given to Avendesora
+        to securely hold. The may be things like account numbers or existing
+        passwords.  There are several ways for Avendesora to hold a secret,
+        presented in order of increasing security.
+
+        Hide
+        ----
+
+        This marks a value as being confidential, meaning that it will be
+        protected when shown to the user, but value is not encoded or encrypted
+        in any way.  Rather, it accounts on the protections afforded the
+        accounts file to protect its secret.
+
+            Hide(plaintext, secure=True)
+
+            plaintext (str):
+                The secret in plain text.
+            secure (bool):
+                Indicates that this secret should only be contained in an
+                encrypted accounts file. Default is True.
+
+        Example:
+
+            account = Hide('5206-7844')
+
+
+        Hidden
+        -------
+
+        This obscures but does not encrypt the text. It can protect the secret from 
+        observers that get a quick glance of the encoded text, but if they are able to 
+        capture it they can easily decode it.
+
+            Hidden(encodetext, secure=True, encoding=None)
+
+            plaintext (str):
+                The secret encoded in base64.
+            secure (bool):
+                Indicates that this secret should only be contained in an
+                encrypted accounts file. Default is True.
+            encoding (str):
+                The encoding to use for the deciphered text.
+
+        Example:
+
+            account = Hidden("NTIwNi03ODQ0")
+
+        To generate the encoded text, use:
+
+            > avendesora conceal
+
+
+        GPG
+        ---
+
+        The secret is fully encrypted with GPG. Both symmetric encryption and
+        key-based encryption are supported.  This can be used to protect a
+        secret held in an unencrypted account file, in which case encrypting
+        with your key is generally preferred. It can also be used to further
+        protect a extremely valuable secret, in which case symmetric encryption
+        is generally used.
+
+            GPG(ciphertext, encoding=None)
+
+            ciphertext (str):
+                The secret encrypted and armored by GPG.
+            encoding (str):
+                The encoding to use for the deciphered text.
+
+        Example:
+
+            secret = GPG('''
+                -----BEGIN PGP MESSAGE-----
+                Version: GnuPG v2.0.22 (GNU/Linux)
+
+                jA0ECQMCwG/vVambFjfX0kkBMfXYyKvAuCbT3IrEuEKD//yuEMCikciteWjrFlYD
+                ntosdZ4WcPrFrV2VzcIIcEtU7+t1Ay+bWotPX9pgBQcdnSBQwr34PuZi
+                =4on3
+                -----END PGP MESSAGE-----
+            ''')
+
+        To generate the cipher text, use:
+
+            > avendesora conceal -e gpg
+
+        The benefit of using symmetric GPG encryption on a secret that is
+        contained in an encrypted account file is that the passphrase will
+        generally not be found in the GPG agent, in which case someone could not
+        walk up to your computer while your screen is unlocked and successfully
+        request the secret.  However, the GPG agent does retain the password for
+        a while after you decrypt the secret. If you are concerned about that,
+        you should follow your use of Avendesora with the following command,
+        which clears the GPG agent:
+
+            > killall gpg-agent
+
+
+        Scrypt
+        ------
+
+        The secret is fully encrypted with Scrypt. You personal Avendesora
+        encryption key is used (contained in ~/.config/avendesora/.key.gpg). As
+        such, these secrets cannot be shared. This encryption method is only
+        available if you have installed scrypt on your system (pip3 install
+        --user scrypt). Since the Scrypt class only exists if you have installed
+        scrypt, it is not imported into your accounts file. You would need to
+        import it yourself before using it.
+
+            Script(ciphertext, encoding=None)
+
+            ciphertext (str):
+                The secret encrypted by scrypt.
+            encoding (str):
+                The encoding to use for the deciphered text.
+
+        Example:
+            from avendesora import Scrypt
+            ...
+            secret = Scrypt("""
+                "c2NyeXB0ABAAAAAIAAAAASfBZvtYnHvgdts2jrz5RfbYlFYj/EQgiM1IYTnX"
+                "KHhMkleZceDg0yUaOWa9PzmZueppNIzVdawAOd9eSVgGeZAIh4ulPHPBGAzX"
+                "GyLKc/vo8Fe24JnLr/RQBlTjM9+r6vbhi6HFUHD11M6Ume8/0UGDkZ0="
+            """)
+
+        To generate the cipher text, use:
+
+            > avendesora conceal -e scrypt
+
+
+        Generated Secrets
+        =================
+
+        Generated secrets are secrets for which the actual value is arbitrary,
+        but it must be quite unpredictable. Generated secrets are generally used
+        for passwords and pass phrases, but it can also be used for things like
+        personal information requested by institutions that they have no need to
+        know. For example, a website might request your birth date to assure
+        that you are an adult, but then also use it as a piece of identifying
+        information if you ever call and request support.  In this case they do
+        not need your actual birth date, they just need you to give the same
+        date every time you call in.
+
+
+        Password
+        --------
+
+        Generates an arbitrary password by selecting symbols from the given
+        alphabet at random. The entropy of the generated password is
+        length*log2(len(alphabet)).
+
+            Password(
+                length=12, alphabet=DISTINGUISHABLE, master=None, version=None,
+                sep='', prefix='', suffix=''
+            )
+
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password.  When using the default alphabet, this will be the
+                number of characters in the password.
+            alphabet (str):
+                The reservoir of legal symbols to use when creating the
+                password. By default the set of easily distinguished
+                alphanumeric characters are used. Typically you would use the
+                pre-imported character sets to construct the alphabet. For
+                example, you might pass:
+                    ALPHANUMERIC + '+=_&%#@'
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                password.
+            sep (str):
+                A string that is placed between each symbol in the generated
+                password.
+            prefix (str):
+                A string added to the front of the generated password.
+            suffix (str):
+                A string added to the end of the generated password.
+
+        Examples:
+
+            passcode = Password(10)
+
+
+        Passphrase
+        ----------
+
+        Similar to Password in that it generates an arbitrary pass phrase by
+        selecting symbols from the given alphabet at random, but in this case
+        the default alphabet is a dictionary containing about 10,000 words.
+
+            Passphrase(
+                length=4, alphabet=None, master=None, version=None, sep=' ', prefix='', 
+                suffix=''
+            )
+
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password.  When using the default alphabet, this will be the
+                number of words in the passphrase.
+            alphabet (str):
+                The reservoir of legal symbols to use when creating the
+                password. By default, this is a predefined list of 10,000 words.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                pass phrase.
+            sep (str):
+                A string that is placed between each symbol in the generated
+                password.
+            prefix (str):
+                A string added to the front of the generated password.
+            suffix (str):
+                A string added to the end of the generated password.
+
+        Examples:
+
+            passcode = Passphrase()
+
+
+        PIN
+        ---
+
+        Similar to Password in that it generates an arbitrary PIN by selecting
+        symbols from the given alphabet at random, but in this case the default
+        alphabet is the set of digits (0-9).
+
+            PIN(length=4, alphabet=DIGITS, master=None, version=None)
+
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password.  When using the default alphabet, this will be the
+                number of digits in the PIN.
+            alphabet (str):
+                The reservoir of legal symbols to use when creating the
+                password. By default the digits (0-9) are used.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                PIN.
+
+        Examples:
+
+            passcode = PIN()
+
+
+        Question
+        --------
+
+        Generates an arbitrary answer to a given question. Used for website
+        security questions. When asked one of these security questions it can be
+        better to use an arbitrary answer. Doing so protects you against people
+        who know your past well and might be able to answer the questions.
+
+        Similar to Passphrase() except a question must be specified when created
+        and it is taken to be the security question. The question is used rather
+        than the field name when generating the secret.
+
+            Question(
+                question, length=3, alphabet=None, master=None, version=None,
+                sep=' ', prefix='', suffix='', answer=None
+            )
+
+            question (str):
+                The question to be answered. Be careful. Changing the question
+                in any way will change the resulting answer.
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password. When using the default alphabet, this will be the
+                number of words in the answer.
+            alphabet (list of strs):
+                The reservoir of legal symbols to use when creating the
+                password. By default, this is a predefined list of 10,000 words.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                answer.
+            sep (str):
+                A string that is placed between each symbol in the generated
+                password.
+            prefix (str):
+                A string added to the front of the generated password.
+            suffix (str):
+                A string added to the end of the generated password.
+            answer:
+                The answer. If provided, this would override the generated
+                answer.  May be a string, or it may be an Obscured object.
+
+        Examples:
+
+            questions = [
+                Question('Favorite foreign city'),
+                Question('Favorite breed of dog'),
+            ]
+
+
+        PasswordRecipe
+        --------------
+
+        Generates passwords that can conform to the restrictive requirements
+        imposed by websites. Allows you to specify the length of your password,
+        and how many characters should be of each type of character using a
+        recipe. The recipe takes the form of a string that gives the total
+        number of characters that should be generated, and then the number of
+        characters that should be taken from particular character sets. The
+        available character sets are:
+
+        l - lower case letters (a-z)
+        u - upper case letters (A-Z)
+        d - digits (0-9)
+        s - punctuation symbols
+        c - explicitly given set of characters
+
+        For example, '12 2u 2d 2s' is a recipe that would generate a
+        12-character password where two characters would be chosen from the
+        upper case letters, two would be digits, two would be punctuation
+        symbols, and the rest would be alphanumeric characters. It might
+        generate something like: *m7Aqj=XBAs7
+
+        Using '12 2u 2d 2c!@#$%^&*' is similar, except the punctuation symbols
+        are constrained to be taken from the given set that includes !@#$%^&*.
+        It might generate something like: YO8K^68J9oC!
+
+            PasswordRecipe(
+                recipe, def_alphabet=ALPHANUMERIC, master=None, version=None,
+            )
+
+            recipe (str):
+                A string that describes how the password should be constructed.
+            def_alphabet (list of strs):
+                The alphabet to use when filling up the password after all the
+                constraints are satisfied.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                answer.
+
+        Examples:
+
+            passcode = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
+
+
+        BirthDate
+        ---------
+
+        Generates an arbitrary birthdate for someone in a specified age range.
+
+
+            BrithDate(
+                year, min_age=18, max_age=65, fmt='YYYY-MM-DD',
+                master=None, version=None,
+            )
+
+            year (int):
+                The year the age range was established.
+            min_age (int):
+                The lower bound of the age range.
+            max_age (int):
+                The upper bound of the age range.
+            fmt (str):
+                Specifies the way the date is formatted. Consider an example
+                date of 6 July 1969. YY and YYYY are replaced by the year (69 or
+                1969). M, MM, MMM, and MMMM are replaced by the month (7, 07,
+                Jul, or July). D and DD are replaced by the day (6 or 06).
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                answer.
+
+        Examples:
+
+            birthdate = BirthDate(2015, 21, 55))
+        """).strip()
+        return text
+
+
 # Stealth class {{{1
 class Stealth(HelpMessage):
     DESCRIPTION = "stealth secrets"
@@ -847,14 +1262,14 @@ class Stealth(HelpMessage):
             GPG keys.
 
             The secret generator will combine the account name with the master
-            password before generating the secret. This allows you to use simple
+            seed before generating the secret. This allows you to use simple
             predictable account names and still get an unpredictable secret.
-            The master password used is taken from master_password in the file
+            The master seed used is taken from master_seed in the file
             that contains the stealth account if it exists, or the users key if
             it does not. By default the stealth accounts file does not contain a
-            master password, which makes it difficult to share stealth accounts.
+            master seed, which makes it difficult to share stealth accounts.
             You can create additional stealth account files that do contain
-            master passwords that you can share with your associates.
+            master seeds that you can share with your associates.
         """).strip()
         return text
 

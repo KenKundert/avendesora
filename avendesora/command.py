@@ -25,7 +25,7 @@ from .obscure import Obscure
 from .utilities import two_columns
 from .writer import get_writer
 from inform import (
-    Error, error, codicil, output, conjoin, os_error,
+    Error, debug, error, codicil, output, conjoin, os_error, warn,
     is_collection, is_str, indent, render,
 )
 from shlib import chmod, mv, rm, to_path
@@ -271,12 +271,15 @@ class Archive(Command):
 
         # get dictionary that fully describes the contents of each account
         entries = []
-        for account in generator.all_accounts:
+        seen = set()
+        for account in generator.all_accounts():
+            name = account.get_name()
+            if name in seen:
+                warn('duplicate account name.', culprit=name)
+            seen.add(name)
             entry = account.archive()
             if entry:
-                entries.append(indent('%r: %s,' % (
-                    account.get_name(), render(entry)
-                ), '    '))
+                entries.append(indent('%r: %s,' % (name, render(entry)), '    '))
 
         # build file contents
         from .preferences import ARCHIVE_FILE_CONTENTS
@@ -401,6 +404,10 @@ class Changed(Command):
 
     @classmethod
     def run(cls, command, args):
+        # define white space insensitive compare function:
+        def differ(a, b):
+            return str(a).split() != str(b).split()
+
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
@@ -424,7 +431,7 @@ class Changed(Command):
 
         # determine the account and open the URL
         current_accounts = {}
-        for account in generator.all_accounts:
+        for account in generator.all_accounts():
             entry = account.archive()
             if entry:
                 current_accounts[account.get_name()] = entry
@@ -449,7 +456,7 @@ class Changed(Command):
             for each in sorted(new):
                 output(account_name, 'new field', each, sep=': ')
             for each in sorted(missing):
-                output(account_name, 'new field', each, sep=': ')
+                output(account_name, 'missing field', each, sep=': ')
 
             # for the common fields, report any differences in the values
             shared = set(archive_account.keys()) & set(current_account.keys())
@@ -471,10 +478,10 @@ class Changed(Command):
                         for each in sorted(missing):
                             output(account_name, field_name, 'missing member', each, sep=': ')
                         for k in sorted(archive_keys & current_keys):
-                            if str(archive_value[k]) != str(current_value[k]):
+                            if differ(archive_value[k], current_value[k]):
                                 output(account_name, 'member differs', '%s[%s]' % (field_name, k), sep=': ')
                     else:
-                        if dedent(str(archive_value)) != dedent(str(current_value)):
+                        if differ(archive_value, current_value):
                             output(account_name, 'field differs', field_name, sep=': ')
                 except Exception:
                     error(
@@ -721,7 +728,7 @@ class New(Command):
             {usage}
 
             Creates a new accounts file. Accounts that share the same file share
-            the same master password by default and, if the file is encrypted,
+            the same master seed by default and, if the file is encrypted,
             can be decrypted by the same recipients.
 
             Generally you would create a new accounts file for each person or

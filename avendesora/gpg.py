@@ -240,10 +240,13 @@ class PythonFile(GnuPG):
             else:
                 narrate('not encrypting.', culprit=path)
                 # file is not encrypted
-                with path.open('w') as f:
+                with path.open('wb') as f:
                     f.write(contents.encode(get_setting('encoding')))
         except OSError as err:
             raise Error(os_error(err))
+
+    def exists(self):
+        return self.path.exists()
 
     def __str__(self):
         return str(self.path)

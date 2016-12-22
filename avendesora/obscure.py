@@ -144,11 +144,39 @@ class Obscure(object):
     def __repr__(self):
         return "Hidden('%s')" % (Obscure.hide(self.plaintext, 'base64'))
 
+# Hide {{{1
+class Hide(Obscure):
+    NAME = 'base64'
+    DESC = '''
+        Marks a value as being secret but the secret is not encoded in any way.
+        Generally used in encrypted accounts files or on very low-value secrets.
+    '''
+    def __init__(self, plaintext, secure=True):
+        """Hide text
+
+        Marks a value as being secret.
+        plaintext (str):
+            The value of interest.
+        secure (bool):
+            Indicates that this secret is of high value and so should not be
+            found in an unencrypted accounts file.
+        """
+        self.plaintext = plaintext
+
+    def generate(self, field_name, field_key, account):
+        # we don't need to do anything, but having this method marks this value
+        # as being confidential
+        pass
+
+    def is_secure(self):
+        return self.secure
+
+    def __str__(self):
+        return self.plaintext
+
+
 # Hidden {{{1
 class Hidden(Obscure):
-    # This decodes a string that is encoded in base64 to hide it from a casual
-    # observer. But it is not encrypted. The original value can be trivially
-    # recovered from the encoded version.
     NAME = 'base64'
     DESC = '''
         This encoding obscures but does not encrypt the text. It can
@@ -156,10 +184,22 @@ class Hidden(Obscure):
         encoded text, but if they are able to capture it they can easily
         decode it.
     '''
-    def __init__(self, ciphertext, secure=True, encoding='utf8'):
-        self.ciphertext = ciphertext
+    def __init__(self, encoded_text, secure=True, encoding=None):
+        """Hidden text
+
+        This encoding obscures but does not encrypt the text.
+        encoded_text (str):
+            The value of interest encoded in base64.
+        secure:
+            Indicates that this secret is of high value and so should not be
+            found in an unencrypted accounts file.
+        encoding:
+            The encoding to use for the decoded text.
+        """
+        self.encoded_text = encoded_text
+        encoding = encoding if encoding else get_setting('encoding')
         try:
-            self.plaintext = a2b_base64(ciphertext).decode(encoding)
+            self.plaintext = a2b_base64(encoded_text).decode(encoding)
             self.secure = secure
         except BinasciiError as err:
             raise Error(
@@ -199,6 +239,7 @@ class Hidden(Obscure):
         except UnicodeDecodeError:
             raise Error('Unable to decode base64 string.')
 
+
 # GPG {{{1
 class GPG(Obscure, GnuPG):
     DESC = '''
@@ -214,23 +255,36 @@ class GPG(Obscure, GnuPG):
     # This uses symmetric encryption to add an additional layer of protection.
     # Generally one would use their private key to protect the gpg file, and
     # then use a symmetric key, or perhaps a separate private key, to protect an
-    # individual piece of data, like a master password.
-    def __init__(self, ciphertext, secure=True, encoding='utf8'):
+    # individual piece of data, like a master seed.
+    def __init__(self, ciphertext, secure=True, encoding=None):
+        """GPG encrypted text
+
+        The secret is fully encrypted with GPG. Both symmetric encryption and
+        key-based encryption are supported.
+        ciphertext (str):
+            The secret encrypted and armored by GPG.
+        encoding (str):
+            The encoding to use for the deciphered text.
+        """
         self.ciphertext = ciphertext
+        self.encoding = encoding
 
     def generate(self, field_name, field_key, account):
         # must do this here in generate rather than in constructor to avoid
         # decrypting this, and perhaps asking for a passcode,  every time
         # Advendesora is run.
-        plaintext = self.gpg.decrypt(dedent(self.ciphertext))
-        if not plaintext.ok:
+        decrypted = self.gpg.decrypt(dedent(self.ciphertext))
+        if not decrypted.ok:
             msg = 'unable to decrypt argument to GPG()'
             try:
-                msg = '%s: %s' % (msg, plaintext.stderr)
+                msg = '%s: %s' % (msg, decrypted.stderr)
             except AttributeError:
                 msg += '.'
             raise Error(msg, culprit=error_source())
-        self.plaintext = plaintext
+        encoding = self.encoding
+        if not self.encoding:
+            encoding = get_setting('encoding')
+        self.plaintext = decripted.data.decode(encoding)
 
     def __str__(self):
         return str(self.plaintext)
@@ -283,6 +337,15 @@ try:
             shared.
         '''
         def __init__(self, ciphertext, secure=True, encoding='utf8'):
+            """Scrypt encrypted text
+
+            The secret is fully encrypted with scrypt. Both symmetric encryption and
+            key-based encryption are supported.
+            ciphertext (str):
+                The secret encrypted and armored by GPG.
+            encoding (str):
+                The encoding to use for the deciphered text.
+            """
             self.ciphertext = ciphertext
             self.encoding = encoding
 

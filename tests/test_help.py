@@ -313,7 +313,7 @@ def test_new():
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
 
         Creates a new accounts file. Accounts that share the same file share
-        the same master password by default and, if the file is encrypted,
+        the same master seed by default and, if the file is encrypted,
         can be decrypted by the same recipients.
 
         Generally you would create a new accounts file for each person or
@@ -590,6 +590,9 @@ def test_accounts():
         it will only be displayed for a minute. You generate the encoded
         value using 'avendesora conceal'.
 
+        You can find the specifics of how to specify or generate your
+        secrets by running 'avendesora help secrets'.
+
         Any value that is an instance of the Secret class (Password,
         Passphrase, ...) or the Obscure class (Hidden, GPG, ...) are
         considered sensitive. They are given out only in a controlled
@@ -616,8 +619,8 @@ def test_accounts():
         of available browsers.
 
         The value of passcode is considered sensitive because it is an
-        instance of PasswordRecipe, which is a subclass of Secret.
-        If we wish to see the passcode, use:
+        instance of PasswordRecipe, which is a subclass of Secret.  If we
+        wish to see the passcode, use:
 
             > avendesora value nyt
             passcode: TZuk8:u7qY8%
@@ -654,10 +657,6 @@ def test_accounts():
         be the value of the top-level attributes, or the top-level
         attributes may be arrays or dictionaries that contain objects of
         these classes, but it can go no further.
-
-        For information on how to generate secrets, run 'avendesora help
-        secrets'.  For information on how to conceal or encrypt values, run
-        'avendesora help obscure'.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -957,58 +956,57 @@ def test_overview():
         each word is drawn from a dictionary of 10,000 words.  Thus, even if
         a bad guy knew that four lower case words were being used for your
         pass phrase, there are still 10,000,000,000,000,000 possible
-        combinations for him to try (this represents a minimum entropy of
-        53 bits).  Using six words results in 80 bits of entropy, which
-        meets the threshold recommended by NIST for the most secure pass
-        phrases. For more on this, see 'avendesora help entropy' below.
+        combinations for him to try (this represents a minimum entropy of 53
+        bits).  Using six words results in 80 bits of entropy, which meets
+        the threshold recommended by NIST for the most secure pass phrases.
+        For more on this, see 'avendesora help entropy' below.
 
         For another perspective on the attractiveness of pass phrases, see
         http://xkcd.com/936/.
 
         Unlike password vaults, Avendesora produces a highly unpredictable
-        password from a master password and the name of the account for
-        which the password is to be used. The process is completely
-        repeatable. If you give the same master password and account name,
-        you will get the same password. As such, the passwords do not have
-        to be saved; instead they are regenerated on the fly.
+        password from a master seed and the name of the account for which
+        the password is to be used. The process is completely repeatable. If
+        you give the same master seed and account name, you will get the
+        same password. As such, the passwords do not have to be saved;
+        instead they are regenerated on the fly.
 
         As a password generator, Avendesora provides three important
         advantages over conventional password vaults.  First, it allows
         groups of people to share access to accounts without having to
         securely share each password.  Instead, one member of the group
-        creates a master password that is securely shared with the group
-        once.  From then on any member of the group can create a new
-        account, share the name of the account, and all members will know
-        the password needed to access the account. The second advantage is
-        that it opens up the possibility of using high-quality passwords for
-        stealth accounts, which are accounts where you remember the name of
-        the account but do not store any information about even the
-        existence of the account on your computer.  With Avendesora, you
-        only need to remember the name of the account and it will regenerate
-        the password for you. This is perfect for your TrueCrypt hidden
-        volume password.  Finally, by securely storing a small amount of
-        information, perhaps on a piece of paper in your safe-deposit box,
-        you can often recover most if not all of your passwords even if you
-        somehow lose your accounts file. You can even recover passwords that
-        were created after you created your backup. This is because
-        Avendesora combines the master password with some easily
-        reconstructed information, such as the account name, to create the
-        password. If you save the master password, the rest should be
-        recoverable.
+        creates a master seed that is securely shared with the group once.
+        From then on any member of the group can create a new account, share
+        the name of the account, and all members will know the password
+        needed to access the account. The second advantage is that it opens
+        up the possibility of using high-quality passwords for stealth
+        accounts, which are accounts where you remember the name of the
+        account but do not store any information about even the existence of
+        the account on your computer.  With Avendesora, you only need to
+        remember the name of the account and it will regenerate the password
+        for you. This is perfect for your TrueCrypt hidden volume password.
+        Finally, by securely storing a small amount of information, perhaps
+        on a piece of paper in your safe-deposit box, you can often recover
+        most if not all of your passwords even if you somehow lose your
+        accounts file. You can even recover passwords that were created
+        after you created your backup. This is because Avendesora combines
+        the master seed with some easily reconstructed information, such as
+        the account name, to create the password. If you save the master
+        seed, the rest should be recoverable.
 
         To use it, one creates a file that contains information about each
         of his or her non-stealth accounts.  Among that information would be
         information that controls how the passwords are generated. This file
         is generally not encrypted, though you can encrypt it if you like).
-        Another file is created that contains one or more master passwords.
+        Another file is created that contains one or more master seeds.
         This file is always GPG encrypted.
 
         The intent is for these files to not include the passwords for your
         accounts.  Rather, the passwords are regenerated when needed from
-        the account information and from the master password. This makes it
+        the account information and from the master seed. This makes it
         easy to share passwords with others without having to pass the
         passwords back and forth.  It is only necessary to create a shared
-        master password in advance. Then new passwords can be created on the
+        master seed in advance. Then new passwords can be created on the
         fly by either party.
     """).strip()
     assert result.decode('utf-8') == expected
@@ -1142,14 +1140,14 @@ def test_stealth():
         GPG keys.
 
         The secret generator will combine the account name with the master
-        password before generating the secret. This allows you to use simple
+        seed before generating the secret. This allows you to use simple
         predictable account names and still get an unpredictable secret.
-        The master password used is taken from master_password in the file
+        The master seed used is taken from master_seed in the file
         that contains the stealth account if it exists, or the users key if
         it does not. By default the stealth accounts file does not contain a
-        master password, which makes it difficult to share stealth accounts.
+        master seed, which makes it difficult to share stealth accounts.
         You can create additional stealth account files that do contain
-        master passwords that you can share with your associates.
+        master seeds that you can share with your associates.
     """).strip()
     assert result.decode('utf-8') == expected
 

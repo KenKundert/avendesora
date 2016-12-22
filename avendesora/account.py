@@ -90,11 +90,13 @@ class Script:
     def render(self, account):
         return str(account.get_value(self.script))
 
+    def __repr__(self):
+        return '%s(%r)' % (self.__class__.__name__, self.script)
 
 # Account class {{{1
 class Account(object):
     __NO_MASTER = True
-        # prevents master password from being added to this base class
+        # prevents master seed from being added to this base class
 
     # all_accounts() {{{2
     @classmethod
@@ -233,7 +235,7 @@ class Account(object):
             if cls.master.is_secure():
                 if not cls._file_info.encrypted:
                     warn(
-                        'high value master password not contained in encrypted',
+                        'high value master seed not contained in encrypted',
                         'account file.', culprit=cls.get_name()
                     )
         except AttributeError as err:

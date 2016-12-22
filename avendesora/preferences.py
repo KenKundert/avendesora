@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '45fabadad98e2ce50c076a371fd90588',
+    'secrets_hash': '908cf69fe5d389969ae0ad9a71963026',
     'discard_logfile': False,
 }
 
@@ -44,7 +44,7 @@ CONFIG_DEFAULTS = {
         NONCONFIG_SETTINGS['default_accounts_file'],
         NONCONFIG_SETTINGS['default_stealth_accounts_file'],
     ],
-    'account_list_file': '.accounts_files',
+    'account_list_file': 'accounts_files',
     'archive_file': 'archive.gpg',
     'previous_archive_file': 'archive.prev.gpg',
     'label_color': 'blue',
@@ -74,11 +74,11 @@ CONFIG_DEFAULTS = {
         '+silent normal zozt',      # open the fold, position near top of screen
         '{filepath}'
     ),
-    'hashes_file': '.hashes',
+    'hashes_file': 'hashes',
     'indent': '    ',
     'log_file': 'log.gpg',
     'required_protocols': ['https'],
-    'user_key_file': '.key.gpg',
+    'user_key_file': 'key.gpg',
     'verbose': False,
     'default_account_template': 'bank',
     'account_templates': {
@@ -246,7 +246,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
     from avendesora import (
         # Basics
- guests       Account, StealthAccount, Hidden, GPG, Scrypt, Script,
+        Account, StealthAccount, Hide, Hidden, GPG, Script,
 
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
@@ -266,7 +266,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     except ImportError:
         pass
 
-    master_password = Hidden({master_password}, secure=True)
+    master_seed = Hidden({master_seed}, secure=True)
     gpg_ids = {gpg_ids}
 
     # Accounts
@@ -463,7 +463,7 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
     # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
     #
     # This file allows you to recover your secrets if Avendesora is not
-    # available.  Except for the master passwords it contains all of the
+    # available.  Except for the master seeds it contains all of the
     # information for all of the accounts. The secrets have been generated and
     # hidden using base64 encoding. To decode a hidden argument of the form:
     # Hidden('<hidden_arg>'), you can use:
@@ -479,7 +479,7 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
     #
 
     from avendesora import (
-        Hidden, Question,
+        Hidden, Question, Script,
         RecognizeAll, RecognizeTitle, RecognizeURL, RecognizeCWD, RecognizeHost,
         RecognizeUser, RecognizeEnvVar
     )

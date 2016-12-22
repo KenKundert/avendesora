@@ -1,4 +1,5 @@
 # Abraxas Password Writers
+# encoding: utf8
 #
 # Given a secret (password or passphrase) the writer is responsible for getting 
 # it to the user in a reasonably secure manner.
