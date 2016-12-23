@@ -42,12 +42,12 @@ guest credentials are offered as choices.
             RecognizeTitle(
                 'Wi-Fi Network Authentication Required',
                 script='{networks.0}{tab}{network_passwords.0}{return}',
-                name='home router (privileged)'
+                name='privileged network'
             ),
             RecognizeTitle(
                 'Wi-Fi Network Authentication Required',
                 script='{networks.1}{tab}{network_passwords.1}{return}',
-                name='home router (guest)'
+                name='guest network'
             ),
         ]
         model_name = "Netgear AC1200 wireless router"

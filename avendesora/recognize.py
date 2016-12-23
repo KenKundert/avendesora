@@ -58,11 +58,15 @@ class Recognizer(object):
     def get_name(self):
         return self.__class__.__name__
 
+
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):
     def __init__(self, *recognizers, **kwargs):
         self.recognizers = recognizers
-        self.script = kwargs.get('script', True)
+        self.script = kwargs.pop('script', True)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         try:
@@ -89,7 +93,10 @@ class RecognizeAll(Recognizer):
 class RecognizeAny(Recognizer):
     def __init__(self, *recognizers, **kwargs):
         self.recognizers = recognizers
-        self.script = kwargs.get('script', True)
+        self.script = kwargs.pop('script', True)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         try:
@@ -116,7 +123,11 @@ class RecognizeAny(Recognizer):
 class RecognizeTitle(Recognizer):
     def __init__(self, *titles, **kwargs):
         self.titles = flatten(titles, split=False)
-        self.script = kwargs.get('script', True)
+        self.script = kwargs.pop('script', True)
+        self.name = kwargs.pop('name', None)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         try:
@@ -136,6 +147,8 @@ class RecognizeTitle(Recognizer):
         args = [repr(each) for each in self.titles]
         if self.script:
             args.append('script=%r' % self.script)
+        if self.name:
+            args.append('name=%r' % self.name)
         return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
 
@@ -143,9 +156,12 @@ class RecognizeTitle(Recognizer):
 class RecognizeURL(Recognizer):
     def __init__(self, *urls, **kwargs):
         self.urls = flatten(urls, split=True)
-        self.script = kwargs.get('script', True)
-        self.name = kwargs.get('name', None)
-        self.exact_path = kwargs.get('exact_path', False)
+        self.script = kwargs.pop('script', True)
+        self.name = kwargs.pop('name', None)
+        self.exact_path = kwargs.pop('exact_path', False)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         try:
@@ -210,7 +226,10 @@ class RecognizeURL(Recognizer):
 class RecognizeCWD(Recognizer):
     def __init__(self, *dirs, **kwargs):
         self.dirs = flatten(dirs, split=True)
-        self.script = kwargs.get('script', True)
+        self.script = kwargs.pop('script', True)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         try:
@@ -236,7 +255,10 @@ class RecognizeCWD(Recognizer):
 class RecognizeHost(Recognizer):
     def __init__(self, *hosts, **kwargs):
         self.hosts = flatten(hosts, split=True)
-        self.script = kwargs.get('script', True)
+        self.script = kwargs.pop('script', True)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         try:
@@ -262,7 +284,10 @@ class RecognizeHost(Recognizer):
 class RecognizeUser(Recognizer):
     def __init__(self, *users, **kwargs):
         self.users = flatten(users, split=True)
-        self.script = kwargs.get('script', True)
+        self.script = kwargs.pop('script', True)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         try:
@@ -314,7 +339,10 @@ class RecognizeNetwork(Recognizer):
     """
     def __init__(self, *macs, **kwargs):
         self.macs = flatten(macs, split=True)
-        self.script = kwargs.get('script', True)
+        self.script = kwargs.pop('script', True)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
     def match(self, data, account, verbose=False):
         # should modify this so that 'ip neigh' can be used in lieu of arp,

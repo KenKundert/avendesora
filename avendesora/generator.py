@@ -176,6 +176,7 @@ class PasswordGenerator(object):
                 log('Trying:', name)
             for key, script in account.recognize(data, verbose):
                 ident = '%s (%s)' % (name, key) if key else name
+                ident = '%s: %s' % (len(matches), ident)  # assure uniqueness
                 matches[ident] = name, script
                 if verbose:
                     log('    %s matches' % ident)
@@ -185,7 +186,7 @@ class PasswordGenerator(object):
             notify(msg)
             raise Error(msg)
         if len(matches) > 1:
-            choice = show_list_dialog('Choose Account', sorted(matches.keys()))
+            choice = show_list_dialog('Choose Secret', sorted(matches.keys()))
             if choice:
                 return matches[choice]
         else:
