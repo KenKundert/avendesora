@@ -170,11 +170,16 @@ class PasswordGenerator(object):
 
         # sweep through accounts to see if any recognize this title data
         matches = {}
+        seen = set()
         for account in self.all_accounts():
             name = account.get_name()
             if verbose:
                 log('Trying:', name)
             for key, script in account.recognize(data, verbose):
+                # identify and skip duplicates
+                if (name, script) in seen:
+                    continue
+                seen.add((name, script))
                 ident = '%s (%s)' % (name, key) if key else name
                 ident = '%s: %s' % (len(matches), ident)  # assure uniqueness
                 matches[ident] = name, script
