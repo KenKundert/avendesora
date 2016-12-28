@@ -18,8 +18,8 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 0.17.3
-| Released: 2016-12-23
+| Version: 0.18.0
+| Released: 2016-12-27
 |
 
 Avendesora is currently in beta. However it is reasonably stable and so you 

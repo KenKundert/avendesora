@@ -206,8 +206,7 @@ def test_conceal():
 
         scrypt:
             This encoding fully encrypts the text with your user key. Only
-            you can decrypt it, secrets encoded with scrypt cannot be
-            shared.
+            you can decrypt it, secrets encoded with scrypt cannot be shared.
 
         Though available as an option for convenience, you should not pass
         the text to be hidden as an argument as it is possible for others to

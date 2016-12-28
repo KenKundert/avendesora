@@ -333,8 +333,7 @@ try:
         # passcode for this symmetric encryption.
         DESC = '''
             This encoding fully encrypts the text with your user key. Only
-            you can decrypt it, secrets encoded with scrypt cannot be
-            shared.
+            you can decrypt it, secrets encoded with scrypt cannot be shared.
         '''
         def __init__(self, ciphertext, secure=True, encoding='utf8'):
             """Scrypt encrypted text
