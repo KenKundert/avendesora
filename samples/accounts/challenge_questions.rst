@@ -20,7 +20,7 @@ The following shows how to configure an account to support challenge questions.
     class BankOfAmerica(Account):
         aliases = 'boa bankamerica'
         username = 'sheldoncooper'
-        passcode = PasswordRecipe('12 2l 2U 2d 2s)
+        passcode = PasswordRecipe('12 2l 2u 2d 2s)
         questions = [
             Question('elementary school?'),
             Question('favorite foreign city?'),

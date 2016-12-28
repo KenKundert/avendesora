@@ -96,7 +96,7 @@ If using Python3 you might also have to install::
    yum install python3-gobject
 
 It has been left out of the dependencies in the setup.py file because it appears 
-to be broken the pypi. See the setup.py file for more information.
+to be broken in pypi. See the setup.py file for more information.
 
 If you would like to use scrypt as a way of encrypting fields, you will need to 
 install scrypt by hand using::
@@ -300,21 +300,22 @@ example, a summary of all information can be requested with::
 
 The attributes have various levels of confidentiality.  Simple strings are not 
 considered sensitive. Those values provided by Python classes inherit the 
-confidentiality of the class.  Hidden() provides simple concealment. GPG() and 
-Scrypt() provides full encryption. And classes like Password(), Passphrase(), 
-PIN() and Question() generate secrets.  Attributes that are considered sensitive 
-are not shown in the above summary, but can be requested individually::
+confidentiality of the class.  Hide() and Hidden() provides simple concealment.  
+GPG() and Scrypt() provides full encryption. And classes like Password(), 
+PasswordRecipe(), Passphrase(), PIN() and Question() generate secrets.  
+Attributes that are considered sensitive are not shown in the above summary, but 
+can be requested individually::
 
     > avendesora value bb pin
     pin: 7784
 
-Attributes can be simple scalars, such as *pin*. They can be array members, such 
-as *questions*::
+Attributes can be simple scalars, such as *pin*. They can be arrays, such as 
+*questions*::
 
     > avendesora value bigbank questions.1
     questions.1 (What street did you grow up on?): lockout insulator crumb
 
-Or they can be dictionary members::
+Or they can be dictionaries::
 
     > avendesora value bb accounts.checking
     accounts.checking: 12345678

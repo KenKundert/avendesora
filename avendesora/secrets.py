@@ -147,9 +147,11 @@ class Secret(object):
             version,
             interactive_seed
         ]
-        key = ' '.join([str(seed) for seed in seeds])
+        self.set_seeds(seeds)
 
-        # Convert the key into 512 bit number
+    def set_seeds(self, seeds):
+        # Convert the seeds into 512 bit number
+        key = ' '.join([str(seed) for seed in seeds])
         digest = hashlib.sha512((key).encode('utf-8')).digest()
         try:
             # convert from string to list of integers if this is python2

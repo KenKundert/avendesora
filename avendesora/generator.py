@@ -29,6 +29,7 @@ from .preferences import (
     HASH_FILE_INITIAL_CONTENTS, STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS,
     ACCOUNT_LIST_FILE_CONTENTS,
 )
+from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_componenets
 from inform import (
@@ -57,12 +58,15 @@ class PasswordGenerator(object):
 
         # read the accounts files
         self.accounts = set()
+        self.shared_secrets = {}
         for filename in get_setting('accounts_files', []):
             try:
                 path = to_path(get_setting('settings_dir'), filename)
                 account_file = PythonFile(path)
                 contents = account_file.run()
                 master_seed = contents.get('master_seed')
+                if master_seed:
+                    self.shared_secrets[path.stem] = master_seed
 
                 # traverse through all accounts, determine which are new, bind
                 # required information to new accounts, and update account list.
@@ -214,4 +218,28 @@ class PasswordGenerator(object):
         for account in self.all_accounts():
             if account.account_contains(target):
                 yield account
+
+    # challenge_response() {{{2
+    def challenge_response(self, name, challenge):
+        """Generare a response to a challenge
+
+        Given the name of a master seed (actually the basename of the file that
+        contains the master seed), returns an identifying response to a
+        challenge. If no challenge is provided, one is generated based on the
+        time and date. Returns both the challenge and the response as a tuple.
+        """
+
+        try:
+            if not challenge:
+                from arrow import utcnow
+                now = str(utcnow())
+                c = Passphrase()
+                c.set_seeds([now])
+                challenge = str(c)
+            r = Passphrase()
+            r.set_seeds([self.shared_secrets[name], challenge])
+            response = str(r)
+            return challenge, response
+        except KeyError:
+            error('unknown.', culprit=name)
 

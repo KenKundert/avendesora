@@ -660,6 +660,92 @@ class Help(Command):
         HelpMessage.show(cmdline['<topic>'])
 
 
+# Identity {{{1
+class Identity(Command):
+    NAMES = 'identity', 'ident', 'i'
+    DESCRIPTION = 'generate an identifying response to a challenge'
+    USAGE = dedent("""
+        Usage:
+            avendesora identity [<name> [<challenge>...]]
+            avendesora ident    [<name> [<challenge>...]]
+            avendesora i        [<name> [<challenge>...]]
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+
+            This command allows you to generate a response to any challenge.
+            The response identifies you to a partner with whom you have shared
+            an account.
+
+            If you run the command with no arguments, it prints the list of
+            valid names. If you run it with no challenge, one is created for you
+            based on the current time and date.
+
+            If you have a remote partner to whom you wish to prove your
+            identity, have that partner use avendesora to generate a challenge
+            and a response based on your shared secret. Then the remote partner
+            provides you with the challenge and you run avendesora with that
+            challenge to generate the same response, which you provide to your
+            remote partner to prove your identity.
+
+            You are free to explicitly specify a challenge to start the process,
+            but it is important that you not use the same challenge twice. As
+            such, it is recommended that you not provide the challenge. In this
+            situation, one is generated for you based on the time and date.
+
+            Consider an example that illustrates the process. In this example,
+            Ahmed is confirming the identity of Reza, where both Ahmed and Reza
+            are assumed to have shared Avendesora accounts.  Ahmed runs
+            Avendesora as follows and remembers the response:
+
+                avendesora identity reza
+                challenge: slouch emirate bedeck brooding
+                response: spear disable local marigold
+
+            This assumes that reza is the name, with any extension removed, of
+            the file that Ahmed uses to contain their shared accounts.
+
+            Ahmed communicates the challenge to Reza but not the response.  Reza
+            then runs Avendesora with the given challenge:
+
+                avendesora identity ahmed slouch emirate bedeck brooding
+                challenge: slouch emirate bedeck brooding
+                response: spear disable local marigold
+
+            In this example, ahmed is the name of the file that Reza uses to
+            contain their shared accounts.
+
+            To complete the process, Reza returns the response to Ahmed, who
+            compares it to the response he received to confirm Reza's identity.
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        if cmdline['<name>']:
+            name = cmdline['<name>']
+            challenge = ' '.join(cmdline['<challenge>'])
+            c, r = generator.challenge_response(name, challenge)
+            output(c, culprit='challenge')
+            output(r, culprit='response')
+        else:
+            names = sorted(generator.shared_secrets.keys())
+            output('Available names:')
+            for name in names:
+                output('  ', name)
+
+
 # Initialize {{{1
 class Initialize(Command):
     NAMES = 'initialize', 'I'
@@ -731,13 +817,13 @@ class New(Command):
             the same master seed by default and, if the file is encrypted,
             can be decrypted by the same recipients.
 
-            Generally you would create a new accounts file for each person or
-            group with which you wish to share accounts. You would also use
-            separate files for passwords with different security domains. For
-            example, a high-value passwords might be placed in an encrypted file
-            that would only be placed highly on protected computers. Conversely,
-            low-value passwords might be contained in perhaps an unencrypted
-            file that is found on many computers.
+            Generally you create new accounts files for each person or group
+            with which you wish to share accounts. You also use separate files
+            for passwords with different security domains. For example, a
+            high-value passwords might be placed in an encrypted file that would
+            only be placed highly on protected computers. Conversely, low-value
+            passwords might be contained in perhaps an unencrypted file that is
+            found on many computers.
 
             Add a '.gpg' extension to <name> to encrypt the file.
         """).strip()
@@ -871,19 +957,19 @@ class Value(Command):
             -t <title>, --title <title>
                                     Use account discovery on this title.
 
-        You would request a scalar value by specifying its name after the
-        account. For example:
+        You request a scalar value by specifying its name after the account.
+        For example:
 
             avendesora value pin
 
         If is a composite value, you should also specify a key that indicates
         which of the composite values you want. For example, if the 'accounts'
-        field is a dictionary, you would specify accounts.checking or
+        field is a dictionary, you specify accounts.checking or
         accounts[checking] to get information on your checking account. If the
-        value is an array, you would give the index of the desired value. For
-        example, questions.0 or questions[0]. If you only specify a number, then
-        the name is assumed to be 'questions', as in the list of security
-        questions (this can be changed by specifying the desired name as the
+        value is an array, you give the index of the desired value. For example,
+        questions.0 or questions[0]. If you only specify a number, then the name
+        is assumed to be 'questions', as in the list of security questions (this
+        can be changed by specifying the desired name as the
         'default_vector_field' in the account or the config file).
 
         If no value is requested the result produced is determined by the value

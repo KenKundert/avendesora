@@ -22,7 +22,7 @@
 # Imports {{{1
 from .config import get_setting
 from shlib import Run
-from inform import error, log
+from inform import error, log, os_error
 
 
 # Browser base class {{{1
