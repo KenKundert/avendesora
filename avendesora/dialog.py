@@ -98,12 +98,12 @@ try:
 
 except ImportError:
     def show_list_dialog(title, choices):
-        msg = 'selection dialog not available, you must install python3-gobject.'
+        msg = 'selection dialog not available, you must install python-gobject.'
         notify(msg)
         fatal(msg)
 
     def show_error_dialog(message):
-        msg = 'error dialog not available, you must install python3-gobject.'
+        msg = 'error dialog not available, you must install python-gobject.'
         notify(msg)
         fatal(msg)
 

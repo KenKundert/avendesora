@@ -142,6 +142,25 @@ class Add(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
+        # determine the accounts file
+        prefix = cmdline['--file']
+        if prefix:
+            candidates = [
+                p
+                for p in get_setting('accounts_files')
+                if p.startswith(prefix)
+            ]
+            if not candidates:
+                raise Error('not found.', cuplrit=cmdline['--file'])
+            if len(candidates) > 1:
+                raise Error(
+                    'ambiguous, matches %s.' % conjoin(candidates),
+                    cuplrit=prefix
+                )
+            filename = candidates[0]
+        else:
+            filename = get_setting('accounts_files')[0]
+
         try:
             # get the specified template
             templates = get_setting('account_templates')
@@ -150,64 +169,75 @@ class Add(Command):
             else:
                 template_name = get_setting('default_account_template')
             template = dedent(templates[template_name]).strip() + '\n'
-
-            # save template to tmp file and open it in the editor
-            from tempfile import mktemp
-            tmpfile = GnuPG(mktemp(suffix='_avendesora.gpg'))
-            tmpfile.save(template, get_setting('gpg_ids'))
-            GenericEditor.open_and_search(tmpfile.path)
-
-            # read the tmp file and determine if it has changed
-            new = tmpfile.read()
-            tmpfile.remove()
-            if new == template:
-                return output('Unchanged, and so ignored.')
-
-            # hide the values that should be hidden
-            def hide(match):
-                return 'Hidden(%r)' % Obscure.hide(match.group(1))
-            new = re.sub("<<(.*?)>>", hide, new)
-
-            # determine the accounts file
-            prefix = cmdline['--file']
-            if prefix:
-                candidates = [
-                    p
-                    for p in get_setting('accounts_files')
-                    if p.startswith(prefix)
-                ]
-                if not candidates:
-                    raise Error('not found.', cuplrit=cmdline['--file'])
-                if len(candidates) > 1:
-                    raise Error(
-                        'ambiguous, matches %s.' % conjoin(candidates),
-                        cuplrit=prefix
-                    )
-                filename = candidates[0]
-            else:
-                filename = get_setting('accounts_files')[0]
-            path = to_path(get_setting('settings_dir'), filename)
-
-            # get original contents of accounts file
-            orig_accounts_file = PythonFile(path)
-            accounts = orig_accounts_file.run()
-            gpg_ids = accounts.get('gpg_ids')
-
-            # add new account to the contents
-            accounts = orig_accounts_file.code + new + '\n'
-
-            # rename the original file and then save the new version
-            orig_accounts_file.rename('.saved')
-            new_accounts_file = GnuPG(path)
-            new_accounts_file.save(accounts, gpg_ids)
-        except OSError as err:
-            error(os_error(err))
         except KeyError as err:
             error(
                 'unknown account template, choose from %s.' % conjoin(
                     sorted(templates.keys())
                 ), culprit=template_name
             )
+
+        backup = None
+        try:
+            # save template to tmp file and open it in the editor
+            from tempfile import mktemp
+            tmpfilename = mktemp(suffix='_avendesora.gpg')
+            tmpfile = GnuPG(tmpfilename)
+            tmpfile.save(template, get_setting('gpg_ids'))
+            GenericEditor.open_and_search(tmpfile.path)
+
+            # read the tmp file and determine if it has changed
+            new = tmpfile.read()
+            if new == template:
+                return output('Unchanged, and so ignored.')
+
+            # remove instructions
+            new = '\n'.join(
+                [l for l in new.split('\n') if not l.startswith('Avendesora:')]
+            ).strip('\n') + '\n'
+
+            # hide the values that should be hidden
+            def hide(match):
+                return 'Hidden(%r)' % Obscure.hide(match.group(1))
+            new = re.sub("<<(.*?)>>", hide, new)
+
+            # get original contents of accounts file
+            path = to_path(get_setting('settings_dir'), filename)
+            orig_accounts_file = PythonFile(path)
+            accounts = orig_accounts_file.run()
+            gpg_ids = accounts.get('gpg_ids')
+
+            # add new account to the contents
+            accounts = orig_accounts_file.code.strip('\n') + '\n\n\n' + new
+
+            # backup the original file and then save the new version
+            backup = orig_accounts_file.backup('.saved')
+            new_accounts_file = PythonFile(path)
+            new_accounts_file.save(accounts, gpg_ids)
+
+            # check the changes to see if there are any issues
+            new_accounts_file.run()
+        except (Error, OSError) as err:
+            if isinstance(err, OSError):
+                error(os_error(err))
+            else:
+                error(err)
+            codicil(
+                '',
+                'What you entered can be found in %s.' % tmpfilename,
+                'Delete it when done with it.', sep='\n'
+            )
+            if backup:
+                codicil(
+                    '',
+                    'Unmodified version of %s' % new_accounts_file.path,
+                    'was saved as %s.' % backup, sep='\n'
+                )
+
+        # delete the temp file
+        try:
+            tmpfile.remove()
+        except:
+            pass
 
 
 # Archive {{{1
@@ -583,10 +613,26 @@ class Edit(Command):
         generator = PasswordGenerator()
 
         # determine the account and open the URL
-        account = generator.get_account(cmdline['<account>'])
-        filepath = account._file_info.path
-        account_name = account.__name__
-        GenericEditor.open_and_search(filepath, account_name)
+        try:
+            account = generator.get_account(cmdline['<account>'])
+            accounts_file = PythonFile(account._file_info.path)
+            backup = accounts_file.backup('.saved')
+            account_name = account.__name__
+            GenericEditor.open_and_search(accounts_file.path, account_name)
+
+            # check the changes to see if there are any issues
+            accounts_file.run()
+        except (Error, OSError) as err:
+            if isinstance(err, OSError):
+                error(os_error(err))
+            else:
+                error(err)
+            if backup:
+                codicil(
+                    '',
+                    'Unmodified version of %s' % accounts_file.path,
+                    'was saved as %s.' % backup, sep='\n'
+                )
 
 
 # Find {{{1
@@ -1074,7 +1120,15 @@ class Version(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
-        # output the version
-        from .__init__ import __version__, __released__
-        output('Avendesora version: %s (%s).' % (__version__, __released__))
+        # get the Python version
+        python = 'Python %s.%s.%s' % (
+            sys.version_info.major,
+            sys.version_info.minor,
+            sys.version_info.micro,
+        )
 
+        # output the Avendesora version along with the Python version
+        from .__init__ import __version__, __released__
+        output('Avendesora version: %s (%s) [%s].' % (
+            __version__, __released__, python
+        ))

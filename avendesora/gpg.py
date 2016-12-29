@@ -23,7 +23,7 @@
 
 # Imports {{{1
 from .config import get_setting, override_setting
-from shlib import to_path, mv, mkdir
+from shlib import to_path, cp, mkdir
 from inform import (
     conjoin, cull, display, Error, log, narrate, os_error, warn, is_str,
     full_stop
@@ -145,10 +145,20 @@ class GnuPG(object):
     def remove(self):
         self.path.unlink()
 
-    def rename(self, extension):
-        new = to_path(str(self.path) + extension)
-        mv(self.path, new)
-        self.path = new
+    def backup(self, extension):
+        """Creates a backup copy of the file.
+
+        The name of the new file has the specified extension prepended to the
+        existing suffixes.
+        """
+
+        # prepend extension to list of suffixes
+        suffixes = self.path.suffixes
+        stem = self.path.stem.partition('.')[0]  # remove all suffixes
+        new = to_path(self.path.parent, ''.join([stem, extension] + suffixes))
+
+        cp(self.path, new)
+        return new
 
     def will_encrypt(self):
         return self.path.suffix in GPG_EXTENSIONS
@@ -205,7 +215,7 @@ class PythonFile(GnuPG):
                 raise Error(full_stop(err.msg), culprit=culprit)
             else:
                 raise Error(
-                    err.msg + ':', err.text, (err.offset-1)*' ' + '^',
+                    err.msg + ':', err.text.rstrip(), (err.offset-1)*' ' + '^',
                     culprit=culprit, sep='\n'
                 )
                 # File "/home/ken/.config/avendesora/config", line 18

@@ -288,6 +288,66 @@ class Accounts(HelpMessage):
         return text
 
 
+# Collaborate class {{{1
+class Collaborate(HelpMessage):
+    DESCRIPTION = "collaborate"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+            If you share an accounts file with a partner, then either partner
+            can create new secrets and the other partner can reproduce their
+            values once a small amount of relatively non-confidential
+            information is shared. This works because the security of the
+            generated secrets is based on the master seed, and that seed is
+            contained in the accounts file that is shared in a secure manner
+            once at the beginning.  For example, imagine one partner creates an
+            account at the US Postal Service website and then informs the
+            partner that the name of the new account is usps and the username is
+            justus.  That is enough information for the second partner to
+            generate the password and login. And notice that the necessary
+            information can be shared over an insecure channel. For example, it
+            could be sent in a text message or from a phone where trustworthy
+            encryption is not available.
+
+            The first step in using Avendesora to collaborate with a partner is
+            for one of the partners to generate and then share an accounts file
+            that is dedicated to the shared accounts.  This file contains the
+            master seed, and it is critical to keep this value secure. Thus, it
+            is recommended that the shared file be encrypted.
+
+            Consider an example where you, Alice, are sharing accounts with your
+            business partner, Bob.  You have hired a contractor to run your
+            email server, Eve, who unbeknownst to you is reading your email in
+            order to steal valuable secrets.  Together, you and Bob jointly run
+            Teneya Enterprises. Since you expect more people will need access to
+            the accounts in the future, you choose to the name the file after
+            the company rather than your partner.  To share accounts with Bob,
+            you start by getting Bob's public GPG key.  Then, create the new
+            accounts file with something like:
+
+                avendesora new -g alice@teneya.com -g bob@teneya.com teneya.gpg
+
+            This generates a new accounts file, ~/.config/avendesora/teneya.gpg,
+            and encrypts it so only you and Bob can open it.  Mail this file to
+            Bob. Since it is encrypted, it is to safe to send the file through
+            email.  Even though Eve can read this message, the accounts file is
+            encrypted so Eve cannot access the master seed it contains.  Bob
+            should put the file in ~/.config/avendesora and then add it to
+            accounts_files in ~/.config/avendesora/accounts_files.  You are now
+            ready to share accounts.
+
+            Then, one partner creates a new account and mails the account entry
+            to the other partner.  This entry does not contain enough
+            information to allow an eavesdropper such as Eve to be able to
+            generate the secrets, but now both partners can.
+
+            Once you have shared an accounts file, you can also use the identity
+            command to prove your identity to your partner.
+        """).strip()
+        return text
+
+
 # Discovery class {{{1
 class Discovery(HelpMessage):
     DESCRIPTION = "account discovery"
@@ -625,20 +685,14 @@ class Overview(HelpMessage):
             the account name, to create the password. If you save the master
             seed, the rest should be recoverable.
 
-            To use it, one creates a file that contains information about each
-            of his or her non-stealth accounts.  Among that information would be
-            information that controls how the passwords are generated. This file
-            is generally not encrypted, though you can encrypt it if you like).
-            Another file is created that contains one or more master seeds.
-            This file is always GPG encrypted.
-
-            The intent is for these files to not include the passwords for your
-            accounts.  Rather, the passwords are regenerated when needed from
-            the account information and from the master seed. This makes it
-            easy to share passwords with others without having to pass the
-            passwords back and forth.  It is only necessary to create a shared
-            master seed in advance. Then new passwords can be created on the
-            fly by either party.
+            To use Avendesora, one creates one or more accounts files. At a
+            minimum, there is should be one for your private accounts, and one
+            each for all the people with whom you hold shared accounts.  These
+            files contain information about each of your non-stealth accounts.
+            Avendesora then provides access to that information.  The
+            information will include both secrets and non-secrets. The secrets
+            can be given explicitly, or information could be provided to specify
+            how to generate the secret.
         """).strip()
         return text
 
@@ -1265,7 +1319,7 @@ class Stealth(HelpMessage):
             seed before generating the secret. This allows you to use simple
             predictable account names and still get an unpredictable secret.
             The master seed used is taken from master_seed in the file
-            that contains the stealth account if it exists, or the users key if
+            that contains the stealth account if it exists, or the user_key if
             it does not. By default the stealth accounts file does not contain a
             master seed, which makes it difficult to share stealth accounts.
             You can create additional stealth account files that do contain

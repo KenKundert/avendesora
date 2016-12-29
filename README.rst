@@ -18,8 +18,8 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 0.18.0
-| Released: 2016-12-27
+| Version: 0.18.1
+| Released: 2016-12-29
 |
 
 Avendesora is currently in beta. However it is reasonably stable and so you 
@@ -91,12 +91,12 @@ You will also need to install some operating system commands. On Fedora use::
 
    yum install gnupg2 xdotool xsel
 
-If using Python3 you might also have to install::
+You should also install python-gobject. Conceivably this could be installed with 
+the above pip command, but gobject appears broken in pypi, so it is better use 
+the operating system's package manager to install it.  See the setup.py file for 
+more information.  On Redhat systms use::
 
    yum install python3-gobject
-
-It has been left out of the dependencies in the setup.py file because it appears 
-to be broken in pypi. See the setup.py file for more information.
 
 If you would like to use scrypt as a way of encrypting fields, you will need to 
 install scrypt by hand using::

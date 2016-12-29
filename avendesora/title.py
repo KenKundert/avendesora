@@ -1,6 +1,11 @@
 # Window Titles
 #
 # Get and parse window title strings.
+# KSK
+# perhaps a better way of handling this is to use title.split(' - ') and then
+# focus and then recombine the initial ones to end up with three: title, url,
+# browser.
+# Also AddURLToWindowTitle no longer seems to output the host.
 
 # License {{{1
 # Copyright (C) 2016 Kenneth S. Kundert
@@ -34,7 +39,8 @@ import re
 def labelRegex(label, regex):
     return "(?P<%s>%s)" % (label, regex)
 
-URL_REGEX = r'(?:[^ ]+)://(?:[^ ]+)'
+URL_REGEX = r'[^ ]+://[^ ]+'
+HOST_REGEX = r'(?:[^ ]+://)?[^ ]+'
 REGEX_COMPONENTS = {
     'title': labelRegex('title', r'.*'),
     'url': labelRegex('url', URL_REGEX),
@@ -99,9 +105,10 @@ class Title(object):
 
 # AddURLToWindowTitle (Firefox) {{{1
 class AddURLToWindowTitle(Title):
-    # This matches the default pattern produced by AddURLToWindowTitle in Firefox
+    # This matches the default pattern produced by AddURLToWindowTitle in
+    # Firefox, though sometimes it outputs the host, and sometimes it does not.
     PATTERN = re.compile(
-        r'\A{title} - {url} - {host} - {browser}\Z'.format(**REGEX_COMPONENTS)
+        r'\A{title} - {url} - (?:{host} - )?{browser}\Z'.format(**REGEX_COMPONENTS)
     )
     PRIORITY = 1
 

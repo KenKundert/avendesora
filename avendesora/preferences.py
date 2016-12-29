@@ -62,13 +62,15 @@ CONFIG_DEFAULTS = {
     'dictionary_file': 'words',
     'encoding': 'utf8',
     'edit_account': (
-        'vim',
+        'gvim',   # use gvim -v so that user can access X clipboard buffers
+        '-v',
         '+silent /^class {account}(Account):/',
         '+silent normal zozt',      # open the fold, position near top of screen
         '{filepath}'
     ),
     'edit_template': (
-        'vim',
+        'gvim',   # use gvim -v so that user can access X clipboard buffers
+        '-v',
         '+silent /_[A-Z0-9_]\+_/',  # matches user modifiable template fields
                                     # fields take the form '_AAA_'
         '+silent normal zozt',      # open the fold, position near top of screen
@@ -84,6 +86,7 @@ CONFIG_DEFAULTS = {
     'account_templates': {
         'website': """
             class _NAME_(Account): # %s1
+                desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
                 username = '_USERNAME_'
                 email = '_EMAIL_'
@@ -93,18 +96,34 @@ CONFIG_DEFAULTS = {
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
                 )
+
+            Avendesora: Tailor the account entry to suit you needs.
+            Avendesora: You can add or delete class attributes as you see fit.
+            Avendesora: The 'n' key should take you to the next field name.
+            Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
+            Avendesora: Fields surrounded by << and >> will be hidden.
+            Avendesora: All lines that begin with Avendesora: are deleted.
         """ % (3*'{'),
         'shell': """
             class _NAME_(Account): # %s1
+                desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
                 passcode = Passphrase()
                 discovery = RecognizeTitle(
                     '_TITLE1_', '_TITLE2_',
                     script='{passcode}{return}'
                 )
+
+            Avendesora: Tailor the account entry to suit you needs.
+            Avendesora: You can add or delete class attributes as you see fit.
+            Avendesora: The 'n' key should take you to the next field name.
+            Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
+            Avendesora: Fields surrounded by << and >> will be hidden.
+            Avendesora: All lines that begin with Avendesora: are deleted.
         """ % (3*'{'),
         'bank': """
             class _NAME_(Account): # %s1
+                desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
                 username = '_NAME_'
                 email = '_EMAIL_'
@@ -127,6 +146,13 @@ CONFIG_DEFAULTS = {
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
                 )
+
+            Avendesora: Tailor the account entry to suit you needs.
+            Avendesora: You can add or delete class attributes as you see fit.
+            Avendesora: The 'n' key should take you to the next field name.
+            Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
+            Avendesora: Fields surrounded by << and >> will be hidden.
+            Avendesora: All lines that begin with Avendesora: are deleted.
         """ % (3*'{'),
     },
 
@@ -239,9 +265,21 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     #
     # Example:
     # To create an alphabet with all characters except tabs use either:
-    #     'alphabet': exclude(PRINTABLE, '\\t')
+    #     Password(..., alphabet = exclude(PRINTABLE, '\\t'))
     # or:
-    #     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
+    #     Password(..., alphabet = ALPHANUMERIC + PUNCTUATION + ' ')
+    #
+    # You can use PasswordRecipe() to generate passwords that include certain
+    # character classes.
+    #
+    # Examples:
+    # To create a 12 character password that contains 2 upper, 2 lower, 2
+    # digits, and 2 symbols, use:
+    #     PasswordRecipe("12 2u 2l 2d 2s")
+    #
+    # To create a 12 character password that contains 2 upper, 2 lower, 2
+    # digits, and 2 characters from a specific set of characters, use:
+    #     PasswordRecipe("12 2u 2l 2d 2c~!@#$%^&*+=?")
     #
 
     from avendesora import (
