@@ -18,8 +18,8 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 0.20.2
-| Released: 2016-12-29
+| Version: 0.20.3
+| Released: 2016-12-30
 |
 
 Avendesora is currently in beta. However it is reasonably stable and so you 
@@ -37,10 +37,10 @@ Avendesora is powerful command-line utility that can securely hold and
 conveniently provide access to a wide variety of information about your online 
 accounts, including its secrets such as passwords. Account values can be 
 displayed, copied to the clipboard, or automatically typed into running 
-applications such as you web browser or terminal windows, automatically 
-recognize which account to use based on the window title.  Avendesora can also 
-open accounts in your web browser and warn you if you are not using encryption 
-when you go to enter your password.
+applications such as you web browser or terminal windows.  Avendesora can also 
+open accounts in your web browser, automatically recognize which account to use 
+based on the window title, and warn you if you are not using encryption when you 
+go to enter your password.
 
 Account secrets can saved in encrypted form, as with password vaults, or 
 generated from a root secret.  Generated secrets have two important benefits.  
@@ -52,30 +52,30 @@ further secrets.
 
 Secrets are generated from a collection of seeds, one of which must be random 
 with a very high degree of entropy. The random seed is referred to as the 
-'master password'.  It is extremely important that the master password remain 
-completely secure.  Never disclose a master password to anyone except for 
-a person you wish to collaborate with, and then only used the shared master 
-password for shared secrets.  All of your private secrets should be generated 
-from private master passwords. The seeds generally include the master password, 
-the account name, the secret name, and perhaps a version name.  For example, 
-imagine having a Gmail account, then the account name might simply be 'gmail', 
-and the secret name might be 'passcode'. In this case, your master password is 
-combined with the words 'gmail' and 'passcode', the combination is hashed, and 
-then password is generated with an appropriate recipe that you specify.  There 
-are recipes for passwords, pass phrases, PINs, security questions, etc.  The 
-password itself is not stored, rather it is the seeds that are stored and the 
-password is regenerated when needed. Notice that all the seeds except the master 
-password need not be kept secure. Thus, once you have shared a master password 
-with a collaborator, all you need to do is share the remaining seeds and your 
-collaborator can generate exactly the same password. Another important thing to 
-notice is that the generated password is dependent on the account and secret 
-names. Thus if you rename your account or your secret, the password will change.  
-So you should be careful when you first create your account to name it 
-appropriately so you don't feel the need to change it in the future. For 
-example, 'gmail' might not be a good account name if you expect to have multiple 
-Gmail accounts. In this case you might want to include your username in the 
-account name. You can always make the shorter 'gmail' as an account alias to you 
-can still access the account quickly.
+'master seed'.  It is extremely important that the master seed remain completely 
+secure.  Never disclose a master seed to anyone except for a person you wish to 
+collaborate with, and then only used the shared master seed for shared secrets.  
+All of your private secrets should be generated from private master seeds.  The 
+seeds generally include the master seed, the account name, the secret name, and 
+perhaps a version name.  For example, imagine having a Gmail account, then the 
+account name might simply be 'gmail', and the secret name might be 'passcode'.  
+In this case, your master seed is combined with the words 'gmail' and 
+'passcode', the combination is hashed, and then password is generated with an 
+appropriate recipe that you specify.  There are recipes for passwords, pass 
+phrases, PINs, security questions, etc.  The password itself is not stored, 
+rather it is the seeds that are stored and the password is regenerated when 
+needed. Notice that all the seeds except the master seed need not be kept 
+secure. Thus, once you have shared a master seed with a collaborator, all you 
+need to do is share the remaining seeds and your collaborator can generate 
+exactly the same password. Another important thing to notice is that the 
+generated password is dependent on the account and secret names. Thus if you 
+rename your account or your secret, the password will change.  So you should be 
+careful when you first create your account to name it appropriately so you don't 
+feel the need to change it in the future. For example, 'gmail' might not be 
+a good account name if you expect to have multiple Gmail accounts. In this case 
+you might want to include your username in the account name. You can always make 
+the shorter 'gmail' as an account alias to you can still access the account 
+quickly.
 
 
 Installation
@@ -114,11 +114,15 @@ is thoroughly tested to assure this does not happen, but there is still a small
 chance that something slips through.  To assure that you are not affected by 
 this, you should archive your passwords before you upgrade with::
 
+    avendesora changed
     avendesora archive
 
-Then upgrade with::
+The *changed* command should always be run before an *archive* command. It 
+allows you to review all the changes that have occurred so that you can verify 
+that they were all intentional.  Once you are comfortable, run the *archive* 
+command to save all the changes.  Then upgrade with::
 
-    pip install -U --user avendesora
+    pip install -upgrade --user avendesora
 
 Finally, run::
 
@@ -386,7 +390,7 @@ name or aliases contains a text fragment. For example::
 Second, you can list any accounts that contain a text fragment in any non-secret 
 field. For example::
 
-    > avendesora find 4408
+    > avendesora search 4408
     4408:
         bankofamerica (boa)
 
@@ -499,16 +503,14 @@ get_value:
 Getting Help
 ------------
 
-Avendesora has information on how to use it features built-in that is accessible 
-using the *help* command. Use::
+The *help* command provides information on how to use Avendesora's various 
+features.  To get a listing of the topics available, use::
 
     avendesora help
 
-To get a list of available commands and topics, and then::
+Then, for information on a specific topic use::
 
     avendesora help <topic>
-
-for information on a specific command or topic.
 
 It is worth browsing all of the available topics at least once to get a sense of 
 all that Avendesora can do.
