@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='avendesora',
-    version='0.19.1',
+    version='0.20.0',
     author='Ken Kundert and Kale Kundert',
     author_email='avendesora@nurdletech.com',
     description='An XKCD-style password generator.',
@@ -48,7 +48,7 @@ setup(
             # scrypt is optional. If you install it then Avendesora will offer
             # it. It is not required because it involves compiling C code and so
             # significant additional dependencies such as gcc.
-        'shlib>=0.3.1',
+        'shlib>=0.4',
     ],
     tests_require=['pytest'],
     keywords=[
