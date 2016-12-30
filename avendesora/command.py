@@ -613,6 +613,7 @@ class Edit(Command):
         generator = PasswordGenerator()
 
         # determine the account and open the URL
+        backup = None
         try:
             account = generator.get_account(cmdline['<account>'])
             accounts_file = PythonFile(account._file_info.path)
