@@ -97,12 +97,12 @@ CONFIG_DEFAULTS = {
                     script='{email}{tab}{passcode}{return}'
                 )
 
-            Avendesora: Tailor the account entry to suit you needs.
-            Avendesora: You can add or delete class attributes as you see fit.
-            Avendesora: The 'n' key should take you to the next field name.
-            Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
-            Avendesora: Fields surrounded by << and >> will be hidden.
-            Avendesora: All lines that begin with Avendesora: are deleted.
+            # Avendesora: Tailor the account entry to suit you needs.
+            # Avendesora: You can add or delete class attributes as you see fit.
+            # Avendesora: The 'n' key should take you to the next field name.
+            # Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
+            # Avendesora: Fields surrounded by << and >> will be hidden.
+            # Avendesora: All lines that begin with '# Avendesora:' are deleted.
         """ % (3*'{'),
         'shell': """
             class _NAME_(Account): # %s1
@@ -114,12 +114,12 @@ CONFIG_DEFAULTS = {
                     script='{passcode}{return}'
                 )
 
-            Avendesora: Tailor the account entry to suit you needs.
-            Avendesora: You can add or delete class attributes as you see fit.
-            Avendesora: The 'n' key should take you to the next field name.
-            Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
-            Avendesora: Fields surrounded by << and >> will be hidden.
-            Avendesora: All lines that begin with Avendesora: are deleted.
+            # Avendesora: Tailor the account entry to suit you needs.
+            # Avendesora: You can add or delete class attributes as you see fit.
+            # Avendesora: The 'n' key should take you to the next field name.
+            # Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
+            # Avendesora: Fields surrounded by << and >> will be hidden.
+            # Avendesora: All lines that begin with '# Avendesora:' are deleted.
         """ % (3*'{'),
         'bank': """
             class _NAME_(Account): # %s1
@@ -147,12 +147,12 @@ CONFIG_DEFAULTS = {
                     script='{email}{tab}{passcode}{return}'
                 )
 
-            Avendesora: Tailor the account entry to suit you needs.
-            Avendesora: You can add or delete class attributes as you see fit.
-            Avendesora: The 'n' key should take you to the next field name.
-            Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
-            Avendesora: Fields surrounded by << and >> will be hidden.
-            Avendesora: All lines that begin with Avendesora: are deleted.
+            # Avendesora: Tailor the account entry to suit you needs.
+            # Avendesora: You can add or delete class attributes as you see fit.
+            # Avendesora: The 'n' key should take you to the next field name.
+            # Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
+            # Avendesora: Fields surrounded by << and >> will be hidden.
+            # Avendesora: All lines that begin with '# Avendesora:' are deleted.
         """ % (3*'{'),
     },
 

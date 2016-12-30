@@ -192,7 +192,7 @@ class Add(Command):
 
             # remove instructions
             new = '\n'.join(
-                [l for l in new.split('\n') if not l.startswith('Avendesora:')]
+                [l for l in new.split('\n') if not l.startswith('# Avendesora:')]
             ).strip('\n') + '\n'
 
             # hide the values that should be hidden
