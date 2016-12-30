@@ -252,16 +252,16 @@ def test_conceal():
 
         Possible encodings include (default encoding is base64):
 
+        gpg:
+            This encoding fully encrypts/decrypts the text with GPG key.
+            By default your GPG key is used, but you can specify symmetric
+            encryption, in which case a passphrase is used.
+
         base64:
             This encoding obscures but does not encrypt the text. It can
             protect text from observers that get a quick glance of the
             encoded text, but if they are able to capture it they can easily
             decode it.
-
-        gpg:
-            This encoding fully encrypts/decrypts the text with GPG key.
-            By default your GPG key is used, but you can specify symmetric
-            encryption, in which case a passphrase is used.
 
         scrypt:
             This encoding fully encrypts the text with your user key. Only

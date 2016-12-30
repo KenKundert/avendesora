@@ -78,7 +78,7 @@ class Obscure(object):
     # obscurers() {{{2
     @classmethod
     def obscurers(cls):
-        for sub in cls.__subclasses__():
+        for sub in sorted(cls.__subclasses__(), key=lambda s: s.__name__):
             if hasattr(sub, 'conceal') and hasattr(sub, 'reveal'):
                 yield sub
                 for each in sub.obscurers():
