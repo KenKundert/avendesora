@@ -1,5 +1,0 @@
-# Include a few unicode characters, but to make sure they work: ±αβγδε
-accounts_files = [
-    'accounts',
-    'templates',
-]

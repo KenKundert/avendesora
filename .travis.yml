@@ -17,7 +17,8 @@ script:
   - coverage run -m py.test
 deploy:
     provider: pypi
-    user: avendesora
+    user: kenkundert
+    password: ankle hibiscus underpay heartbeat
     on:
         tags: true
 after_success:
