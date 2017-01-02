@@ -1007,17 +1007,18 @@ class Value(Command):
         You request a scalar value by specifying its name after the account.
         For example:
 
-            avendesora value pin
+            avendesora value bank pin
 
-        If is a composite value, you should also specify a key that indicates
-        which of the composite values you want. For example, if the 'accounts'
-        field is a dictionary, you specify accounts.checking or
-        accounts[checking] to get information on your checking account. If the
-        value is an array, you give the index of the desired value. For example,
-        questions.0 or questions[0]. If you only specify a number, then the name
-        is assumed to be 'questions', as in the list of security questions (this
-        can be changed by specifying the desired name as the
-        'default_vector_field' in the account or the config file).
+        If the requested value is composite (an array or dictionary), you should
+        also specify a key that indicates which of the composite values you
+        want. For example, if the 'accounts' field is a dictionary, you specify
+        accounts.checking or accounts[checking] to get information on your
+        checking account. If the value is an array, you give the index of the
+        desired value. For example, questions.0 or questions[0]. If you only
+        specify a number, then the name is assumed to be 'questions', as in the
+        list of security questions (this can be changed by specifying the
+        desired name as the 'default_vector_field' in the account or the config
+        file).
 
         If no value is requested the result produced is determined by the value
         of the 'default' attribute. If no value is given for 'default', then the
@@ -1028,6 +1029,22 @@ class Value(Command):
         script produces a one line output if it contains secrets. If not a
         script, the value of 'default' should be the name of another attribute,
         and the value of that attribute is shown.
+
+        If no account is requested, then Avendesora attempts to determine the
+        appropriate account through discovery (see 'avendesora help discovery').
+        Normally Avendesora is called in this manner from your window manager.
+        You would arrange for it to be run when you type a hot key. In this case
+        Avendesora determines which account to use from information available
+        from the environment, information like the title on active window. In
+        this mode, Avendesora mimics the keyboard when producing its output.
+
+        The verbose and title options are used when debugging account
+        discovery. The verbose option adds more information about the
+        discovery process to the logfile (~/.config/avendesora/log.gpg). The
+        title option allows you to override the active window title so you can
+        debug title-based discovery. Specifying the title option also scrubs
+        the output and outputs directly to the standard output rather than
+        mimicking the keyboard so as to avoid exposing your secret.
     """).strip()
 
     @classmethod
@@ -1061,7 +1078,7 @@ class Value(Command):
                 title=cmdline['--title'], verbose=cmdline['--verbose']
             )
             account = generator.get_account(account_name)
-            writer.run_script(account, script)
+            writer.run_script(account, script, title)
 
 
 # Values {{{1

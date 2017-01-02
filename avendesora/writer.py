@@ -254,7 +254,7 @@ class StdoutWriter(Writer):
 class KeyboardWriter(Writer):
     """Writes output via pseudo-keyboard."""
 
-    def run_script(self, account, script):
+    def run_script(self, account, script, dryrun):
 
         def run_xdotool(args):
             try:
@@ -264,6 +264,8 @@ class KeyboardWriter(Writer):
                 fatal(os_error(err))
 
         def autotype(text):
+            if dryrun:
+                return
             # Split the text into individual key strokes and convert the special
             # characters to their xkeysym names
             keysyms = []
@@ -344,5 +346,9 @@ class KeyboardWriter(Writer):
             else:
                 out.append(term)
 
-        log('Autotyping "%s".' % ''.join(scrubbed).replace('\t', '→').replace('\n', '↲'))
+        scrubbed = ''.join(scrubbed).replace('\t', '→').replace('\n', '↲')
+        log('Autotyping "%s".' % scrubbed)
+        if dryrun:
+            output(scrubbed)
+            log('dryrun')
         autotype(''.join(out))

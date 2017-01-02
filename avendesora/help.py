@@ -1301,8 +1301,16 @@ class Stealth(HelpMessage):
 
             Generally one uses the predefined stealth accounts, which all have
             names that are descriptive of the form of the secret they generate,
-            for example Word6 generates a 6-word pass phrase. The predefined
-            accounts are kept in ~/.config/avendesora/stealth_accounts.
+            for example word4 generates a 4-word pass phrase (also referred as
+            the xkcd pattern):
+
+                > avendesora value word4
+                account: my_secret_account
+                gulch sleep scone halibut
+
+            The predefined accounts are kept in
+            ~/.config/avendesora/stealth_accounts.  You are free to add new
+            accounts or modify the existing accounts.
 
             Stealth accounts are subclasses of the StealthAccount class. These
             accounts differ from normal accounts in that they do not contribute
