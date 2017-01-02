@@ -18,12 +18,9 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/dd/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 0.20.5
+| Version: 1.0.0
 | Released: 2017-01-01
 |
-
-Avendesora is currently in beta. However it is reasonably stable and so you 
-should feel comfortable using it.
 
 Avendesora replaces the Abraxas, which are both alternatives to the traditional 
 password vault.
