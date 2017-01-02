@@ -1078,7 +1078,7 @@ class Value(Command):
                 title=cmdline['--title'], verbose=cmdline['--verbose']
             )
             account = generator.get_account(account_name)
-            writer.run_script(account, script, title)
+            writer.run_script(account, script, cmdline['--title'])
 
 
 # Values {{{1

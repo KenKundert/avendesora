@@ -347,8 +347,7 @@ class KeyboardWriter(Writer):
                 out.append(term)
 
         scrubbed = ''.join(scrubbed).replace('\t', '→').replace('\n', '↲')
-        log('Autotyping "%s".' % scrubbed)
+        log('Autotyping "%s"%s.' % (scrubbed, ' -- dry run' if dryrun else ''))
         if dryrun:
-            output(scrubbed)
-            log('dryrun')
+            output(account.get_name(), scrubbed, sep=': ')
         autotype(''.join(out))
