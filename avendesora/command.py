@@ -25,7 +25,7 @@ from .obscure import Obscure
 from .utilities import two_columns
 from .writer import get_writer
 from inform import (
-    Error, debug, error, codicil, output, conjoin, os_error, warn,
+    Error, codicil, debug, error, fatal, output, warn, conjoin, os_error,
     is_collection, is_str, indent, render,
 )
 from shlib import chmod, mv, rm, to_path
@@ -176,62 +176,82 @@ class Add(Command):
                 ), culprit=template_name
             )
 
-        backup = None
         try:
-            # save template to tmp file and open it in the editor
+            # get original contents of accounts file
+            path = to_path(get_setting('settings_dir'), filename)
+            orig_accounts_file = PythonFile(path)
+            orig_accounts = orig_accounts_file.run()
+            gpg_ids = orig_accounts.get('gpg_ids')
+            orig_accounts_code = orig_accounts_file.code.strip('\n')
+
+            # backup the original file
+            orig_accounts_file.backup('.saved')
+
+            # save the template into temp file
             from tempfile import mktemp
             tmpfilename = mktemp(suffix='_avendesora.gpg')
             tmpfile = GnuPG(tmpfilename)
             tmpfile.save(template, get_setting('gpg_ids'))
-            GenericEditor.open_and_search(tmpfile.path)
-
-            # read the tmp file and determine if it has changed
-            new = tmpfile.read()
-            if not new.strip() or new == template:
-                return output('Unchanged, and so ignored.')
-
-            # remove instructions
-            new = '\n'.join(
-                [l for l in new.split('\n') if not l.startswith('# Avendesora:')]
-            ).strip('\n') + '\n'
-
-            # hide the values that should be hidden
-            def hide(match):
-                return 'Hidden(%r)' % Obscure.hide(match.group(1))
-            new = re.sub("<<(.*?)>>", hide, new)
-
-            # get original contents of accounts file
-            path = to_path(get_setting('settings_dir'), filename)
-            orig_accounts_file = PythonFile(path)
-            accounts = orig_accounts_file.run()
-            gpg_ids = accounts.get('gpg_ids')
-
-            # add new account to the contents
-            accounts = orig_accounts_file.code.strip('\n') + '\n\n\n' + new
-
-            # backup the original file and then save the new version
-            backup = orig_accounts_file.backup('.saved')
-            new_accounts_file = PythonFile(path)
-            new_accounts_file.save(accounts, gpg_ids)
-
-            # check the changes to see if there are any issues
-            new_accounts_file.run()
         except (Error, OSError) as err:
             if isinstance(err, OSError):
-                error(os_error(err))
+                fatal(os_error(err))
             else:
-                error(err)
+                fatal(err)
+
+        # save template to tmp file and open it in the editor
+        try:
+            while (True):
+                GenericEditor.open_and_search(tmpfile.path)
+
+                # read the tmp file and determine if it has changed
+                new = tmpfile.read()
+                if not new.strip() or new == template:
+                    return output('Unchanged, and so ignored.')
+                new = tmpfile.read()
+
+                # remove instructions
+                new = '\n'.join([
+                    l
+                    for l in new.split('\n')
+                    if not l.startswith('# Avendesora:')
+                ]).strip('\n') + '\n'
+
+                # hide the values that should be hidden
+                def hide(match):
+                    return 'Hidden(%r)' % Obscure.hide(match.group(1))
+                new = re.sub("<<(.*?)>>", hide, new)
+
+                # add new account to the contents
+                accounts = orig_accounts_code + '\n\n\n' + new
+
+                # save the new version
+                new_accounts_file = PythonFile(path)
+                new_accounts_file.save(accounts, gpg_ids)
+
+                # check the changes to see if there are any issues
+                try:
+                    new_accounts_file.run()
+                    break
+                except Error as err:
+                    error(err)
+                    if sys.version_info.major < 3:
+                        response = raw_input('Try again? ')
+                    else:
+                        response = input('Try again? ')
+                    if response.lower() not in ['y', 'yes']:
+                        raise Error('Giving up, restoring original file.')
+
+        except (Error, OSError) as err:
+            orig_accounts_file.restore()
+            if isinstance(err, OSError):
+                err = os_error(err)
+            error(err)
             codicil(
                 '',
                 'What you entered can be found in %s.' % tmpfilename,
                 'Delete it when done with it.', sep='\n'
             )
-            if backup:
-                codicil(
-                    '',
-                    'Unmodified version of %s' % new_accounts_file.path,
-                    'was saved as %s.' % backup, sep='\n'
-                )
+            return
 
         # delete the temp file
         try:
@@ -612,28 +632,42 @@ class Edit(Command):
         # run the generator
         generator = PasswordGenerator()
 
-        # determine the account and open the URL
+        # determine the account file and back it up
         backup = None
         try:
             account = generator.get_account(cmdline['<account>'])
             accounts_file = PythonFile(account._file_info.path)
-            backup = accounts_file.backup('.saved')
+            accounts_file.backup('.saved')
             account_name = account.__name__
-            GenericEditor.open_and_search(accounts_file.path, account_name)
-
-            # check the changes to see if there are any issues
-            accounts_file.run()
         except (Error, OSError) as err:
             if isinstance(err, OSError):
-                error(os_error(err))
+                fatal(os_error(err))
             else:
-                error(err)
-            if backup:
-                codicil(
-                    '',
-                    'Unmodified version of %s' % accounts_file.path,
-                    'was saved as %s.' % backup, sep='\n'
-                )
+                fatal(err)
+
+        # allow the user to editor, and then check and make sure it is valid
+        try:
+            while True:
+                GenericEditor.open_and_search(accounts_file.path, account_name)
+
+                # check the changes to see if there are any issues
+                try:
+                    accounts_file.run()
+                    break
+                except Error as err:
+                    error(err)
+                    if sys.version_info.major < 3:
+                        response = raw_input('Try again? ')
+                    else:
+                        response = input('Try again? ')
+                    if response.lower() not in ['y', 'yes']:
+                        raise Error('Giving up, restoring original version.')
+
+        except (Error, OSError) as err:
+            accounts_file.restore()
+            if isinstance(err, OSError):
+                err = os_error(err)
+            error(err)
 
 
 # Find {{{1

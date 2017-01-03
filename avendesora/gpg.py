@@ -156,9 +156,15 @@ class GnuPG(object):
         suffixes = self.path.suffixes
         stem = self.path.stem.partition('.')[0]  # remove all suffixes
         new = to_path(self.path.parent, ''.join([stem, extension] + suffixes))
+        self.backup_path = new
 
         cp(self.path, new)
         return new
+
+    def restore(self):
+        "Restores the backup copy of the file."
+
+        cp(self.backup_path, self.path)
 
     def will_encrypt(self):
         return self.path.suffix in GPG_EXTENSIONS
