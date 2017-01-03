@@ -15,11 +15,5 @@ install:
   - chmod -R go-rwx tests/home/gnupg
 script:
   - coverage run -m py.test
-deploy:
-    provider: pypi
-    user: kenkundert
-    password: ankle hibiscus underpay heartbeat
-    on:
-        tags: true
 after_success:
   - coveralls
