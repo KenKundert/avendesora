@@ -69,7 +69,7 @@ class Title(object):
             except OSError as err:
                 raise Error(str(err))
             title = output.stdout.strip()
-        log('Focused window title: %s' % title)
+        log('Focused window title: <%s>' % title)
         data = {'rawtitle': title}
         for sub in sorted(Title.__subclasses__(), key=lambda c: c.PRIORITY):
             matched = sub._process(title, data)
@@ -108,7 +108,7 @@ class AddURLToWindowTitle(Title):
     # This matches the default pattern produced by AddURLToWindowTitle in
     # Firefox, though sometimes it outputs the host, and sometimes it does not.
     PATTERN = re.compile(
-        r'\A{title} - {url} - (?:{host} - )?{browser}\Z'.format(**REGEX_COMPONENTS)
+        r'\A{title}- {url} - (?:{host} - )?{browser}\Z'.format(**REGEX_COMPONENTS)
     )
     PRIORITY = 1
 

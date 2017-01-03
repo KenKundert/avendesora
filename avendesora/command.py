@@ -187,7 +187,7 @@ class Add(Command):
 
             # read the tmp file and determine if it has changed
             new = tmpfile.read()
-            if new == template:
+            if not new.strip() or new == template:
                 return output('Unchanged, and so ignored.')
 
             # remove instructions
