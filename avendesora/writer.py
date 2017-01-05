@@ -195,14 +195,11 @@ class ClipboardWriter(Writer):
         # could steal my passwords. This is why I use an absolute path. I tried
         # to access the clipboard directly using GTK but I cannot get the code
         # to work.
+        base_cmd = Run.split(get_setting('xsel_executable'))
 
         log('Writing to clipboard.')
         try:
-            Run(
-                get_setting('xsel_executable').split() + ['-i'],
-                'soew',
-                stdin=value+'\n'
-            )
+            Run(base_cmd + ['-i'], 'soew', stdin=value+'\n')
         except Error as err:
             err.terminate()
 
@@ -218,7 +215,7 @@ class ClipboardWriter(Writer):
 
             # clear the clipboard
             try:
-                Run(get_setting('xsel_executable').split() + ['-c'], 'soew')
+                Run(base_cmd + ['-c'], 'soew')
             except Error as err:
                 err.terminate()
 

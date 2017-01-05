@@ -48,7 +48,7 @@ setup(
             # scrypt is optional. If you install it then Avendesora will offer
             # it. It is not required because it involves compiling C code and so
             # significant additional dependencies such as gcc.
-        'shlib>=0.4',
+        'shlib>=0.6',
     ],
     tests_require=['pytest'],
     keywords=[
@@ -57,7 +57,7 @@ setup(
         'XKCD',
     ],
     classifiers=[
-        'Development Status :: 5 - Production',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
