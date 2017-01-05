@@ -50,6 +50,7 @@ setup(
             # significant additional dependencies such as gcc.
         'shlib>=0.6',
     ],
+    setup_requires=['pytest-runner>=2.0'],
     tests_require=['pytest'],
     keywords=[
         'avendesora',

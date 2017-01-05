@@ -81,7 +81,6 @@ CONFIG_DEFAULTS = {
     'log_file': 'log.gpg',
     'required_protocols': ['https'],
     'user_key_file': 'key.gpg',
-    'verbose': False,
     'default_account_template': 'bank',
     'account_templates': {
         'website': """
@@ -201,9 +200,6 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
         # choose from black, red, green, yellow, blue, magenta, cyan, white
     color_scheme = {color_scheme}
         # choose from dark, light
-    verbose = {verbose}
-        # normally set to false, if set true it sets --verbose option, which can
-        # help when debugging account discovery
     use_pager = {use_pager}
 
     # Prototype accounts
