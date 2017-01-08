@@ -130,7 +130,9 @@ class PasswordGenerator(object):
                         # reads the file.
         else:
             # Create a new accounts file
-            fields['accounts_files'] = get_setting('accounts_files', []) + [filename]
+            fields['accounts_files'] = render(
+                get_setting('accounts_files', []) + [filename]
+            )
             path = to_path(get_setting('settings_dir'), filename)
             if path.exists():
                 raise Error('exists.', culprit=path)

@@ -284,6 +284,28 @@ class Accounts(HelpMessage):
             be the value of the top-level attributes, or the top-level
             attributes may be arrays or dictionaries that contain objects of
             these classes, but it can go no further.
+
+            By default the account name is taken to be the class name converted
+            to lower case.  So the name for the NewYorkTimes account given above
+            would be newyorktimes. You can override the name with the NAME
+            field. This allows you to create account names that contain dashes
+            or any other character that would not be acceptable in a class name
+            (best to avoid characters that are meaningful to your shell, such as
+            !$&*()|<>'"\{};`.  For example:
+
+                class Root_Work(Account):
+                    NAME = 'root@work'
+
+            It is important to remember that any generated secrets use the
+            account name when generating their value, so if you change the
+            account name you will change the secret.  For this reason is it
+            important to choose a good account name up front and not change it.
+            It should be very specific to avoid conflicts with similar accounts
+            created later.  For example, rather than choosing gmail as your
+            account name, you might want to include your username, ex.
+            gmail-paul-bunyan. This would allow you to create additional gmail
+            accounts later without ambiguity. Then just add 'gmail' as an alias
+            to the account you use most often.
         """).strip()
         return text
 

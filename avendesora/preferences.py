@@ -530,6 +530,7 @@ ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
     # immaterial, except that first file given is the default file, meaning that
     # the add account will add a new account to the first files specified unless
     # a different files is specified explicitly.
+
     accounts_files = {accounts_files}
 ''')
 
