@@ -428,7 +428,8 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         passcode = PIN(length=12)
 
     # Pass phrases {section}
-    class Word(StealthAccount):
+    class Word1(StealthAccount):
+        aliases = 'word'
         passcode = Passphrase(length=1)
 
     class Word2(StealthAccount):
@@ -439,7 +440,7 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         passcode = Passphrase(length=3)
 
     class Word4(StealthAccount):
-        aliases = 'word xkcd'
+        aliases = 'words xkcd'
         passcode = Passphrase(length=4)
 
     class Word5(StealthAccount):

@@ -27,8 +27,8 @@ from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import Secret
 from inform import (
-    Color, conjoin, cull, debug, Error, is_collection, is_str, log, output,
-    warn, indent
+    Color, codicil, conjoin, cull, debug, Error, is_collection, is_str, log,
+    output, warn, indent
 )
 from textwrap import dedent
 try:
@@ -106,6 +106,31 @@ class Account(object):
             for each in sub.all_accounts():
                 yield each
 
+    # preprocess_accounts() {{{2
+    @classmethod
+    def preprocess_accounts(cls):
+        seen = {}
+        for account in Account.all_accounts():
+            aliases = Collection(getattr(account, 'aliases', ''))
+            account.aliases = aliases
+            acct_name = account.get_name()
+            names = [acct_name] + list(aliases)
+            new = {}
+            for name in names:
+                if name in seen:
+                    if name == acct_name:
+                        warn('duplicate account name.', culprit=name)
+                    else:
+                        warn('alias duplicates existing name.', culprit=name)
+                    codicil('Seen in %s in %s.' % seen[name])
+                    codicil('And in %s in %s.' % (acct_name, account._file_info.path))
+                else:
+                    new[name] = (account.get_name(), account._file_info.path)
+            seen.update(new)
+                # this two step approach to updating seen prevents us from
+                # complaining about aliases that duplicate the account name,
+                # or duplicate aliases, both of which are harmless
+
     # fields() {{{2
     @classmethod
     def fields(cls):
@@ -154,7 +179,7 @@ class Account(object):
         if account == cls.get_name():
             return True
         try:
-            if account in Collection(cls.aliases):
+            if account in cls.aliases:
                 return True
         except AttributeError:
             pass
@@ -167,7 +192,7 @@ class Account(object):
         if target in cls.get_name().lower():
             return True
         try:
-            for alias in Collection(cls.aliases):
+            for alias in cls.aliases:
                 if target in alias.lower():
                     return True
         except AttributeError:
@@ -487,9 +512,7 @@ class Account(object):
             return lines
 
         # preload list with the names associated with this account
-        names = [cls.get_name()]
-        if hasattr(cls, 'aliases'):
-            names += Collection(cls.aliases)
+        names = [cls.get_name()] + list(cls.aliases)
         lines = [fmt_field('names', ', '.join(names))]
 
         for key, value in cls.items():

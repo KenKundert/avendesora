@@ -56,3 +56,9 @@ class Collection(object):
 
     def __iter__(self):
         return iter(self.values())
+
+    def __len__(self):
+        return len(self.collection)
+
+    def __getitem__(self, key):
+        return self.collection[key]

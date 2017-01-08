@@ -59,7 +59,7 @@ def test_add():
 
         The available accounts files are:
             accounts
-            templates
+            stealth_accounts
     """).strip()
     assert result.decode('utf-8') == expected
 

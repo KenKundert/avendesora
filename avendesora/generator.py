@@ -57,7 +57,7 @@ class PasswordGenerator(object):
             terminate()
 
         # read the accounts files
-        self.accounts = set()
+        self.accounts = []
         self.shared_secrets = {}
         for filename in get_setting('accounts_files', []):
             try:
@@ -75,9 +75,10 @@ class PasswordGenerator(object):
                         account.add_fileinfo(master_seed, account_file)
 
                         # save a copy of account so it is not garbage collected
-                        self.accounts.add(account)
+                        self.accounts.append(account)
             except Error as err:
                 err.terminate()
+        Account.preprocess_accounts()
         terminate_if_errors()
 
     # initialize() {{{2

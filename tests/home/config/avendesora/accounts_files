@@ -4,5 +4,5 @@
 # a different files is specified explicitly.
 accounts_files = [
     'accounts',
-    'templates',
+    'stealth_accounts',
 ]

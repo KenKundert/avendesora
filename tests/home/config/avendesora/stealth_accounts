@@ -1,0 +1,171 @@
+# Avendesora Stealth Accounts
+# vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding='utf8' :
+#
+# Stealth accounts are accounts where the class name is not taken to be the
+# account name, instead the user is interactively asked for the account
+# name. In this way there is no record that the account actually exists.
+
+# Imports {{{1
+from avendesora import (
+    # Account
+    StealthAccount,
+
+    # Character sets
+    exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
+    HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
+
+    # Secrets
+    Password, PasswordRecipe, Passphrase, PIN, Hidden
+)
+
+# Accounts
+# Alphanumeric passwords {{{1
+class Anum4(StealthAccount):
+    passcode = Password(length=4, alphabet=DISTINGUISHABLE)
+
+class Anum6(StealthAccount):
+    passcode = Password(length=6, alphabet=DISTINGUISHABLE)
+
+class Anum8(StealthAccount):
+    passcode = Password(length=8, alphabet=DISTINGUISHABLE)
+
+class Anum10(StealthAccount):
+    passcode = Password(length=10, alphabet=DISTINGUISHABLE)
+
+class Anum12(StealthAccount):
+    aliases = 'anum'
+    passcode = Password(length=12, alphabet=DISTINGUISHABLE)
+
+class Anum14(StealthAccount):
+    passcode = Password(length=14, alphabet=DISTINGUISHABLE)
+
+class Anum16(StealthAccount):
+    passcode = Password(length=16, alphabet=DISTINGUISHABLE)
+
+class Anum18(StealthAccount):
+    passcode = Password(length=18, alphabet=DISTINGUISHABLE)
+
+class Anum20(StealthAccount):
+    passcode = Password(length=20, alphabet=DISTINGUISHABLE)
+
+# High entropy passwords {{{1
+class Char4(StealthAccount):
+    passcode = Password(length=4, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char6(StealthAccount):
+    passcode = Password(length=6, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char8(StealthAccount):
+    passcode = Password(length=8, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char10(StealthAccount):
+    passcode = Password(length=10, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char12(StealthAccount):
+    aliases = 'char'
+    passcode = Password(length=12, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char14(StealthAccount):
+    passcode = Password(length=14, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char16(StealthAccount):
+    passcode = Password(length=16, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char18(StealthAccount):
+    passcode = Password(length=18, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+class Char20(StealthAccount):
+    passcode = Password(length=20, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+# Extreme passwords {{{1
+class Extreme(StealthAccount):
+    passcode = Passphrase(length=64, alphabet=PRINTABLE)
+
+# Hex passwords {{{1
+class Hex4(StealthAccount):
+    passcode = Password(length=4, alphabet=HEXDIGITS, prefix='0x')
+
+class Hex8(StealthAccount):
+    passcode = Password(length=8, alphabet=HEXDIGITS, prefix='0x')
+
+class Hex16(StealthAccount):
+    passcode = Password(length=16, alphabet=HEXDIGITS, prefix='0x')
+
+class Hex32(StealthAccount):
+    passcode = Password(length=32, alphabet=HEXDIGITS, prefix='0x')
+
+class Hex64(StealthAccount):
+    aliases = 'hex'
+    passcode = Password(length=64, alphabet=HEXDIGITS, prefix='0x')
+
+# PINs {{{1
+class Pin4(StealthAccount):
+    aliases = 'pin'
+    passcode = PIN(length=4)
+
+class Pin6(StealthAccount):
+    passcode = PIN(length=6)
+
+class Pin8(StealthAccount):
+    aliases = 'num'
+    passcode = PIN(length=8)
+
+class Pin10(StealthAccount):
+    passcode = PIN(length=10)
+
+class Pin12(StealthAccount):
+    passcode = PIN(length=12)
+
+# Pass phrases {{{1
+class Word1(StealthAccount):
+    aliases = 'word'
+    passcode = Passphrase(length=1)
+
+class Word2(StealthAccount):
+    aliases = 'pair'
+    passcode = Passphrase(length=2)
+
+class Word3(StealthAccount):
+    passcode = Passphrase(length=3)
+
+class Word4(StealthAccount):
+    aliases = 'words xkcd'
+    passcode = Passphrase(length=4)
+
+class Word5(StealthAccount):
+    passcode = Passphrase(length=5)
+
+class Word6(StealthAccount):
+    passcode = Passphrase(length=6)
+
+class Word7(StealthAccount):
+    passcode = Passphrase(length=7)
+
+class Word8(StealthAccount):
+    passcode = Passphrase(length=8)
+
+# Web passwords {{{1
+class Web6(StealthAccount):
+    passcode = PasswordRecipe('6 u d s')
+
+class Web8(StealthAccount):
+    passcode = PasswordRecipe('8 u d s')
+
+class Web10(StealthAccount):
+    passcode = PasswordRecipe('10 2u 2d 2s')
+
+class Web12(StealthAccount):
+    aliases = 'web'
+    passcode = PasswordRecipe('12 2u 2d 2s')
+
+class Web14(StealthAccount):
+    passcode = PasswordRecipe('14 2u 2d 2s')
+
+class Web16(StealthAccount):
+    passcode = PasswordRecipe('16 3u 3d 3s')
+
+class Web18(StealthAccount):
+    passcode = PasswordRecipe('18 3u 3d 3s')
+
+class Web20(StealthAccount):
+    passcode = PasswordRecipe('20 3u 3d 3s')
