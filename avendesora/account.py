@@ -111,10 +111,13 @@ class Account(object):
     def preprocess_accounts(cls):
         seen = {}
         for account in Account.all_accounts():
-            aliases = Collection(getattr(account, 'aliases', ''))
-            account.aliases = aliases
             acct_name = account.get_name()
-            names = [acct_name] + list(aliases)
+            if hasattr(account, 'aliases'):
+                aliases = list(Collection(account.aliases))
+                account.aliases = aliases
+            else:
+                aliases = []
+            names = [acct_name] + aliases
             new = {}
             for name in names:
                 if name in seen:
@@ -512,7 +515,8 @@ class Account(object):
             return lines
 
         # preload list with the names associated with this account
-        names = [cls.get_name()] + list(cls.aliases)
+        aliases = cls.aliases if cls.aliases else []
+        names = [cls.get_name()] + aliases
         lines = [fmt_field('names', ', '.join(names))]
 
         for key, value in cls.items():
