@@ -412,7 +412,7 @@ class RecognizeFile(Recognizer):
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
-        args = [repr(self.filepath)]
+        args = [repr(str(self.filepath))]
         if self.script:
             args.append('script=%r' % self.script)
         return "%s(%s)" % (self.__class__.__name__, ', '.join(args))

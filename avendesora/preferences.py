@@ -308,8 +308,8 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     master_seed = Hidden({master_seed}, secure=True)
     gpg_ids = {gpg_ids}
 
-    # Accounts
 
+    # Accounts
 ''')
 
 # Initial stealth_accounts file {{{1
