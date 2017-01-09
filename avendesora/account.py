@@ -515,8 +515,7 @@ class Account(object):
             return lines
 
         # preload list with the names associated with this account
-        aliases = cls.aliases if cls.aliases else []
-        names = [cls.get_name()] + aliases
+        names = [cls.get_name()] + getattr(cls, 'aliases', [])
         lines = [fmt_field('names', ', '.join(names))]
 
         for key, value in cls.items():
