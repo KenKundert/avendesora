@@ -81,6 +81,7 @@ CONFIG_DEFAULTS = {
     'log_file': 'log.gpg',
     'required_protocols': ['https'],
     'user_key_file': 'key.gpg',
+    'verbose': False,
     'default_account_template': 'bank',
     'account_templates': {
         'website': """
@@ -197,10 +198,14 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     default_browser = {default_browser}
     required_protocols = {required_protocols}
     label_color = {label_color}
-        # choose from black, red, green, yellow, blue, magenta, cyan, white
+        # Choose from black, red, green, yellow, blue, magenta, cyan, white.
     color_scheme = {color_scheme}
-        # choose from dark, light
+        # Choose from dark, light.
     use_pager = {use_pager}
+    verbose = {verbose}
+        # Set this to True to generate additional information in the log file
+        # that can help debug account discovery issues.  Normally it should be
+        # False to avoid leaking account information into log file.
 
     # Prototype accounts
     default_account_template = {default_account_template}
@@ -515,8 +520,9 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
 
     from avendesora import (
         Hidden, Question, Script,
-        RecognizeAll, RecognizeTitle, RecognizeURL, RecognizeCWD, RecognizeHost,
-        RecognizeUser, RecognizeEnvVar, RecognizeNetwork
+        RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
+        RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
+        RecognizeFile
     )
 
     CREATED = '{date}'

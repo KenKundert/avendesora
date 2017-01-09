@@ -332,7 +332,7 @@ class RecognizeEnvVar(Recognizer):
 
 # RecognizeNetwork {{{1
 class RecognizeNetwork(Recognizer):
-    """RecognizeNetwork from MAC address
+    """Recognize network from MAC address
 
     Matches if any of the MAC addresses reported by /sbin/arp match any of those
     given as an argument.
@@ -359,13 +359,60 @@ class RecognizeNetwork(Recognizer):
                     log('    %s: matches.' % self.get_name())
                 return self.script
         except OSError as err:
-            warn(os_error())
+            warn(os_error(err))
             return
         if verbose:
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
         args = [repr(each) for each in self.macs]
+        if self.script:
+            args.append('script=%r' % self.script)
+        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+
+
+# RecognizeFile {{{1
+class RecognizeFile(Recognizer):
+    """Recognize file
+
+    Triggers if file exists and was created within the last few seconds.
+    """
+    def __init__(self, filepath, contents=None, wait=60, **kwargs):
+        self.filepath = to_path(filepath)
+        self.expected = contents
+        self.wait = wait
+        self.script = kwargs.pop('script', True)
+        if kwargs:
+            raise TypeError(
+                '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
+
+    def match(self, data, account, verbose=False):
+        import arrow
+        try:
+            mtime = self.filepath.stat().st_mtime
+            now = arrow.now().timestamp
+            if mtime + self.wait > now:
+                if self.expected:
+                    found = self.filepath.read_text()
+                    if found.strip() == self.expected.strip():
+                        if verbose:
+                            log('    %s: matches.' % self.get_name())
+                        return self.script
+                    elif verbose:
+                        log('    %s: content mismatch.' % self.get_name())
+                        return
+            elif verbose:
+                log('    %s: file stale.' % self.get_name())
+                return
+        except FileNotFoundError:
+            pass
+        except OSError as err:
+            warn(os_error(err))
+        if verbose:
+            log('    %s: no match.' % self.get_name())
+
+    def __repr__(self):
+        args = [repr(self.filepath)]
         if self.script:
             args.append('script=%r' % self.script)
         return "%s(%s)" % (self.__class__.__name__, ', '.join(args))

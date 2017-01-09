@@ -15,6 +15,7 @@ except ImportError:  # no cover
 from .recognize import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
     RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
+    RecognizeFile
 )
 from .generator import PasswordGenerator
 from inform import Error as PasswordError

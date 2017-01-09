@@ -170,6 +170,9 @@ class PasswordGenerator(object):
     def discover_account(self, title=None, verbose=False):
         log('Account Discovery ...')
 
+        if not verbose:
+            verbose = get_setting('verbose')
+
         # get and parse the title
         data = Title(override=title).get_data()
 

@@ -860,9 +860,22 @@ def test_discovery():
             )
 
         If you use Firefox, you can install the 'Add URL to Window Title'
-        extension. Doing so adds the website URL to the Firefox window
-        title, which can make account discovery more robust. In this case
-        you can use:
+        extension.  It is a plugin that makes discovery easier and more
+        robust by adding the URL to the title.  For Chrome the appropriate
+        plugin is  is 'URL in Title'.  It is recommended that you install
+        the appropriate one into your browser.  For AddURLToWindowTitle, set
+        the following options:
+
+            show full URL = yes
+            separator string = '-'
+            show field attributes = no
+
+        For URLinTitle, set:
+
+            tab title format = '{title} - {protocol}://{hostname}{port}/{path}'
+
+        RecognizeURL designed to recognize such titles. Once you have
+        deployed the appropriate plugin, you can use:
 
             discovery = RecognizeURL(
                 'https://chaseonline.chase.com',
@@ -874,43 +887,9 @@ def test_discovery():
         not supported. If you give a partial path, by default Avendesora
         will match up to what you have given, but you can require an exact
         match of the entire path by specifying exact_path=True to
-        RecognizeURL.  If you do not give the protocol, https is assumed.
-
-        The following recognizers are available:
-
-            RecognizeAll(<recognizer>..., [script=<script>])
-            RecognizeAny(<recognizer>..., [script=<script>])
-            RecognizeTitle(<title>..., [script=<script>])
-            RecognizeURL(<title>..., [script=<script>, [name=<name>]], [exact_path=<bool>])
-            RecognizeHost(<host>..., [script=<script>])
-            RecognizeUser(<user>..., [script=<script>])
-            RecognizeCWD(<cwd>..., [script=<script>])
-            RecognizeEnvVar(<name>, <value>, [script=<script>])
-            RecognizeNetwork(<mac>..., [script=<script>])
-
-        RecognizeAll() and RecognizeAny() can be used to combine several
-        recognizers. For example:
-
-            discovery = RecognizeAll(
-                RecognizeTitle('sudo *'),
-                RecognizeUser('hhyde'),
-                script='{passcode}{return}'
-            )
-
-        To make secret discovery easier and more robust it is helpful to add
-        a plugin to your web browser to make its title more informative. For
-        Firefox, the best plugin to use is AddURLToWindowTitle. For Chrome
-        it is URLinTitle. It is recommended that you install the appropriate
-        one into your browser.  For AddURLToWindowTitle, set the following
-        options:
-
-            show full URL = yes
-            separator string = '-'
-            show field attributes = no
-
-        For URLinTitle, set:
-
-            tab title format = '{title} - {protocol}://{hostname}{port}/{path}'
+        RecognizeURL.  If you do not give the protocol, https is assumed. If
+        you expect to use a protocol other than https you must specify it,
+        otherwise Avendesora will complain.
 
         When account discovery fails it can be difficult to determine what
         is going wrong. When this occurs, you should first examine the log
@@ -923,7 +902,31 @@ def test_discovery():
 
         The title should be copied from the log file. The verbose option
         causes the result of each test to be included in the log file, so
-        you can determine which recognizer is failing to trigger.
+        you can determine which recognizer is failing to trigger.  You can
+        either specify the verbose option on the command line or in the
+        config file.
+
+        The following recognizers are available:
+
+            RecognizeAll(<recognizer>..., [script=<script>])
+            RecognizeAny(<recognizer>..., [script=<script>])
+            RecognizeTitle(<title>..., [script=<script>])
+            RecognizeURL(<title>..., [script=<script>, [name=<name>,]] [exact_path=<bool>])
+            RecognizeHost(<host>..., [script=<script>])
+            RecognizeUser(<user>..., [script=<script>])
+            RecognizeCWD(<cwd>..., [script=<script>])
+            RecognizeEnvVar(<name>, <value>, [script=<script>])
+            RecognizeNetwork(<mac>..., [script=<script>])
+            RecognizeFile(<path>, [<contents>,] [<ttl>,] [script=<script>])
+
+        RecognizeAll() and RecognizeAny() can be used to combine several
+        recognizers. For example:
+
+            discovery = RecognizeAll(
+                RecognizeTitle('sudo *'),
+                RecognizeUser('hhyde'),
+                script='{passcode}{return}'
+            )
 
         If the recognizers are given in an array, all are tried. For
         example:
@@ -945,6 +948,58 @@ def test_discovery():
         will both be offered for this site.  But each has a different
         script. The name allows the user to distinguish the available
         choices.
+
+        RecognizeFile checks to determine whether a particular file has been
+        created recently.  This can be use in scripts to force secret
+        recognition.  For example, the titles used by Firefox and
+        Thunderbird when collecting the master password is either
+        non-existent or undistinguished.  These programs also produce a
+        large amount of uninteresting chatter on their output, so it is
+        common to write a shell script to run the program that redirects
+        their output to /dev/null.  Such a script can be modified to
+        essentially notify Avendesora that a particular password is desired.
+        For example, for Thunderbird:
+
+            #!/bin/sh
+            touch /tmp/thunderbird-1024
+            /usr/bin/thunderbird > /dev/null
+
+        Here I have adding my user id (uid=1024) to make the filename unique
+        so I am less likely to clash with other users. Alternately, you
+        could choose a path that fell within your home directory. Then,
+        adding:
+
+            class Firefox(Account):
+                desc = 'Master password for Firefox and Thunderbird'
+                passcode = Password()
+                discovery = RecognizeFile(
+                    '/tmp/thunderbird-1024', wait=60, script='{passcode}{return}'
+                )
+
+        If the specified file exists and has been updated within the last 60
+        seconds, then secret is recognized.  You can specify the amount of
+        time you can wait in between running the script and running
+        Avendesora with the 'wait' argument, which takes a number of
+        seconds.  It defaults to 60.
+
+        Using this particular approach, every secret would need its own
+        file. But you can share a file by specifying the file contents.
+        Then the script could be rewritten as:
+
+            #!/bin/sh
+            echo thunderbird > ~/.avendesora-password-request
+            /usr/bin/thunderbird > /dev/null
+
+        Then you would add something like the following to your accounts file:
+
+            class Firefox(Account):
+                desc = 'Master password for Firefox and Thunderbird'
+                passcode = Password()
+                discovery = RecognizeFile(
+                    '~/.avendesora-password-request',
+                    contents='thunderbird',
+                    script='{passcode}{return}'
+                )
     """).strip()
     assert result.decode('utf-8') == expected
 
