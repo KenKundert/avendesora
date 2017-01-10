@@ -37,11 +37,11 @@ except ImportError:
 # Globals {{{1
 GPG_EXTENSIONS = ['.gpg', '.asc']
 ARMOR_CHOICES = ['always', 'never', 'extension']
-ActiveFile= None
+ActivePythonFile= None
 
-# get_active_file() {{{1
-def get_active_file():
-    return ActiveFile
+# get_active_python_file() {{{1
+def get_active_python_file():
+    return ActivePythonFile
 
 # GnuPG class {{{1
 class GnuPG(object):
@@ -202,8 +202,8 @@ class BufferedFile(GnuPG):
 # PythonFile class {{{1
 class PythonFile(GnuPG):
     def run(self):
-        global ActiveFile
-        ActiveFile = self.path
+        global ActivePythonFile
+        ActivePythonFile = self.path
         path = self.path
         self.encrypted = path.suffix in ['.gpg', '.asc']
         log('reading.', culprit=path)
@@ -234,7 +234,7 @@ class PythonFile(GnuPG):
         except Exception as err:
             from .utilities import error_source
             raise Error(full_stop(err), culprit=error_source())
-        ActiveFile = None
+        ActivePythonFile = None
         return contents
 
     def create(self, contents, gpg_ids):

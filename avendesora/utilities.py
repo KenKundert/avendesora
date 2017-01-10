@@ -162,14 +162,16 @@ def error_source(lvl=-1):
         import sys
         cls, exc, tb = sys.exc_info()
         trace = traceback.extract_tb(tb)
-        return trace[lvl][:2]
+        filename, lineno = trace[lvl][:2]
     except SyntaxError:
         # extract_stack() does not work on binary encrypted files. It generates
         # a syntax error that indicates that the file encoding is missing
         # because the function tries to read the file and sees binary data. This
         # is not a problem with ascii encrypted files as we don't actually show
         # code, which is gibberish, but does not require an encoding. In this
-        # case, just return the file name, cannot get the line number.
-        from .gpg import get_active_file
-        return get_active_file()
+        # case, extract the line number from the trace.
+        from .gpg import get_active_python_file
+        filename = get_active_python_file()
+        lineno = tb.tb_next.tb_lineno
+    return filename, 'line %s' % lineno
 
