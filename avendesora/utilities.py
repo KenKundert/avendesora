@@ -151,7 +151,7 @@ def to_python(obj, _level=0):
     return '\n'.join(code)
 
 # error_source {{{1
-def error_source(lvl=-1):
+def error_source():
     """Source of error
     Reads stack trace to determine filename and line number of error.
     """
@@ -160,9 +160,9 @@ def error_source(lvl=-1):
         # return filename and lineno
         # context and content are also available
         import sys
-        cls, exc, tb = sys.exc_info()
+        exc_cls, exc, tb = sys.exc_info()
         trace = traceback.extract_tb(tb)
-        filename, lineno = trace[lvl][:2]
+        filename, line, context, text = trace[-1]
     except SyntaxError:
         # extract_stack() does not work on binary encrypted files. It generates
         # a syntax error that indicates that the file encoding is missing
@@ -172,6 +172,6 @@ def error_source(lvl=-1):
         # case, extract the line number from the trace.
         from .gpg import get_active_python_file
         filename = get_active_python_file()
-        lineno = tb.tb_next.tb_lineno
-    return filename, 'line %s' % lineno
+        line = tb.tb_next.tb_lineno
+    return filename, 'line %s' % line
 

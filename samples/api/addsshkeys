@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""
+Add SSH keys
+
+Add SSH keys to SSH agent.
+The following keys are added: {keys}.
+
+Usage:
+    addsshkeys [options]
+
+Options:
+    -v, --verbose    list the keys as they are being added
+"""
+# This assumes that Avendesora that contains the ssh key's passphrase has a name 
+# or alias of the form <name>-ssh-key. It also assumes that the account contains 
+# a field named 'keyfile' or 'keyfiles' that contains an absolute path or paths 
+# to the ssh key files.
+
+from avendesora import PasswordGenerator, PasswordError
+from inform import Error, Inform, codicil, error, fatal, narrate, is_str
+from docopt import docopt
+from pathlib import Path
+import pexpect
+
+SSHkeys = ['primary', 'digitalocean', 'tunnelr', 'github', 'backups']
+SSHadd = 'ssh-add'
+
+cmdline = docopt(__doc__.format(keys = ', '.join(SSHkeys)))
+Inform(narrate=cmdline['--verbose'])
+
+try:
+    pw = PasswordGenerator()
+except PasswordError as error:
+    fatal(error)
+
+for key in SSHkeys:
+    name = key + '-ssh-key'
+    try:
+        account = pw.get_account(name)
+        passphrase = account.get_value('passcode').value
+        if account.has_field('keyfiles'):
+            keyfiles = account.get_value('keyfiles').value
+        else:
+            keyfiles = account.get_value('keyfile').value
+        for keyfile in keyfiles.split():
+            path = Path(keyfile).expanduser()
+            narrate('adding.', culprit=keyfile)
+            try:
+                sshadd = pexpect.spawn(SSHadd, [str(path)])
+                sshadd.expect('Enter passphrase for %s: ' % (path), timeout=4)
+                sshadd.sendline(passphrase)
+                sshadd.expect(pexpect.EOF)
+                sshadd.close()
+                response = sshadd.before.decode('utf-8')
+                if 'identity added' in response.lower():
+                    continue
+            except (pexpect.EOF, pexpect.TIMEOUT):
+                pass
+            error('failed.', culprit=path)
+            codicil('response:', sshadd.before.decode('utf8'), culprit=SSHadd)
+            codicil('exit status:', sshadd.exitstatus , culprit=SSHadd)
+    except PasswordError as error:
+        fatal(error, culprit=path)

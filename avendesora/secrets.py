@@ -58,19 +58,16 @@ from .utilities import error_source
 from inform import Error, terminate, log, warn, output
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
+import math
 import hashlib
 import getpass
 import re
-import gnupg
-import sys
 
 # Exceptions {{{1
-class SecretExhausted(Exception):
-    def __init__(self):
-        pass
-
-    def __str__(self):
-        return "secret exhausted"
+class SecretExhausted(Error):
+    def __init__(self, **kwargs):
+        self.args = ['entropy exhausted.']
+        self.kwargs = kwargs
 
 # Secret {{{1
 class Secret(object):
@@ -164,6 +161,7 @@ class Secret(object):
         for byte in digest:
             bits = radix * bits + byte
         self.pool = bits
+        self.entropy = 0
 
     def _partition(self, radix, num_partitions):
         """
@@ -180,6 +178,7 @@ class Secret(object):
         """
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
+        self.entropy += num_partions*math.log(radix, 2)
 
         for i in range(num_partitions):
             if self.pool < max_index:
@@ -213,6 +212,7 @@ class Secret(object):
         radix = len(alphabet)
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
+        self.entropy += num_symbols*math.log(len(alphabet), 2)
 
         for i in range(num_symbols):
             if self.pool < max_index:
@@ -233,6 +233,8 @@ class Secret(object):
 
         """
         max_index = radix-1
+        self.entropy += math.log(radix, 2)
+
         if self.pool < max_index:
             raise SecretExhausted()
 
@@ -266,6 +268,8 @@ class Secret(object):
         """
         radix = len(alphabet)
         max_index = radix-1
+        self.entropy += math.log(len(alphabet), 2)
+
         if self.pool < max_index:
             raise SecretExhausted()
 

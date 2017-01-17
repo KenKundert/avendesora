@@ -5,7 +5,7 @@ from .charsets import (
 from .account import Account, StealthAccount, Script
 from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
-    BirthDate,
+    BirthDate, SecretExhausted
 )
 from .obscure import Hide, Hidden, GPG
 try:

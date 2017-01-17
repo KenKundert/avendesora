@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'e07a517b6c590c9903f27b64c82fa9b2',
+    'secrets_hash': 'd6dcfda5b5877b9e3759067ed6070d9b',
     'discard_logfile': False,
 }
 
@@ -364,7 +364,20 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     class Anum20(StealthAccount):
         passcode = Password(length=20, alphabet=DISTINGUISHABLE)
 
-    # High entropy passwords {section}
+    class Anum24(StealthAccount):
+        passcode = Password(length=24, alphabet=DISTINGUISHABLE)
+
+    class Anum32(StealthAccount):
+        passcode = Password(length=32, alphabet=DISTINGUISHABLE)
+
+    class Anum48(StealthAccount):
+        passcode = Password(length=48, alphabet=DISTINGUISHABLE)
+
+    class Anum64(StealthAccount):
+        passcode = Password(length=64, alphabet=DISTINGUISHABLE)
+
+
+    # Ascii passwords {section}
     class Char4(StealthAccount):
         passcode = Password(length=4, alphabet=ALPHANUMERIC+PUNCTUATION)
 
@@ -393,9 +406,19 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     class Char20(StealthAccount):
         passcode = Password(length=20, alphabet=ALPHANUMERIC+PUNCTUATION)
 
-    # Extreme passwords {section}
-    class Extreme(StealthAccount):
-        passcode = Passphrase(length=64, alphabet=PRINTABLE)
+    class Char24(StealthAccount):
+        passcode = Password(length=24, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char32(StealthAccount):
+        passcode = Password(length=32, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char48(StealthAccount):
+        passcode = Password(length=48, alphabet=ALPHANUMERIC+PUNCTUATION)
+
+    class Char64(StealthAccount):
+        alias = 'extreme'
+        passcode = Password(length=64, alphabet=ALPHANUMERIC+PUNCTUATION)
+
 
     # Hex passwords {section}
     class Hex4(StealthAccount):
@@ -407,12 +430,21 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     class Hex16(StealthAccount):
         passcode = Password(length=16, alphabet=HEXDIGITS, prefix='0x')
 
+    class Hex24(StealthAccount):
+        passcode = Password(length=24, alphabet=HEXDIGITS, prefix='0x')
+
     class Hex32(StealthAccount):
         passcode = Password(length=32, alphabet=HEXDIGITS, prefix='0x')
 
+    class Hex48(StealthAccount):
+        passcode = Password(length=48, alphabet=HEXDIGITS, prefix='0x')
+
     class Hex64(StealthAccount):
-        aliases = 'hex'
         passcode = Password(length=64, alphabet=HEXDIGITS, prefix='0x')
+
+    class Hex96(StealthAccount):
+        passcode = Password(length=96, alphabet=HEXDIGITS, prefix='0x')
+
 
     # PINs {section}
     class Pin4(StealthAccount):
@@ -431,6 +463,31 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
     class Pin12(StealthAccount):
         passcode = PIN(length=12)
+
+    class Pin14(StealthAccount):
+        passcode = PIN(length=14)
+
+    class Pin16(StealthAccount):
+        passcode = PIN(length=16)
+
+    class Pin18(StealthAccount):
+        passcode = PIN(length=18)
+
+    class Pin20(StealthAccount):
+        passcode = PIN(length=20)
+
+    class Pin24(StealthAccount):
+        passcode = PIN(length=24)
+
+    class Pin32(StealthAccount):
+        passcode = PIN(length=32)
+
+    class Pin48(StealthAccount):
+        passcode = PIN(length=48)
+
+    class Pin64(StealthAccount):
+        passcode = PIN(length=64)
+
 
     # Pass phrases {section}
     class Word1(StealthAccount):
@@ -460,6 +517,25 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     class Word8(StealthAccount):
         passcode = Passphrase(length=8)
 
+    class Word10(StealthAccount):
+        passcode = Passphrase(length=10)
+
+    class Word12(StealthAccount):
+        passcode = Passphrase(length=12)
+
+    class Word16(StealthAccount):
+        passcode = Passphrase(length=16)
+
+    class Word20(StealthAccount):
+        passcode = Passphrase(length=20)
+
+    class Word24(StealthAccount):
+        passcode = Passphrase(length=24)
+
+    class Word32(StealthAccount):
+        passcode = Passphrase(length=32)
+
+
     # Web passwords {section}
     class Web6(StealthAccount):
         passcode = PasswordRecipe('6 u d s')
@@ -485,6 +561,18 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
     class Web20(StealthAccount):
         passcode = PasswordRecipe('20 3u 3d 3s')
+
+    class Web24(StealthAccount):
+        passcode = PasswordRecipe('24 4u 4d 4s')
+
+    class Web32(StealthAccount):
+        passcode = PasswordRecipe('32 5u 5d 5s')
+
+    class Web48(StealthAccount):
+        passcode = PasswordRecipe('48 6u 6d 6s')
+
+    class Web64(StealthAccount):
+        passcode = PasswordRecipe('64 8u 8d 8s')
 ''')
 
 # Initial user key file {{{1

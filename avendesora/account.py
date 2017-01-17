@@ -127,6 +127,7 @@ class Account(object):
                         warn('alias duplicates existing name.', culprit=name)
                     codicil('Seen in %s in %s.' % seen[name])
                     codicil('And in %s in %s.' % (acct_name, account._file_info.path))
+                    break
                 else:
                     new[name] = (account.get_name(), account._file_info.path)
             seen.update(new)
@@ -448,8 +449,11 @@ class Account(object):
             except AttributeError:
                 pass
             if isinstance(value, Secret) or isinstance(value, Obscure):
+                secret = value
                 value = str(value)
-            value =  dedent(value).strip() if is_str(value) else value
+                if isinstance(secret, Secret):
+                    log('entropy =', round(secret.entropy), 'bits.')
+            value = dedent(value).strip() if is_str(value) else value
             return AccountValue(value, is_secret, label)
 
         # run the script
@@ -597,6 +601,12 @@ class Account(object):
 
         # open the url
         browser.run(url)
+
+
+    # has_field() {{{2
+    @classmethod
+    def has_field(cls, name):
+        return name in dir(cls)
 
 
 # StealthAccount class {{{1
