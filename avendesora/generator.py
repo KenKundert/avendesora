@@ -33,7 +33,8 @@ from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_componenets
 from inform import (
-    debug, Error, notify, log, render, terminate, terminate_if_errors
+    debug, Error, error, notify, log, os_error, render,
+    terminate, terminate_if_errors
 )
 from shlib import to_path
 from pathlib import Path
@@ -105,6 +106,8 @@ class PasswordGenerator(object):
             value = get_setting(key, expand=False)
             value = render(str(value) if isinstance(value, Path) else value)
             fields.update({key: value})
+        fields['encoding'] = get_setting('encoding')
+            # get this one again, this time without the quotes
         gpg_ids = gpg_ids if gpg_ids else get_setting('gpg_ids', [])
         fields.update({
             'section': '{''{''{''1',

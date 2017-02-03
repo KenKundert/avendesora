@@ -22,7 +22,7 @@
 from .config import get_setting
 from .utilities import gethostname, getusername, error_source
 from shlib import cwd, to_path, Run
-from inform import Error, is_collection, is_str, log, notify, warn
+from inform import Error, is_collection, is_str, log, notify, warn, os_error
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
@@ -100,7 +100,7 @@ class RecognizeAny(Recognizer):
 
     def match(self, data, account, verbose=False):
         try:
-            match = Any([
+            match = any([
                 each.match(data, account, verbose) for each in self.recognizers
             ])
             if match:
@@ -197,7 +197,7 @@ class RecognizeURL(Recognizer):
                     if path_matches(path, data.get('path')):
                         if (
                             protocol == data.get('protocol') or
-                            protocol not in REQUIRED_PROTOCOLS
+                            protocol not in get_setting('required_protocols')
                         ):
                             if verbose:
                                 log('    %s: matches.' % self.get_name())
@@ -233,7 +233,7 @@ class RecognizeCWD(Recognizer):
 
     def match(self, data, account, verbose=False):
         try:
-            cwd = cwd()
+            cwd = os.cwd()
             for directory in self.dirs:
                 if cwd.samefile(to_path(directory)):
                     if verbose:
@@ -316,7 +316,7 @@ class RecognizeEnvVar(Recognizer):
 
     def match(self, data, account, verbose=False):
         try:
-            if name in os.environ and value == os.environ[name]:
+            if self.name in os.environ and self.value == os.environ[self.name]:
                 if verbose:
                     log('    %s: matches.' % self.get_name())
                 return self.script

@@ -486,15 +486,30 @@ get_value:
         checking = account.get_value('accounts.checking')
         savings = account.get_value('accounts[checking]')
         answer0 = account.get_value(0)
-        answer1 = account.get_field('questions.1')
+        answer1 = account.get_value('questions.1')
         answer2 = account.get_value('questions[2]')
 
-    The value is returned as an object that contains three attributes, value 
-    (the actual value), is_secret (whether the value is secret or contains 
-    a secret) and label (a descriptive name for the value if the value of 
-    a simple field is requested). Converting the object to a string returns the 
-    value rendered as a string. There is also a render method that returns 
-    a string that combines the label with the value.
+    The value is returned as an object that contains four attributes, value (the 
+    actual value), is_secret (whether the value is secret or contains a secret), 
+    name (the name of the value), and desc (the description, contains the actual 
+    question of the answer to a question is requested).  Converting the object 
+    to a string returns the value rendered as a string.  There is also a render 
+    method that returns a string that combines the name and the description with 
+    the value.
+
+get_scalar:
+
+    A lower level interface than get_value that given a name and perhaps a key 
+    returns a scalar value.  Also takes an optional default value that is 
+    returned if the value is not found. Unlike get_value, the actual value is 
+    returned, not a object that contains multiple facets of the value.
+
+get_composite:
+
+    A lower level interface than get_value that given a name returns the value 
+    of the associated field, which may be a scalar (string or integer) or 
+    a composite (array of dictionary).  Unlike get_value, the actual value is 
+    returned, not a object that contains multiple facets of the value.
 
 
 Getting Help

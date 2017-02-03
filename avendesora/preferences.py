@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'd6dcfda5b5877b9e3759067ed6070d9b',
+    'secrets_hash': 'ed6affe9ce4c3db17bb03750fc71dc51',
     'discard_logfile': False,
 }
 
@@ -60,7 +60,7 @@ CONFIG_DEFAULTS = {
     'default_vector_field': 'questions',
     'display_time': 60,
     'dictionary_file': 'words',
-    'encoding': 'utf8',
+    'encoding': 'utf-8',
     'edit_account': (
         'gvim',   # use gvim -v so that user can access X clipboard buffers
         '-v',
@@ -256,7 +256,7 @@ HASH_FILE_INITIAL_CONTENTS = dedent('''\
 # Initial accounts file {{{1
 ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Accounts
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} foldmethod=marker :
     #
     # Add information about each of your accounts to the accounts dictionary.
     #
@@ -315,7 +315,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 # Initial stealth_accounts file {{{1
 STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Stealth Accounts
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} foldmethod=marker :
     #
     # Stealth accounts are accounts where the class name is not taken to be the
     # account name, instead the user is interactively asked for the account

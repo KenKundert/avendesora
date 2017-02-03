@@ -19,7 +19,7 @@
 # Imports {{{1
 from .config import get_setting, add_setting
 from shlib import Run
-from inform import log, Error
+from inform import log, Error, os_error
 
 # Editor base class {{{1
 class Editor(object):

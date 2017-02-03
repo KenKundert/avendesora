@@ -28,7 +28,7 @@ from .recognize import Recognizer
 from .secrets import Secret
 from inform import (
     Color, codicil, conjoin, cull, debug, Error, is_collection, is_str, log,
-    output, warn, indent
+    notify, output, warn, indent
 )
 from textwrap import dedent
 try:
@@ -56,20 +56,28 @@ class AccountValue:
         is_secret: whether the value is secret or contains a secret
         label: a descriptive name for the value if the value of a  simple field is requested
     """
-    def __init__(self, value, is_secret, label=None):
+    def __init__(self, value, is_secret, name=None, desc=None):
         self.value = value
         self.is_secret = is_secret
-        self.label = label
+        self.name = name
+        self.desc = desc
 
     def __str__(self):
+        "Returns value as string."
         return str(self.value)
 
     def render(self, sep=': '):
-        if self.label is not None:
-            return self.label + sep + str(self.value)
+        "Returns string that contains name and value."
+        if self.name:
+            if self.desc:
+                label = '%s (%s)' % (self.name, self.desc)
+            else:
+                label = self.name
+            return label + sep + str(self.value)
         return str(self.value)
 
     def __iter__(self):
+        "Cast AccountValue to a tuple to get value, is_secret, and label."
         for each in [self.value, self.is_secret, self.label]:
             yield each
 
@@ -79,10 +87,10 @@ class Script:
 
     Takes a string that contains attributes. Those attributes are expanded
     before being output. For example, 'username: {username}, password:
-    {passcode}' (this happens to be the default if no script is given. In this
-    case, {username} and {passcode} are replaced by with the value of the
-    corresponding account attribute. In addition to the account attributes,
-    {tab} and {return} are replaced by a tab or carriage return character.
+    {passcode}'. In this case, {username} and {passcode} are replaced by with
+    the value of the corresponding account attribute. In addition to the account
+    attributes, {tab} and {return} are replaced by a tab or carriage return
+    character.
     """
     def __init__(self, script = 'username: {username}, password: {passcode}'):
         self.script = script
@@ -134,13 +142,6 @@ class Account(object):
                 # this two step approach to updating seen prevents us from
                 # complaining about aliases that duplicate the account name,
                 # or duplicate aliases, both of which are harmless
-
-    # fields() {{{2
-    @classmethod
-    def fields(cls):
-        for key, value in cls.__dict__.items():
-            if not key.startswith('_'):
-                yield key, value
 
     # get_name() {{{2
     @classmethod
@@ -209,9 +210,7 @@ class Account(object):
         if cls.id_contains(target):
             return True
         target = target.lower()
-        for key, value in cls.fields():
-            if key in TOOL_FIELDS:
-                continue
+        for key, value in cls.items():
             try:
                 if is_collection(value):
                     for k, v in Collection(value).items():
@@ -239,7 +238,7 @@ class Account(object):
             return
 
         # If no recognizers specified, just check the urls
-        for url in Collection(cls.get_field('urls', default=[])):
+        for url in Collection(cls.get_scalar('urls', default=[])):
             components = urlparse(url)
             protocol = components.scheme
             host = components.netloc
@@ -250,7 +249,7 @@ class Account(object):
                 ):
                     msg = 'url matches, but uses wrong protocol.'
                     notify(msg)
-                    raise Error(msg, culprit=account.get_name())
+                    raise Error(msg, culprit=cls.get_name())
                 else:
                     yield None, True
                     return
@@ -270,21 +269,27 @@ class Account(object):
         except AttributeError as err:
             pass
 
+    # keys() {{{2
+    @classmethod
+    def keys(cls, all=False):
+        for key in sorted(cls.__dict__):
+            if not key.startswith('_') and (all or key not in TOOL_FIELDS):
+                yield key
+
     # items() {{{2
     @classmethod
-    def items(cls):
-        for key in sorted(cls.__dict__):
-            if not key.startswith('_'):
-                yield key, cls.__dict__[key]
+    def items(cls, all=False):
+        for key in cls.keys(all):
+            yield key, getattr(cls, key)
 
-    # get_field() {{{2
+    # get_scalar() {{{2
     @classmethod
-    def get_field(cls, name, key=None, default=False):
+    def get_scalar(cls, name, key=None, default=False):
         "Get field Value given a field name and key"
         value = getattr(cls, name, None)
         if value is None:
             if name == 'NAME':
-                return self.get_name()
+                return cls.get_name()
             if default is False:
                 raise Error(
                     'not found.',
@@ -359,7 +364,7 @@ class Account(object):
         #     field[key] or field/key: for dictionary value
 
         if name is True or not name:
-            name = cls.get_field('default', default=None)
+            name = cls.get_scalar('default', default=None)
         if not name:
             name = get_setting('default_field')
 
@@ -437,24 +442,22 @@ class Account(object):
         if not is_script:
             name, key = cls.split_name(field)
             try:
-                value = cls.get_field(name, key)
+                value = cls.get_scalar(name, key)
             except Error as err:
                 err.terminate()
             is_secret = cls.is_secret(name, key)
             label = cls.combine_name(name, key)
             try:
-                alt_name = value.get_key()
-                if alt_name:
-                    label += ' (%s)' % alt_name
+                desc = value.get_key()
             except AttributeError:
-                pass
+                desc = None
             if isinstance(value, Secret) or isinstance(value, Obscure):
                 secret = value
                 value = str(value)
                 if isinstance(secret, Secret):
-                    log('entropy =', round(secret.entropy), 'bits.')
+                    log('entropy =', round(getattr(secret, 'entropy', 0)), 'bits.')
             value = dedent(value).strip() if is_str(value) else value
-            return AccountValue(value, is_secret, label)
+            return AccountValue(value, is_secret, label, desc)
 
         # run the script
         script = field
@@ -474,7 +477,7 @@ class Account(object):
                 else:
                     name, key = cls.split_name(cmd)
                     try:
-                        value = cls.get_field(name, key)
+                        value = cls.get_scalar(name, key)
                         out.append(dedent(str(value)).strip())
                         if cls.is_secret(name, key):
                             is_secret = True
@@ -483,6 +486,39 @@ class Account(object):
             else:
                 out.append(term)
         return AccountValue(''.join(out), is_secret)
+
+    # get_composite() {{{2
+    @classmethod
+    def get_composite(cls, name):
+        "Get field Value given a field name"
+        value = getattr(cls, name, None)
+        if value is None:
+            if name == 'NAME':
+                return cls.get_name()
+            return None
+
+        if is_collection(value):
+            if type(value) is dict:
+                result = {}
+                for key in value.keys():
+                    v = cls.get_scalar(name, key)
+                    if isinstance(v, Secret) or isinstance(v, Obscure):
+                        v = str(v)
+                    result[key] = v
+            elif type(value) is list:
+                result = []
+                for index in range(len(value)):
+                    v = cls.get_scalar(name, index)
+                    if isinstance(v, Secret) or isinstance(v, Obscure):
+                        v = str(v)
+                    result.append(v)
+            else:
+                raise NotImplementedError
+        else:
+            result = cls.get_scalar(name)
+            if isinstance(result, Secret) or isinstance(result, Obscure):
+                result = str(result)
+        return result
 
     # write_summary() {{{2
     @classmethod
@@ -523,9 +559,7 @@ class Account(object):
         lines = [fmt_field('names', ', '.join(names))]
 
         for key, value in cls.items():
-            if key in TOOL_FIELDS:
-                pass  # is an Avendesora field
-            elif is_collection(value):
+            if is_collection(value):
                 lines += extract_collection(key, value)
             elif hasattr(value, 'generate'):
                 lines.append(fmt_field(key, reveal(key)))
@@ -552,13 +586,13 @@ class Account(object):
                 # still need to work out how to output the question.
                 return [extract(v, name, i) for i, v in enumerate(value)]
 
-        return {k: extract(v, k) for k, v in cls.items() if k != 'master'}
+        return {k: extract(v, k) for k, v in cls.items(True) if k != 'master'}
 
     # open_browser() {{{2
     @classmethod
     def open_browser(cls, browser_name, key=None):
         if not browser_name:
-            browser_name = cls.get_field('browser', default=None)
+            browser_name = cls.get_scalar('browser', default=None)
         browser = StandardBrowser(browser_name)
 
         # get the urls from the urls attribute

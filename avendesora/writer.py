@@ -26,7 +26,9 @@ from .config import get_setting
 from .dialog import show_list_dialog
 from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
-from inform import Color, Error, cull, error, fatal, log, output, warn, indent
+from inform import (
+    Color, Error, cull, error, fatal, log, output, warn, indent, os_error
+)
 from time import sleep
 from textwrap import dedent
 import string
@@ -101,7 +103,7 @@ class Writer(object):
         if '{' not in field:
             name, key = account.split_name(field)
             try:
-                value = account.get_field(name, key)
+                value = account.get_scalar(name, key)
             except Error as err:
                 err.terminate()
             is_secret = account.is_secret(name, key)
@@ -132,7 +134,7 @@ class Writer(object):
                 else:
                     name, key = account.split_name(cmd)
                     try:
-                        value = account.get_field(name, key)
+                        value = account.get_scalar(name, key)
                         out.append(dedent(str(value)).strip())
                         if account.is_secret(name, key):
                             is_secret = True
@@ -315,7 +317,7 @@ class KeyboardWriter(Writer):
                 else:
                     name, key = account.split_name(cmd)
                     try:
-                        value = account.get_field(name, key)
+                        value = account.get_scalar(name, key)
                     except Error as err:
                         if err.is_collection and len(err.collection):
                             # is composite value, ask user which one is desired
@@ -329,7 +331,7 @@ class KeyboardWriter(Writer):
                                 )
                             try:
                                 key = choices[choice]
-                                value = account.get_field(name, key)
+                                value = account.get_scalar(name, key)
                             except Error as err:
                                 err.terminate()
                         else:

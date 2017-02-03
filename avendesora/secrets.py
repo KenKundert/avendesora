@@ -14,7 +14,7 @@ doctests::
 
 >>> from avendesora.secrets import *
 >>> class Account(object):
-...     def get_field(self, name, default=None):
+...     def get_scalar(self, name, default=None):
 ...          if name == 'master':
 ...              return 'fux'
 ...          else:
@@ -93,8 +93,8 @@ class Secret(object):
         account_name = account.get_name()
         account_seed = account.get_seed()
         if self.master is None:
-            master = account.get_field('master', default=None)
-            master_source = account.get_field('_master_source', default=None)
+            master = account.get_scalar('master', default=None)
+            master_source = account.get_scalar('_master_source', default=None)
         else:
             master = self.master
             master_source = 'secret'
@@ -119,7 +119,7 @@ class Secret(object):
         if self.version:
             version = self.version
         else:
-            version = account.get_field('version', default='')
+            version = account.get_scalar('version', default='')
 
         if account.request_seed():
             try:
@@ -178,7 +178,7 @@ class Secret(object):
         """
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
-        self.entropy += num_partions*math.log(radix, 2)
+        self.entropy += num_partitions*math.log(radix, 2)
 
         for i in range(num_partitions):
             if self.pool < max_index:

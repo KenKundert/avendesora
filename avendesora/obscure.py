@@ -27,7 +27,7 @@ from .dictionary import DICTIONARY
 from .gpg import GnuPG
 from .utilities import error_source
 from inform import (
-    debug, Error, log, indent, is_str, output, terminate, warn, full_stop
+    debug, Error, log, indent, is_str, output, terminate, warn, full_stop, cull
 )
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
@@ -284,7 +284,7 @@ class GPG(Obscure, GnuPG):
         encoding = self.encoding
         if not self.encoding:
             encoding = get_setting('encoding')
-        self.plaintext = decripted.data.decode(encoding)
+        self.plaintext = decrypted.data.decode(encoding)
 
     def __str__(self):
         return str(self.plaintext)

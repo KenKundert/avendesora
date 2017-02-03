@@ -34,7 +34,7 @@ def test_mybank_accounts_checking2():
     try:
         pw = PasswordGenerator()
         account = pw.get_account('mybank')
-        checking = account.get_field('accounts', 'checking')
+        checking = account.get_scalar('accounts', 'checking')
     except PasswordError as err:
         checking = str(err)
     assert str(checking) == '12345678'
@@ -61,7 +61,7 @@ def test_alertscc_question2():
     try:
         pw = PasswordGenerator()
         account = pw.get_account('alertscc')
-        answer = account.get_field('questions', 2)
+        answer = account.get_scalar('questions', 2)
     except PasswordError as err:
         answer = str(err)
     assert str(answer) == 'vestige corny convector'
