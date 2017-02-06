@@ -152,7 +152,8 @@ class TTY_Writer(Writer):
     def display_field(self, account, field):
 
         # get string to display
-        value, is_secret, label = tuple(account.get_value(field))
+        value, is_secret, name, desc = tuple(account.get_value(field))
+        label = '%s (%s)' % (name, desc) if desc else name
 
         # indent multiline outputs
         sep = ' '
@@ -190,7 +191,7 @@ class ClipboardWriter(Writer):
     def display_field(self, account, field):
 
         # get string to display
-        value, is_secret, label = tuple(account.get_value(field))
+        value, is_secret, name, desc, = tuple(account.get_value(field))
 
         # Use 'xsel' to put the information on the clipboard.
         # This represents a vulnerability, if someone were to replace xsel they

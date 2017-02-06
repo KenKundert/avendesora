@@ -77,8 +77,8 @@ class AccountValue:
         return str(self.value)
 
     def __iter__(self):
-        "Cast AccountValue to a tuple to get value, is_secret, and label."
-        for each in [self.value, self.is_secret, self.label]:
+        "Cast AccountValue to a tuple to get value, is_secret, name, and desc."
+        for each in [self.value, self.is_secret, self.name, self.desc]:
             yield each
 
 # Script class {{{1
