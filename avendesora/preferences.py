@@ -79,7 +79,7 @@ CONFIG_DEFAULTS = {
     'hashes_file': 'hashes',
     'indent': '    ',
     'log_file': 'log.gpg',
-    'required_protocols': ['https'],
+    'default_protocol': 'https',
     'user_key_file': 'key.gpg',
     'verbose': False,
     'default_account_template': 'bank',
@@ -196,7 +196,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     edit_template = {edit_template}
     browsers = {browsers}
     default_browser = {default_browser}
-    required_protocols = {required_protocols}
+    default_protocol = {default_protocol}
     label_color = {label_color}
         # Choose from black, red, green, yellow, blue, magenta, cyan, white.
     color_scheme = {color_scheme}

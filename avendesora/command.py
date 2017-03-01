@@ -829,11 +829,12 @@ class Identity(Command):
 
 # Initialize {{{1
 class Initialize(Command):
-    NAMES = 'initialize', 'I'
+    NAMES = 'initialize', 'init', 'I'
     DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
             avendesora initialize [--gpg-id <id>]... [options]
+            avendesora init       [--gpg-id <id>]... [options]
             avendesora I          [--gpg-id <id>]... [options]
 
         Options:

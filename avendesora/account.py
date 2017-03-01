@@ -239,20 +239,23 @@ class Account(object):
 
         # If no recognizers specified, just check the urls
         for url in Collection(cls.get_scalar('urls', default=[])):
-            components = urlparse(url)
-            protocol = components.scheme
-            host = components.netloc
+            url = url if '//' in url else ('//'+url)
+            url_components = urlparse(url)
+            if url_components.scheme:
+                protocol = url_components.scheme
+            else:
+                protocol = get_setting('default_protocol')
+            host = url_components.netloc
             if host == data.get('host'):
-                if (
-                    protocol != data.get('protocol') and
-                    data['protocol'] in get_setting('required_protocols')
-                ):
+                if (protocol == data.get('protocol')):
+                    if verbose:
+                        log('    %s: matches.' % self.get_name())
+                    yield None, True
+                    return
+                else:
                     msg = 'url matches, but uses wrong protocol.'
                     notify(msg)
                     raise Error(msg, culprit=cls.get_name())
-                else:
-                    yield None, True
-                    return
 
     # initialize() {{{2
     @classmethod

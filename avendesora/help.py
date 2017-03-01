@@ -439,9 +439,8 @@ class Discovery(HelpMessage):
             not supported. If you give a partial path, by default Avendesora
             will match up to what you have given, but you can require an exact
             match of the entire path by specifying exact_path=True to
-            RecognizeURL.  If you do not give the protocol, https is assumed. If
-            you expect to use a protocol other than https you must specify it,
-            otherwise Avendesora will complain.
+            RecognizeURL.  If you do not give the protocol, the default_protocol
+            (https) is assumed.
 
             When account discovery fails it can be difficult to determine what
             is going wrong. When this occurs, you should first examine the log

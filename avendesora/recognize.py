@@ -166,10 +166,14 @@ class RecognizeURL(Recognizer):
     def match(self, data, account, verbose=False):
         try:
             for url in self.urls:
-                url = urlparse(url)
-                protocol = url.scheme
-                host = url.netloc
-                path = url.path
+                url = url if '//' in url else ('//'+url)
+                url_components = urlparse(url)
+                if url_components.scheme:
+                    protocol = url_components.scheme
+                else:
+                    protocol = get_setting('default_protocol')
+                host = url_components.netloc
+                path = url_components.path
 
                 # data may contain the following fields after successful title
                 # recognition:
@@ -195,10 +199,7 @@ class RecognizeURL(Recognizer):
                             return actual.startswith(expected)
 
                     if path_matches(path, data.get('path')):
-                        if (
-                            protocol == data.get('protocol') or
-                            protocol not in get_setting('required_protocols')
-                        ):
+                        if (protocol == data.get('protocol')):
                             if verbose:
                                 log('    %s: matches.' % self.get_name())
                             return self.script
