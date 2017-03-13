@@ -708,7 +708,7 @@ def test_accounts():
 
         You then access its values using:
 
-            > avendesora value newyorktimes accounts.checking 
+            > avendesora value newyorktimes accounts.checking
             accounts.checking: 1234-56-7890
 
         You might consider your account numbers as sensitive information. In
