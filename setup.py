@@ -10,7 +10,7 @@ setup(
     version='1.5.0',
     author='Ken Kundert and Kale Kundert',
     author_email='avendesora@nurdletech.com',
-    description='An XKCD-style password generator.',
+    description='A password generator and account manager.',
     long_description=readme,
     url='http://nurdletech.com/linux-utilities/avendesora',
     download_url='https://github.com/kenkundert/avendesora/tarball/master',

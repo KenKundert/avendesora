@@ -39,7 +39,7 @@ open accounts in your web browser, automatically recognize which account to use
 based on the window title, and warn you if you are not using encryption when you 
 go to enter your password.
 
-Account secrets can saved in encrypted form, as with password vaults, or 
+Account secrets can be saved in encrypted form, as with password vaults, or 
 generated from a root secret.  Generated secrets have two important benefits.  
 First, they are produced from a random seed, and so are quite unpredictable.  
 This is important, because the predictability of a passwords can be exploited 
@@ -104,12 +104,12 @@ install scrypt by hand using::
 Upgrading
 ---------
 
-Avendesora is a password generator rather than a password vault. As a result, 
-there is always a chance that something could change in the password generation 
-algorithm that causes the generated passwords to change. Of course, the program 
-is thoroughly tested to assure this does not happen, but there is still a small 
-chance that something slips through.  To assure that you are not affected by 
-this, you should archive your passwords before you upgrade with::
+Avendesora is primarily a password generator. As a result, there is always 
+a chance that something could change in the password generation algorithm that 
+causes the generated passwords to change. Of course, the program is thoroughly 
+tested to assure this does not happen, but there is still a small chance that 
+something slips through.  To assure that you are not affected by this, you 
+should archive your passwords before you upgrade with::
 
     avendesora changed
     avendesora archive
@@ -470,7 +470,8 @@ PasswordGenerator:
 get_account:
 
     Accesses a particular account. Takes a string for the account name or alias.  
-    Optionally takes a second string that is used as an additional seed.
+    Optionally takes a second string that is used as an additional seed (see: 
+    `avendesora help misdirection`).
 
 get_value:
 
@@ -493,9 +494,9 @@ get_value:
     actual value), is_secret (whether the value is secret or contains a secret), 
     name (the name of the value), and desc (the description, contains the actual 
     question of the answer to a question is requested).  Converting the object 
-    to a string returns the value rendered as a string.  There is also a render 
-    method that returns a string that combines the name and the description with 
-    the value.
+    to a string returns the value rendered as a string.  There is also the 
+    render() method that returns a string that combines the name and the 
+    description with the value.
 
 get_scalar:
 

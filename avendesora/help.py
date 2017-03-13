@@ -61,8 +61,8 @@ class HelpMessage(object):
             if command:
                 return pager(command.help())
             for topic in cls.topics():
-               if name == topic.get_name():
-                   return pager(topic.help())
+                if name == topic.get_name():
+                    return pager(topic.help())
             error('topic not found.', culprit=name)
         else:
             cls.help()
@@ -198,7 +198,7 @@ class Accounts(HelpMessage):
 
             You then access its values using:
 
-                > avendesora value newyorktimes accounts.checking 
+                > avendesora value newyorktimes accounts.checking
                 accounts.checking: 1234-56-7890
 
             You might consider your account numbers as sensitive information. In
@@ -982,8 +982,8 @@ class Secrets(HelpMessage):
         Hidden
         -------
 
-        This obscures but does not encrypt the text. It can protect the secret from 
-        observers that get a quick glance of the encoded text, but if they are able to 
+        This obscures but does not encrypt the text. It can protect the secret from
+        observers that get a quick glance of the encoded text, but if they are able to
         capture it they can easily decode it.
 
             Hidden(encodetext, secure=True, encoding=None)
@@ -1149,7 +1149,7 @@ class Secrets(HelpMessage):
         the default alphabet is a dictionary containing about 10,000 words.
 
             Passphrase(
-                length=4, alphabet=None, master=None, version=None, sep=' ', prefix='', 
+                length=4, alphabet=None, master=None, version=None, sep=' ', prefix='',
                 suffix=''
             )
 
