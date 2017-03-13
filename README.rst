@@ -223,7 +223,7 @@ The config file (~/.config/avendesora/config) allows you to personalize
 Avendesora to your needs. After initializing your account you should take the 
 time to review the config file and adjust it to fit your needs. You should be 
 very thoughtful in this initial configuration, because some decisions (or 
-nondecision) you make can be very difficult to change later.  The reason for 
+nondecisions) you make can be very difficult to change later.  The reason for 
 this is that they may affect the passwords you generate, and if you change them 
 you may change existing generated passwords. In particular, be careful with 
 *dictionary_file* and *default_passphase_separator*. Changing these values when 
