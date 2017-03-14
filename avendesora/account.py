@@ -593,7 +593,7 @@ class Account(object):
 
     # open_browser() {{{2
     @classmethod
-    def open_browser(cls, browser_name, key=None):
+    def open_browser(cls, key=None, browser_name=None, list_urls=False):
         if not browser_name:
             browser_name = cls.get_scalar('browser', default=None)
         browser = StandardBrowser(browser_name)
@@ -634,10 +634,14 @@ class Account(object):
                     'keys are not supported with urls on this account.',
                     culprit=key
                 )
-        url = list(Collection(urls))[0]  # use the first url specified
 
         # open the url
-        browser.run(url)
+        if list_urls:
+            for url in urls:
+                output(url)
+        else:
+            url = list(Collection(urls))[0]  # use the first url specified
+            browser.run(url)
 
 
     # has_field() {{{2

@@ -114,6 +114,7 @@ def test_browse():
         Options:
             -b <browser>, --browser <browser>
                                     Open account in specified browser.
+            -l, --list              List available URLs rather than open first.
 
         The account is examined for URLS, a URL is chosen, and then that URL
         is opened in the chosen browser.  First URLS are gathered from the
@@ -135,7 +136,7 @@ def test_browse():
 
             class SilkRoad(Account):
                 passcode = Passphrase()
-                username = 'viscount-placebo'
+                username = Passphrase(length=2, sep='-')
                 url = 'http://silkroad6ownowfk.onion'
                 browser = 't'
 

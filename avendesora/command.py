@@ -362,6 +362,7 @@ class Browse(Command):
         Options:
             -b <browser>, --browser <browser>
                                     Open account in specified browser.
+            -l, --list              List available URLs rather than open first.
     """).strip()
 
     @classmethod
@@ -397,7 +398,7 @@ class Browse(Command):
 
                 class SilkRoad(Account):
                     passcode = Passphrase()
-                    username = 'viscount-placebo'
+                    username = Passphrase(length=2, sep='-')
                     url = 'http://silkroad6ownowfk.onion'
                     browser = 't'
 
@@ -419,7 +420,9 @@ class Browse(Command):
 
         # determine the account and open the URL
         account = generator.get_account(cmdline['<account>'])
-        account.open_browser(cmdline['--browser'], cmdline['<key>'])
+        account.open_browser(
+            cmdline['<key>'], cmdline['--browser'], cmdline['--list']
+        )
 
 # Changed {{{1
 class Changed(Command):
