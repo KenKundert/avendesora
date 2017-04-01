@@ -586,7 +586,6 @@ class Account(object):
             try:
                 return {k: extract(v, name, k) for k, v in value.items()}
             except AttributeError:
-                # still need to work out how to output the question.
                 return [extract(v, name, i) for i, v in enumerate(value)]
 
         return {k: extract(v, k) for k, v in cls.items(True) if k != 'master'}
@@ -599,29 +598,27 @@ class Account(object):
         browser = StandardBrowser(browser_name)
 
         # get the urls from the urls attribute
-        if not key:
-            key = getattr(cls, 'default_url', None)
-        urls = getattr(cls, 'urls', [])
-        if type(urls) != dict:
-            if is_str(urls):
-                urls = urls.split()
-            urls = {None: urls}
+        # this must be second so it overrides those from recognizers.
+        primary_urls = getattr(cls, 'urls', [])
+        if type(primary_urls) != dict:
+            if is_str(primary_urls):
+                primary_urls = primary_urls.split()
+            primary_urls = {None: primary_urls} if primary_urls else {}
 
         # get the urls from the url recognizers
-        # currently urls from recognizers dominate over those from attributes
         discovery = getattr(cls, 'discovery', ())
+        urls = {}
         for each in Collection(discovery):
             urls.update(each.all_urls())
 
+        # combine, primary_urls must be added to urls, so they dominate
+        urls.update(primary_urls)
+
         # select the urls
+        if not key:
+            key = getattr(cls, 'default_url', None)
         try:
             urls = urls[key]
-        except TypeError:
-            if key:
-                raise Error(
-                    'keys are not supported with urls on this account.',
-                    culprit=key
-                )
         except KeyError:
             keys = cull(urls.keys())
             if keys:
