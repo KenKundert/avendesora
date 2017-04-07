@@ -15,8 +15,9 @@ Avendesora Collaborative Password Utility
 .. image:: https://img.shields.io/pypi/pyversions/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-.. image:: https://img.shields.io/pypi/dd/avendesora.svg
-    :target: https://pypi.python.org/pypi/avendesora/
+.. IGNORE: pypi statics are broken and unlikely to be fixed
+    .. image:: https://img.shields.io/pypi/dm/avendesora.svg
+        :target: https://pypi.python.org/pypi/avendesora/
 
 | Version: 1.6.0
 | Released: 2017-04-07
