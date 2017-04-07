@@ -308,6 +308,7 @@ class KeyboardWriter(Writer):
                         assert cmd[0] == 'sleep'
                         assert len(cmd) == 2
                         if out:
+                            # drain the buffer before sleeping
                             autotype(''.join(out))
                             out = []
                         sleep(float(cmd[1]))
@@ -343,7 +344,7 @@ class KeyboardWriter(Writer):
                         scrubbed.append('<%s>' % cmd)
                     else:
                         scrubbed.append('%s' % value)
-            else:
+            elif term:
                 out.append(term)
 
         scrubbed = ''.join(scrubbed).replace('\t', '→').replace('\n', '↲')

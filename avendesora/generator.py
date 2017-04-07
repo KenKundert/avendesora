@@ -194,8 +194,7 @@ class PasswordGenerator(object):
                 ident = '%s (%s)' % (name, key) if key else name
                 ident = '%s: %s' % (len(matches), ident)  # assure uniqueness
                 matches[ident] = name, script
-                if verbose:
-                    log('    %s matches' % ident)
+                log('%s matches' % ident)
 
         if not matches:
             msg = 'cannot find appropriate account.'
@@ -204,9 +203,11 @@ class PasswordGenerator(object):
         if len(matches) > 1:
             choice = show_list_dialog('Choose Secret', sorted(matches.keys()))
             if choice:
+                log('user selects %s' % choice)
                 return matches[choice]
-        else:
-            return matches.popitem()[1]
+        return matches.popitem()[1]
+            # this odd little piece of code returns the value of the one item in
+            # the dictionary
 
 
     # all_accounts() {{{2
