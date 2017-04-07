@@ -39,7 +39,6 @@ NONCONFIG_SETTINGS = {
 # Config Settings {{{1
 # These are the default values for settings that may be found in the config file
 CONFIG_DEFAULTS = {
-    'default_command': 'value',
     'accounts_files': [
         NONCONFIG_SETTINGS['default_accounts_file'],
         NONCONFIG_SETTINGS['default_stealth_accounts_file'],
@@ -56,6 +55,7 @@ CONFIG_DEFAULTS = {
         'x': 'xdg-open {url}', # system default browser
     },
     'default_browser': 'x',
+    'default_command': 'value',
     'default_field': 'passcode',
     'default_vector_field': 'questions',
     'display_time': 60,
@@ -168,8 +168,10 @@ CONFIG_DEFAULTS = {
     'arp_executable': '/sbin/arp',
 }
 
-# the following could be config settings, but they do not seem worth promoting
-INITIAL_AUTOTYPE_DELAY = 0.0
+# The following could be config settings, but they do not seem worth promoting.
+INITIAL_AUTOTYPE_DELAY = 0.25
+    # Give the window manager a bit of time to close the 'choose' dialog and
+    # refocus on the original window. Delay given in seconds.
 
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
