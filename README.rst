@@ -161,21 +161,11 @@ the line::
    use-agent
 
 That way, you generally need to give your GPG key pass phrase less often. The 
-agent remembers the passphrase for you for a time. So if you use the agent, be 
-sure to also use screen locking so your passwords are secure when you walk away 
-from your computer.
+agent remembers the passphrase for you for a time. Ten minutes is the default, 
+but you can configure gpg-agent to cache passphrases for as long as you like.
 
-The ultimate in convenience is to use Gnome Keyring to act as the GPG agent 
-because it allows you to unlock the agent simply by logging in.  To do so, make 
-sure Keyring is installed::
-
-   yum install gnome-keyring gnome-keyring-pam
-
-If you are using Gnome, it will start Keyring for you. Otherwise, you should 
-modify your .xinitrc or .xsession file to add the following::
-
-    # Set ssh and gpg agent environment variables
-    export $(gnome-keyring-daemon --start)
+If you use the agent, be sure to also use screen locking so your passwords are 
+secure when you walk away from your computer.
 
 
 Vim

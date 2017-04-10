@@ -170,7 +170,7 @@ class Add(Command):
                 template_name = get_setting('default_account_template')
             template = dedent(templates[template_name]).strip() + '\n'
         except KeyError as err:
-            error(
+            fatal(
                 'unknown account template, choose from %s.' % conjoin(
                     sorted(templates.keys())
                 ), culprit=template_name
