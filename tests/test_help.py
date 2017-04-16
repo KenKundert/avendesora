@@ -367,7 +367,7 @@ def test_identity():
         are assumed to have shared Avendesora accounts.  Ahmed runs
         Avendesora as follows and remembers the response:
 
-            avendesora identity reza
+            > avendesora identity reza
             challenge: slouch emirate bedeck brooding
             response: spear disable local marigold
 
@@ -377,7 +377,7 @@ def test_identity():
         Ahmed communicates the challenge to Reza but not the response.  Reza
         then runs Avendesora with the given challenge:
 
-            avendesora identity ahmed slouch emirate bedeck brooding
+            > avendesora identity ahmed slouch emirate bedeck brooding
             challenge: slouch emirate bedeck brooding
             response: spear disable local marigold
 
