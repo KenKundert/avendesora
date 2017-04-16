@@ -33,7 +33,7 @@ from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_componenets
 from inform import (
-    debug, Error, error, notify, log, os_error, render,
+    conjoin, debug, Error, error, notify, log, os_error, render,
     terminate, terminate_if_errors
 )
 from shlib import to_path
@@ -249,5 +249,9 @@ class PasswordGenerator(object):
             response = str(r)
             return challenge, response
         except KeyError:
-            error('unknown.', culprit=name)
+            choices = conjoin(sorted(self.shared_secrets.keys()))
+            raise Error(
+                'Unknown partner. Choose from %s.' % choices,
+                culprit=name
+            )
 

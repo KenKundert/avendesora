@@ -787,7 +787,7 @@ class Identity(Command):
             are assumed to have shared Avendesora accounts.  Ahmed runs
             Avendesora as follows and remembers the response:
 
-                avendesora identity reza
+                > avendesora identity reza
                 challenge: slouch emirate bedeck brooding
                 response: spear disable local marigold
 
@@ -797,7 +797,7 @@ class Identity(Command):
             Ahmed communicates the challenge to Reza but not the response.  Reza
             then runs Avendesora with the given challenge:
 
-                avendesora identity ahmed slouch emirate bedeck brooding
+                > avendesora identity ahmed slouch emirate bedeck brooding
                 challenge: slouch emirate bedeck brooding
                 response: spear disable local marigold
 
@@ -818,11 +818,14 @@ class Identity(Command):
         generator = PasswordGenerator()
 
         if cmdline['<name>']:
-            name = cmdline['<name>']
-            challenge = ' '.join(cmdline['<challenge>'])
-            c, r = generator.challenge_response(name, challenge)
-            output(c, culprit='challenge')
-            output(r, culprit='response')
+            try:
+                name = cmdline['<name>']
+                challenge = ' '.join(cmdline['<challenge>'])
+                c, r = generator.challenge_response(name, challenge)
+                output(c, culprit='challenge')
+                output(r, culprit='response')
+            except Error as err:
+                err.report()
         else:
             names = sorted(generator.shared_secrets.keys())
             output('Available names:')
