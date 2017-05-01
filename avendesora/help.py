@@ -442,6 +442,10 @@ class Discovery(HelpMessage):
             RecognizeURL.  If you do not give the protocol, the default_protocol
             (https) is assumed.
 
+            In general you should use RecognizeURL() rather than
+            RecognizeTitle() for websites if you can. Doing so will help protect
+            you from phishing attacks by carefully examining the URL.
+
             When account discovery fails it can be difficult to determine what
             is going wrong. When this occurs, you should first examine the log
             file. It should show you the window title and the recognized title
@@ -841,6 +845,39 @@ class Questions(HelpMessage):
             Be aware that the question is used as a seed when generating the
             answer, so if you change the question in any way it changes the
             answer.
+        """).strip()
+        return text
+
+
+# Questions class {{{1
+class Phishing(HelpMessage):
+    DESCRIPTION = "avoiding phishing attacks"
+
+    @staticmethod
+    def help():
+        text = dedent("""
+            Phishing is a very common method used on the web to get people to
+            unknowingly divulge sensitive information such as account
+            credentials.  It is generally accomplished by sending misleading
+            URLs in email or placing them on websites. When you visit these
+            URLs you are taken to a site that looks identical to the site you
+            were expecting to go to in the hope that you are tricked into giving
+            up your account credentials.  It used to be that if you carefully
+            inspected the url you could spot deception, but even that is no
+            longer true.
+
+            Avendesora helps you avoid phishing attacks in two ways. First, you
+            should never go to one of your secure sites by clicking on a link.
+            Instead, you should use Avendesora's browse command:
+
+                avendesora browse chase
+
+            In this way you use the URL stored in Avendesora rather than
+            trusting a url link provided by a third party. Second, you should
+            auto-type the account credentials using Avendesora's account
+            discovery based on RecognizeURL() (be sure to use RecognizeURL() for
+            websites rather than RecognizeTitle() when configuring account
+            discovery). RecogniseURL() will not fooled by a phishing site).
         """).strip()
         return text
 
