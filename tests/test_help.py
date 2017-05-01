@@ -894,8 +894,7 @@ def test_discovery():
 
         In general you should use RecognizeURL() rather than
         RecognizeTitle() for websites if you can. Doing so will help protect
-        you from phishing attacks
-        (https://www.xudongz.com/blog/2017/idn-phishing).
+        you from phishing attacks by carefully examining the URL.
 
         When account discovery fails it can be difficult to determine what
         is going wrong. When this occurs, you should first examine the log
