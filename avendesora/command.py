@@ -25,8 +25,8 @@ from .obscure import Obscure
 from .utilities import two_columns
 from .writer import get_writer
 from inform import (
-    Error, codicil, debug, error, fatal, output, warn, conjoin, os_error,
-    is_collection, is_str, indent, render,
+    Error, codicil, cull, debug, error, fatal, output, warn, conjoin, os_error,
+    is_collection, is_str, indent, render, ddd, ppp, vvv
 )
 from shlib import chmod, mv, rm, to_path
 from docopt import docopt
@@ -879,6 +879,73 @@ class Initialize(Command):
 
         # run the generator
         generator = PasswordGenerator(init=True, gpg_ids=gpg_ids)
+
+
+# Login Credentials {{{1
+class LoginCredentials(Command):
+    NAMES = 'login', 'credentials', 'l'
+    DESCRIPTION = 'show login credentials'
+    USAGE = dedent("""
+        Displays the accounts login credentials which consists of an identifier
+        and a secret. Generally the identifier is a username or an email address
+        and the secret is a password or passphrase.
+
+        Usage:
+            avendesora login       [options] <account> [<field>]
+            avendesora credentials [options] <account> [<field>]
+            avendesora l           [options] <account> [<field>]
+
+        Options:
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
+            -v, --verbose           Add additional information to log file to
+                                    help identify issues in account discovery.
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # determine the account and output specified information
+        account_name = cmdline['<account>']
+        writer = get_writer()
+        account = generator.get_account(account_name, cmdline['--seed'])
+        credentials = account.get_scalar('credentials', default=None)
+        if credentials:
+            credentials = Collection(credentials)
+        else:
+            ids = Collection(get_setting('credential_ids'))
+            secrets = Collection(get_setting('credential_secrets'))
+            for each in ids:
+                if account.has_field(each):
+                    identity = each
+                    break
+            else:
+                identity = None
+            for each in secrets:
+                if account.has_field(each):
+                    secret = each
+                    break
+            else:
+                secret = None
+            if not identity and not secret:
+                raise Error('credentials not found.')
+            credentials = [identity, secret]
+        for each in cull(credentials):
+            writer.display_field(account, each)
 
 
 # New {{{1

@@ -81,7 +81,7 @@ Installation
 
 Install with::
 
-    pip3 install --user avendesora
+   pip3 install --user avendesora
 
 This will place avendesora in ~/.local/bin, which should be added to your path.
 
@@ -112,19 +112,19 @@ tested to assure this does not happen, but there is still a small chance that
 something slips through.  To assure that you are not affected by this, you 
 should archive your passwords before you upgrade with::
 
-    avendesora changed
-    avendesora archive
+   avendesora changed
+   avendesora archive
 
 The *changed* command should always be run before an *archive* command. It 
 allows you to review all the changes that have occurred so that you can verify 
 that they were all intentional.  Once you are comfortable, run the *archive* 
 command to save all the changes.  Then upgrade with::
 
-    pip install -upgrade --user avendesora
+   pip install -upgrade --user avendesora
 
 Finally, run::
 
-    avendesora changed
+   avendesora changed
 
 to confirm that none of your generated passwords have changed.
 
@@ -454,17 +454,17 @@ relatively high-level interface as shown in this example:
         fatal(os_error(err))
 
 
-PasswordGenerator:
+PasswordGenerator():
 
-    Initializes the password generator.
+    Initializes the password generator. You should pass no arguments.
 
-get_account:
+get_account(name, request_seed=False):
 
     Accesses a particular account. Takes a string for the account name or alias.  
     Optionally takes a second string that is used as an additional seed (see: 
     `avendesora help misdirection`).
 
-get_value:
+get_value(field):
 
     Returns the value of a particular account attribute given a user-oriented 
     string that describes the desired attribute.  The value requested must be 
@@ -489,14 +489,18 @@ get_value:
     render() method that returns a string that combines the name and the 
     description with the value.
 
-get_scalar:
+get_scalar(name, key=None, default=False):
 
     A lower level interface than get_value that given a name and perhaps a key 
     returns a scalar value.  Also takes an optional default value that is 
     returned if the value is not found. Unlike get_value, the actual value is 
     returned, not a object that contains multiple facets of the value.
 
-get_composite:
+    The name is the field name, and the key would identity which value is 
+    desired if the field is a composite. If default is False, an error is raise 
+    if the value is not present, otherwise the default value itself is returned.
+
+get_composite(name):
 
     A lower level interface than get_value that given a name returns the value 
     of the associated field, which may be a scalar (string or integer) or 

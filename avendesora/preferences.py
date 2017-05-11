@@ -46,6 +46,8 @@ CONFIG_DEFAULTS = {
     'account_list_file': 'accounts_files',
     'archive_file': 'archive.gpg',
     'previous_archive_file': 'archive.prev.gpg',
+    'credential_ids': 'username email',
+    'credential_secrets': 'passcode password passphrase',
     'label_color': 'blue',
     'color_scheme': 'dark',
     'browsers': {
@@ -54,10 +56,10 @@ CONFIG_DEFAULTS = {
         't': 'torbrowser {url}',
         'x': 'xdg-open {url}', # system default browser
     },
-    'default_browser': 'x',
-    'default_command': 'value',
+    'default_command': 'credentials',
     'default_field': 'passcode',
     'default_vector_field': 'questions',
+    'default_browser': 'x',
     'display_time': 60,
     'dictionary_file': 'words',
     'encoding': 'utf-8',
@@ -91,7 +93,6 @@ CONFIG_DEFAULTS = {
                 username = '_USERNAME_'
                 email = '_EMAIL_'
                 passcode = PasswordRecipe('12 2u 2d 2s')
-                default = 'username: {email}, password: {passcode}'
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
@@ -136,7 +137,6 @@ CONFIG_DEFAULTS = {
                 passcode = PasswordRecipe('12 2u 2d 2s')
                 verbal = Passphrase(length=2)
                 pin = PIN()
-                default = 'username: {username}, password: {passcode}'
                 questions = [
                     Question("_QUESTION1_?"),
                     Question("_QUESTION2_?"),
