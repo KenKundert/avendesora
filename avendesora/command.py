@@ -886,14 +886,14 @@ class LoginCredentials(Command):
     NAMES = 'login', 'credentials', 'l'
     DESCRIPTION = 'show login credentials'
     USAGE = dedent("""
-        Displays the accounts login credentials which consists of an identifier
+        Displays the accounts login credentials, which consists of an identifier
         and a secret. Generally the identifier is a username or an email address
         and the secret is a password or passphrase.
 
         Usage:
-            avendesora login       [options] <account> [<field>]
-            avendesora credentials [options] <account> [<field>]
-            avendesora l           [options] <account> [<field>]
+            avendesora credentials [options] <account>
+            avendesora login       [options] <account>
+            avendesora l           [options] <account>
 
         Options:
             -S, --seed              Interactively request additional seed for

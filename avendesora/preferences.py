@@ -93,6 +93,11 @@ CONFIG_DEFAULTS = {
                 username = '_USERNAME_'
                 email = '_EMAIL_'
                 passcode = PasswordRecipe('12 2u 2d 2s')
+                questions = [
+                    Question("_QUESTION1_?"),
+                    Question("_QUESTION2_?"),
+                    Question("_QUESTION3_?"),
+                ]
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
