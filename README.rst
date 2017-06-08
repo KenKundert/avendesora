@@ -238,6 +238,33 @@ recreated, and this time they will be encrypted or not based on the extensions
 you gave.
 
 
+Using Avendesora
+----------------
+
+Avendesora supports a series of commands, the complete list of which can be had 
+by running the help command::
+
+    > avendesora help
+
+More information on a command is accessed by adding the name of the command as 
+the second argument to the help command::
+
+    > avendesora help value
+
+If the first argument is not a command, then one of two commands are run based 
+on the number of arguments given. If there is one argument, then the 
+*credentials* command is run that prints both an account identifier (typically 
+a username or email) and a passcode (password or pass phrase). If more than one 
+argument is given, then the value command is run.  So for example::
+
+    > avendesora amazon
+    email: albert@ricochet.com
+    password: XDyfL5it
+
+    > avendesora southwest 0
+    questions.0 (First foreign country I visited): contour subtract impel
+
+
 Accounts
 --------
 
@@ -458,11 +485,14 @@ PasswordGenerator():
 
     Initializes the password generator. You should pass no arguments.
 
-get_account(name, request_seed=False):
+get_account(name, request_seed=False, stealth_name=None):
 
     Accesses a particular account. Takes a string for the account name or alias.  
     Optionally takes a second string that is used as an additional seed (see: 
     `avendesora help misdirection`).
+
+    The stealth name is used as account name if the account is a stealth 
+    account.
 
 get_value(field):
 

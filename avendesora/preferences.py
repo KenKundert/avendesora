@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'ed6affe9ce4c3db17bb03750fc71dc51',
+    'secrets_hash': 'e13b9ec732d6748f55b7ef0644bab446',
     'discard_logfile': False,
 }
 
@@ -56,7 +56,6 @@ CONFIG_DEFAULTS = {
         't': 'torbrowser {url}',
         'x': 'xdg-open {url}', # system default browser
     },
-    'default_command': 'credentials',
     'default_field': 'passcode',
     'default_vector_field': 'questions',
     'default_browser': 'x',
@@ -194,7 +193,6 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     previous_archive_file = {previous_archive_file}
 
     # Various settings
-    default_command = {default_command}
     default_field = {default_field}
     default_vector_field = {default_vector_field}
     display_time = {display_time}

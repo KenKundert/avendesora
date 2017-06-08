@@ -65,9 +65,12 @@ class Command(object):
             args = []
         command = cls.find(name)
         if not command:
-            # assume they simply neglected to specify the command explicitly
+            # no recognizable command was specified
+            # in this case, run credentials if one argument is given
+            # and value otherwise
             args = [name] + args
-            name = get_setting('default_command')
+            num_args = len([a for a in args if a[0] != '-'])
+            name = 'value' if num_args > 1 else 'credentials'
             command = cls.find(name)
             if not command:
                 error('unknown command.', culprit=name)
@@ -85,6 +88,17 @@ class Command(object):
     @classmethod
     def get_name(cls):
         return cls.NAMES[0]
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+        """).strip()
+        return text.format(
+            title=title(cls.DESCRIPTION), usage=cls.USAGE,
+        )
 
 
 # Add {{{1
@@ -445,17 +459,6 @@ class Changed(Command):
     """).strip()
 
     @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(
-            title=title(cls.DESCRIPTION), usage=cls.USAGE,
-        )
-
-    @classmethod
     def run(cls, command, args):
         # define white space insensitive compare function:
         def differ(a, b):
@@ -686,15 +689,6 @@ class Find(Command):
     """).strip()
 
     @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
@@ -722,15 +716,6 @@ class Help(Command):
             avendesora help [<topic>]
             avendesora h    [<topic>]
     """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):
@@ -903,15 +888,6 @@ class LoginCredentials(Command):
     """).strip()
 
     @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
@@ -1062,15 +1038,6 @@ class Search(Command):
     """).strip()
 
     @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
@@ -1156,15 +1123,6 @@ class Value(Command):
     """).strip()
 
     @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
@@ -1203,15 +1161,6 @@ class Values(Command):
     """).strip()
 
     @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
-
-    @classmethod
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
@@ -1231,15 +1180,6 @@ class Version(Command):
         Usage:
             avendesora version
     """).strip()
-
-    @classmethod
-    def help(cls):
-        text = dedent("""
-            {title}
-
-            {usage}
-        """).strip()
-        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
     @classmethod
     def run(cls, command, args):

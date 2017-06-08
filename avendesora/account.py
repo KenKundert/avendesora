@@ -28,7 +28,8 @@ from .recognize import Recognizer
 from .secrets import Secret
 from inform import (
     Color, codicil, conjoin, cull, debug, Error, is_collection, is_str, log,
-    notify, output, warn, indent
+    notify, output, warn, indent,
+    ddd, ppp, vvv
 )
 from textwrap import dedent
 try:
@@ -259,9 +260,9 @@ class Account(object):
 
     # initialize() {{{2
     @classmethod
-    def initialize(cls, interactive_seed=False):
+    def initialize(cls, interactive_seed=False, stealth_name=None):
         cls._interactive_seed = interactive_seed
-        log('initializing', cls.get_name())
+        log('initializing account:', cls.get_name())
         try:
             if cls.master.is_secure():
                 if not cls._file_info.encrypted:
@@ -652,8 +653,25 @@ class StealthAccount(Account):
     __NO_MASTER = True
         # prevents master password from being added to this base class
 
+    # initialize() {{{2
+    @classmethod
+    def initialize(cls, interactive_seed=False, stealth_name=None):
+        cls._interactive_seed = interactive_seed
+        cls.stealth_name = stealth_name
+        log('initializing stealth account:', cls.get_name())
+        for key, value in cls.items():
+            # reset the secrets so they honor stealth_name
+            try:
+                value.reset()
+            except AttributeError:
+                pass
+
     @classmethod
     def get_seed(cls):
+        if cls.stealth_name:
+            # In this case we are running using API rather than running from
+            # command line and the account names was specified to get_account().
+            return cls.stealth_name
         # need to handle case where stdin/stdout is not available.
         # perhaps write generic password getter that supports both gui and tui.
         # Then have global option that indicates which should be used.

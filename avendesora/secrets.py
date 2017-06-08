@@ -73,6 +73,11 @@ class SecretExhausted(Error):
 class Secret(object):
     """Base class for generated secrets"""
 
+    def __new__(cls, *args, **kwargs):
+        self = super(Secret, cls).__new__(cls)
+        self.reset()
+        return self
+
     def __init__(self):
         """Constructor
 
@@ -85,11 +90,8 @@ class Secret(object):
         return default
 
     def generate(self, field_name, field_key, account):
-        try:
-            if self.secret:
-                return
-        except AttributeError:
-            pass
+        if self.secret:
+            return
         account_name = account.get_name()
         account_seed = account.get_seed()
         if self.master is None:
@@ -163,6 +165,17 @@ class Secret(object):
         self.pool = bits
         self.entropy = 0
 
+    def reset(self):
+        """
+        A secret once generated will remember its value. With stealth secrets
+        this is undesired because it prevents a new secret from being generated
+        when account name changes. Calling this function causes the secret to
+        forget its previously saved value, which will require generate to be
+        called again.
+        """
+        self.secret = None
+        self.pool = None
+
     def _partition(self, radix, num_partitions):
         """
         An iterator that returns a sequence of numbers. The length of the 
@@ -179,6 +192,7 @@ class Secret(object):
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
         self.entropy += num_partitions*math.log(radix, 2)
+        assert self.pool, 'generate() must be called first'
 
         for i in range(num_partitions):
             if self.pool < max_index:
@@ -213,6 +227,7 @@ class Secret(object):
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
         self.entropy += num_symbols*math.log(len(alphabet), 2)
+        assert self.pool, 'generate() must be called first'
 
         for i in range(num_symbols):
             if self.pool < max_index:
@@ -234,6 +249,7 @@ class Secret(object):
         """
         max_index = radix-1
         self.entropy += math.log(radix, 2)
+        assert self.pool, 'generate() must be called first'
 
         if self.pool < max_index:
             raise SecretExhausted()
@@ -269,6 +285,7 @@ class Secret(object):
         radix = len(alphabet)
         max_index = radix-1
         self.entropy += math.log(len(alphabet), 2)
+        assert self.pool, 'generate() must be called first'
 
         if self.pool < max_index:
             raise SecretExhausted()
@@ -355,16 +372,16 @@ class Password(Secret):
         self.suffix = suffix
 
     def __str__(self):
-        try:
-            secret = self.secret
-        except AttributeError:
+        if self.secret:
             # it is important that this be called only once, because the secret
             # changes each time it is called
-            secret = self.secret = (
-                self.prefix
-              + self.sep.join(self._symbols(self.alphabet, self.length))
-              + self.suffix
-            )
+            return self.secret
+
+        secret = self.secret = (
+            self.prefix
+            + self.sep.join(self._symbols(self.alphabet, self.length))
+            + self.suffix
+        )
         return secret
 
 
@@ -575,9 +592,9 @@ class Question(Passphrase):
         self.prefix = prefix
         self.suffix = suffix
         if answer:
-            self.secret = str(answer)
             # answer allows the user to override the generator and simply
             # specify the answer. This is also used when producing the archive.
+            self.secret = str(answer)
 
     # get_key() {{{2
     def get_key(self, default=None):
@@ -655,31 +672,30 @@ class MixedPassword(Secret):
         self.version = version
 
     def __str__(self):
-        try:
-            secret = self.secret
-        except AttributeError:
+        if self.secret:
             # It is important that this be called only once, because the secret
             # changes each time it is called.
+            return self.secret
 
-            # Choose the symbols we will used to create the password by drawing from 
-            # the various alphabets in order.
-            num_required = 0
-            symbols = []
-            for alphabet, count in self.requirements:
-                for i in range(count):
-                    symbols.append(self._get_symbol(alphabet))
-                    num_required += 1
-            for i in range(self.length - num_required):
-                symbols.append(self._get_symbol(self.def_alphabet))
+        # Choose the symbols used to create the password by drawing from the
+        # various alphabets in order.
+        num_required = 0
+        symbols = []
+        for alphabet, count in self.requirements:
+            for i in range(count):
+                symbols.append(self._get_symbol(alphabet))
+                num_required += 1
+        for i in range(self.length - num_required):
+            symbols.append(self._get_symbol(self.def_alphabet))
 
-            # Now, randomize the symbols to produce the password.
-            password = []
-            length = self.length
-            while (length > 0):
-                i = self._get_index(length)
-                password.append(symbols.pop(i))
-                length -= 1
-            secret = ''.join(password)
+        # Now, randomize the symbols to produce the password.
+        password = []
+        length = self.length
+        while (length > 0):
+            i = self._get_index(length)
+            password.append(symbols.pop(i))
+            length -= 1
+        secret = ''.join(password)
         self.secret = secret
         return secret
 
@@ -841,19 +857,19 @@ class BirthDate(Secret):
         self.version = version
 
     def __str__(self):
-        try:
-            secret = self.secret
-        except AttributeError:
+        if self.secret:
             # It is important that this be called only once, because the secret
             # changes each time it is called.
-            import arrow
-            year = self._get_symbol(range(self.first_year, self.last_year))
-            jan1 = arrow.get(year, 1, 1)
-            dec31 = arrow.get(year, 12, 31)
-            days_in_year = (dec31 - jan1).days
-            day = self._get_symbol(range(days_in_year))
-            birthdate = jan1.replace(days=day)
-            secret = birthdate.format(self.fmt)
+            return self.secret
+
+        import arrow
+        year = self._get_symbol(range(self.first_year, self.last_year))
+        jan1 = arrow.get(year, 1, 1)
+        dec31 = arrow.get(year, 12, 31)
+        days_in_year = (dec31 - jan1).days
+        day = self._get_symbol(range(days_in_year))
+        birthdate = jan1.replace(days=day)
+        secret = birthdate.format(self.fmt)
         self.secret = secret
         return secret
 
