@@ -66,11 +66,10 @@ class Command(object):
         command = cls.find(name)
         if not command:
             # no recognizable command was specified
-            # in this case, run credentials if one argument is given
-            # and value otherwise
+            # in this case, run 'credentials' if one argument is given
+            # and 'value' otherwise
             args = [name] + args
-            num_args = len([a for a in args if a[0] != '-'])
-            name = 'value' if num_args > 1 else 'credentials'
+            name = 'value' if len(args) > 1 else 'credentials'
             command = cls.find(name)
             if not command:
                 error('unknown command.', culprit=name)

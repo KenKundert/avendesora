@@ -251,18 +251,26 @@ the second argument to the help command::
 
     > avendesora help value
 
-If the first argument is not a command, then one of two commands are run based 
-on the number of arguments given. If there is one argument, then the 
-*credentials* command is run that prints both an account identifier (typically 
-a username or email) and a passcode (password or pass phrase). If more than one 
-argument is given, then the value command is run.  So for example::
+If the first argument is not a command, then it must be the name of an account.  
+In this case, the *credentials* command is run if only the account name is 
+given, otherwise the *value* command is run (any options to the value command 
+should be given after the account name). The *credentials* command generally 
+gives the information you would need to login to an account, typically the 
+username or email and the passcode.  The *value* command allows you to request 
+the value of a specific piece of information from the account. So for example::
 
     > avendesora amazon
     email: albert@ricochet.com
     password: XDyfL5it
 
+    > avendesora citi pin
+    56713522
+
     > avendesora southwest 0
     questions.0 (First foreign country I visited): contour subtract impel
+
+If you give a number for the desired value, Avendesora assumes you want the 
+answer to the corresponding security question.
 
 
 Accounts
