@@ -19,8 +19,8 @@ Avendesora Collaborative Password Utility
     .. image:: https://img.shields.io/pypi/dm/avendesora.svg
         :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 1.7.1
-| Released: 2017-06-08
+| Version: 1.7.2
+| Released: 2017-06-10
 |
 
 Avendesora replaces the Abraxas, which are both alternatives to the traditional 
