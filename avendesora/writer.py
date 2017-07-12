@@ -343,9 +343,10 @@ class KeyboardWriter(Writer):
                     if account.is_secret(name, key):
                         scrubbed.append('<%s>' % cmd)
                     else:
-                        scrubbed.append('%s' % value)
+                        scrubbed.append(value)
             elif term:
                 out.append(term)
+                scrubbed.append(term)
 
         scrubbed = ''.join(scrubbed).replace('\t', '→').replace('\n', '↲')
         log('Autotyping "%s"%s.' % (scrubbed, ' -- dry run' if dryrun else ''))
