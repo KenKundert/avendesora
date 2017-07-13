@@ -245,7 +245,9 @@ class StdoutWriter(Writer):
         value = account.get_value(field)
 
         try:
-            output(str(value))
+            # don't use inform otherwise password shows up in logfile
+            print(str(value))
+            log('writing secret to standard output.')
         except Error as err:
             err.terminate()
 
