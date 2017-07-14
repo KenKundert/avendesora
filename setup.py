@@ -40,7 +40,7 @@ setup(
             #     dnf install libffi-devel
             #     dnf install gobject-introspection-devel
             #     dnf install python3-cairo-devel
-        'python-gnupg',
+        'python-gnupg>=0.4.1',
             # Be careful.  There's a package called 'gnupg' that's an 
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
