@@ -650,7 +650,7 @@ class Edit(Command):
             else:
                 fatal(err)
 
-        # allow the user to editor, and then check and make sure it is valid
+        # allow the user to edit, and then check and make sure it is valid
         try:
             while True:
                 GenericEditor.open_and_search(accounts_file.path, account_name)
@@ -870,9 +870,8 @@ class LoginCredentials(Command):
     NAMES = 'login', 'credentials', 'l'
     DESCRIPTION = 'show login credentials'
     USAGE = dedent("""
-        Displays the accounts login credentials, which consists of an identifier
-        and a secret. Generally the identifier is a username or an email address
-        and the secret is a password or passphrase.
+        Displays the account's login credentials, which generally consist of an
+        identifier and a secret.
 
         Usage:
             avendesora credentials [options] <account>
@@ -885,6 +884,31 @@ class LoginCredentials(Command):
             -v, --verbose           Add additional information to log file to
                                     help identify issues in account discovery.
     """).strip()
+
+
+    @classmethod
+    def help(cls):
+        idents=conjoin(get_setting('credential_ids').split(), conj=' or ')
+        secrets=conjoin(get_setting('credential_secrets').split(), conj=' or ')
+        text = dedent("""
+            {title}
+
+            {usage}
+
+            The credentials can be specified explicitly using the credentials
+            setting in your account. For example::
+
+                credentials = 'usernames.0 usernames.1 passcode'
+
+            If credentials is not specified then the first of the following will
+            be used if available:
+                id: {idents}
+                secret: {secrets}
+        """).strip()
+        return text.format(
+            title=title(cls.DESCRIPTION), usage=cls.USAGE,
+            idents=idents, secrets=secrets,
+        ).strip()
 
     @classmethod
     def run(cls, command, args):

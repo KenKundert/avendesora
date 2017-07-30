@@ -120,7 +120,7 @@ allows you to review all the changes that have occurred so that you can verify
 that they were all intentional.  Once you are comfortable, run the *archive* 
 command to save all the changes.  Then upgrade with::
 
-   pip install -upgrade --user avendesora
+   pip3 install -upgrade --user avendesora
 
 Finally, run::
 

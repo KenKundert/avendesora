@@ -276,6 +276,41 @@ def test_conceal():
     """).strip()
     assert result.decode('utf-8') == expected
 
+# test_credentials() {{{1
+def test_credentials():
+    try:
+        result = run('avendesora help credentials')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Show login credentials.
+
+        Displays the account's login credentials, which generally consist of an
+        identifier and a secret.
+
+        Usage:
+            avendesora credentials [options] <account>
+            avendesora login       [options] <account>
+            avendesora l           [options] <account>
+
+        Options:
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
+            -v, --verbose           Add additional information to log file to
+                                    help identify issues in account discovery.
+
+        The credentials can be specified explicitly using the credentials
+        setting in your account. For example::
+
+            credentials = 'usernames.0 usernames.1 passcode'
+
+        If credentials is not specified then the first of the following will
+        be used if available:
+            id: username or email
+            secret: passcode, password or passphrase
+    """).strip()
+    assert result.decode('utf-8') == expected
+
 # test_edit() {{{1
 def test_edit():
     try:
