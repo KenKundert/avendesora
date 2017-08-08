@@ -167,7 +167,7 @@ CONFIG_DEFAULTS = {
     'gpg_armor': 'extension',
     'gpg_ids': None,
     'xdotool_executable': '/usr/bin/xdotool',
-    'xsel_executable': '/usr/bin/xsel -p',
+    'xsel_executable': '/usr/bin/xsel -p -n -v',
     'use_pager': True,
     'arp_executable': '/sbin/arp',
 }
@@ -196,7 +196,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     default_field = {default_field}
     default_vector_field = {default_vector_field}
     display_time = {display_time}
-    encoding = {encoding}
+    encoding = {encoding!r}
     edit_account = {edit_account}
     edit_template = {edit_template}
     browsers = {browsers}
@@ -262,32 +262,26 @@ HASH_FILE_INITIAL_CONTENTS = dedent('''\
 ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Accounts
     # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} foldmethod=marker :
-    #
-    # Add information about each of your accounts to the accounts dictionary.
-    #
-    # You can use the dedent function to strip leading whitespace from
-    # multi-line remarks.  You can use the character sets and exclude function
-    # to create alphabets for you character-base passwords.
+
+    # Description {section}
+    # Subclass Account to create new accounts. Attributes of the subclass are
+    # the account fields. Fields can be strings, lists, dictionaries or
+    # Avendesora classes.
     #
     # Example:
-    # To create an alphabet with all characters except tabs use either:
-    #     Password(..., alphabet = exclude(PRINTABLE, '\\t'))
-    # or:
-    #     Password(..., alphabet = ALPHANUMERIC + PUNCTUATION + ' ')
-    #
-    # You can use PasswordRecipe() to generate passwords that include certain
-    # character classes.
-    #
-    # Examples:
-    # To create a 12 character password that contains 2 upper, 2 lower, 2
-    # digits, and 2 symbols, use:
-    #     PasswordRecipe("12 2u 2l 2d 2s")
-    #
-    # To create a 12 character password that contains 2 upper, 2 lower, 2
-    # digits, and 2 characters from a specific set of characters, use:
-    #     PasswordRecipe("12 2u 2l 2d 2c~!@#$%^&*+=?")
-    #
+    #     class Mortgage(Account):
+    #         username = 'herbie962'
+    #         account = '0036727963'
+    #         passcode = PasswordRecipe('12 2u 2d 2s')
+    #         phone = '800-529-2345'
+    #         discovery = [
+    #             RecognizeURL(
+    #                 'https://www.loanservicing.com/login.jsp',
+    #                 script='{{account}}{{tab}}{{passcode}}{{return}}',
+    #             ),
+    #         ]
 
+    # Imports {section}
     from avendesora import (
         # Basics
         Account, StealthAccount, Hide, Hidden, GPG, Script,
@@ -310,6 +304,9 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     except ImportError:
         pass
 
+    # Shared Values {section}
+    # These values are shared across all accounts defined in this file.
+    #
     # Never disclose the master seed to anyone you are not collaborating with.
     # Never give it to your collaborator using an insecure channel, such as
     # email.  If you have encrypted this file with your colloborator's public
@@ -328,7 +325,8 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Stealth Accounts
     # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} foldmethod=marker :
-    #
+
+    # Description {section}
     # Stealth accounts are accounts where the class name is not taken to be the
     # account name, instead the user is interactively asked for the account
     # name. In this way there is no record that the account actually exists.

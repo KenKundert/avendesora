@@ -84,9 +84,9 @@ class PasswordGenerator(object):
 
     # initialize() {{{2
     def initialize(self, gpg_ids, filename):
-        # if filename is True, this is being called as part of the Avendesora
+        # If filename is True, this is being called as part of the Avendesora
         # 'initialize' command, in which case all missing files should be created.
-        # if filename is a string, this is being called as part of the
+        # If filename is a string, this is being called as part of the
         # Avendesora 'new' command, in which case a single new account file
         # should be created.
         def split(s, l=72):
@@ -118,6 +118,10 @@ class PasswordGenerator(object):
 
         # create the initial versions of the files in the settings directory
         if filename is True:
+            path = to_path(get_setting('account_list_file'))
+            if path.suffix in GPG_EXTENSIONS:
+                raise Error('encryption is not supported.', culprit=path)
+
             # Assure that the default initial set of files is present
             for path, contents in [
                 (get_setting('config_file'), CONFIG_FILE_INITIAL_CONTENTS),
@@ -125,6 +129,7 @@ class PasswordGenerator(object):
                 (get_setting('user_key_file'), USER_KEY_FILE_INITIAL_CONTENTS),
                 (get_setting('default_accounts_file'), ACCOUNTS_FILE_INITIAL_CONTENTS),
                 (get_setting('default_stealth_accounts_file'), STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS),
+                (get_setting('account_list_file'), ACCOUNT_LIST_FILE_CONTENTS),
             ]:
                 if path:
                     log('creating initial version.', culprit=path)
@@ -145,19 +150,6 @@ class PasswordGenerator(object):
             log('creating accounts file.', culprit=path)
             f = PythonFile(path)
             f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
-
-        # Create a new accounts file
-        path = to_path(get_setting('account_list_file'))
-        if path.suffix in GPG_EXTENSIONS:
-            raise Error('encryption is not supported.', culprit=path)
-        try:
-            log('writing.', culprit=path)
-            path.write_text(
-                ACCOUNT_LIST_FILE_CONTENTS.format(**fields),
-                get_setting('encoding')
-            )
-        except OSError as err:
-            raise Error(os_error(err))
 
     # get_account() {{{2
     def get_account(self, name, request_seed=False, stealth_name=None):

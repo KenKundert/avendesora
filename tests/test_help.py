@@ -659,7 +659,7 @@ def test_abraxas():
             cd ~/.config/avendesora
             ln -s ../abraxas/avendesora/accounts.gpg abraxas_accounts.gpg
 
-        2. add abraxas_accounts.gpg to account_files list in .accounts_files.
+        2. add abraxas_accounts.gpg to account_files list in accounts_files.
 
         Now all of the Abraxas accounts contained in abraxas_accounts.gpg
         should be available though Avendesora and the various features of
@@ -687,9 +687,9 @@ def test_accounts():
         result = os_error(err)
     expected = dedent("""
         Account information is stored in account files. The list of account
-        files is given in ~/.config/avendesora/.accounts_files.  New account
+        files is given in ~/.config/avendesora/accounts_files.  New account
         files are created using 'avendesora new', but to delete an accounts
-        file, you must remove it from .accounts_files. Once an accounts file
+        file, you must remove it from accounts_files. Once an accounts file
         exists, you may add accounts to it using 'account add'. Use the -f
         option to specify which file is to contain the new account.
 
