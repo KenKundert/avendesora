@@ -191,10 +191,10 @@ class Accounts(HelpMessage):
 
             A dictionary is often used to hold account numbers:
 
-                accounts = [
+                accounts = {
                     'checking': '1234-56-7890',
                     'savings': '0123-45-6789',
-                ]
+                }
 
             You then access its values using:
 
@@ -204,10 +204,10 @@ class Accounts(HelpMessage):
             You might consider your account numbers as sensitive information. In
             this case you can hide them with:
 
-                accounts = [
+                accounts = {
                     'checking': Hidden('MTIzNC01Ni03ODkw'),
                     'savings': Hidden('MDEyMy00NS02Nzg5'),
-                ]
+                }
 
             The values are now hidden, but not encrypted. They are simply
             encoded with base64. Any knowledgable person with the encoded value
@@ -362,10 +362,18 @@ class Collaborate(HelpMessage):
             Then, one partner creates a new account and mails the account entry
             to the other partner.  This entry does not contain enough
             information to allow an eavesdropper such as Eve to be able to
-            generate the secrets, but now both partners can.
+            generate the secrets, but now both partners can. At a minimum you
+            would need to share only the account name and the user name if one
+            is needed. With that, the other partner can generate the passcode.
 
             Once you have shared an accounts file, you can also use the identity
             command to prove your identity to your partner.
+
+            You cannot share secrets encrypted with Scrypt. Also, you cannot
+            share stealth accounts unless the file that contains the account
+            templates has a *master_seed* specified, which they do not by
+            default. You would need to create a separate file for shared stealth
+            account templates and add a master seed to that file manually.
         """).strip()
         return text
 

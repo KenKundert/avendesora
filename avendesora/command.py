@@ -790,6 +790,9 @@ class Identity(Command):
 
             To complete the process, Reza returns the response to Ahmed, who
             compares it to the response he received to confirm Reza's identity.
+            If Ahmed has forgotten the desired response, he can also specify the
+            challenge to the *identity* command to regenerate the expected
+            response.
         """).strip()
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
