@@ -866,6 +866,73 @@ def test_accounts():
     """).strip()
     assert result.decode('utf-8') == expected
 
+# test_collaborate() {{{1
+def test_collaborate():
+    try:
+        result = run('avendesora help collaborate')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        If you share an accounts file with a partner, then either partner
+        can create new secrets and the other partner can reproduce their
+        values once a small amount of relatively non-confidential
+        information is shared. This works because the security of the
+        generated secrets is based on the master seed, and that seed is
+        contained in the accounts file that is shared in a secure manner
+        once at the beginning.  For example, imagine one partner creates an
+        account at the US Postal Service website and then informs the
+        partner that the name of the new account is usps and the username is
+        justus.  That is enough information for the second partner to
+        generate the password and login. And notice that the necessary
+        information can be shared over an insecure channel. For example, it
+        could be sent in a text message or from a phone where trustworthy
+        encryption is not available.
+
+        The first step in using Avendesora to collaborate with a partner is
+        for one of the partners to generate and then share an accounts file
+        that is dedicated to the shared accounts.  This file contains the
+        master seed, and it is critical to keep this value secure. Thus, it
+        is recommended that the shared file be encrypted.
+
+        Consider an example where you, Alice, are sharing accounts with your
+        business partner, Bob.  You have hired a contractor to run your
+        email server, Eve, who unbeknownst to you is reading your email in
+        order to steal valuable secrets.  Together, you and Bob jointly run
+        Teneya Enterprises. Since you expect more people will need access to
+        the accounts in the future, you choose to the name the file after
+        the company rather than your partner.  To share accounts with Bob,
+        you start by getting Bob's public GPG key.  Then, create the new
+        accounts file with something like:
+
+            avendesora new -g alice@teneya.com -g bob@teneya.com teneya.gpg
+
+        This generates a new accounts file, ~/.config/avendesora/teneya.gpg,
+        and encrypts it so only you and Bob can open it.  Mail this file to
+        Bob. Since it is encrypted, it is to safe to send the file through
+        email.  Even though Eve can read this message, the accounts file is
+        encrypted so Eve cannot access the master seed it contains.  Bob
+        should put the file in ~/.config/avendesora and then add it to
+        accounts_files in ~/.config/avendesora/accounts_files.  You are now
+        ready to share accounts.
+
+        Then, one partner creates a new account and mails the account entry
+        to the other partner.  This entry does not contain enough
+        information to allow an eavesdropper such as Eve to be able to
+        generate the secrets, but now both partners can. At a minimum you
+        would need to share only the account name and the user name if one
+        is needed. With that, the other partner can generate the passcode.
+
+        Once you have shared an accounts file, you can also use the identity
+        command to prove your identity to your partner.
+
+        You cannot share secrets encrypted with Scrypt. Also, you cannot
+        share stealth accounts unless the file that contains the account
+        templates has a *master_seed* specified, which they do not by
+        default. You would need to create a separate file for shared stealth
+        account templates and add a master seed to that file manually.
+    """).strip()
+    assert result.decode('utf-8') == expected
+
 # test_discovery() {{{1
 def test_discovery():
     try:
@@ -1269,6 +1336,109 @@ def test_overview():
     """).strip()
     assert result.decode('utf-8') == expected
 
+# test_phishing() {{{1
+def test_phishing():
+    try:
+        result = run('avendesora help phishing')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Phishing is a very common method used on the web to get people to
+        unknowingly divulge sensitive information such as account
+        credentials.  It is generally accomplished by sending misleading
+        URLs in email or placing them on websites. When you visit these
+        URLs you are taken to a site that looks identical to the site you
+        were expecting to go to in the hope that you are tricked into giving
+        up your account credentials.  It used to be that if you carefully
+        inspected the url you could spot deception, but even that is no
+        longer true.
+
+        Avendesora helps you avoid phishing attacks in two ways. First, you
+        should never go to one of your secure sites by clicking on a link.
+        Instead, you should use Avendesora's browse command:
+
+            avendesora browse chase
+
+        In this way you use the URL stored in Avendesora rather than
+        trusting a url link provided by a third party. Second, you should
+        auto-type the account credentials using Avendesora's account
+        discovery based on RecognizeURL() (be sure to use RecognizeURL() for
+        websites rather than RecognizeTitle() when configuring account
+        discovery). RecogniseURL() will not fooled by a phishing site).
+    """).strip()
+    assert result.decode('utf-8') == expected
+
+# test_questions() {{{1
+def test_questions():
+    try:
+        result = run('avendesora help questions')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Security questions are form of security theater imposed upon you by
+        many websites. The claim is that these questions increase the
+        security of your account. In fact they often do the opposite by
+        creating additional avenues of access to your account. Their real
+        purpose is to allow you to regain access to your account in case you
+        lose your password. If you are careful, this is not needed (you do
+        back up your Avendesora accounts, right?). In this case it is better
+        to randomly generate your answers.
+
+        Security questions are handled by adding something like the
+        following to your account:
+
+            questions = [
+                Question('oldest aunt'),
+                Question('title of first job'),
+                Question('oldest uncle'),
+                Question('savings goal'),
+                Question('childhood vacation spot'),
+            ]
+
+        The string identifying the question does not need to contain the
+        question verbatim, a abbreviated version is sufficient as long as it
+        allows you to distinguish the question.  The questions are given as
+        an array, and so are accessed with an index that starts at 0. Thus,
+        to get the answer to who is your 'oldest aunt', you would use:
+
+            > avendesora value <accountname> 0
+            questions.0 (oldest aunt): ampere reimburse duster
+
+        You can get a list of your questions so you can identify which index
+        to use with:
+
+            > avenedesora values <accountname>
+            ...
+            questions:
+                0: oldest aunt <reveal with 'avendesora value <accountname> questions.0'>
+                1: title of first job <reveal with 'avendesora value <accountname> questions.1'>
+                2: oldest uncle <reveal with 'avendesora value <accountname> questions.2'>
+                3: savings goal <reveal with 'avendesora value <accountname> questions.3'>
+                4: childhood vacation spot <reveal with 'avendesora value <accountname> questions.4'>
+            ...
+
+        By default, Avendesora generates a response that consists of 3
+        random words. This makes it easy to read to a person over the phone
+        if asked to confirm your identity.  Occasionally you will not be
+        able to enter your own answer, but must choose one that is offered
+        to you. In this case, you can specify the answer as part of the
+        question:
+
+            questions = [
+                Question('favorite fruit', answer='grapes'),
+                Question('first major city visited', answer='paris'),
+                Question('favorite subject', answer='history'),
+            ]
+
+        When giving the answers you may want to conceal them to protect them
+        from casual observation.
+
+        Be aware that the question is used as a seed when generating the
+        answer, so if you change the question in any way it changes the
+        answer.
+    """).strip()
+    assert result.decode('utf-8') == expected
+
 # test_scripts() {{{1
 def test_scripts():
     try:
@@ -1364,6 +1534,428 @@ def test_scripts():
     """).strip()
     assert result.decode('utf-8') == expected
 
+# test_secrets() {{{1
+def test_secrets():
+    try:
+        result = run('avendesora help secrets')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Secrets can either by obscured or generated.
+
+        Obscured Secrets
+        ================
+
+        Obscured secrets are secrets that are those that are given to Avendesora
+        to securely hold. The may be things like account numbers or existing
+        passwords.  There are several ways for Avendesora to hold a secret,
+        presented in order of increasing security.
+
+        Hide
+        ----
+
+        This marks a value as being confidential, meaning that it will be
+        protected when shown to the user, but value is not encoded or encrypted
+        in any way.  Rather, it accounts on the protections afforded the
+        accounts file to protect its secret.
+
+            Hide(plaintext, secure=True)
+
+            plaintext (str):
+                The secret in plain text.
+            secure (bool):
+                Indicates that this secret should only be contained in an
+                encrypted accounts file. Default is True.
+
+        Example:
+
+            account = Hide('5206-7844')
+
+
+        Hidden
+        -------
+
+        This obscures but does not encrypt the text. It can protect the secret from
+        observers that get a quick glance of the encoded text, but if they are able to
+        capture it they can easily decode it.
+
+            Hidden(encodetext, secure=True, encoding=None)
+
+            plaintext (str):
+                The secret encoded in base64.
+            secure (bool):
+                Indicates that this secret should only be contained in an
+                encrypted accounts file. Default is True.
+            encoding (str):
+                The encoding to use for the deciphered text.
+
+        Example:
+
+            account = Hidden("NTIwNi03ODQ0")
+
+        To generate the encoded text, use:
+
+            > avendesora conceal
+
+
+        GPG
+        ---
+
+        The secret is fully encrypted with GPG. Both symmetric encryption and
+        key-based encryption are supported.  This can be used to protect a
+        secret held in an unencrypted account file, in which case encrypting
+        with your key is generally preferred. It can also be used to further
+        protect a extremely valuable secret, in which case symmetric encryption
+        is generally used.
+
+            GPG(ciphertext, encoding=None)
+
+            ciphertext (str):
+                The secret encrypted and armored by GPG.
+            encoding (str):
+                The encoding to use for the deciphered text.
+
+        Example:
+
+            secret = GPG('''
+                -----BEGIN PGP MESSAGE-----
+                Version: GnuPG v2.0.22 (GNU/Linux)
+
+                jA0ECQMCwG/vVambFjfX0kkBMfXYyKvAuCbT3IrEuEKD//yuEMCikciteWjrFlYD
+                ntosdZ4WcPrFrV2VzcIIcEtU7+t1Ay+bWotPX9pgBQcdnSBQwr34PuZi
+                =4on3
+                -----END PGP MESSAGE-----
+            ''')
+
+        To generate the cipher text, use:
+
+            > avendesora conceal -e gpg
+
+        The benefit of using symmetric GPG encryption on a secret that is
+        contained in an encrypted account file is that the passphrase will
+        generally not be found in the GPG agent, in which case someone could not
+        walk up to your computer while your screen is unlocked and successfully
+        request the secret.  However, the GPG agent does retain the password for
+        a while after you decrypt the secret. If you are concerned about that,
+        you should follow your use of Avendesora with the following command,
+        which clears the GPG agent:
+
+            > killall gpg-agent
+
+
+        Scrypt
+        ------
+
+        The secret is fully encrypted with Scrypt. You personal Avendesora
+        encryption key is used (contained in ~/.config/avendesora/.key.gpg). As
+        such, these secrets cannot be shared. This encryption method is only
+        available if you have installed scrypt on your system (pip3 install
+        --user scrypt). Since the Scrypt class only exists if you have installed
+        scrypt, it is not imported into your accounts file. You would need to
+        import it yourself before using it.
+
+            Script(ciphertext, encoding=None)
+
+            ciphertext (str):
+                The secret encrypted by scrypt.
+            encoding (str):
+                The encoding to use for the deciphered text.
+
+        Example:
+            from avendesora import Scrypt
+            ...
+            secret = Scrypt(c2NyeXB0ABAAAAAIAAAAASfBZvtYnHvgdts2jrz5RfbYlFYj/EQgiM1IYTnXKHhMkleZceDg0yUaOWa9PzmZueppNIzVdawAOd9eSVgGeZAIh4ulPHPBGAzXGyLKc/vo8Fe24JnLr/RQBlTjM9+r6vbhi6HFUHD11M6Ume8/0UGDkZ0=)
+
+        To generate the cipher text, use:
+
+            > avendesora conceal -e scrypt
+
+
+        Generated Secrets
+        =================
+
+        Generated secrets are secrets for which the actual value is arbitrary,
+        but it must be quite unpredictable. Generated secrets are generally used
+        for passwords and pass phrases, but it can also be used for things like
+        personal information requested by institutions that they have no need to
+        know. For example, a website might request your birth date to assure
+        that you are an adult, but then also use it as a piece of identifying
+        information if you ever call and request support.  In this case they do
+        not need your actual birth date, they just need you to give the same
+        date every time you call in.
+
+
+        Password
+        --------
+
+        Generates an arbitrary password by selecting symbols from the given
+        alphabet at random. The entropy of the generated password is
+        length*log2(len(alphabet)).
+
+            Password(
+                length=12, alphabet=DISTINGUISHABLE, master=None, version=None,
+                sep='', prefix='', suffix=''
+            )
+
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password.  When using the default alphabet, this will be the
+                number of characters in the password.
+            alphabet (str):
+                The reservoir of legal symbols to use when creating the
+                password. By default the set of easily distinguished
+                alphanumeric characters are used. Typically you would use the
+                pre-imported character sets to construct the alphabet. For
+                example, you might pass:
+                    ALPHANUMERIC + '+=_&%#@'
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                password.
+            shift_sort(bool):
+                If true, the characters in the password will be sorted so that
+                the characters that require the shift key when typing are placed
+                last, making it easier to type. Use this option if you expect to
+                be typing the password by hand.
+            sep (str):
+                A string that is placed between each symbol in the generated
+                password.
+            prefix (str):
+                A string added to the front of the generated password.
+            suffix (str):
+                A string added to the end of the generated password.
+
+        Examples:
+
+            passcode = Password(10)
+
+
+        Passphrase
+        ----------
+
+        Similar to Password in that it generates an arbitrary pass phrase by
+        selecting symbols from the given alphabet at random, but in this case
+        the default alphabet is a dictionary containing about 10,000 words.
+
+            Passphrase(
+                length=4, alphabet=None, master=None, version=None, sep=' ', prefix='',
+                suffix=''
+            )
+
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password.  When using the default alphabet, this will be the
+                number of words in the passphrase.
+            alphabet (str):
+                The reservoir of legal symbols to use when creating the
+                password. By default, this is a predefined list of 10,000 words.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                pass phrase.
+            sep (str):
+                A string that is placed between each symbol in the generated
+                password.
+            prefix (str):
+                A string added to the front of the generated password.
+            suffix (str):
+                A string added to the end of the generated password.
+
+        Examples:
+
+            passcode = Passphrase()
+
+
+        PIN
+        ---
+
+        Similar to Password in that it generates an arbitrary PIN by selecting
+        symbols from the given alphabet at random, but in this case the default
+        alphabet is the set of digits (0-9).
+
+            PIN(length=4, alphabet=DIGITS, master=None, version=None)
+
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password.  When using the default alphabet, this will be the
+                number of digits in the PIN.
+            alphabet (str):
+                The reservoir of legal symbols to use when creating the
+                password. By default the digits (0-9) are used.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                PIN.
+
+        Examples:
+
+            passcode = PIN()
+
+
+        Question
+        --------
+
+        Generates an arbitrary answer to a given question. Used for website
+        security questions. When asked one of these security questions it can be
+        better to use an arbitrary answer. Doing so protects you against people
+        who know your past well and might be able to answer the questions.
+
+        Similar to Passphrase() except a question must be specified when created
+        and it is taken to be the security question. The question is used rather
+        than the field name when generating the secret.
+
+            Question(
+                question, length=3, alphabet=None, master=None, version=None,
+                sep=' ', prefix='', suffix='', answer=None
+            )
+
+            question (str):
+                The question to be answered. Be careful. Changing the question
+                in any way will change the resulting answer.
+            length (int):
+                The number of items to draw from the alphabet when creating the
+                password. When using the default alphabet, this will be the
+                number of words in the answer.
+            alphabet (list of strs):
+                The reservoir of legal symbols to use when creating the
+                password. By default, this is a predefined list of 10,000 words.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                answer.
+            sep (str):
+                A string that is placed between each symbol in the generated
+                password.
+            prefix (str):
+                A string added to the front of the generated password.
+            suffix (str):
+                A string added to the end of the generated password.
+            answer:
+                The answer. If provided, this would override the generated
+                answer.  May be a string, or it may be an Obscured object.
+
+        Examples:
+
+            questions = [
+                Question('Favorite foreign city'),
+                Question('Favorite breed of dog'),
+            ]
+
+
+        PasswordRecipe
+        --------------
+
+        Generates passwords that can conform to the restrictive requirements
+        imposed by websites. Allows you to specify the length of your password,
+        and how many characters should be of each type of character using a
+        recipe. The recipe takes the form of a string that gives the total
+        number of characters that should be generated, and then the number of
+        characters that should be taken from particular character sets. The
+        available character sets are:
+
+        l - lower case letters (a-z)
+        u - upper case letters (A-Z)
+        d - digits (0-9)
+        s - punctuation symbols
+        c - explicitly given set of characters
+
+        For example, '12 2u 2d 2s' is a recipe that would generate a
+        12-character password where two characters would be chosen from the
+        upper case letters, two would be digits, two would be punctuation
+        symbols, and the rest would be alphanumeric characters. It might
+        generate something like: *m7Aqj=XBAs7
+
+        Using '12 2u 2d 2c!@#$%^&*' is similar, except the punctuation symbols
+        are constrained to be taken from the given set that includes !@#$%^&*.
+        It might generate something like: YO8K^68J9oC!
+
+            PasswordRecipe(
+                recipe, def_alphabet=ALPHANUMERIC, master=None, version=None,
+            )
+
+            recipe (str):
+                A string that describes how the password should be constructed.
+            def_alphabet (list of strs):
+                The alphabet to use when filling up the password after all the
+                constraints are satisfied.
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                answer.
+            shift_sort(bool):
+                If true, the characters in the password will be sorted so that
+                the characters that require the shift key when typing are placed
+                last, making it easier to type. Use this option if you expect to
+                be typing the password by hand.
+
+        Examples:
+
+            passcode = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
+
+
+        BirthDate
+        ---------
+
+        Generates an arbitrary birthdate for someone in a specified age range.
+
+
+            BrithDate(
+                year, min_age=18, max_age=65, fmt='YYYY-MM-DD',
+                master=None, version=None,
+            )
+
+            year (int):
+                The year the age range was established.
+            min_age (int):
+                The lower bound of the age range.
+            max_age (int):
+                The upper bound of the age range.
+            fmt (str):
+                Specifies the way the date is formatted. Consider an example
+                date of 6 July 1969. YY and YYYY are replaced by the year (69 or
+                1969). M, MM, MMM, and MMMM are replaced by the month (7, 07,
+                Jul, or July). D and DD are replaced by the day (6 or 06).
+            master (str):
+                Overrides the master seed that is used when generating the
+                password.  Generally, there is one master seed shared by all
+                accounts contained in an account file.  This argument overrides
+                that behavior and instead explicitly specifies the master seed
+                for this secret.
+            version (str):
+                An optional seed. Changing this value will change the generated
+                answer.
+
+        Examples:
+
+            birthdate = BirthDate(2015, 21, 55))
+    """).strip()
+    assert result.decode('utf-8') == expected
+
 # test_stealth() {{{1
 def test_stealth():
     try:
@@ -1414,109 +2006,6 @@ def test_stealth():
         master seed, which makes it difficult to share stealth accounts.
         You can create additional stealth account files that do contain
         master seeds that you can share with your associates.
-    """).strip()
-    assert result.decode('utf-8') == expected
-
-# test_security_questions() {{{1
-def test_security_questions():
-    try:
-        result = run('avendesora help questions')
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        Security questions are form of security theater imposed upon you by
-        many websites. The claim is that these questions increase the
-        security of your account. In fact they often do the opposite by
-        creating additional avenues of access to your account. Their real
-        purpose is to allow you to regain access to your account in case you
-        lose your password. If you are careful, this is not needed (you do
-        back up your Avendesora accounts, right?). In this case it is better
-        to randomly generate your answers.
-
-        Security questions are handled by adding something like the
-        following to your account:
-
-            questions = [
-                Question('oldest aunt'),
-                Question('title of first job'),
-                Question('oldest uncle'),
-                Question('savings goal'),
-                Question('childhood vacation spot'),
-            ]
-
-        The string identifying the question does not need to contain the
-        question verbatim, a abbreviated version is sufficient as long as it
-        allows you to distinguish the question.  The questions are given as
-        an array, and so are accessed with an index that starts at 0. Thus,
-        to get the answer to who is your 'oldest aunt', you would use:
-
-            > avendesora value <accountname> 0
-            questions.0 (oldest aunt): ampere reimburse duster
-
-        You can get a list of your questions so you can identify which index
-        to use with:
-
-            > avenedesora values <accountname>
-            ...
-            questions:
-                0: oldest aunt <reveal with 'avendesora value <accountname> questions.0'>
-                1: title of first job <reveal with 'avendesora value <accountname> questions.1'>
-                2: oldest uncle <reveal with 'avendesora value <accountname> questions.2'>
-                3: savings goal <reveal with 'avendesora value <accountname> questions.3'>
-                4: childhood vacation spot <reveal with 'avendesora value <accountname> questions.4'>
-            ...
-
-        By default, Avendesora generates a response that consists of 3
-        random words. This makes it easy to read to a person over the phone
-        if asked to confirm your identity.  Occasionally you will not be
-        able to enter your own answer, but must choose one that is offered
-        to you. In this case, you can specify the answer as part of the
-        question:
-
-            questions = [
-                Question('favorite fruit', answer='grapes'),
-                Question('first major city visited', answer='paris'),
-                Question('favorite subject', answer='history'),
-            ]
-
-        When giving the answers you may want to conceal them to protect them
-        from casual observation.
-
-        Be aware that the question is used as a seed when generating the
-        answer, so if you change the question in any way it changes the
-        answer.
-    """).strip()
-    assert result.decode('utf-8') == expected
-
-# test_phishing() {{{1
-def test_phishing():
-    try:
-        result = run('avendesora help phishing')
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        Phishing is a very common method used on the web to get people to
-        unknowingly divulge sensitive information such as account
-        credentials.  It is generally accomplished by sending misleading
-        URLs in email or placing them on websites. When you visit these
-        URLs you are taken to a site that looks identical to the site you
-        were expecting to go to in the hope that you are tricked into giving
-        up your account credentials.  It used to be that if you carefully
-        inspected the url you could spot deception, but even that is no
-        longer true.
-
-        Avendesora helps you avoid phishing attacks in two ways. First, you
-        should never go to one of your secure sites by clicking on a link.
-        Instead, you should use Avendesora's browse command:
-
-            avendesora browse chase
-
-        In this way you use the URL stored in Avendesora rather than
-        trusting a url link provided by a third party. Second, you should
-        auto-type the account credentials using Avendesora's account
-        discovery based on RecognizeURL() (be sure to use RecognizeURL() for
-        websites rather than RecognizeTitle() when configuring account
-        discovery). RecogniseURL() will not fooled by a phishing site).
     """).strip()
     assert result.decode('utf-8') == expected
 
