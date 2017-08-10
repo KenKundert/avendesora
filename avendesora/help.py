@@ -1173,6 +1173,10 @@ class Secrets(HelpMessage):
             version (str):
                 An optional seed. Changing this value will change the generated
                 password.
+            shift_sort(bool):
+                If true, the characters in the password will be sorted so that
+                the characters that require the shift key when typing are placed
+                last, making it easier to type.
             sep (str):
                 A string that is placed between each symbol in the generated
                 password.
@@ -1358,6 +1362,10 @@ class Secrets(HelpMessage):
             version (str):
                 An optional seed. Changing this value will change the generated
                 answer.
+            shift_sort(bool):
+                If true, the characters in the password will be sorted so that
+                the characters that require the shift key when typing are placed
+                last, making it easier to type.
 
         Examples:
 

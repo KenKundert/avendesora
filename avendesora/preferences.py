@@ -31,7 +31,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'e13b9ec732d6748f55b7ef0644bab446',
+    'secrets_hash': '20c2f34148962d01b3b0f33c0a55270a',
     'discard_logfile': False,
 }
 

@@ -69,6 +69,14 @@ class SecretExhausted(Error):
         self.args = ['entropy exhausted.']
         self.kwargs = kwargs
 
+# Utilities {{{1
+SHIFTED = UPPERCASE + '~!@#$%^&*()_+{}|:"<>?'
+def shift_sort_join(chars, sep=''):
+    return sep.join(sorted(chars, key=lambda x: x in SHIFTED))
+
+def simple_join(chars, sep=''):
+    return sep.join(chars)
+
 # Secret {{{1
 class Secret(object):
     """Base class for generated secrets"""
@@ -323,6 +331,7 @@ class Password(Secret):
         alphabet=DISTINGUISHABLE,
         master=None,
         version=None,
+        shift_sort=False,
         sep='',
         prefix='',
         suffix='',
@@ -350,6 +359,9 @@ class Password(Secret):
         version (str):
             An optional seed. Changing this value will change the generated
             password.
+        shift_sort (bool):
+            If true, the characters in the password will be sorted so that the
+            characters that require the shift key when typing are placed last.
         sep (str):
             A string that is placed between each symbol in the generated
             password.
@@ -367,6 +379,8 @@ class Password(Secret):
         self.alphabet = alphabet
         self.master = master
         self.version = version
+
+        self.shift_sort = shift_sort
         self.sep = sep
         self.prefix = prefix
         self.suffix = suffix
@@ -377,9 +391,10 @@ class Password(Secret):
             # changes each time it is called
             return self.secret
 
+        join = shift_sort_join if self.shift_sort else simple_join
         secret = self.secret = (
             self.prefix
-            + self.sep.join(self._symbols(self.alphabet, self.length))
+            + join(self._symbols(self.alphabet, self.length), self.sep)
             + self.suffix
         )
         return secret
@@ -443,6 +458,7 @@ class Passphrase(Password):
         self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
         self.version = version
+        self.shift_sort = False
         self.sep = sep
         self.prefix = prefix
         self.suffix = suffix
@@ -504,6 +520,7 @@ class PIN(Password):
         self.alphabet = alphabet
         self.master = master
         self.version = version
+        self.shift_sort = False
         self.sep = ''
         self.prefix = ''
         self.suffix = ''
@@ -588,6 +605,7 @@ class Question(Passphrase):
         self.alphabet = alphabet if alphabet else DICTIONARY.words
         self.master = master
         self.version = version
+        self.shift_sort = False
         self.sep = sep
         self.prefix = prefix
         self.suffix = suffix
@@ -638,6 +656,7 @@ class MixedPassword(Secret):
         requirements,
         master=None,
         version=None,
+        shift_sort=False,
     ):
         """Mixed Password
 
@@ -659,6 +678,9 @@ class MixedPassword(Secret):
         version (str):
             An optional seed. Changing this value will change the generated
             answer.
+        shift_sort (bool):
+            If true, the characters in the password will be sorted so that the
+            characters that require the shift key when typing are placed last.
         """
         try:
             self.length = int(length)
@@ -670,6 +692,7 @@ class MixedPassword(Secret):
         self.requirements = requirements
         self.master = master
         self.version = version
+        self.shift_sort = shift_sort
 
     def __str__(self):
         if self.secret:
@@ -695,7 +718,8 @@ class MixedPassword(Secret):
             i = self._get_index(length)
             password.append(symbols.pop(i))
             length -= 1
-        secret = ''.join(password)
+        join = shift_sort_join if self.shift_sort else simple_join
+        secret = join(password)
         self.secret = secret
         return secret
 
@@ -746,6 +770,7 @@ class PasswordRecipe(MixedPassword):
         def_alphabet=ALPHANUMERIC,
         master=None,
         version=None,
+        shift_sort=False,
     ):
         """Password Recipe
 
@@ -762,6 +787,9 @@ class PasswordRecipe(MixedPassword):
         version (str):
             An optional seed. Changing this value will change the generated
             answer.
+        shift_sort (bool):
+            If true, the characters in the password will be sorted so that the
+            characters that require the shift key when typing are placed last.
         """
 
         requirements = []
@@ -791,6 +819,7 @@ class PasswordRecipe(MixedPassword):
         self.requirements = requirements
         self.master = master
         self.version = version
+        self.shift_sort = shift_sort
 
 
 # BirthDate {{{1

@@ -31,11 +31,11 @@ class GenericEditor(Editor):
 
     @classmethod
     def open_and_search(cls, filepath, account = None):
-        args = {
-            'filepath': filepath,
-            'account': account,
-            'section': '{' '{' '{' '1',
-        }
+        args = dict(
+            filepath = filepath,
+            account = account,
+            section = '{{' '{1',
+        )
         try:
             editor_setting = 'edit_account' if account else 'edit_template'
             cmd = get_setting(editor_setting)
