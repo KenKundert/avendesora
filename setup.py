@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='avendesora',
-    version='1.7.6',
+    version='1.7.7',
     author='Ken Kundert and Kale Kundert',
     author_email='avendesora@nurdletech.com',
     description='A password generator and account manager.',
