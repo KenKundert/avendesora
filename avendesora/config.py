@@ -1,8 +1,10 @@
 # Avendesora Password Generator Settings
 #
-# Copyright (C) 2016 Kenneth S. Kundert
+# Access user settings.
 
 # License {{{1
+# Copyright (C) 2016-17 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -20,9 +22,6 @@
 from .preferences import CONFIG_DEFAULTS, NONCONFIG_SETTINGS
 from shlib import to_path
 from inform import Error, comment, warn, is_str
-from textwrap import dedent
-import re
-from appdirs import user_config_dir
 
 # Globals {{{1
 Config = {}

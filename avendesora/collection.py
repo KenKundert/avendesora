@@ -6,6 +6,8 @@
 # in the ordering of the dictionary-based collections.
 
 # License {{{1
+# Copyright (C) 2016-17 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -29,6 +31,8 @@ class Collection(object):
             self.collection = collection.split(splitter)
         elif is_collection(collection):
             self.collection = collection
+        elif collection is None:
+            self.collection = []
         else:
             # is scalar
             self.collection = {None: collection}

@@ -1,6 +1,8 @@
 # Commands
 
 # License {{{1
+# Copyright (C) 2016-17 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -75,7 +77,7 @@ class Command(object):
                 error('unknown command.', culprit=name)
                 codicil("Use 'avendesora help' for list of available commands."),
                 return
-        command.run(name, args if args else [])
+        command.run(name, args)
 
     @classmethod
     def summarize(cls, width=16):
@@ -214,7 +216,7 @@ class Add(Command):
         # save template to tmp file and open it in the editor
         try:
             while (True):
-                GenericEditor.open_and_search(tmpfile.path)
+                GenericEditor.open(tmpfile.path)
 
                 # read the tmp file and determine if it has changed
                 new = tmpfile.read()
@@ -653,7 +655,7 @@ class Edit(Command):
         # allow the user to edit, and then check and make sure it is valid
         try:
             while True:
-                GenericEditor.open_and_search(accounts_file.path, account_name)
+                GenericEditor.open(accounts_file.path, account_name)
 
                 # check the changes to see if there are any issues
                 try:
@@ -866,6 +868,42 @@ class Initialize(Command):
 
         # run the generator
         generator = PasswordGenerator(init=True, gpg_ids=gpg_ids)
+
+
+# Log {{{1
+class Log(Command):
+    NAMES = 'log'
+    DESCRIPTION = 'edit the logfile'
+    USAGE = dedent("""
+        Usage:
+            avendesora log
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+
+            Opens the logfile in your editor.
+
+            You can specify the editor by changing the 'edit_account' setting in
+            the config file (~/.config/avendesora/config).
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # don't clobber the existing logfile
+        override_setting('discard_logfile', True)
+
+        # open the logfile
+        logfile = get_setting('log_file')
+        GenericEditor.open(logfile)
 
 
 # Login Credentials {{{1

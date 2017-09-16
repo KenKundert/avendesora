@@ -1,8 +1,10 @@
 # Avendesora Password Generator Preferences
 #
-# Copyright (C) 2016 Kenneth S. Kundert
+# Copyright (C) 2016-17 Kenneth S. Kundert
 
 # License {{{1
+# Copyright (C) 2016-17 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -31,7 +33,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '20c2f34148962d01b3b0f33c0a55270a',
+    'secrets_hash': '27bd25b361b60c4ca339f2f185178a9d',
     'discard_logfile': False,
 }
 
@@ -63,18 +65,18 @@ CONFIG_DEFAULTS = {
     'dictionary_file': 'words',
     'encoding': 'utf-8',
     'edit_account': (
-        'gvim',   # use gvim -v so that user can access X clipboard buffers
-        '-v',
-        '+silent /^class {account}(Account):/',
-        '+silent normal zozt',      # open the fold, position near top of screen
+        'gvim',                     # use gvim -v so that user can access
+        '-v',                       # the X clipboard buffers
+        '+silent! /^class {account}(Account):/',
+        '+silent! normal zozt',     # open the fold, position near top of screen
         '{filepath}'
     ),
     'edit_template': (
-        'gvim',   # use gvim -v so that user can access X clipboard buffers
-        '-v',
-        '+silent /_[A-Z0-9_]\+_/',  # matches user modifiable template fields
+        'gvim',                     # use gvim -v so that user can access
+        '-v',                       # the X clipboard buffers
+        '+silent! /_[A-Z0-9_]\+_/', # matches user modifiable template fields
                                     # fields take the form '_AAA_'
-        '+silent normal zozt',      # open the fold, position near top of screen
+        '+silent! normal zozt',     # open the fold, position near top of screen
         '{filepath}'
     ),
     'hashes_file': 'hashes',
@@ -85,7 +87,7 @@ CONFIG_DEFAULTS = {
     'verbose': False,
     'default_account_template': 'bank',
     'account_templates': {
-        'website': """
+        'website': dedent("""
             class _NAME_(Account): # %s1
                 desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
@@ -108,8 +110,8 @@ CONFIG_DEFAULTS = {
             # Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
             # Avendesora: Fields surrounded by << and >> will be hidden.
             # Avendesora: All lines that begin with '# Avendesora:' are deleted.
-        """ % (3*'{'),
-        'shell': """
+        """ % (3*'{')),
+        'shell': dedent("""
             class _NAME_(Account): # %s1
                 desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
@@ -125,8 +127,8 @@ CONFIG_DEFAULTS = {
             # Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
             # Avendesora: Fields surrounded by << and >> will be hidden.
             # Avendesora: All lines that begin with '# Avendesora:' are deleted.
-        """ % (3*'{'),
-        'bank': """
+        """ % (3*'{')),
+        'bank': dedent("""
             class _NAME_(Account): # %s1
                 desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
@@ -157,7 +159,7 @@ CONFIG_DEFAULTS = {
             # Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
             # Avendesora: Fields surrounded by << and >> will be hidden.
             # Avendesora: All lines that begin with '# Avendesora:' are deleted.
-        """ % (3*'{'),
+        """ % (3*'{')),
     },
 
     # use absolute paths for executables so they cannot be maliciously replaced

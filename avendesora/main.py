@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Usage {{{1
 """
 Avendesora Collaborative Password Generator
@@ -19,6 +18,8 @@ Use 'avendesora help' for list of available help topics.
 """
 
 # License {{{1
+# Copyright (C) 2016-17 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or

@@ -3,10 +3,10 @@
 #
 # Given a secret (password or passphrase) the writer is responsible for getting 
 # it to the user in a reasonably secure manner.
-#
-# Copyright (C) 2016 Kenneth S. Kundert and Kale Kundert
 
 # License {{{1
+# Copyright (C) 2016-17 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or

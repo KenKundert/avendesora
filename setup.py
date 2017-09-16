@@ -6,23 +6,21 @@ with open('README.rst') as file:
     readme = file.read()
 
 setup(
-    name='avendesora',
-    version='1.7.7',
-    author='Ken Kundert and Kale Kundert',
-    author_email='avendesora@nurdletech.com',
-    description='A password generator and account manager.',
-    long_description=readme,
-    url='http://nurdletech.com/linux-utilities/avendesora',
-    download_url='https://github.com/kenkundert/avendesora/tarball/master',
-    license='GPLv3+',
-    packages=[
-        'avendesora',
-    ],
-    package_data={'avendesora': ['words']},
-    entry_points={
-        'console_scripts': ['avendesora=avendesora.main:main'],
+    name = 'avendesora',
+    version = '1.7.7',
+    author = 'Ken Kundert and Kale Kundert',
+    author_email = 'avendesora@nurdletech.com',
+    description = 'A password generator and account manager.',
+    long_description = readme,
+    url = 'http://nurdletech.com/linux-utilities/avendesora',
+    download_url = 'https://github.com/kenkundert/avendesora/tarball/master',
+    license = 'GPLv3+',
+    packages = 'avendesora'.split(),
+    package_data = {'avendesora': ['words']},
+    entry_points = {
+        'console_scripts': ['avendesora = avendesora.main:main'],
     },
-    install_requires=[
+    install_requires = [
         'appdirs',
         'docopt',
         'inform>=1.9',
@@ -50,14 +48,10 @@ setup(
             # significant additional dependencies such as gcc.
         'shlib>=0.6',
     ],
-    setup_requires=['pytest-runner>=2.0'],
-    tests_require=['pytest'],
-    keywords=[
-        'avendesora',
-        'password',
-        'XKCD',
-    ],
-    classifiers=[
+    setup_requires = 'pytest-runner>=2.0'.split(),
+    tests_require = 'pytest'.split(),
+    keywords = 'avendesora password XKCD'.split(),
+    classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',

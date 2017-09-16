@@ -2,10 +2,10 @@
 #
 # Interfaces to the passphrase dictionary (the dictionary acts as the alphabet
 # used to create pass phrases).
-#
-# Copyright (C) 2013-14 Kenneth S. Kundert and Kale Kundert
 
-# License (fold)
+# License {{{1
+# Copyright (C) 2013-17 Kenneth S. Kundert and Kale Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
-# Imports (folds)
+# Imports {{{1
 from .config import get_setting
 from shlib import to_path
 from inform import codicil, error, warn, os_error

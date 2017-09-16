@@ -1,11 +1,10 @@
-#
 # INTERFACE TO GNUPG PACKAGE
 #
 # Package for reading and writing text files that may or may not be encrypted.
 # File will be encrypted if file path ends in a GPG extension.
 
 # License {{{1
-# Copyright (C) 2016 Kenneth S. Kundert
+# Copyright (C) 2016-17 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -169,6 +168,12 @@ class GnuPG(object):
     def will_encrypt(self):
         return self.path.suffix in GPG_EXTENSIONS
 
+    def exists(self):
+        return self.path.exists()
+
+    def __str__(self):
+        return str(self.path)
+
 
 # BufferedFile class {{{1
 class BufferedFile(GnuPG):
@@ -185,12 +190,12 @@ class BufferedFile(GnuPG):
         pass
 
     def close(self):
-
         if get_setting('discard_logfile'):
             # this is the case when the output would be uninteresting (such as
             # with help messages) and running GPG (and thus risk requiring the
             # user to type in the passphrase) is silly.
             return
+
         contents = self.stream.getvalue()
         try:
             self.save(contents, get_setting('gpg_ids'))
@@ -260,9 +265,3 @@ class PythonFile(GnuPG):
                     f.write(contents.encode(get_setting('encoding')))
         except OSError as err:
             raise Error(os_error(err))
-
-    def exists(self):
-        return self.path.exists()
-
-    def __str__(self):
-        return str(self.path)
