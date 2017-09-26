@@ -46,9 +46,9 @@ class Command(object):
     @classmethod
     def commands(cls):
         for cmd in cls.__subclasses__():
+            assert is_collection(cmd.NAMES)
             yield cmd
-            for sub in cmd.commands():
-                yield sub
+            # currently only one level of subclassing is supported
 
     @classmethod
     def commands_sorted(cls):
@@ -872,7 +872,7 @@ class Initialize(Command):
 
 # Log {{{1
 class Log(Command):
-    NAMES = 'log'
+    NAMES = 'log',
     DESCRIPTION = 'edit the logfile'
     USAGE = dedent("""
         Usage:

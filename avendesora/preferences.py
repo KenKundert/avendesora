@@ -35,6 +35,10 @@ NONCONFIG_SETTINGS = {
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
     'secrets_hash': '27bd25b361b60c4ca339f2f185178a9d',
     'discard_logfile': False,
+    'commonly_mistaken_attributes': {
+        'url': 'urls',
+        'alias': 'aliases',
+    }
 }
 
 

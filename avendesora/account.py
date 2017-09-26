@@ -272,6 +272,13 @@ class Account(object):
                     )
         except AttributeError as err:
             pass
+        for bad, good in get_setting('commonly_mistaken_attributes').items():
+            if hasattr(cls, bad):
+                warn(
+                    '{} attribute found,'.format(bad),
+                    'should probably be {}.'.format(good),
+                    culprit=cls.get_name()
+                )
 
     # keys() {{{2
     @classmethod
@@ -623,10 +630,11 @@ class Account(object):
         except KeyError:
             keys = cull(urls.keys())
             if keys:
-                raise Error(
-                    'unknown key, choose from %s.' % conjoin(keys),
-                    culprit=key
-                )
+                if key:
+                    msg = 'unknown key, choose from {}.'
+                else:
+                    msg = 'key required, choose from {}.'
+                raise Error(msg.format(conjoin(keys)), culprit=key)
             else:
                 raise Error(
                     'keys are not supported with urls on this account.',
