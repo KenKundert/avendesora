@@ -27,7 +27,8 @@ from .dialog import show_list_dialog
 from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
 from inform import (
-    Color, Error, cull, error, fatal, log, output, warn, indent, os_error
+    Color, Error,
+    codicil, cull, error, fatal, log, output, warn, indent, os_error
 )
 from time import sleep
 from textwrap import dedent
@@ -172,14 +173,28 @@ class TTY_Writer(Writer):
         log('Writing to TTY:', label)
 
         if is_secret:
-            try:
-                cursor.write(text)
-                cursor.conceal()
-                sleep(get_setting('display_time'))
-            except KeyboardInterrupt:
-                pass
-            cursor.reveal()
-            cursor.clear()
+            if Color.isTTY():
+                # Write only if output is a TTY. This is a security feature.
+                # The ideas is that when the TTY writer is called it is because
+                # the user is expecting the output to go to the tty. This
+                # eliminates the chance that the output can be intercepted and
+                # recorded by replacing Avendesora with an alias or shell
+                # script. If the user really want the output to go to something
+                # other than the TTY, the user should use the --stdout option.
+                try:
+                    cursor.write(text)
+                    cursor.conceal()
+                    sleep(get_setting('display_time'))
+                except KeyboardInterrupt:
+                    pass
+                cursor.reveal()
+                cursor.clear()
+            else:
+                error('output is not a TTY.')
+                codicil(
+                    'Use --stdout option if you want to send secret',
+                    'to a file or a pipe.'
+                )
         else:
             output(text)
 

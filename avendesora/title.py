@@ -69,7 +69,7 @@ class Title(object):
             except OSError as err:
                 raise Error(str(err))
             title = output.stdout.strip()
-        log('Focused window title: <%s>' % title)
+        log('Focused window title:\n    %s' % title)
         data = {'rawtitle': title}
         for sub in sorted(Title.__subclasses__(), key=lambda c: c.PRIORITY):
             matched = sub._process(title, data)

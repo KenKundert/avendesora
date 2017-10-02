@@ -1141,13 +1141,13 @@ def test_entropy():
         knows everything about the scheme used to generate the password but
         does not know the password itself.  So in this case the minimum
         entropy is the likelihood of guessing the password if it is known
-        that we are using 4 space separated words as our pass phrase.  This
-        is very easy to compute.  There are roughly 10,000 words in our
-        dictionary, so if there was only one word in our pass phrase, the
-        chance of guessing it would be one in 10,000 or 13 bits of entropy.
-        If we used a two word pass phrase the chance of guessing it in a
-        single guess is one in 10,000*10,000 or one in 100,000,000 or 26
-        bits of entropy.
+        that we are using 4 space separated lower case words as our pass
+        phrase.  This is very easy to compute.  There are roughly 10,000
+        words in our dictionary, so if there was only one word in our pass
+        phrase, the chance of guessing it would be one in 10,000 or 13 bits
+        of entropy.  If we used a two word pass phrase the chance of
+        guessing it in a single guess is one in 10,000*10,000 or one in
+        100,000,000 or 26 bits of entropy.
 
         The probability of guessing our pass phrase in one guess is not our
         primary concern. Really what we need to worry about is given a
@@ -1924,7 +1924,7 @@ def test_secrets():
         Generates an arbitrary birthdate for someone in a specified age range.
 
 
-            BrithDate(
+            BirthDate(
                 year, min_age=18, max_age=65, fmt='YYYY-MM-DD',
                 master=None, version=None,
             )
