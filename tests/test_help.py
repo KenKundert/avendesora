@@ -141,10 +141,13 @@ def test_browse():
                 browser = 't'
 
         The available browsers are:
-            c  google-chrome
-            f  firefox
-            t  torbrowser
-            x  xdg-open
+            c      google-chrome {url}
+            ci     google-chrome --incognito {url}
+            f      firefox -new-tab {url}
+            fp     firefox -private-window {url}
+            t      torbrowser {url}
+            x      xdg-open {url}
+
     """).strip()
     assert result.decode('utf-8') == expected
 

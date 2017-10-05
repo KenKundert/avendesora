@@ -385,7 +385,7 @@ class Browse(Command):
         default_browser = get_setting('default_browser')
         browsers = get_setting('browsers')
         browsers = '\n'.join([
-            two_columns(k, browsers[k].split()[0], width=1)
+            two_columns(k, browsers[k], width=5)
             for k in sorted(browsers)
         ])
         text = dedent("""

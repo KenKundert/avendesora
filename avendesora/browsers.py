@@ -48,7 +48,7 @@ class StandardBrowser(Browser):
                 except TypeError:
                     pass
                 log("running '%s'" % cmd)
-                Run(cmd, 'sOeW0')
+                Run(cmd, 'sOew0')
             except KeyError:
                 error('unknown browser, choose from %s.' % (
                     name, ', '.join(get_setting('browsers'))

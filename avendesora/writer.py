@@ -28,7 +28,8 @@ from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
 from inform import (
     Color, Error,
-    codicil, cull, error, fatal, log, output, warn, indent, os_error
+    codicil, cull, error, fatal, log, output, warn, indent, os_error,
+    ddd, ppp, vvv
 )
 from time import sleep
 from textwrap import dedent

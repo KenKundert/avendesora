@@ -57,10 +57,12 @@ CONFIG_DEFAULTS = {
     'label_color': 'blue',
     'color_scheme': 'dark',
     'browsers': {
-        'f': 'firefox -new-tab {url}',
-        'c': 'google-chrome {url}',
-        't': 'torbrowser {url}',
-        'x': 'xdg-open {url}', # system default browser
+        'f':  'firefox -new-tab {url}',
+        'fp':  'firefox -private-window {url}',
+        'c':  'google-chrome {url}',
+        'ci': 'google-chrome --incognito {url}',
+        't':  'torbrowser {url}',
+        'x':  'xdg-open {url}', # system default browser
     },
     'default_field': 'passcode',
     'default_vector_field': 'questions',
@@ -225,7 +227,7 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # Information used by GPG when encrypting and decrypting files.
     gpg_ids = {gpg_ids}
     gpg_armor = {gpg_armor}
-        # choose between 'always', 'never' and 'by-ext' (.asc: armor, .gpg: no)
+        # choose between 'always', 'never' and 'extension' (.asc: armor, .gpg: no)
     gpg_home = {gpg_home}
 
     # Utilities

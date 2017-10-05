@@ -280,6 +280,13 @@ class Account(object):
                     culprit=cls.get_name()
                 )
 
+        # do some more error checking
+        if isinstance(getattr(cls, 'master', None), Secret):
+            raise Error(
+                'master must not be a subclass of Secret.',
+                culprit=cls.get_name()
+            )
+
     # keys() {{{2
     @classmethod
     def keys(cls, all=False):
