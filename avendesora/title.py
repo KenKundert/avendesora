@@ -25,7 +25,7 @@
 
 
 # Imports {{{1
-from .config import get_setting
+from .config import get_setting, setting_path
 from shlib import Run
 from inform import Error, log
 try:
@@ -59,7 +59,7 @@ class Title(object):
             if not xdotool:
                 raise Error(
                     "must set xdotool_executable'.",
-                    culprit=get_setting('config_file')
+                    culprit=setting_path('xdotool_executable')
                 )
             try:
                 output = Run(

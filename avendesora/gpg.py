@@ -21,7 +21,7 @@
 
 
 # Imports {{{1
-from .config import get_setting, override_setting
+from .config import get_setting, override_setting, setting_path
 from shlib import to_path, cp, mkdir
 from inform import (
     conjoin, cull, display, Error, log, narrate, os_error, warn, is_str,
@@ -68,9 +68,9 @@ class GnuPG(object):
             warn(
                 "'%s' is not valid, choose from %s." % (
                     armor, conjoin(ARMOR_CHOICES)
-                ), culprit=(get_setting('config_file'), 'gpg_armor')
+                ), culprit=setting_path('gpg_armor')
             )
-            armor = None
+            armor = 'extension'
         cls.armor = armor
         override_setting('gpg_armor', armor)
 

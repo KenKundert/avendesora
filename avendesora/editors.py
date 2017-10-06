@@ -19,7 +19,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from .config import get_setting, add_setting
+from .config import get_setting, add_setting, setting_path
 from shlib import Run
 from inform import log, Error, os_error
 
@@ -48,4 +48,7 @@ class GenericEditor(Editor):
         except OSError as err:
             raise Error(os_error(err))
         except KeyError as err:
-            raise Error('invalid field: %s.' % err, culprit=editor_setting)
+            raise Error(
+                'invalid field: %s.' % err.args[0],
+                culprit=setting_path(editor_setting)
+            )

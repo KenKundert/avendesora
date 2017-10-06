@@ -20,9 +20,9 @@
 
 
 # Imports {{{1
-from .config import get_setting
-from shlib import Run
-from inform import error, log, os_error
+from .config import get_setting, setting_path
+from shlib import Cmd
+from inform import Error, log, os_error
 
 
 # Browser base class {{{1
@@ -43,17 +43,26 @@ class StandardBrowser(Browser):
                 url = 'https://' + url
             try:
                 cmd = self.cmd if self.cmd else get_setting('browsers')[name]
-                try:
-                    cmd = cmd.format(url=url)
-                except TypeError:
-                    pass
-                log("running '%s'" % cmd)
-                Run(cmd, 'sOew0')
             except KeyError:
-                error('unknown browser, choose from %s.' % (
-                    name, ', '.join(get_setting('browsers'))
-                ))
+                raise Error("unknown browser, choose from %s." % (
+                    ', '.join(get_setting('browsers', name))
+                ), culprit=name)
+
+            try:
+                cmd = cmd.format(url=url)
+            except TypeError:
+                pass
+            except KeyError as err:
+                raise Error(
+                    'unknown key {%s}.  Choose from: {url}.' % err.args[0],
+                    culprit=setting_path('browsers', name)
+                )
+
+            browser = Cmd(cmd, 'sOe')
+            log("running '%s'" % str(browser))
+            try:
+                browser.start()
             except OSError as err:
-                error(os_error(err))
+                raise Error(os_error(err), culprit=setting_path('browsers'))
         else:
-            error('url not available.')
+            raise Error('url not available from account.')

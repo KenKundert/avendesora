@@ -46,7 +46,7 @@ setup(
             # scrypt is optional. If you install it then Avendesora will offer
             # it. It is not required because it involves compiling C code and so
             # significant additional dependencies such as gcc.
-        'shlib>=0.6',
+        'shlib>=0.7',
     ],
     setup_requires = 'pytest-runner>=2.0'.split(),
     tests_require = 'pytest'.split(),

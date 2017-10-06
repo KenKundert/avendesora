@@ -114,6 +114,14 @@ def get_setting(name, default=None, expand=True):
         value = to_path(get_setting('settings_dir'), value)
     return value
 
+# setting_path() {{{1
+def setting_path(name, index=None):
+    # this returns a path to a particular setting that is useful as a culprit
+    if index is None:
+        return (get_setting('config_file'), name)
+    else:
+        return (get_setting('config_file'), name, index)
+
 # override_setting() {{{1
 def override_setting(name, value):
     Config[name.lower()] = value
