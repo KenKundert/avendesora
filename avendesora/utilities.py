@@ -175,5 +175,7 @@ def error_source():
         from .gpg import get_active_python_file
         filename = get_active_python_file()
         line = tb.tb_next.tb_lineno
+    except IndexError:
+        return None
     return filename, 'line %s' % line
 

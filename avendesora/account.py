@@ -459,10 +459,7 @@ class Account(object):
         # treat field as name rather than script if it there are no attributes
         if not is_script:
             name, key = cls.split_name(field)
-            try:
-                value = cls.get_scalar(name, key)
-            except Error as err:
-                err.terminate()
+            value = cls.get_scalar(name, key)
             is_secret = cls.is_secret(name, key)
             label = cls.combine_name(name, key)
             try:
@@ -505,10 +502,43 @@ class Account(object):
                 out.append(term)
         return AccountValue(''.join(out), is_secret)
 
+    # get_values() {{{2
+    @classmethod
+    def get_values(cls, name):
+        """Iterate through the values for a field.
+
+        Takes a field name and generates all the values of that field. The key
+        and an AccountValue object is returned for each value. If the value is a
+        scalar, the key is None.
+        """
+        value = getattr(cls, name, None)
+        if value is None:
+            if name == 'NAME':
+                value = cls.get_name()
+            else:
+                return
+
+        values = Collection(value, splitter=False)
+        for key, val in values.items():
+            value = cls.get_scalar(name, key)
+            is_secret = cls.is_secret(name, key)
+            label = cls.combine_name(name, key)
+            try:
+                desc = value.get_key()
+            except AttributeError:
+                desc = None
+            if isinstance(value, Secret) or isinstance(value, Obscure):
+                secret = value
+                value = str(value)
+                if isinstance(secret, Secret):
+                    log('entropy =', round(getattr(secret, 'entropy', 0)), 'bits.')
+            value = dedent(value).strip() if is_str(value) else value
+            yield key, AccountValue(value, is_secret, label, desc)
+
     # get_composite() {{{2
     @classmethod
     def get_composite(cls, name):
-        "Get field Value given a field name"
+        "Get field value given a field name"
         value = getattr(cls, name, None)
         if value is None:
             if name == 'NAME':

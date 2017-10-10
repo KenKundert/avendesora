@@ -27,7 +27,8 @@ from inform import is_str, is_collection
 # Collection {{{1
 class Collection(object):
     def __init__(self, collection, splitter=None):
-        if is_str(collection):
+        if splitter is not False and is_str(collection):
+            # strings will be split unless splitter is False
             self.collection = collection.split(splitter)
         elif is_collection(collection):
             self.collection = collection

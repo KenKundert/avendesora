@@ -36,7 +36,7 @@ from inform import (
     conjoin, debug, Error, error, notify, log, os_error, render,
     terminate, terminate_if_errors
 )
-from shlib import to_path
+from shlib import to_path, mv
 from pathlib import Path
 
 # PasswordGenerator class{{{1
@@ -139,9 +139,9 @@ class PasswordGenerator(object):
                         # reads the file.
         else:
             # Create a new accounts file
-            fields['accounts_files'] = render(
+            fields['accounts_files'] = render(sorted(
                 get_setting('accounts_files', []) + [filename]
-            )
+            ))
             path = to_path(get_setting('settings_dir'), filename)
             if path.exists():
                 raise Error('exists.', culprit=path)
@@ -150,6 +150,18 @@ class PasswordGenerator(object):
             log('creating accounts file.', culprit=path)
             f = PythonFile(path)
             f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
+
+            # update the accounts list file
+            path = to_path(
+                get_setting('settings_dir'), get_setting('account_list_file')
+            )
+            log('update accounts list.', culprit=path)
+            f = PythonFile(path)
+            try:
+                mv(path, str(path) + '~')
+                f.create(ACCOUNT_LIST_FILE_CONTENTS.format(**fields), gpg_ids)
+            except OSError as e:
+                raise Error(os_error(e))
 
     # get_account() {{{2
     def get_account(self, name, request_seed=False, stealth_name=None):
@@ -221,7 +233,7 @@ class PasswordGenerator(object):
 
     # challenge_response() {{{2
     def challenge_response(self, name, challenge):
-        """Generare a response to a challenge
+        """Generate a response to a challenge
 
         Given the name of a master seed (actually the basename of the file that
         contains the master seed), returns an identifying response to a

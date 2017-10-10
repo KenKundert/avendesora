@@ -32,8 +32,8 @@ def test_add():
         Add a new account.
 
         Usage:
-            avendesora [options] add [<template>]
-            avendesora [options] a   [<template>]
+            avendesora add [options] [<template>]
+            avendesora a   [options] [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -108,8 +108,8 @@ def test_browse():
         Open account URL in web browser.
 
         Usage:
-            avendesora [options] browse <account> [<key>]
-            avendesora [options] b      <account> [<key>]
+            avendesora browse [options] <account> [<key>]
+            avendesora b      [options] <account> [<key>]
 
         Options:
             -b <browser>, --browser <browser>
@@ -253,12 +253,16 @@ def test_conceal():
         Conceal text by encoding it.
 
         Usage:
-            avendesora [options] conceal [<text>]
-            avendesora [options] c       [<text>]
+            avendesora conceal [options] [<text>]
+            avendesora c       [options] [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
                                     Encoding used when concealing information.
+            -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+                                    Use commas with no spaces to separate multiple IDs.
+            -h <path>, --gpg-home <path>
+                                    GPG home directory (default is ~/.gnupg).
             -s, --symmetric         Encrypt with a passphrase rather than using your
                                     GPG key (only appropriate for gpg encodings).
 
@@ -448,12 +452,13 @@ def test_initialize():
         Create initial set of Avendesora files.
 
         Usage:
-            avendesora initialize [--gpg-id <id>]... [options]
-            avendesora init       [--gpg-id <id>]... [options]
-            avendesora I          [--gpg-id <id>]... [options]
+            avendesora initialize [options]
+            avendesora init       [options]
+            avendesora I          [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+                                    Use commas with no spaces to separate multiple IDs.
             -h <path>, --gpg-home <path>
                                     GPG home directory (default is ~/.gnupg).
 
@@ -476,11 +481,12 @@ def test_new():
         Create new accounts file.
 
         Usage:
-            avendesora new [--gpg-id <id>]... <name>
-            avendesora N   [--gpg-id <id>]... <name>
+            avendesora new [options] <name>
+            avendesora N   [options] <name>
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+                                    Use commas with no spaces to separate multiple IDs.
 
         Creates a new accounts file. Accounts that share the same file share
         the same master seed by default and, if the file is encrypted,

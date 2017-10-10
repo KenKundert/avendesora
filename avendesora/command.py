@@ -108,8 +108,8 @@ class Add(Command):
     DESCRIPTION = 'add a new account'
     USAGE = dedent("""
         Usage:
-            avendesora [options] add [<template>]
-            avendesora [options] a   [<template>]
+            avendesora add [options] [<template>]
+            avendesora a   [options] [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -371,8 +371,8 @@ class Browse(Command):
     DESCRIPTION = 'open account URL in web browser'
     USAGE = dedent("""
         Usage:
-            avendesora [options] browse <account> [<key>]
-            avendesora [options] b      <account> [<key>]
+            avendesora browse [options] <account> [<key>]
+            avendesora b      [options] <account> [<key>]
 
         Options:
             -b <browser>, --browser <browser>
@@ -554,12 +554,16 @@ class Conceal(Command):
     DESCRIPTION = 'conceal text by encoding it'
     USAGE = dedent("""
         Usage:
-            avendesora [options] conceal [<text>]
-            avendesora [options] c       [<text>]
+            avendesora conceal [options] [<text>]
+            avendesora c       [options] [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
                                     Encoding used when concealing information.
+            -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+                                    Use commas with no spaces to separate multiple IDs.
+            -h <path>, --gpg-home <path>
+                                    GPG home directory (default is ~/.gnupg).
             -s, --symmetric         Encrypt with a passphrase rather than using your
                                     GPG key (only appropriate for gpg encodings).
     """).strip()
@@ -597,14 +601,26 @@ class Conceal(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # get the text
+        encoding = cmdline['--encoding']
         text = cmdline['<text>']
         symmetric = cmdline['--symmetric']
+
+        # get the gpg ids of those who will be able to decrypt the file
+        gpg_ids = cmdline['--gpg-id']
+        if gpg_ids:
+            gpg_ids = gpg_ids.split(',')
+        else:
+            gpg_ids = get_setting('gpg_ids', [])
+
+        if cmdline['--gpg-home']:
+            override_setting('gpg_home', cmdline['--gpg-home'])
+
         if not text:
             output('Enter text to obscure, type ctrl-d to terminate.')
             text = sys.stdin.read()[:-1]
 
         # transform and output the string
-        output(Obscure.hide(text, cmdline['--encoding'], True, symmetric))
+        output(Obscure.hide(text, encoding, True, symmetric, gpg_ids))
 
 
 # Edit {{{1
@@ -828,12 +844,13 @@ class Initialize(Command):
     DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
-            avendesora initialize [--gpg-id <id>]... [options]
-            avendesora init       [--gpg-id <id>]... [options]
-            avendesora I          [--gpg-id <id>]... [options]
+            avendesora initialize [options]
+            avendesora init       [options]
+            avendesora I          [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+                                    Use commas with no spaces to separate multiple IDs.
             -h <path>, --gpg-home <path>
                                     GPG home directory (default is ~/.gnupg).
     """).strip()
@@ -861,10 +878,15 @@ class Initialize(Command):
         if cmdline['--gpg-home']:
             override_setting('gpg_home', cmdline['--gpg-home'])
 
-        # save the gpg_ids for the logfile in case it is encrypted.
+        # get the gpg ids of those who will be able to decrypt the file
         gpg_ids = cmdline['--gpg-id']
-        if not get_setting('gpg_ids'):
-            override_setting('gpg_ids', gpg_ids)
+        if gpg_ids:
+            gpg_ids = gpg_ids.split(',')
+            # save the gpg_ids for the logfile in case it is encrypted.
+            if not get_setting('gpg_ids'):
+                override_setting('gpg_ids', gpg_ids)
+        else:
+            gpg_ids = get_setting('gpg_ids', [])
 
         # run the generator
         generator = PasswordGenerator(init=True, gpg_ids=gpg_ids)
@@ -994,11 +1016,12 @@ class New(Command):
     DESCRIPTION = 'create new accounts file'
     USAGE = dedent("""
         Usage:
-            avendesora new [--gpg-id <id>]... <name>
-            avendesora N   [--gpg-id <id>]... <name>
+            avendesora new [options] <name>
+            avendesora N   [options] <name>
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
+                                    Use commas with no spaces to separate multiple IDs.
     """).strip()
 
     @classmethod
@@ -1031,13 +1054,14 @@ class New(Command):
 
         # get the gpg ids of those who will be able to decrypt the file
         gpg_ids = cmdline['--gpg-id']
-        if not gpg_ids:
+        if gpg_ids:
+            gpg_ids = gpg_ids.split(',')
+        else:
             gpg_ids = get_setting('gpg_ids', [])
 
         # run the generator
         generator = PasswordGenerator(
-            init=cmdline['<name>'], gpg_ids=sorted(set(gpg_ids))
-                # docopt sometimes duplicates the gpg_ids
+            init=cmdline['<name>'], gpg_ids=sorted(gpg_ids)
         )
 
 

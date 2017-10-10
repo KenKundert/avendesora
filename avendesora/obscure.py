@@ -97,11 +97,13 @@ class Obscure(object):
 
     # hide() {{{2
     @classmethod
-    def hide(cls, text, encoding=None, decorate=False, symmetric=False):
+    def hide(cls, text, encoding=None, decorate=False, symmetric=False, gpg_ids=None):
         encoding = encoding.lower() if encoding else 'base64'
         for obscurer in cls.obscurers():
             if encoding == obscurer.get_name():
-                return obscurer.conceal(text, decorate, symmetric=symmetric)
+                return obscurer.conceal(
+                    text, decorate, symmetric=symmetric, gpg_ids=gpg_ids
+                )
         raise Error('not found.', culprit=encoding)
 
     # show() {{{2
@@ -219,7 +221,7 @@ class Hidden(Obscure):
         return self.plaintext
 
     @staticmethod
-    def conceal(plaintext, decorate=False, encoding=None, symmetric=False):
+    def conceal(plaintext, decorate=False, encoding=None, **kwargs):
         encoding = encoding if encoding else get_setting('encoding')
         plaintext = str(plaintext).encode(encoding)
         encoded = b2a_base64(plaintext).rstrip().decode('ascii')
@@ -290,10 +292,14 @@ class GPG(Obscure, GnuPG):
         return str(self.plaintext)
 
     @classmethod
-    def conceal(cls, plaintext, decorate=False, encoding=None, symmetric=False):
+    def conceal(
+        cls, plaintext, decorate=False, encoding=None,
+        symmetric=False, gpg_ids=None
+    ):
         encoding = encoding if encoding else get_setting('encoding')
         plaintext = str(plaintext).encode(encoding)
-        gpg_ids = get_setting('gpg_ids', [])
+        if not gpg_ids:
+            gpg_ids = get_setting('gpg_ids', [])
         if is_str(gpg_ids):
             gpg_ids = gpg_ids.split()
 
@@ -359,7 +365,7 @@ try:
             return str(self.plaintext).strip()
 
         @staticmethod
-        def conceal(plaintext, decorate=False, encoding=None, symmetric=False):
+        def conceal(plaintext, decorate=False, encoding=None, **kwargs):
             encoding = encoding if encoding else get_setting('encoding')
             plaintext = str(plaintext).encode(encoding)
             encrypted = scrypt.encrypt(
