@@ -24,10 +24,10 @@ from .editors import GenericEditor
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import Obscure
-from .utilities import two_columns
+from .utilities import query_user, two_columns
 from .writer import get_writer
 from inform import (
-    Error, codicil, cull, debug, error, fatal, output, warn, conjoin, os_error,
+    Error, codicil, cull, debug, error, output, warn, conjoin, os_error,
     is_collection, is_str, indent, render, ddd, ppp, vvv
 )
 from shlib import chmod, mv, rm, to_path
@@ -139,7 +139,7 @@ class Add(Command):
             The default template is {default}. The available templates are:
             {templates}
 
-            The available accounts files are:
+            The available accounts files are (the default is given first):
             {files}
         """).strip()
         def indented_list(l):
@@ -184,8 +184,8 @@ class Add(Command):
             else:
                 template_name = get_setting('default_account_template')
             template = dedent(templates[template_name]).strip() + '\n'
-        except KeyError as err:
-            fatal(
+        except KeyError:
+            raise Error(
                 'unknown account template, choose from %s.' % conjoin(
                     sorted(templates.keys())
                 ), culprit=template_name
@@ -207,13 +207,10 @@ class Add(Command):
             tmpfilename = mktemp(suffix='_avendesora.gpg')
             tmpfile = GnuPG(tmpfilename)
             tmpfile.save(template, get_setting('gpg_ids'))
-        except (Error, OSError) as err:
-            if isinstance(err, OSError):
-                fatal(os_error(err))
-            else:
-                fatal(err)
+        except OSError as e:
+            raise Error(os_error(e))
 
-        # save template to tmp file and open it in the editor
+        # open template in the editor
         try:
             while (True):
                 GenericEditor.open(tmpfile.path)
@@ -247,20 +244,17 @@ class Add(Command):
                 try:
                     new_accounts_file.run()
                     break
-                except Error as err:
-                    error(err)
-                    if sys.version_info.major < 3:
-                        response = raw_input('Try again? ')
-                    else:
-                        response = input('Try again? ')
+                except Error as e:
+                    error(e)
+                    response = query_user('Try again?')
                     if response.lower() not in ['y', 'yes']:
                         raise Error('Giving up, restoring original file.')
 
-        except (Error, OSError) as err:
+        except (Error, OSError) as e:
             orig_accounts_file.restore()
-            if isinstance(err, OSError):
-                err = os_error(err)
-            error(err)
+            if isinstance(e, OSError):
+                e = os_error(e)
+            error(e)
             codicil(
                 '',
                 'What you entered can be found in %s.' % tmpfilename,
@@ -328,8 +322,8 @@ class Archive(Command):
             if previous_archive and archive_file.is_file():
                 rm(previous_archive)
                 mv(archive_file, previous_archive)
-        except OSError as err:
-            raise Error(os_error(err))
+        except OSError as e:
+            raise Error(os_error(e))
 
         # run the generator
         generator = PasswordGenerator()
@@ -361,8 +355,8 @@ class Archive(Command):
         try:
             archive.save(contents)
             chmod(0o600, archive_file)
-        except OSError as err:
-            raise Error(os_error(err), culprit=archive_file)
+        except OSError as e:
+            raise Error(os_error(e), culprit=archive_file)
 
 
 # Browse {{{1
@@ -662,11 +656,8 @@ class Edit(Command):
             accounts_file = PythonFile(account._file_info.path)
             accounts_file.backup('.saved')
             account_name = account.__name__
-        except (Error, OSError) as err:
-            if isinstance(err, OSError):
-                fatal(os_error(err))
-            else:
-                fatal(err)
+        except OSError as e:
+            raise Error(os_error(e))
 
         # allow the user to edit, and then check and make sure it is valid
         try:
@@ -677,8 +668,8 @@ class Edit(Command):
                 try:
                     accounts_file.run()
                     break
-                except Error as err:
-                    error(err)
+                except Error as e:
+                    error(e)
                     if sys.version_info.major < 3:
                         response = raw_input('Try again? ')
                     else:
@@ -686,11 +677,12 @@ class Edit(Command):
                     if response.lower() not in ['y', 'yes']:
                         raise Error('Giving up, restoring original version.')
 
-        except (Error, OSError) as err:
+        except Error:
             accounts_file.restore()
-            if isinstance(err, OSError):
-                err = os_error(err)
-            error(err)
+            raise
+        except OSError as e:
+            accounts_file.restore()
+            raise Error(os_error(e))
 
 
 # Find {{{1
@@ -829,8 +821,8 @@ class Identity(Command):
                 c, r = generator.challenge_response(name, challenge)
                 output(c, culprit='challenge')
                 output(r, culprit='response')
-            except Error as err:
-                err.report()
+            except Error as e:
+                e.report()
         else:
             names = sorted(generator.shared_secrets.keys())
             output('Available names:')

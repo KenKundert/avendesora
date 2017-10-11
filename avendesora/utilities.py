@@ -26,6 +26,7 @@ from textwrap import dedent, wrap
 from pkg_resources import resource_filename
 import hashlib
 import os
+import sys
 
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
@@ -178,4 +179,11 @@ def error_source():
     except IndexError:
         return None
     return filename, 'line %s' % line
+
+# query_user {{{1
+def query_user(msg):
+     if sys.version_info.major < 3:
+        return raw_input(msg + ' ')
+     else:
+        return input(msg + ' ')
 

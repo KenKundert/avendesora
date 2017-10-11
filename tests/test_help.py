@@ -57,7 +57,7 @@ def test_add():
             shell
             website
 
-        The available accounts files are:
+        The available accounts files are (the default is given first):
             accounts
             stealth_accounts
     """).strip()

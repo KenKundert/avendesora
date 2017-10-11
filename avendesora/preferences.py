@@ -105,6 +105,7 @@ CONFIG_DEFAULTS = {
                     Question("_QUESTION2_?"),
                     Question("_QUESTION3_?"),
                 ]
+                urls = '_URL_'
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
@@ -154,6 +155,7 @@ CONFIG_DEFAULTS = {
                     Question("_QUESTION2_?"),
                     Question("_QUESTION3_?"),
                 ]
+                urls = '_URL_'
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
