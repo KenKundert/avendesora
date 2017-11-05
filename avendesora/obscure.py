@@ -95,6 +95,11 @@ class Obscure(object):
             # dashes.
             return cls.__name__.lower()
 
+    # get_description() {{{2
+    @classmethod
+    def get_description(cls):
+        return None
+
     # hide() {{{2
     @classmethod
     def hide(cls, text, encoding=None, decorate=False, symmetric=False, gpg_ids=None):
@@ -146,6 +151,10 @@ class Obscure(object):
     def __repr__(self):
         return "Hidden('%s')" % (Obscure.hide(self.plaintext, 'base64'))
 
+    # __str__() {{{2
+    def __str__(self):
+        return self.render()
+
 # Hide {{{1
 class Hide(Obscure):
     NAME = 'base64'
@@ -165,7 +174,7 @@ class Hide(Obscure):
         """
         self.plaintext = plaintext
 
-    def generate(self, field_name, field_key, account):
+    def initialize(self, account, field_name, field_key=None):
         # we don't need to do anything, but having this method marks this value
         # as being confidential
         pass
@@ -173,7 +182,7 @@ class Hide(Obscure):
     def is_secure(self):
         return self.secure
 
-    def __str__(self):
+    def render(self):
         return self.plaintext
 
 
@@ -209,7 +218,7 @@ class Hidden(Obscure):
                 culprit=error_source()
             )
 
-    def generate(self, field_name, field_key, account):
+    def initialize(self, account, field_name, field_key=None):
         # we don't need to do anything, but having this method marks this value
         # as being confidential
         pass
@@ -217,7 +226,7 @@ class Hidden(Obscure):
     def is_secure(self):
         return self.secure
 
-    def __str__(self):
+    def render(self):
         return self.plaintext
 
     @staticmethod
@@ -271,8 +280,8 @@ class GPG(Obscure, GnuPG):
         self.ciphertext = ciphertext
         self.encoding = encoding
 
-    def generate(self, field_name, field_key, account):
-        # must do this here in generate rather than in constructor to avoid
+    def initialize(self, account, field_name, field_key=None):
+        # must do this here in initialize rather than in constructor to avoid
         # decrypting this, and perhaps asking for a passcode,  every time
         # Advendesora is run.
         decrypted = self.gpg.decrypt(dedent(self.ciphertext))
@@ -288,7 +297,7 @@ class GPG(Obscure, GnuPG):
             encoding = get_setting('encoding')
         self.plaintext = decrypted.data.decode(encoding)
 
-    def __str__(self):
+    def render(self):
         return str(self.plaintext)
 
     @classmethod
@@ -354,14 +363,14 @@ try:
             self.ciphertext = ciphertext
             self.encoding = encoding
 
-        def generate(self, field_name, field_key, account):
+        def initialize(self, account, field_name, field_key=None):
             encrypted = a2b_base64(self.ciphertext.encode(self.encoding))
             self.plaintext = scrypt.decrypt(encrypted, get_setting('user_key'))
 
         def is_secure(self):
             return False
 
-        def __str__(self):
+        def render(self):
             return str(self.plaintext).strip()
 
         @staticmethod

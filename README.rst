@@ -201,7 +201,7 @@ or::
 If you would like to have more than one person access your passwords, you should 
 give GPG IDs for everyone::
 
-    avendesora init -g bob@nurdletech.com -g rob@nurdletech.com
+    avendesora init -g bob@nurdletech.com,rob@nurdletech.com
 
 After initialization, there should be several files in ~/.config/avendesora. In 
 particular, you should see at least an initial accounts files and a config file.
@@ -496,11 +496,16 @@ PasswordGenerator():
 get_account(name, request_seed=False, stealth_name=None):
 
     Accesses a particular account. Takes a string for the account name or alias.  
+    The name is case insensitive and the '-' may be given for '_'.
     Optionally takes a second string that is used as an additional seed (see: 
     `avendesora help misdirection`).
 
     The stealth name is used as account name if the account is a stealth 
     account.
+
+
+get_name():
+    return name of account.
 
 get_value(field):
 
@@ -519,31 +524,179 @@ get_value(field):
         answer1 = account.get_value('questions.1')
         answer2 = account.get_value('questions[2]')
 
+    If the argument passed to get_value is a field, then it may consist of 
+    a name (the identifier for the first level of the field) and a key (the 
+    identifier for the second level of the field). The field is case insensitive 
+    and a '-' will match a '_' and visa versa.
+
+    You can also specify the name and key separately in a tuple::
+
+        username = account.get_value(('username',))
+        checking = account.get_value(('accounts', 'checking'))
+        answer0 = account.get_value((0,))
+        answer1 = account.get_value(('questions', 1))
+
     The value is returned as an object that contains four attributes, value (the 
     actual value), is_secret (whether the value is secret or contains a secret), 
     name (the name of the value), and desc (the description, contains the actual 
     question of the answer to a question is requested).  Converting the object 
     to a string returns the value rendered as a string.  There is also the 
     render() method that returns a string that combines the name and the 
-    description with the value.
+    description with the value. It takes an optional collection of format 
+    strings, the first one that matches is used. The format strings may contain 
+    keys in braces that get replaced by the corresponding attributes. The known 
+    keys are n {name}, k (key), f (field, combination of name and key), 
+    d (description) and v (value).  A format string does not match it if 
+    contains a key for a value that is not available. If no format string 
+    matches, the value is returned as a string.  The default formats are ('{f} 
+    ({d}): {v}', '{f}: {v}').
+
+    If a composite field is requested get_value() raises a PasswordError, and 
+    the exception contains the *is_collection* and *collection* attributes. The 
+    first is a boolean and the second is the list of available keys.  
+    PassworError returns None for unknown attributes, so it is always safe to 
+    access these attributes without checking whether they exist.
+
+get_values(field):
+    Used to get the values for a composite field. It iterates through the value 
+    and returns a tuple that contains the key and the value for each item in the 
+    field.
+
+    Field is an identifier that may consist of a name (the identifier for the 
+    first level of the field) and a key (the identifier for the second level of 
+    the field).  The field is case insensitive and a '-' will match a '_' and 
+    visa versa.
+
+    Here is how you might iterate through both the scalar and composite values 
+    in an account::
+
+        try:
+            value = acct.get_value(field)
+            lines += value.render('{n}: {v}').split('\n')
+        except PasswordError as e:
+            if not e.is_collection:
+                raise
+            lines += [name + ':']
+            for key, value in acct.get_values(name):
+                lines += indent(
+                    value.render(('{k}) {d}: {v}', '{k}: {v}'))
+                ).split('\n')
+
+get_fields():
+    Iterates through the fields, each iteration yields a name and possibly 
+    a collection of keys (None is returned if the name corresponds to a scalar).  
+    The name and keys returned are the resolved names, which can be passed to 
+    get_scalar() and get_composite().
+
+    Here is how this method can be used to iterate through the account values::
+
+        for name, keys in acct.get_fields():
+            if keys:
+                for key, value in acct.get_values(name):
+                    lines += indent(
+                        value.render(('{k}) {d}: {v}', '{k}: {v}'))
+                    ).split('\n')
+            if keys:
+                value = acct.get_value(name)
+                lines += value.render('{n}: {v}').split('\n')
+
+    get_fields() accepts a boolean argument that if specified and is true will 
+    iterate through all fields, including those generally only used by 
+    Avendesora, such as aliases and discovery.
+
 
 get_scalar(name, key=None, default=False):
 
     A lower level interface than get_value that given a name and perhaps a key 
     returns a scalar value.  Also takes an optional default value that is 
     returned if the value is not found. Unlike get_value, the actual value is 
-    returned, not a object that contains multiple facets of the value.
+    returned, not a object that contains multiple facets of the value. Also, the 
+    name and key must match exactly.
 
     The name is the field name, and the key would identity which value is 
     desired if the field is a composite. If default is False, an error is raise 
     if the value is not present, otherwise the default value itself is returned.
+
+    If the value returned is an Avendesora object (Secret, Obscure, Script), 
+    then you should cast it to a string to get its resolved value.
 
 get_composite(name):
 
     A lower level interface than get_value that given a name returns the value 
     of the associated field, which may be a scalar (string or integer) or 
     a composite (array of dictionary).  Unlike get_value, the actual value is 
-    returned, not a object that contains multiple facets of the value.
+    returned, not a object that contains multiple facets of the value.  Also, 
+    the name and key must match exactly.
+
+    If the value returned is an Avendesora object (Secret, Obscure, Script), 
+    then you should cast it to a string to get its resolved value.
+
+API Example
+-----------
+
+The following example creates encrypted files that contain account information 
+that would be needed by close family members and by a business partner in case 
+anything happened to you.
+
+
+    #!/bin/env python3
+
+    from avendesora import PasswordGenerator, PasswordError
+    from textwrap import dedent
+    from inform import (
+        display, done, Error, error, indent, is_collection, os_error
+    )
+    import gnupg
+
+
+    files = [
+        {   'FILENAME': 'family.gpg',
+            'RECIPIENTS': 'me@home.com son@home.com daughter@home.com'.split(),
+            'ACCOUNTS': 'bank brokerage creditcard'.split(),
+        },
+        {   'FILENAME': 'partner.gpg',
+            'RECIPIENTS': 'me@work.com partner@work.com'.split(),
+            'ACCOUNTS': 'login ssh root backups'.split(),
+        },
+    ]
+
+    try:
+        pw = PasswordGenerator()
+
+        for each in files:
+            accounts = []
+            for account_name in each['ACCOUNTS']:
+                acct = pw.get_account(account_name)
+                title = acct.get_scalar('desc', default=account_name)
+                lines = [title, len(title)*'=']
+
+                for name, keys in acct.get_fields():
+                    if keys:
+                        lines.append(name + ':')
+                        for key, value in acct.get_values(name):
+                            lines += indent(
+                                value.render(('{k}) {d}: {v}', '{k}: {v}'))
+                            ).split('\n')
+                    else:
+                        value = acct.get_value(name)
+                        lines += value.render('{n}: {v}').split('\n')
+                accounts.append('\n'.join(lines))
+
+            gpg = gnupg.GPG(gpgbinary='gpg2')
+            encrypted = gpg.encrypt('\n\n\n'.join(accounts), each['RECIPIENTS'])
+            if not encrypted.ok:
+                raise Error(
+                    'unable to encrypt:', encrypted.stderr, culprit=each['FILENAME']
+                )
+            try:
+                with open(each['FILENAME'], 'w') as file:
+                    file.write(str(encrypted))
+                print("%s: created." % each['FILENAME'])
+            except OSError as e:
+                raise Error(os_error(e))
+
+    except (PasswordError, Error) as e:
+        e.terminate()
 
 
 Getting Help

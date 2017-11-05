@@ -81,14 +81,19 @@ KEYSYMS = {
 }
 
 # Writer selection {{{1
-def get_writer(display=True, clipboard=False, stdout=False):
-    if not display:
-        return KeyboardWriter()
-    elif clipboard:
+def get_writer(tty=None, clipboard=False, stdout=False):
+    if clipboard:
         return ClipboardWriter()
-    elif stdout:
+    if stdout:
         return StdoutWriter()
-    return TTY_Writer()
+    if tty is True:
+        return TTY_Writer()
+    if tty is False:
+        return KeyboardWriter()
+    if Color.isTTY():
+        return TTY_Writer()
+    else:
+        return KeyboardWriter()
 
 # Writer base class {{{1
 class Writer(object):
@@ -98,18 +103,18 @@ class Writer(object):
 
         # if field was not given
         if not field:
-            name, key = account.split_name(field)
+            name, key = account.split_field(field)
             field = '.'.join(cull([name, key]))
 
         # treat field as name rather than script if it there are not attributes
         if '{' not in field:
-            name, key = account.split_name(field)
+            name, key = account.split_field(field)
             try:
                 value = account.get_scalar(name, key)
             except Error as err:
                 err.terminate()
             is_secret = account.is_secret(name, key)
-            label = account.combine_name(name, key)
+            label = account.combine_field(name, key)
             try:
                 alt_name = value.get_key()
                 if alt_name:
@@ -134,7 +139,7 @@ class Writer(object):
                 elif cmd.startswith('sleep '):
                     pass
                 else:
-                    name, key = account.split_name(cmd)
+                    name, key = account.split_field(cmd)
                     try:
                         value = account.get_scalar(name, key)
                         out.append(dedent(str(value)).strip())
@@ -152,7 +157,6 @@ class TTY_Writer(Writer):
     """Writes output to the user's TTY."""
 
     def display_field(self, account, field):
-
         # get string to display
         value, is_secret, name, desc = tuple(account.get_value(field))
         label = '%s (%s)' % (name, desc) if desc else name
@@ -167,7 +171,7 @@ class TTY_Writer(Writer):
                 sep = '\n'
 
         if label:
-            text = LabelColor(label + ':') + sep + value
+            text = LabelColor(label.replace('_', '-') + ':') + sep + value
         else:
             text = value
             label = field
@@ -218,7 +222,7 @@ class ClipboardWriter(Writer):
 
         log('Writing to clipboard.')
         try:
-            Run(base_cmd + ['-i'], 'soew', stdin=value+'\n')
+            Run(base_cmd + ['-i'], 'soeW', stdin=value+'\n')
         except Error as err:
             err.terminate()
 
@@ -272,7 +276,9 @@ class StdoutWriter(Writer):
 class KeyboardWriter(Writer):
     """Writes output via pseudo-keyboard."""
 
-    def run_script(self, account, script, dryrun):
+    def _autotype(self, text):
+        # Split the text into individual key strokes and convert the special
+        # characters to their xkeysym names
 
         def run_xdotool(args):
             try:
@@ -281,28 +287,35 @@ class KeyboardWriter(Writer):
             except OSError as err:
                 fatal(os_error(err))
 
-        def autotype(text):
-            if dryrun:
-                return
-            # Split the text into individual key strokes and convert the special
-            # characters to their xkeysym names
-            keysyms = []
-            for char in text:
-                if char in string.ascii_letters + string.digits:
-                    keysym = char
-                else:
-                    keysym = KEYSYMS.get(char)
-                if not keysym:
-                    error('cannot map to keysym, unknown', culprit=char)
-                else:
-                    keysyms.append(keysym)
-            run_xdotool('key --clearmodifiers'.split() + keysyms)
+        keysyms = []
+        for char in text:
+            if char in string.ascii_letters + string.digits:
+                keysym = char
+            else:
+                keysym = KEYSYMS.get(char)
+            if not keysym:
+                error('cannot map to keysym, unknown.', culprit=char)
+            else:
+                keysyms.append(keysym)
+        run_xdotool('key --clearmodifiers'.split() + keysyms)
+
+    def display_field(self, account, field):
+        # get string to display
+        value = account.get_value(field)
+
+        try:
+            log('writing secret to keyboard writer.')
+            self._autotype(str(value))
+        except Error as err:
+            err.terminate()
+
+    def run_script(self, account, script, dryrun):
 
         # Create the default script if a script was not given
         if script is True:
             # this bit of trickery gets the name of the default field
-            name, key = account.split_name(None)
-            name = account.combine_name(name, key)
+            name, key = account.split_field(None)
+            name = account.combine_field(name, key)
             script = "{%s}{return}" % name
 
         # Run the script
@@ -327,7 +340,8 @@ class KeyboardWriter(Writer):
                         assert len(cmd) == 2
                         if out:
                             # drain the buffer before sleeping
-                            autotype(''.join(out))
+                            if not dryrun:
+                                self._autotype(''.join(out))
                             out = []
                         sleep(float(cmd[1]))
                         scrubbed.append('<sleep %s>' % cmd[1])
@@ -335,7 +349,7 @@ class KeyboardWriter(Writer):
                         raise
                         fatal('syntax error in keyboard script.', culprit=term)
                 else:
-                    name, key = account.split_name(cmd)
+                    name, key = account.split_field(cmd)
                     try:
                         value = account.get_scalar(name, key)
                     except Error as err:
@@ -370,4 +384,5 @@ class KeyboardWriter(Writer):
         log('Autotyping "%s"%s.' % (scrubbed, ' -- dry run' if dryrun else ''))
         if dryrun:
             output(account.get_name(), scrubbed, sep=': ')
-        autotype(''.join(out))
+        else:
+            self._autotype(''.join(out))

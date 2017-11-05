@@ -49,13 +49,13 @@ doctests::
 
 # Imports {{{1
 from .charsets import (
-    ALPHANUMERIC, DIGITS, DISTINGUISHABLE, LOWERCASE, SYMBOLS, UPPERCASE,
+    ALPHANUMERIC, DIGITS, DISTINGUISHABLE, LOWERCASE, SYMBOLS, UPPERCASE, SHIFTED
 )
 from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
 from .obscure import Obscure
 from .utilities import error_source
-from inform import Error, terminate, log, warn, output
+from inform import Error, cull, log, output, terminate, warn
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import math
@@ -70,7 +70,6 @@ class SecretExhausted(Error):
         self.kwargs = kwargs
 
 # Utilities {{{1
-SHIFTED = UPPERCASE + '~!@#$%^&*()_+{}|:"<>?'
 def shift_sort_join(chars, sep=''):
     return sep.join(sorted(chars, key=lambda x: x in SHIFTED))
 
@@ -94,10 +93,26 @@ class Secret(object):
         """
         self.master = self.version = None
 
-    def get_key(self, default=None):
+    def get_key_seed(self, default=None):
+        """Get key seed.
+
+        The default behavior is to pass the key in as the argument, and then
+        simply use it as the return value so it will be used as a seed.  However,
+        the subclasses can override this method and provide an alternative seed.
+        This is used by Question. It returns the question so that it used rather
+        than the index.
+        """
         return default
 
-    def generate(self, field_name, field_key, account):
+    def get_description(self):
+        """Get description.
+
+        Returns description of the secret.
+        This is used by Question. It returns the question as the description.
+        """
+        return None
+
+    def initialize(self, account, field_name, field_key=None):
         if self.secret:
             return
         account_name = account.get_name()
@@ -124,12 +139,19 @@ class Secret(object):
                     warn("master seed is empty.")
             except (EOFError, KeyboardInterrupt):
                 terminate()
-        log('Generating secret, source of master seed:', master_source)
-        field_key = self.get_key(field_key)
         if self.version:
             version = self.version
         else:
             version = account.get_scalar('version', default='')
+
+        log(
+            'Generating secret ',
+            '.'.join([str(n) for n in cull([account_name, field_name, field_key, version], remove=(None, ''))]),
+            ', source of master seed: ',
+            master_source,
+            sep=''
+        )
+        field_key = self.get_key_seed(field_key)
 
         if account.request_seed():
             try:
@@ -192,7 +214,7 @@ class Secret(object):
         the components that are passed into the constructor.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', None, account)
+        >>> secret.initialize(account, 'dux')
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
         '89 80 17 20 34 40 79 1 93 42'
 
@@ -200,7 +222,7 @@ class Secret(object):
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
         self.entropy += num_partitions*math.log(radix, 2)
-        assert self.pool, 'generate() must be called first'
+        assert self.pool, 'initialize() must be called first'
 
         for i in range(num_partitions):
             if self.pool < max_index:
@@ -215,7 +237,7 @@ class Secret(object):
         alphabet.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', None, account)
+        >>> secret.initialize(account, 'dux')
         >>> ' '.join(secret._symbols([str(i) for i in range(100)], 10))
         '89 80 17 20 34 40 79 1 93 42'
 
@@ -235,7 +257,7 @@ class Secret(object):
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
         self.entropy += num_symbols*math.log(len(alphabet), 2)
-        assert self.pool, 'generate() must be called first'
+        assert self.pool, 'initialize() must be called first'
 
         for i in range(num_symbols):
             if self.pool < max_index:
@@ -250,14 +272,14 @@ class Secret(object):
         secret is exhausted.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', None, account)
+        >>> secret.initialize(account, 'dux')
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
         '89 80 17 20 34 40 79 1 93 42'
 
         """
         max_index = radix-1
         self.entropy += math.log(radix, 2)
-        assert self.pool, 'generate() must be called first'
+        assert self.pool, 'initialize() must be called first'
 
         if self.pool < max_index:
             raise SecretExhausted()
@@ -275,7 +297,7 @@ class Secret(object):
         secret is exhausted.
 
         >>> secret = Secret()
-        >>> secret.generate('dux', None, account)
+        >>> secret.initialize(account, 'dux')
         >>> ' '.join([str(secret._get_symbol(range(100))) for i in range(10)])
         '89 80 17 20 34 40 79 1 93 42'
 
@@ -293,7 +315,7 @@ class Secret(object):
         radix = len(alphabet)
         max_index = radix-1
         self.entropy += math.log(len(alphabet), 2)
-        assert self.pool, 'generate() must be called first'
+        assert self.pool, 'initialize() must be called first'
 
         if self.pool < max_index:
             raise SecretExhausted()
@@ -309,6 +331,10 @@ class Secret(object):
     def __repr__(self):
         return "Hidden('%s')" % Obscure.hide(str(self))
 
+    # __str__() {{{2
+    def __str__(self):
+        return self.render()
+
 # Password {{{1
 class Password(Secret):
     """
@@ -321,7 +347,7 @@ class Password(Secret):
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = Password()
-    >>> secret.generate('dux', None, account)
+    >>> secret.initialize(account, 'dux')
     >>> str(secret)
     'tvA8mewbbig3'
 
@@ -385,7 +411,7 @@ class Password(Secret):
         self.prefix = prefix
         self.suffix = suffix
 
-    def __str__(self):
+    def render(self):
         if self.secret:
             # it is important that this be called only once, because the secret
             # changes each time it is called
@@ -408,7 +434,7 @@ class Passphrase(Password):
 
     >>> import string
     >>> secret = Passphrase()
-    >>> secret.generate('dux', None, account)
+    >>> secret.initialize(account, 'dux')
     >>> str(secret)
     'graveyard cockle intone provider'
 
@@ -473,7 +499,7 @@ class PIN(Password):
     >>> import string
     >>> alphabet = string.ascii_letters + string.digits
     >>> secret = PIN()
-    >>> secret.generate('dux', None, account)
+    >>> secret.initialize(account, 'dux')
     >>> str(secret)
     '9301'
 
@@ -535,7 +561,7 @@ class Question(Passphrase):
 
     >>> import string
     >>> secret = Question('What city were you born in?')
-    >>> secret.generate('dux', None, account)
+    >>> secret.initialize(account, 'dux')
     >>> str(secret)
     'dustcart olive label'
 
@@ -614,9 +640,13 @@ class Question(Passphrase):
             # specify the answer. This is also used when producing the archive.
             self.secret = str(answer)
 
-    # get_key() {{{2
-    def get_key(self, default=None):
+    # get_key_seed() {{{2
+    def get_key_seed(self, default=None):
         return self.question
+
+    # get_description() {{{2
+    def get_description(self):
+        return self.get_key_seed(None)
 
     # __repr__() {{{2
     def __repr__(self):
@@ -644,7 +674,7 @@ class MixedPassword(Secret):
     >>> secret = MixedPassword(
     ...     12, base, [(lowercase, 2), (uppercase, 2), (digits, 2)]
     ... )
-    >>> secret.generate('dux', None, account)
+    >>> secret.initialize(account, 'dux')
     >>> str(secret)
     'ZyW62fvxX0Fg'
 
@@ -694,7 +724,7 @@ class MixedPassword(Secret):
         self.version = version
         self.shift_sort = shift_sort
 
-    def __str__(self):
+    def render(self):
         if self.secret:
             # It is important that this be called only once, because the secret
             # changes each time it is called.
@@ -744,12 +774,12 @@ class PasswordRecipe(MixedPassword):
     password be generated, 2 of which are taken from the set !@#$%^&=.
 
     >>> secret = PasswordRecipe('12 2u 2d 2s')
-    >>> secret.generate('pux', None, account)
+    >>> secret.initialize(account, 'pux')
     >>> str(secret)
     '*m7Aqj=XBAs7'
 
     >>> secret = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
-    >>> secret.generate('bux', None, account)
+    >>> secret.initialize(account, 'bux')
     >>> str(secret)
     'YO8K^68J9oC!'
 
@@ -828,7 +858,7 @@ class BirthDate(Secret):
     This function can be used to generate an arbitrary date using::
 
     >>> secret = BirthDate(2015, 18, 65)
-    >>> secret.generate('dux', None, account)
+    >>> secret.initialize(account, 'dux')
     >>> str(secret)
     '1970-03-22'
 
@@ -842,7 +872,7 @@ class BirthDate(Secret):
     formatted::
 
     >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
-    >>> secret.generate('dux', None, account)
+    >>> secret.initialize(account, 'dux')
     >>> str(secret)
     '3/22/70'
 
@@ -885,7 +915,7 @@ class BirthDate(Secret):
         self.master = master
         self.version = version
 
-    def __str__(self):
+    def render(self):
         if self.secret:
             # It is important that this be called only once, because the secret
             # changes each time it is called.

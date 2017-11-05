@@ -408,9 +408,10 @@ def test_identity():
         remote partner to prove your identity.
 
         You are free to explicitly specify a challenge to start the process,
-        but it is important that you not use the same challenge twice. As
-        such, it is recommended that you not provide the challenge. In this
-        situation, one is generated for you based on the time and date.
+        but it is important that it be unpredictable and that you not use
+        the same challenge twice. As such, it is recommended that you not
+        provide the challenge. In this situation, one is generated for you
+        based on the time and date.
 
         Consider an example that illustrates the process. In this example,
         Ahmed is confirming the identity of Reza, where both Ahmed and Reza
@@ -561,9 +562,9 @@ def test_value():
         temporarily unless --stdout is specified.
 
         Usage:
-            avendesora value [options] [--stdout | --clipboard] [<account> [<field>]]
-            avendesora val   [options] [--stdout | --clipboard] [<account> [<field>]]
-            avendesora v     [options] [--stdout | --clipboard] [<account> [<field>]]
+            avendesora value [options] [<account> [<field>]]
+            avendesora val   [options] [<account> [<field>]]
+            avendesora v     [options] [<account> [<field>]]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
@@ -573,7 +574,7 @@ def test_value():
                                     generated secrets.
             -v, --verbose           Add additional information to log file to
                                     help identify issues in account discovery.
-            -t <title>, --title <title>
+            -T <title>, --title <title>
                                     Use account discovery on this title.
 
         You request a scalar value by specifying its name after the account.
@@ -591,6 +592,12 @@ def test_value():
         list of security questions (this can be changed by specifying the
         desired name as the 'default_vector_field' in the account or the config
         file).
+
+        The field may be also be a script, with is nothing but a string that it
+        output as given except that embedded attributes are replaced by account
+        field values. For example:
+
+            avendesora value bank '{accounts.checking}: {passcode}'
 
         If no value is requested the result produced is determined by the value
         of the 'default' attribute. If no value is given for 'default', then the
@@ -1269,7 +1276,7 @@ def test_misdirection():
         chance someone could guess it.
 
         Be aware that when you employ misdirection on a secret, the value of
-        the secret stored in in the archive will not be the true value, it
+        the secret stored in the archive will not be the true value, it
         will instead be the misdirected value.
     """).strip()
     assert result.decode('utf-8') == expected
@@ -1373,7 +1380,7 @@ def test_phishing():
         auto-type the account credentials using Avendesora's account
         discovery based on RecognizeURL() (be sure to use RecognizeURL() for
         websites rather than RecognizeTitle() when configuring account
-        discovery). RecogniseURL() will not fooled by a phishing site).
+        discovery). RecogniseURL() will not be fooled by a phishing site).
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -1600,7 +1607,7 @@ def test_secrets():
 
         Example:
 
-            account = Hidden("NTIwNi03ODQ0")
+            account = Hidden('NTIwNi03ODQ0')
 
         To generate the encoded text, use:
 
@@ -1961,7 +1968,7 @@ def test_secrets():
 
         Examples:
 
-            birthdate = BirthDate(2015, 21, 55))
+            birthdate = BirthDate(2015, 21, 55)
     """).strip()
     assert result.decode('utf-8') == expected
 

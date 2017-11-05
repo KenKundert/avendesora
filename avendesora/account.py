@@ -48,6 +48,10 @@ LabelColor = Color(
     enable=Color.isTTY()
 )
 
+# Utilities {{{1
+def canonicalize(name):
+    return name.replace('-', '_').lower()
+
 # AccountValue class {{{1
 class AccountValue:
     """An Account Value
@@ -57,29 +61,64 @@ class AccountValue:
         is_secret: whether the value is secret or contains a secret
         label: a descriptive name for the value if the value of a  simple field is requested
     """
-    def __init__(self, value, is_secret, name=None, desc=None):
+    def __init__(self, value, is_secret, name=None, key=None, desc=None):
         self.value = value
         self.is_secret = is_secret
         self.name = name
+        self.key = str(key) if key is not None else key
+        self.field = '.'.join(cull([name, self.key]))
         self.desc = desc
 
     def __str__(self):
         "Returns value as string."
+        if hasattr(self.value, 'entropy'):
+            entropy = round(self.value.entropy)
+            log('entropy of {} = {} bits'.format(self.name, entropy))
         return str(self.value)
 
-    def render(self, sep=': '):
-        "Returns string that contains name and value."
-        if self.name:
-            if self.desc:
-                label = '%s (%s)' % (self.name, self.desc)
-            else:
-                label = self.name
-            return label + sep + str(self.value)
-        return str(self.value)
+    def render(self, fmts=('{f} ({d}): {v}', '{f}: {v}')):
+        """Uses fmts to generate a string containing the value.
+
+        fmts contains a sequence of format strings that are tried in sequence.
+        The first one for which all keys are known is used.
+        The possible keys are:
+            n -- name (identifier for the first level of a field)
+            k -- key (identifier for the second level of a field)
+            f -- field (name.key)
+            d -- description
+            v -- value
+        In none work, the value alone is returned.
+        """
+        value = str(self.value)
+        if '\n' in value:
+            value = '\n'+indent(dedent(value), get_setting('indent')).strip('\n')
+        if is_str(fmts):
+            fmts = fmts,
+
+        # build list of arguments, deleting any that is not set
+        args = {
+            k:v for k,v in [
+                ('f', self.field),
+                ('k', self.key),
+                ('n', self.name),
+                ('d', self.desc),
+                ('v', value)
+            ] if v
+        }
+
+        # format the arguments, use first format sting that works
+        for fmt in fmts:
+            try:
+                return fmt.format(**args)
+            except KeyError:
+                pass
+
+        # nothing worked, just return the value
+        return value
 
     def __iter__(self):
         "Cast AccountValue to a tuple to get value, is_secret, name, and desc."
-        for each in [self.value, self.is_secret, self.name, self.desc]:
+        for each in [str(self), self.is_secret, self.name, self.desc]:
             yield each
 
 # Script class {{{1
@@ -95,9 +134,35 @@ class Script:
     """
     def __init__(self, script = 'username: {username}, password: {passcode}'):
         self.script = script
+        self.is_secret = False
+        self.account = None
 
-    def render(self, account):
-        return str(account.get_value(self.script))
+    def initialize(self, account, field_name=None, field_key=None):
+        self.account = account
+
+    def __str__(self):
+        regex = re.compile(r'({[\w. ]+})')
+        out = []
+        self.is_secret = False
+        for term in regex.split(self.script):
+            if term and term[0] == '{' and term[-1] == '}':
+                # we have found a command
+                cmd = term[1:-1].lower()
+                if cmd == 'tab':
+                    out.append('\t')
+                elif cmd == 'return':
+                    out.append('\n')
+                elif cmd.startswith('sleep '):
+                    pass
+                else:
+                    name, key = self.account.split_field(cmd)
+                    value = self.account.get_scalar(name, key)
+                    out.append(dedent(str(value)).strip())
+                    if self.account.is_secret(name, key):
+                        self.is_secret = True
+            else:
+                out.append(term)
+        return ''.join(out)
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.script)
@@ -106,6 +171,7 @@ class Script:
 class Account(object):
     __NO_MASTER = True
         # prevents master seed from being added to this base class
+    _accounts = {}
 
     # all_accounts() {{{2
     @classmethod
@@ -115,34 +181,14 @@ class Account(object):
             for each in sub.all_accounts():
                 yield each
 
-    # preprocess_accounts() {{{2
-    @classmethod
-    def preprocess_accounts(cls):
-        seen = {}
-        for account in Account.all_accounts():
-            acct_name = account.get_name()
-            if hasattr(account, 'aliases'):
-                aliases = list(Collection(account.aliases))
-                account.aliases = aliases
-            else:
-                aliases = []
-            names = [acct_name] + aliases
-            new = {}
-            for name in names:
-                if name in seen:
-                    if name == acct_name:
-                        warn('duplicate account name.', culprit=name)
-                    else:
-                        warn('alias duplicates existing name.', culprit=name)
-                    codicil('Seen in %s in %s.' % seen[name])
-                    codicil('And in %s in %s.' % (acct_name, account._file_info.path))
-                    break
-                else:
-                    new[name] = (account.get_name(), account._file_info.path)
-            seen.update(new)
-                # this two step approach to updating seen prevents us from
-                # complaining about aliases that duplicate the account name,
-                # or duplicate aliases, both of which are harmless
+    # get_account() {{{2
+    @staticmethod
+    def get_account(name):
+        canonical = canonicalize(name)
+        try:
+            return Account._accounts[canonical]
+        except KeyError:
+            raise Error('account not found.', culprit=name)
 
     # get_name() {{{2
     @classmethod
@@ -168,28 +214,53 @@ class Account(object):
         return getattr(cls, '_interactive_seed', False)
 
 
-    # add_fileinfo() {{{2
+    # preprocess() {{{2
     @classmethod
-    def add_fileinfo(cls, master, fileinfo):
+    def preprocess(cls, master, fileinfo, seen):
+
+        # return if this account has already been processed
+        if hasattr(cls, '_file_info'):
+            return  # don't override on those accounts where it was already set
+
+        # add fileinfo
+        cls._file_info = fileinfo
+
+        # add master seed
         if master and not hasattr(cls, '_%s__NO_MASTER' % cls.__name__):
             if not hasattr(cls, 'master'):
                 cls.master = master
                 cls._master_source = 'file'
             else:
                 cls._master_source = 'account'
-        cls._file_info = fileinfo
 
-    # matches_exactly() {{{2
-    @classmethod
-    def matches_exactly(cls, account):
-        if account == cls.get_name():
-            return True
-        try:
-            if account in cls.aliases:
-                return True
-        except AttributeError:
-            pass
-        return False
+        # convert aliases to a list
+        if hasattr(cls, 'aliases'):
+            aliases = list(Collection(cls.aliases))
+            cls.aliases = aliases
+        else:
+            aliases = []
+
+        # canonicalize names and look for duplicates
+        new = {}
+        account_name = cls.get_name()
+        path = cls._file_info.path
+        for name in [account_name] + aliases:
+            canonical = canonicalize(name)
+            Account._accounts[canonical] = cls
+            if canonical in seen:
+                if name == account_name:
+                    warn('duplicate account name.', culprit=name)
+                else:
+                    warn('alias duplicates existing name.', culprit=name)
+                codicil('Seen in %s in %s.' % seen[name])
+                codicil('And in %s in %s.' % (account_name, path))
+                break
+            else:
+                new[canonical] = (account_name, path)
+        seen.update(new)
+            # this two step approach to updating seen prevents us from
+            # complaining about aliases that duplicate the account name,
+            # or duplicate aliases, both of which are harmless
 
     # id_contains() {{{2
     @classmethod
@@ -300,6 +371,17 @@ class Account(object):
         for key in cls.keys(all):
             yield key, getattr(cls, key)
 
+    # get_fields() {{{2
+    @classmethod
+    def get_fields(cls, all=False):
+        for key in sorted(cls.__dict__):
+            if not key.startswith('_') and (all or key not in TOOL_FIELDS):
+                value = getattr(cls, key)
+                if is_collection(value):
+                    yield key, Collection(value).keys()
+                else:
+                    yield key, None
+
     # get_scalar() {{{2
     @classmethod
     def get_scalar(cls, name, key=None, default=False):
@@ -310,8 +392,8 @@ class Account(object):
                 return cls.get_name()
             if default is False:
                 raise Error(
-                    'not found.',
-                    culprit=(cls.get_name(), cls.combine_name(name, key))
+                    'field not found.',
+                    culprit=(cls.get_name(), cls.combine_field(name, key))
                 )
             return default
 
@@ -320,7 +402,7 @@ class Account(object):
                 choices = {}
                 for k, v in Collection(value).items():
                     try:
-                        desc = v.get_key()
+                        desc = v.get_description()
                     except AttributeError:
                         desc = None
                     if desc:
@@ -343,16 +425,14 @@ class Account(object):
                     warn('not a composite value, key ignored.', culprit=name)
                     key = None
             except (IndexError, KeyError, TypeError):
-                raise Error('not found.', culprit=cls.combine_name(name, key))
+                raise Error('key not found.', culprit=cls.combine_field(name, key))
 
-        # generate the value if needed
-        if isinstance(value, Script):
-            value = value.render(cls)
-        else:
-            try:
-                value.generate(name, key, cls)
-            except AttributeError as err:
-                pass
+        # initialize the value if needed
+        try:
+            value.initialize(cls, name, key)
+                 # if Secret or Script, initialize otherwise raise exception
+        except AttributeError as err:
+            pass
         return value
 
     # is_secret() {{{2
@@ -360,71 +440,119 @@ class Account(object):
     def is_secret(cls, name, key=None):
         value = cls.__dict__.get(name)
         if key is None:
-            return hasattr(value, 'generate')
+            return isinstance(value, (Secret, Obscure))
         else:
             try:
-                return hasattr(value[key], 'generate')
+                return isinstance(value, (Secret, Obscure))
             except (IndexError, KeyError, TypeError):
-                raise Error('not found.', culprit=cls.combine_name(name, key))
+                raise Error('not found.', culprit=cls.combine_field(name, key))
 
-    # split_name() {{{2
+    # split_field() {{{2
     @classmethod
-    def split_name(cls, name):
+    def split_field(cls, field):
         # Account fields can either be scalars or composites (vectors or
-        # dictionaries). This function takes a string (name) that the user
-        # provides to specify which account value they wish and splits it into a
-        # field name and a key.  If the field is a scalar, the key will be None.
-        # Users request a value using one of the following forms:
+        # dictionaries). This function takes a string or tuple (field) that the
+        # user provides to specify which account value they wish and splits it
+        # into a name and a key.  If the field is a scalar, the key will be
+        # None.  Users request a value using one of the following forms:
         #     True: use default name
         #     field: scalar value (key=None)
         #     index: questions (field->'questions', key=index)
-        #     field[index] or field/index: for vector value
-        #     field[key] or field/key: for dictionary value
+        #     field[index] or field.index: for vector value
+        #     field[key] or field.key: for dictionary value
 
-        if name is True or not name:
-            name = cls.get_scalar('default', default=None)
-        if not name:
-            name = get_setting('default_field')
+        # handle empty field
+        if field is True or field is False or field == '':
+            field = None
+        if field is None:
+            field = cls.get_scalar('default', default=None)
 
-        # convert dashes to underscores
-        name = str(name).replace('-', '_')
-
-        # If name is an integer, treat it as number of security question.
+        # convert field into integer if posible
         try:
-            return get_setting('default_vector_field'), int(name)
-        except ValueError:
+            field = int(field)
+        except:
             pass
 
-        # Split name if given in the form: name/key
-        try:
-            name, key = name.split('.')
-            try:
-                return name, int(key)
-            except ValueError:
-                return name, key
-        except ValueError:
-            pass
+        # separate field into name and key
+        if type(field) is tuple:
+            # split field if given as a tuple
+            if len(field) == 1:
+                name, key = field[0], None
+            elif len(field) == 2:
+                name, key = field[0], field[1]
+            else:
+                raise Error('too many values.', culprit=field)
+        elif is_str(field):
+            # split field if given in the form: name[key]
+            match = VECTOR_PATTERN.match(field)
+            if match:
+                name, key = match.groups()
+            else:
+                # split field if given in the form: name.key
+                try:
+                    name, key = field.split('.')
+                except ValueError:
+                    # must be simple name
+                    name, key = field, None
+        elif field is None:
+            # handle defaulting
+            defaults = get_setting('default_field').split()
+            for default in defaults:
+                if hasattr(cls, default):
+                    name, key = default, None
+                    break
+            else:
+                raise Error(
+                    'no default available, you must request a specific value.',
+                    culprit=cls.get_name()
+                )
+        elif type(field) is int:
+            name, key = get_setting('default_vector_field'), int(field)
+        else:
+            raise Error('invalid field.', culprit=field)
 
-        # Split name if given in the form: name[key]
-        match = VECTOR_PATTERN.match(name)
-        if match:
-            # vector name using 'name[key]' syntax
-            name, key = match.groups()
-            try:
-                return name, int(key)
-            except ValueError:
-                return name, key
+        # look up name and key
+        return cls.find_field(name, key)
 
-        # Must be scalar name
-        return name, None
-
-    # combine_name() {{{2
+    # find_field() {{{2
     @classmethod
-    def combine_name(cls, name, key=None):
-        # Inverse of split_name().
+    def find_field(cls, name, key=None):
+        # look up field name while ignoring case and treating - and _ as same
+        names = {
+            n.replace('-', '_').lower(): n
+            for n in cls.__dict__.keys()
+            if not n.startswith('_')
+        }
+        try:
+            name = names[name.replace('-', '_').lower()]
+        except KeyError:
+            raise Error('field not found.', culprit=name)
 
-        # convert underscores to dashes
-        #name = name.replace('_', '-')
+        # name is now the true field name, now resolve key
+        if key is None:
+            return name, None
+        try:
+            return name, int(key)
+        except ValueError:
+            pass
+        try:
+            value = getattr(cls, name)
+            keys = {
+                n.replace('-', '_').lower(): n
+                for n in value.keys()
+            }
+            try:
+                key = keys[key.replace('-', '_').lower()]
+            except KeyError:
+                raise Error('key not found.', culprit=key)
+        except AttributeError:
+            key = None
+        return name, key
+
+    # combine_field() {{{2
+    @classmethod
+    def combine_field(cls, name, key=None):
+        # Inverse of split_field().
 
         if key is None:
             return name
@@ -447,60 +575,31 @@ class Account(object):
             'username: {username}, password: {passcode}'
         Returns a tuple: value, is_secret, label
         """
-
         # get default if field was not given
-        if not field:
-            name, key = cls.split_name(field)
-            field = '.'.join(cull([name, key]))
+        if field is None:
+            field = cls.get_scalar('default', default=None)
 
         # determine whether field is actually a script
         is_script = is_str(field) and '{' in field and '}' in field
 
-        # treat field as name rather than script if it there are no attributes
-        if not is_script:
-            name, key = cls.split_name(field)
+        if is_script:
+            # run the script
+            script = Script(field)
+            script.initialize(cls)
+            value = str(script)
+            is_secret = script.is_secret
+            name = key = desc = None
+        else:
+            name, key = cls.split_field(field)
+
             value = cls.get_scalar(name, key)
             is_secret = cls.is_secret(name, key)
-            label = cls.combine_name(name, key)
             try:
-                desc = value.get_key()
+                desc = value.get_description()
             except AttributeError:
                 desc = None
-            if isinstance(value, Secret) or isinstance(value, Obscure):
-                secret = value
-                value = str(value)
-                if isinstance(secret, Secret):
-                    log('entropy =', round(getattr(secret, 'entropy', 0)), 'bits.')
-            value = dedent(value).strip() if is_str(value) else value
-            return AccountValue(value, is_secret, label, desc)
+        return AccountValue(value, is_secret, name, key, desc)
 
-        # run the script
-        script = field
-        regex = re.compile(r'({[\w. ]+})')
-        out = []
-        is_secret = False
-        for term in regex.split(script):
-            if term and term[0] == '{' and term[-1] == '}':
-                # we have found a command
-                cmd = term[1:-1].lower()
-                if cmd == 'tab':
-                    out.append('\t')
-                elif cmd == 'return':
-                    out.append('\n')
-                elif cmd.startswith('sleep '):
-                    pass
-                else:
-                    name, key = cls.split_name(cmd)
-                    try:
-                        value = cls.get_scalar(name, key)
-                        out.append(dedent(str(value)).strip())
-                        if cls.is_secret(name, key):
-                            is_secret = True
-                    except Error as err:
-                        err.terminate()
-            else:
-                out.append(term)
-        return AccountValue(''.join(out), is_secret)
 
     # get_values() {{{2
     @classmethod
@@ -511,6 +610,7 @@ class Account(object):
         and an AccountValue object is returned for each value. If the value is a
         scalar, the key is None.
         """
+        name, key = cls.find_field(name)
         value = getattr(cls, name, None)
         if value is None:
             if name == 'NAME':
@@ -522,18 +622,11 @@ class Account(object):
         for key, val in values.items():
             value = cls.get_scalar(name, key)
             is_secret = cls.is_secret(name, key)
-            label = cls.combine_name(name, key)
             try:
-                desc = value.get_key()
+                desc = value.get_description()
             except AttributeError:
                 desc = None
-            if isinstance(value, Secret) or isinstance(value, Obscure):
-                secret = value
-                value = str(value)
-                if isinstance(secret, Secret):
-                    log('entropy =', round(getattr(secret, 'entropy', 0)), 'bits.')
-            value = dedent(value).strip() if is_str(value) else value
-            yield key, AccountValue(value, is_secret, label, desc)
+            yield key, AccountValue(value, is_secret, name, key, desc)
 
     # get_composite() {{{2
     @classmethod
@@ -587,18 +680,15 @@ class Account(object):
 
         def reveal(name, key=None):
             return "<reveal with 'avendesora value %s %s'>" % (
-                cls.get_name(), cls.combine_name(name, key)
+                cls.get_name(), cls.combine_field(name, key)
             )
 
         def extract_collection(name, collection):
             lines = [fmt_field(key)]
             for k, v in Collection(collection).items():
-                if hasattr(v, 'generate'):
+                if isinstance(v, (Secret, Obscure)):
                     # is a secret, get description if available
-                    try:
-                        v = ' '.join(cull([v.get_key(), reveal(name, k)]))
-                    except AttributeError:
-                        v = reveal(name, k)
+                    v = ' '.join(cull([v.get_description(), reveal(name, k)]))
                 lines.append(fmt_field(k, v, level=1))
             return lines
 
@@ -609,10 +699,10 @@ class Account(object):
         for key, value in cls.items():
             if is_collection(value):
                 lines += extract_collection(key, value)
-            elif hasattr(value, 'generate'):
-                lines.append(fmt_field(key, reveal(key)))
-            elif hasattr(value, 'render'):
+            elif hasattr(value, 'script'):
                 lines.append(fmt_field(key, '<%s>' % value.script))
+            elif cls.is_secret(key):
+                lines.append(fmt_field(key, reveal(key)))
             else:
                 lines.append(fmt_field(key, value))
         output(*lines, sep='\n')
@@ -624,9 +714,8 @@ class Account(object):
 
         def extract(value, name, key=None):
             if not is_collection(value):
-                if hasattr(value, 'generate'):
-                    value.generate(name, key, cls)
-                    #value = 'Hidden(%s)' % Obscure.hide(str(value))
+                if hasattr(value, 'initialize'):
+                    value.initialize(cls, name, key)
                 return value
             try:
                 return {k: extract(v, name, k) for k, v in value.items()}

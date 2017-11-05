@@ -457,7 +457,9 @@ class Changed(Command):
     def run(cls, command, args):
         # define white space insensitive compare function:
         def differ(a, b):
-            return str(a).split() != str(b).split()
+            a = ' '.join(repr(a).replace(r'\n', ' ').split())
+            b = ' '.join(repr(b).replace(r'\n', ' ').split())
+            return a != b
 
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
@@ -772,9 +774,10 @@ class Identity(Command):
             remote partner to prove your identity.
 
             You are free to explicitly specify a challenge to start the process,
-            but it is important that you not use the same challenge twice. As
-            such, it is recommended that you not provide the challenge. In this
-            situation, one is generated for you based on the time and date.
+            but it is important that it be unpredictable and that you not use
+            the same challenge twice. As such, it is recommended that you not
+            provide the challenge. In this situation, one is generated for you
+            based on the time and date.
 
             Consider an example that illustrates the process. In this example,
             Ahmed is confirming the identity of Reza, where both Ahmed and Reza
@@ -975,7 +978,7 @@ class LoginCredentials(Command):
 
         # determine the account and output specified information
         account_name = cmdline['<account>']
-        writer = get_writer()
+        writer = get_writer(tty=True)
         account = generator.get_account(account_name, cmdline['--seed'])
         credentials = account.get_scalar('credentials', default=None)
         if credentials:
@@ -1144,9 +1147,9 @@ class Value(Command):
         temporarily unless --stdout is specified.
 
         Usage:
-            avendesora value [options] [--stdout | --clipboard] [<account> [<field>]]
-            avendesora val   [options] [--stdout | --clipboard] [<account> [<field>]]
-            avendesora v     [options] [--stdout | --clipboard] [<account> [<field>]]
+            avendesora value [options] [<account> [<field>]]
+            avendesora val   [options] [<account> [<field>]]
+            avendesora v     [options] [<account> [<field>]]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
@@ -1156,7 +1159,7 @@ class Value(Command):
                                     generated secrets.
             -v, --verbose           Add additional information to log file to
                                     help identify issues in account discovery.
-            -t <title>, --title <title>
+            -T <title>, --title <title>
                                     Use account discovery on this title.
 
         You request a scalar value by specifying its name after the account.
@@ -1174,6 +1177,12 @@ class Value(Command):
         list of security questions (this can be changed by specifying the
         desired name as the 'default_vector_field' in the account or the config
         file).
+
+        The field may be also be a script, with is nothing but a string that it
+        output as given except that embedded attributes are replaced by account
+        field values. For example:
+
+            avendesora value bank '{accounts.checking}: {passcode}'
 
         If no value is requested the result produced is determined by the value
         of the 'default' attribute. If no value is given for 'default', then the
@@ -1212,11 +1221,11 @@ class Value(Command):
 
         # determine the account and output specified information
         account_name = cmdline['<account>']
-        writer = get_writer(
-            bool(account_name), cmdline['--clipboard'], cmdline['--stdout']
-        )
         if account_name:
             account = generator.get_account(account_name, cmdline['--seed'])
+            writer = get_writer(
+                clipboard=cmdline['--clipboard'], stdout=cmdline['--stdout']
+            )
             writer.display_field(account, cmdline['<field>'])
         else:
             # use discovery to determine account
@@ -1224,6 +1233,7 @@ class Value(Command):
                 title=cmdline['--title'], verbose=cmdline['--verbose']
             )
             account = generator.get_account(account_name)
+            writer = get_writer(tty=False)
             writer.run_script(account, script, cmdline['--title'])
 
 

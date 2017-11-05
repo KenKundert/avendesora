@@ -32,10 +32,7 @@ from .preferences import (
 from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_componenets
-from inform import (
-    conjoin, debug, Error, error, notify, log, os_error, render,
-    terminate, terminate_if_errors
-)
+from inform import conjoin, debug, Error, error, notify, log, os_error, render
 from shlib import to_path, mv
 from pathlib import Path
 
@@ -55,32 +52,23 @@ class PasswordGenerator(object):
         # create the avendesora data directory
         if init:
             self.initialize(gpg_ids, init)
-            terminate()
+            return
 
         # read the accounts files
-        self.accounts = []
         self.shared_secrets = {}
+        seen = {}
         for filename in get_setting('accounts_files', []):
-            try:
-                path = to_path(get_setting('settings_dir'), filename)
-                account_file = PythonFile(path)
-                contents = account_file.run()
-                master_seed = contents.get('master_seed')
-                if master_seed:
-                    self.shared_secrets[path.stem] = master_seed
+            path = to_path(get_setting('settings_dir'), filename)
+            account_file = PythonFile(path)
+            contents = account_file.run()
+            master_seed = contents.get('master_seed')
+            if master_seed:
+                self.shared_secrets[path.stem] = master_seed
 
-                # traverse through all accounts, determine which are new, bind
-                # required information to new accounts, and update account list.
-                for account in Account.all_accounts():
-                    if account not in self.accounts:
-                        account.add_fileinfo(master_seed, account_file)
-
-                        # save a copy of account so it is not garbage collected
-                        self.accounts.append(account)
-            except Error as err:
-                err.terminate()
-        Account.preprocess_accounts()
-        terminate_if_errors()
+            # traverse through all accounts and pass in fileinfo and master
+            # will be ignored if already set
+            for account in self.all_accounts():
+                account.preprocess(master_seed, account_file, seen)
 
     # initialize() {{{2
     def initialize(self, gpg_ids, filename):
@@ -168,10 +156,7 @@ class PasswordGenerator(object):
     def get_account(self, name, request_seed=False, stealth_name=None):
         if not name:
             raise Error('no account specified.')
-        for account in self.all_accounts():
-            if account.matches_exactly(name):
-                account.initialize(request_seed, stealth_name)
-                return account
+        return Account.get_account(name)
         raise Error('not found.', culprit=name)
 
     # discover_account() {{{2
@@ -214,10 +199,9 @@ class PasswordGenerator(object):
             # this odd little piece of code returns the value of the one item in
             # the dictionary
 
-
     # all_accounts() {{{2
     def all_accounts(self):
-        for account in self.accounts:
+        for account in Account.all_accounts():
             yield account
 
     # find_acounts() {{{2

@@ -64,7 +64,7 @@ CONFIG_DEFAULTS = {
         't':  'torbrowser {url}',
         'x':  'xdg-open {url}', # system default browser
     },
-    'default_field': 'passcode',
+    'default_field': 'passcode password passphrase',
     'default_vector_field': 'questions',
     'default_browser': 'x',
     'display_time': 60,
@@ -100,16 +100,22 @@ CONFIG_DEFAULTS = {
                 username = '_USERNAME_'
                 email = '_EMAIL_'
                 passcode = PasswordRecipe('12 2u 2d 2s')
+            # Avendesora: length is 12, includes 2 upper, 2 digits and 2 symbols
+            # Avendesora: Alternatively use '12 2u 2d 2c!@#$&' to specify valid symbol characters.
+            # Avendesora: Alternatively use Passphrase()
                 questions = [
                     Question("_QUESTION1_?"),
                     Question("_QUESTION2_?"),
                     Question("_QUESTION3_?"),
                 ]
                 urls = '_URL_'
+            # Avendesora: specify urls if there are multiple recognizers.
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
                 )
+            # Avendesora: Specify list of urls to recognizer if multiple pages need same script.
+            # Avendesora: Specify list of recognizers if multiple pages need different scripts.
 
             # Avendesora: Tailor the account entry to suit you needs.
             # Avendesora: You can add or delete class attributes as you see fit.
@@ -123,6 +129,8 @@ CONFIG_DEFAULTS = {
                 desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
                 passcode = Passphrase()
+            # Avendesora: Alternatively use PasswordRecipe('12 2u 2d 2s')
+            # Avendesora: or '12 2u 2d 2c!@#$&' to specify valid symbol characters.
                 discovery = RecognizeTitle(
                     '_TITLE1_', '_TITLE2_',
                     script='{passcode}{return}'
@@ -148,6 +156,9 @@ CONFIG_DEFAULTS = {
                 }
                 customer_service = '_PHONE_NUMBER_'
                 passcode = PasswordRecipe('12 2u 2d 2s')
+            # Avendesora: length is 12, includes 2 upper, 2 digits and 2 symbols
+            # Avendesora: Alternatively use '12 2u 2d 2c!@#$&' to specify valid symbol characters.
+            # Avendesora: Alternatively use Passphrase()
                 verbal = Passphrase(length=2)
                 pin = PIN()
                 questions = [
@@ -156,10 +167,13 @@ CONFIG_DEFAULTS = {
                     Question("_QUESTION3_?"),
                 ]
                 urls = '_URL_'
+            # Avendesora: specify urls if there are multiple recognizers.
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
                 )
+            # Avendesora: Specify list of urls to recognizer if multiple pages need same script.
+            # Avendesora: Specify list of recognizers if multiple pages need different scripts.
 
             # Avendesora: Tailor the account entry to suit you needs.
             # Avendesora: You can add or delete class attributes as you see fit.
@@ -177,7 +191,7 @@ CONFIG_DEFAULTS = {
     'gpg_armor': 'extension',
     'gpg_ids': None,
     'xdotool_executable': '/usr/bin/xdotool',
-    'xsel_executable': '/usr/bin/xsel -p -n -v',
+    'xsel_executable': '/usr/bin/xsel',
     'use_pager': True,
     'arp_executable': '/sbin/arp',
 }
@@ -237,6 +251,8 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     gpg_executable = {gpg_executable}
     xdotool_executable = {xdotool_executable}
     xsel_executable = {xsel_executable}
+        # recommend '/usr/bin/xsel -p' if you wish to use mouse middle click
+        # recommend '/usr/bin/xsel -b' if you wish to use mouse right click then paste
 ''')
 
 
@@ -617,7 +633,7 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
     # Hidden('<hidden_arg>'), you can use:
     #
     #     > avendesora reveal
-    #     hidden text: <hidden_text>
+    #     hidden text: <hidden_arg>
     #
     # or
     #

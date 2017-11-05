@@ -84,8 +84,8 @@ def validate_componenets():
             warn("file contents have changed.", culprit=path)
             codicil(
                 *wrap(dedent("""\
-                    This results in passwords that are inconsistent with those
-                    created in the past.  Change {hashes} to contain
+                    This could result in passwords that are inconsistent with
+                    those created in the past.  Change {hashes} to contain
                     "{kind} = '{md5}'".  Then use 'avendesora changed'
                     to assure that nothing has changed.
                 """.format(

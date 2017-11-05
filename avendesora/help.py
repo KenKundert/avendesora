@@ -707,7 +707,7 @@ class Misdirection(HelpMessage):
             chance someone could guess it.
 
             Be aware that when you employ misdirection on a secret, the value of
-            the secret stored in in the archive will not be the true value, it
+            the secret stored in the archive will not be the true value, it
             will instead be the misdirected value.
         """).strip()
         return text
@@ -885,7 +885,7 @@ class Phishing(HelpMessage):
             auto-type the account credentials using Avendesora's account
             discovery based on RecognizeURL() (be sure to use RecognizeURL() for
             websites rather than RecognizeTitle() when configuring account
-            discovery). RecogniseURL() will not fooled by a phishing site).
+            discovery). RecogniseURL() will not be fooled by a phishing site).
         """).strip()
         return text
 
@@ -1043,7 +1043,7 @@ class Secrets(HelpMessage):
 
         Example:
 
-            account = Hidden("NTIwNi03ODQ0")
+            account = Hidden('NTIwNi03ODQ0')
 
         To generate the encoded text, use:
 
@@ -1408,7 +1408,7 @@ class Secrets(HelpMessage):
 
         Examples:
 
-            birthdate = BirthDate(2015, 21, 55))
+            birthdate = BirthDate(2015, 21, 55)
         """).strip()
         return text
 

@@ -22,6 +22,7 @@ setup(
     },
     install_requires = [
         'appdirs',
+        'arrow',
         'docopt',
         'inform>=1.9',
         #'pygobject',
