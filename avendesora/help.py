@@ -55,11 +55,22 @@ class HelpMessage(object):
 
     # show {{{2
     @classmethod
-    def show(cls, name=None):
-        if name:
-            command = Command.find(name)
-            if command:
-                return pager(command.help())
+    def show(cls, name=None, search=False):
+        if name and search:
+            import re
+            term = re.compile(r'\b'+name+r'\b', re.I)
+            output("Commands that reference '{}':".format(name))
+            for cmd in Command.commands_sorted():
+                if term.search(cmd.help()):
+                    output(two_columns(', '.join(cmd.NAMES), cmd.DESCRIPTION))
+            output("\nTopics that reference '{}':".format(name))
+            for topic in cls.topics():
+                if term.search(topic.help()):
+                    output(two_columns(topic.get_name(), topic.DESCRIPTION))
+        elif name:
+            cmd = Command.find(name)
+            if cmd:
+                return pager(cmd.help())
             for topic in cls.topics():
                 if name == topic.get_name():
                     return pager(topic.help())
@@ -491,8 +502,8 @@ class Discovery(HelpMessage):
                     script='{passcode}{return}'
                 )
 
-            If the recognizers are given in an array, all are tried. For
-            example:
+            If the recognizers are given in an array, all are tried, and each
+            that match are offered. For example:
 
                 discovery = [
                     RecognizeURL(
@@ -511,6 +522,22 @@ class Discovery(HelpMessage):
             will both be offered for this site.  But each has a different
             script. The name allows the user to distinguish the available
             choices.
+
+            If there is a need to distinguish URLs where is one is a substring
+            of another, you can use *exact_path*::
+
+                discovery = [
+                    RecognizeURL(
+                        'https://mybank.com/Authentication',
+                        script='{username}{return}',
+                        exact_path=True,
+                    ),
+                    RecognizeURL(
+                        'https://mybank.com/Authentication/Password',
+                        script='{passcode}{return}',
+                        exact_path=True,
+                    ),
+                ]
 
             RecognizeFile checks to determine whether a particular file has been
             created recently.  This can be use in scripts to force secret

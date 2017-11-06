@@ -373,8 +373,11 @@ def test_help():
         Give information about commands or other topics.
 
         Usage:
-            avendesora help [<topic>]
-            avendesora h    [<topic>]
+            avendesora help [options] [<topic>]
+            avendesora h    [options] [<topic>]
+
+        Options:
+            -s, --search            list topics that include <topic> as a search term.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -1062,8 +1065,8 @@ def test_discovery():
                 script='{passcode}{return}'
             )
 
-        If the recognizers are given in an array, all are tried. For
-        example:
+        If the recognizers are given in an array, all are tried, and each
+        that match are offered. For example:
 
             discovery = [
                 RecognizeURL(
@@ -1082,6 +1085,22 @@ def test_discovery():
         will both be offered for this site.  But each has a different
         script. The name allows the user to distinguish the available
         choices.
+
+        If there is a need to distinguish URLs where is one is a substring
+        of another, you can use *exact_path*::
+
+            discovery = [
+                RecognizeURL(
+                    'https://mybank.com/Authentication',
+                    script='{username}{return}',
+                    exact_path=True,
+                ),
+                RecognizeURL(
+                    'https://mybank.com/Authentication/Password',
+                    script='{passcode}{return}',
+                    exact_path=True,
+                ),
+            ]
 
         RecognizeFile checks to determine whether a particular file has been
         created recently.  This can be use in scripts to force secret

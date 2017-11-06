@@ -249,7 +249,12 @@ by running the help command::
 More information on a command is accessed by adding the name of the command as 
 the second argument to the help command::
 
-    > avendesora help value
+    > avendesora help name
+
+As an aid to finding the right help topic the topics that contain a particular 
+search term are listed by adding the -s or --search command line option::
+
+    > avendesora help -s term
 
 If the first argument is not a command, then it must be the name of an account.  
 In this case, the *credentials* command is run if only the account name is 

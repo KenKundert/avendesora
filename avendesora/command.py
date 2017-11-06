@@ -724,8 +724,11 @@ class Help(Command):
     DESCRIPTION = 'give information about commands or other topics'
     USAGE = dedent("""
         Usage:
-            avendesora help [<topic>]
-            avendesora h    [<topic>]
+            avendesora help [options] [<topic>]
+            avendesora h    [options] [<topic>]
+
+        Options:
+            -s, --search            list topics that include <topic> as a search term.
     """).strip()
 
     @classmethod
@@ -737,7 +740,7 @@ class Help(Command):
         override_setting('discard_logfile', True)
 
         from .help import HelpMessage
-        HelpMessage.show(cmdline['<topic>'])
+        HelpMessage.show(cmdline['<topic>'], cmdline['--search'])
 
 
 # Identity {{{1
