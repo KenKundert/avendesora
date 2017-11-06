@@ -611,7 +611,6 @@ get_fields():
 
 
 get_scalar(name, key=None, default=False):
-
     A lower level interface than get_value that given a name and perhaps a key 
     returns a scalar value.  Also takes an optional default value that is 
     returned if the value is not found. Unlike get_value, the actual value is 
@@ -626,7 +625,6 @@ get_scalar(name, key=None, default=False):
     then you should cast it to a string to get its resolved value.
 
 get_composite(name):
-
     A lower level interface than get_value that given a name returns the value 
     of the associated field, which may be a scalar (string or integer) or 
     a composite (array of dictionary).  Unlike get_value, the actual value is 
@@ -641,7 +639,7 @@ API Example
 
 The following example creates encrypted files that contain account information 
 that would be needed by close family members and by a business partner in case 
-anything happened to you.
+anything happened to you::
 
 
     #!/bin/env python3
