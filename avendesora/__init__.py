@@ -20,5 +20,5 @@ from .recognize import (
 from .generator import PasswordGenerator
 from inform import Error as PasswordError
 
-__version__ = '1.7.15'
-__released__ = '2017-11-05'
+__version__ = '1.7.16'
+__released__ = '2017-11-06'
