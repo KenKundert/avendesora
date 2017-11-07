@@ -495,11 +495,9 @@ relatively high-level interface as shown in this example:
 
 
 PasswordGenerator():
-
     Initializes the password generator. You should pass no arguments.
 
 get_account(name, request_seed=False, stealth_name=None):
-
     Accesses a particular account. Takes a string for the account name or alias.  
     The name is case insensitive and the '-' may be given for '_'.
     Optionally takes a second string that is used as an additional seed (see: 
@@ -513,12 +511,13 @@ get_name():
     return name of account.
 
 get_value(field):
-
     Returns the value of a particular account attribute given a user-oriented 
     string that describes the desired attribute.  The value requested must be 
     a scalar value, meaning that you must individually request members of arrays 
     or dictionary attibutes. Here are some examples that demonstrate the various 
-    ways of accessing the various kinds of attributes::
+    ways of accessing the various kinds of attributes:
+
+    .. code-block:: python
 
         passcode = account.get_value()
         username = account.get_value('username')
@@ -534,7 +533,9 @@ get_value(field):
     identifier for the second level of the field). The field is case insensitive 
     and a '-' will match a '_' and visa versa.
 
-    You can also specify the name and key separately in a tuple::
+    You can also specify the name and key separately in a tuple:
+
+    .. code-block:: python
 
         username = account.get_value(('username',))
         checking = account.get_value(('accounts', 'checking'))
@@ -573,7 +574,9 @@ get_values(field):
     visa versa.
 
     Here is how you might iterate through both the scalar and composite values 
-    in an account::
+    in an account:
+
+    .. code-block:: python
 
         try:
             value = acct.get_value(field)
@@ -593,7 +596,9 @@ get_fields():
     The name and keys returned are the resolved names, which can be passed to 
     get_scalar() and get_composite().
 
-    Here is how this method can be used to iterate through the account values::
+    Here is how this method can be used to iterate through the account values:
+
+    .. code-block:: python
 
         for name, keys in acct.get_fields():
             if keys:
@@ -639,8 +644,9 @@ API Example
 
 The following example creates encrypted files that contain account information 
 that would be needed by close family members and by a business partner in case 
-anything happened to you::
+anything happened to you:
 
+.. code-block:: python
 
     #!/bin/env python3
 
