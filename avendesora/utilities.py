@@ -24,6 +24,7 @@ from inform import (
 )
 from textwrap import dedent, wrap
 from pkg_resources import resource_filename
+from stat import ST_MODE
 import hashlib
 import os
 import sys
@@ -58,8 +59,21 @@ def generate_random_string(length=64):
     return password
 
 
-# validate_componenets {{{1
-def validate_componenets():
+# validate_components {{{1
+def validate_components():
+
+    # check permissions on the settings directory
+    path = get_setting('settings_dir')
+    mask = get_setting('config_dir_mask')
+    permissions = os.stat(path)[ST_MODE]
+    violation = permissions & mask
+    recommended = permissions & ~mask & 0o777
+    if violation:
+        warn(
+            "directory permissions are too loose.",
+            "Recommend running 'chmod {:o} {}'.".format(recommended, path),
+            culprit=path
+        )
 
     # find dictionary file
     dict_path = get_setting('dictionary_file')
@@ -82,22 +96,22 @@ def validate_componenets():
         # Check that file has not changed.
         if md5 != get_setting(kind):
             warn("file contents have changed.", culprit=path)
-            codicil(
-                *wrap(dedent("""\
+            lines = wrap(dedent("""\
                     This could result in passwords that are inconsistent with
-                    those created in the past.  Change {hashes} to contain
-                    "{kind} = '{md5}'".  Then use 'avendesora changed'
-                    to assure that nothing has changed.
-                """.format(
-                    kind=kind, md5=md5,
-                    hashes=get_setting('hashes_file'),
-                ))),
-                sep = '\n'
-            )
+                    those created in the past.  Use 'avendesora changed' to
+                    assure that nothing has changed. Then, to suppress this
+                    message, change {hashes} to contain:
+                """.format(hashes=get_setting('hashes_file'))
+            ))
+            lines.append("     {kind} = '{md5}'".format(kind=kind, md5=md5))
+            codicil(*lines, sep='\n')
+
 # pager {{{1
 def pager(text):
-    if get_setting('use_pager'):
+    program = get_setting('use_pager')
+    if not is_str(program):
         program = os.environ.get('PAGER', 'less')
+    if program:
         Run([program], stdin=text, modes='Woes')
     else:
         output(text)

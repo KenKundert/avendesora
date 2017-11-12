@@ -55,7 +55,7 @@ from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
 from .obscure import Obscure
 from .utilities import error_source
-from inform import Error, cull, log, output, terminate, warn
+from inform import Error, cull, log, output, terminate, warn, is_str
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import math
@@ -153,20 +153,23 @@ class Secret(object):
         )
         field_key = self.get_key_seed(field_key)
 
-        if account.request_seed():
+        request_seed = account.request_seed()
+        interactive_seed = ''
+        if request_seed is True:
             try:
-                try:
-                    interactive_seed = getpass.getpass(
-                        'seed for %s: ' % account_name
-                    )
-                except EOFError:
-                    output()
-                if not interactive_seed:
-                    warn("seed is empty.")
+                interactive_seed = getpass.getpass(
+                    'seed for %s: ' % account_name
+                )
             except (EOFError, KeyboardInterrupt):
                 terminate()
-        else:
-            interactive_seed = ''
+        elif callable(request_seed):
+            interactive_seed = request_seed()
+        elif is_str(request_seed):
+            interactive_seed = request_seed
+        elif request_seed:
+            warn("invalid seed.")
+        if request_seed and not interactive_seed:
+            warn("seed is empty.")
 
         seeds = [
             master,
@@ -177,6 +180,7 @@ class Secret(object):
             interactive_seed
         ]
         self.set_seeds(seeds)
+        assert(self.pool)
 
     def set_seeds(self, seeds):
         # Convert the seeds into 512 bit number
@@ -219,10 +223,10 @@ class Secret(object):
         '89 80 17 20 34 40 79 1 93 42'
 
         """
+        assert self.pool, 'initialize() must be called first'
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
         self.entropy += num_partitions*math.log(radix, 2)
-        assert self.pool, 'initialize() must be called first'
 
         for i in range(num_partitions):
             if self.pool < max_index:
@@ -253,11 +257,11 @@ class Secret(object):
         'eeny eeny moe miny'
 
         """
+        assert self.pool, 'initialize() must be called first'
         radix = len(alphabet)
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
         self.entropy += num_symbols*math.log(len(alphabet), 2)
-        assert self.pool, 'initialize() must be called first'
 
         for i in range(num_symbols):
             if self.pool < max_index:
@@ -277,9 +281,9 @@ class Secret(object):
         '89 80 17 20 34 40 79 1 93 42'
 
         """
+        assert self.pool, 'initialize() must be called first'
         max_index = radix-1
         self.entropy += math.log(radix, 2)
-        assert self.pool, 'initialize() must be called first'
 
         if self.pool < max_index:
             raise SecretExhausted()
@@ -312,10 +316,10 @@ class Secret(object):
         '11/19/1980'
 
         """
+        assert self.pool, 'initialize() must be called first'
         radix = len(alphabet)
         max_index = radix-1
         self.entropy += math.log(len(alphabet), 2)
-        assert self.pool, 'initialize() must be called first'
 
         if self.pool < max_index:
             raise SecretExhausted()
@@ -935,4 +939,4 @@ class BirthDate(Secret):
 if __name__ == "__main__":
     import doctest
     fail, total = doctest.testmod()
-    print("{} failures out of {} tests".format(fail, total))
+    output("{} failures out of {} tests".format(fail, total))

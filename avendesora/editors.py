@@ -36,7 +36,6 @@ class GenericEditor(Editor):
         args = dict(
             filepath = filepath,
             account = account,
-            section = '{{' '{1',
         )
         try:
             editor_setting = 'edit_account' if account else 'edit_template'

@@ -3,6 +3,7 @@ from inform import os_error
 from textwrap import dedent
 import subprocess
 import os
+import pexpect
 
 # set various environment variables so avendesora uses local gpg key and config
 # directory rather than the users.
@@ -211,3 +212,33 @@ def test_conceal():
             "MTIzNDU2Nzg="
         )
     ''').lstrip().encode('ascii')
+
+# test_stealth() {{{1
+def test_stealth():
+    try:
+        avendesora = pexpect.spawn('avendesora', 'value -s xkcd'.split())
+        avendesora.expect('account name: ', timeout=4)
+        avendesora.sendline('an-account-name')
+        avendesora.expect(pexpect.EOF)
+        avendesora.close()
+        result = avendesora.before.decode('utf-8')
+    except (pexpect.EOF, pexpect.TIMEOUT):
+        result = avendesora.before.decode('utf8')
+    except OSError as err:
+        result = os_error(err)
+    assert result.strip() == 'underdog crossword apron whinny'
+
+# test_alertscc_seed() {{{1
+def test_alertscc_seed():
+    try:
+        avendesora = pexpect.spawn('avendesora', 'value -S -s alertscc password'.split())
+        avendesora.expect('seed for alertscc: ', timeout=4)
+        avendesora.sendline('frozen-chaos')
+        avendesora.expect(pexpect.EOF)
+        avendesora.close()
+        result = avendesora.before.decode('utf-8')
+    except (pexpect.EOF, pexpect.TIMEOUT):
+        result = avendesora.before.decode('utf8')
+    except OSError as err:
+        result = os_error(err)
+    assert result.strip() == 'tRT7vXLeZrbz'

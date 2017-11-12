@@ -25,15 +25,15 @@ from .gpg import GnuPG, PythonFile, GPG_EXTENSIONS
 from .obscure import Hidden
 from .preferences import (
     CONFIG_DEFAULTS, NONCONFIG_SETTINGS, ACCOUNTS_FILE_INITIAL_CONTENTS,
-    CONFIG_FILE_INITIAL_CONTENTS, USER_KEY_FILE_INITIAL_CONTENTS,
-    HASH_FILE_INITIAL_CONTENTS, STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS,
-    ACCOUNT_LIST_FILE_CONTENTS,
+    CONFIG_FILE_INITIAL_CONTENTS, CONFIG_DOC_FILE_INITIAL_CONTENTS,
+    USER_KEY_FILE_INITIAL_CONTENTS, HASH_FILE_INITIAL_CONTENTS,
+    STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS, ACCOUNT_LIST_FILE_CONTENTS,
 )
 from .secrets import Passphrase
 from .title import Title
-from .utilities import generate_random_string, validate_componenets
+from .utilities import generate_random_string, validate_components
 from inform import conjoin, debug, Error, error, notify, log, os_error, render
-from shlib import to_path, mv
+from shlib import to_path, mv, rm
 from pathlib import Path
 
 # PasswordGenerator class{{{1
@@ -47,7 +47,7 @@ class PasswordGenerator(object):
         GnuPG.initialize()
 
         # check the integrity of avendesora
-        validate_componenets()
+        validate_components()
 
         # create the avendesora data directory
         if init:
@@ -104,6 +104,13 @@ class PasswordGenerator(object):
             'gpg_ids': repr(' '.join(gpg_ids)),
         })
 
+        # delete the config_doc_file so we always get an updated version.
+        if (get_setting('config_doc_file')):
+            try:
+                rm(get_setting('config_doc_file'))
+            except OSError as e:
+                warn(os_error(e))
+
         # create the initial versions of the files in the settings directory
         if filename is True:
             path = to_path(get_setting('account_list_file'))
@@ -113,6 +120,7 @@ class PasswordGenerator(object):
             # Assure that the default initial set of files is present
             for path, contents in [
                 (get_setting('config_file'), CONFIG_FILE_INITIAL_CONTENTS),
+                (get_setting('config_doc_file'), CONFIG_DOC_FILE_INITIAL_CONTENTS),
                 (get_setting('hashes_file'), HASH_FILE_INITIAL_CONTENTS),
                 (get_setting('user_key_file'), USER_KEY_FILE_INITIAL_CONTENTS),
                 (get_setting('default_accounts_file'), ACCOUNTS_FILE_INITIAL_CONTENTS),
@@ -156,8 +164,9 @@ class PasswordGenerator(object):
     def get_account(self, name, request_seed=False, stealth_name=None):
         if not name:
             raise Error('no account specified.')
-        return Account.get_account(name)
-        raise Error('not found.', culprit=name)
+        account = Account.get_account(name)
+        account.initialize(request_seed, stealth_name)
+        return account
 
     # discover_account() {{{2
     def discover_account(self, title=None, verbose=False):

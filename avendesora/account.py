@@ -29,7 +29,7 @@ from .secrets import Secret
 from inform import (
     Color, codicil, conjoin, cull, debug, Error, is_collection, is_str, log,
     notify, output, warn, indent,
-    ddd, ppp, vvv
+    ddd, ppp, vvv, sss,
 )
 from textwrap import dedent
 try:
@@ -177,7 +177,9 @@ class Account(object):
     @classmethod
     def all_accounts(cls):
         for sub in cls.__subclasses__():
-            yield sub
+            # do not yield the base StealthAccount
+            if sub != StealthAccount:
+                yield sub
             for each in sub.all_accounts():
                 yield each
 

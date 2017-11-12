@@ -41,6 +41,15 @@ def test_mybank_accounts_checking2():
         checking = str(err)
     assert str(checking) == '12345678'
 
+def test_xkcd():
+    try:
+        pw = PasswordGenerator()
+        account = pw.get_account('xkcd', stealth_name='chaos')
+        password = account.get_value()
+    except PasswordError as err:
+        password = err
+    assert str(password) == 'tauten polymer rudder lively'
+
 def test_alertscc():
     try:
         pw = PasswordGenerator()
@@ -55,6 +64,15 @@ def test_alertscc():
     except PasswordError as err:
         password = err
     assert str(password) == 'R7ibHyPjWtG2'
+
+def test_alertscc_seed():
+    try:
+        pw = PasswordGenerator()
+        account = pw.get_account('alertscc', request_seed='chaos')
+        password = account.get_value('password')
+    except PasswordError as err:
+        password = err
+    assert str(password) == 'E3wx6hNqU2Zu'
 
 def test_alertscc_question1():
     try:

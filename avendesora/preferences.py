@@ -28,12 +28,13 @@ from appdirs import user_config_dir
 # but should not be found in the config file
 NONCONFIG_SETTINGS = {
     'config_file': 'config',
+    'config_doc_file': 'config.doc',
     'settings_dir': user_config_dir('avendesora'),
     'default_accounts_file': 'accounts.gpg',
     'default_stealth_accounts_file': 'stealth_accounts',
-    'charsets_hash': 'e4ae3714d9dbdffc0cf3b51a0462b5ec',
+    'charsets_hash': '82bb252a11ac8b6a9a6830809d181b96',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': '27bd25b361b60c4ca339f2f185178a9d',
+    'secrets_hash': '5fc0355b1c9eb0e885ecc26c28e0c60e',
     'discard_logfile': False,
     'commonly_mistaken_attributes': {
         'url': 'urls',
@@ -52,6 +53,7 @@ CONFIG_DEFAULTS = {
     'account_list_file': 'accounts_files',
     'archive_file': 'archive.gpg',
     'previous_archive_file': 'archive.prev.gpg',
+    'config_dir_mask': 0o077,
     'credential_ids': 'username email',
     'credential_secrets': 'passcode password passphrase',
     'label_color': 'blue',
@@ -206,49 +208,155 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Configuration
     # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
     #
-    # The desired location of the log file (relative to config directory).
-    # Adding a suffix of .gpg or .asc causes the file to be encrypted
-    # (otherwise it can leak account names). Use None to disable logging.
-    log_file = {log_file}
+    # This file is read by Avendesora. Use it to change any configuration
+    # settings from their default values.  See {config_doc_file} for the list of
+    # available settings along with a description and the default value of the
+    # setting.
 
-    # The desired location of the archive file (relative to config director).
-    # End the path in .gpg. Use None to disable archiving.
+    # Default identity to use when creating encrypted files.
+    gpg_ids = {gpg_ids}
+''')
+
+# Initial config.doc file {{{1
+CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
+    # Avendesora Configuration Documentation
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
+    #
+    # This file is generated and updated by Avendesora using the initialize
+    # command. It documents the supported configuration settings and gives the
+    # default values for those settings. However it is not read by Avendesora. To
+    # change your configuration settings, you should modify your config file:
+    # {config_file}. In general you want to include only those settings that
+    # differ from their defaults in {config_file}. In this way, if the defaults
+    # change as Avendesora is upgraded you will naturally pick up the new
+    # values.
+
+    # Avendesora settings
+    log_file = {log_file}
+        # The desired location of the log file (relative to config directory).
+        # Adding a suffix of .gpg or .asc causes the file to be encrypted
+        # (otherwise it can leak account names). Use None to disable logging.
+
     archive_file = {archive_file}
     previous_archive_file = {previous_archive_file}
+        # The desired location of the archive files (relative to config director).
+        # End the path in .gpg or .asc. Use None to disable archiving.
 
-    # Various settings
     default_field = {default_field}
+        # The name of the field to use for the value command when one is not
+        # given. May be a space separated list of names, in which case the first
+        # that is found is used.
+
     default_vector_field = {default_vector_field}
+        # The name of the field to use when an integer is given as the argument
+        # to the value command. In this case the field is expected to be a list
+        # and the argument is taken to be the index of the desired value.
+        # For example, if default_vector_field is 'question' and the argument
+        # given with the value command is 1, then question[1] is produced.
+
+    credential_ids = {credential_ids}
+        # A string that contains the field names (space separated) that should be
+        # considered by the credentials command for the account identity.
+
+    credential_secrets = {credential_secrets}
+        # A string that contains the field names (space separated) that should be
+        # considered by the credentials command for the primary account secret.
+
     display_time = {display_time}
+        # The number of seconds that the secret will be displayed before it is
+        # erase when writing to the TTY or clibboard.
+
     encoding = {encoding!r}
+        # The unicode encoding to use when reading or writing files.
+
     edit_account = {edit_account}
+        # The command used when editing an account. The command is given as
+        # list of strings. The strings may contain {{filepath}} and {{account}},
+        # which are replaced by the path to the file and the name of the
+        # account.
+
     edit_template = {edit_template}
+        # The command used when creating a new account that has been initialized
+        # with a template. The command is given as list of strings. The strings
+        # may contain {{filepath}}, which is replaced by the path to the file.
+
     browsers = {browsers}
+        # A dictionary containing the supported browsers. For each entry the key
+        # is the name to be used for the browser, and the value is string that
+        # contains the command that invokes the browser. The value may contain
+        # {{url}}, which is replaced by the URL to open.
+
     default_browser = {default_browser}
+        # The name of the default browser. This name should be one of the keys
+        # in the browsers dictionary.
+
     default_protocol = {default_protocol}
+        # The default protocol to use for a URL if the protocol is not specified
+        # in the requested URL. Generally this should be 'https' or 'http',
+        # though 'https' is recommended.
+
+    config_dir_mask = {config_dir_mask}
+        # An integer that determines if a warning should be printed about the
+        # file permissions on the Avendesora configuration directory
+        # (~/.config/avendesora) being too loose. A bitwise and operation is
+        # performed between this value and the actual file permissions, and if
+        # the result is nonzero, a warning is printed.  Set to 0o000 to disable
+        # the warning. Set to 0o077 to generate a warning if the configuration
+        # directory is readable or writable by the group or others. Set to 0o007
+        # to generated a warning if the directory is readable or writable by
+        # others.
+
     label_color = {label_color}
+        # The color of the label use by the value and values commands.
         # Choose from black, red, green, yellow, blue, magenta, cyan, white.
+
     color_scheme = {color_scheme}
-        # Choose from dark, light.
+        # The color scheme used for the label color.  Choose from dark, light.
+        # If the shell background color is light, use dark.
+
     use_pager = {use_pager}
+        # Use a external program to break long output into pages.
+        # May be either a boolean or a string. If a string the string is taken
+        # to be a command line use to invoke a paging program (like 'more'). If
+        # True, the program name is taken from the PAGER environment variable if
+        # set, or 'less' is used if not set. If False, a paging program is not
+        # used.
+
     verbose = {verbose}
         # Set this to True to generate additional information in the log file
         # that can help debug account discovery issues.  Normally it should be
         # False to avoid leaking account information into log file.
+        # This is most useful when debugging account discovery, and in that case
+        # this setting has largely been superseded by the use of the --title and
+        # --verbose command line options.
 
-    # Prototype accounts
-    default_account_template = {default_account_template}
+    # Account templates
+    # Use these settings to specify the available account templates that are
+    # used when creating new accounts.  The templates are given as a dictionary
+    # where the key is the name of the template and the value is the template
+    # itself. The template is passed through textwrap.dedent() to remove any
+    # leading white space.  Any lines that begin with '# Avendesora: ' represent
+    # comments that can contain instructions to the user. They will are removed
+    # when the account is created.
     account_templates = {account_templates}
+    default_account_template = {default_account_template}
 
+    # GPG settings
     # Information used by GPG when encrypting and decrypting files.
     gpg_ids = {gpg_ids}
+        # the GPG IDs to use by default when creating encrypted files (the
+        # archive and account files).
     gpg_armor = {gpg_armor}
-        # choose between 'always', 'never' and 'extension' (.asc: armor, .gpg: no)
+        # In the GPG world, armoring a file means converting it to simple ASCI.
+        # Choose between 'always', 'never' and 'extension' (.asc: armor, .gpg:
+        # no).
     gpg_home = {gpg_home}
+        # This is your GPG home directory. By default it will be ~/.gnupg.
 
-    # Utilities
-    # use of full absolute paths for executables is recommended
+    # External Executables
+    # Use of full absolute paths for executables is recommended.
     gpg_executable = {gpg_executable}
+        # Path to the gpg2 executable.
     xdotool_executable = {xdotool_executable}
     xsel_executable = {xsel_executable}
         # recommend '/usr/bin/xsel -p' if you wish to use mouse middle click

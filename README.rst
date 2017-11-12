@@ -500,8 +500,11 @@ PasswordGenerator():
 get_account(name, request_seed=False, stealth_name=None):
     Accesses a particular account. Takes a string for the account name or alias.  
     The name is case insensitive and the '-' may be given for '_'.
-    Optionally takes a second string that is used as an additional seed (see: 
-    `avendesora help misdirection`).
+
+    Optionally takes a second argument (*request_seed*) that may be a boolean, 
+    a string, or a function that returns a string. The string is used as an 
+    additional seed (see: `avendesora help misdirection`), and if True is passed 
+    in, the user in queried for the seed.
 
     The stealth name is used as account name if the account is a stealth 
     account.
