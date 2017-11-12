@@ -29,7 +29,7 @@ from .secrets import Secret
 from inform import (
     Color, codicil, conjoin, cull, debug, Error, is_collection, is_str, log,
     notify, output, warn, indent,
-    ddd, ppp, vvv, sss,
+    ddd, ppp, vvv
 )
 from textwrap import dedent
 try:
