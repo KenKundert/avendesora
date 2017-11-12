@@ -10,7 +10,7 @@ addons:
     packages:
       - gnupg
 install:
-  - pip install scrypt coveralls
+  - pip install scrypt coveralls pexpect
   - pip install .
   - chmod -R go-rwx tests/home/gnupg
 script:
