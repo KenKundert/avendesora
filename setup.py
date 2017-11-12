@@ -50,7 +50,7 @@ setup(
         'shlib>=0.7',
     ],
     setup_requires = 'pytest-runner>=2.0'.split(),
-    tests_require = 'pytest'.split(),
+    tests_require = 'pytest pexpect'.split(),
     keywords = 'avendesora password XKCD'.split(),
     classifiers = [
         'Development Status :: 5 - Production/Stable',
