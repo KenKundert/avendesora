@@ -17,5 +17,8 @@ config_dir_mask = 0o000
 # I just cannot get gpg to cooperate.
 user_key_file = 'key'
 
+# Don't use an archive file
+archive_file = None
+
 # Include a few unicode characters, but to make sure they work: ±αβγδε
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :
