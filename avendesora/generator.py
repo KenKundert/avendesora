@@ -32,9 +32,13 @@ from .preferences import (
 from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_components
-from inform import conjoin, debug, Error, error, notify, log, os_error, render
+from inform import (
+    codicil, conjoin, debug, Error, error, notify, log, os_error, render, warn
+)
 from shlib import to_path, mv, rm
+from textwrap import dedent, fill
 from pathlib import Path
+import os
 
 # PasswordGenerator class{{{1
 class PasswordGenerator(object):
@@ -57,8 +61,12 @@ class PasswordGenerator(object):
         # read the accounts files
         self.shared_secrets = {}
         seen = {}
+        most_recently_updated = 0
         for filename in get_setting('accounts_files', []):
             path = to_path(get_setting('settings_dir'), filename)
+            updated = os.path.getmtime(str(path.resolve()))
+            if updated > most_recently_updated:
+                most_recently_updated = updated
             account_file = PythonFile(path)
             contents = account_file.run()
             master_seed = contents.get('master_seed')
@@ -69,6 +77,27 @@ class PasswordGenerator(object):
             # will be ignored if already set
             for account in self.all_accounts():
                 account.preprocess(master_seed, account_file, seen)
+
+        # check for missing or stale archive file
+        archive_file = get_setting('archive_file')
+        if archive_file:
+            if archive_file.exists():
+                stale = int(get_setting('archive_stale'))
+                archive_updated = os.path.getmtime(str(archive_file))
+                if most_recently_updated - archive_updated > 86400 * stale:
+                    warn('stale archive.')
+                    codicil(fill(dedent("""
+                        Recommend running 'avendesora changed' to determine
+                        which account entries have changed, and if all the
+                        changes are expected, running 'avendesora archive' to
+                        update the archive.
+                    """).strip()))
+            else:
+                warn('archive missing.')
+                codicil(
+                    "Recommend running 'avendesora archive'",
+                    "to create the archive."
+                )
 
     # initialize() {{{2
     def initialize(self, gpg_ids, filename):

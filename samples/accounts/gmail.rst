@@ -15,10 +15,6 @@ your Gmail/Google account entry::
         username = '_YOUR_USERNAME_'
         passcode = Passphrase()
         urls = 'https://accounts.google.com/signin/v2/identifier'
-        questions = [
-            Question("recovery email?", answer='_YOUR_RECOVERY_EMAIL_ADDRESS_'),
-            Question("recovery phone?", answer='_YOUR_RECOVERY_PHONE_NUMBER_'),
-        ]
         discovery = [
             RecognizeURL(
                 'https://accounts.google.com/ServiceLogin/identifier',

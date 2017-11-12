@@ -52,6 +52,7 @@ CONFIG_DEFAULTS = {
     ],
     'account_list_file': 'accounts_files',
     'archive_file': 'archive.gpg',
+    'archive_stale': 1,
     'previous_archive_file': 'archive.prev.gpg',
     'config_dir_mask': 0o077,
     'credential_ids': 'username email',
@@ -230,6 +231,9 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     # differ from their defaults in {config_file}. In this way, if the defaults
     # change as Avendesora is upgraded you will naturally pick up the new
     # values.
+    #
+    # This file is replaced every time you run 'avendesora initialize'. Any
+    # changes you make to this file will be lost.
 
     # Avendesora settings
     log_file = {log_file}
@@ -241,6 +245,10 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     previous_archive_file = {previous_archive_file}
         # The desired location of the archive files (relative to config director).
         # End the path in .gpg or .asc. Use None to disable archiving.
+
+    archive_stale = {archive_stale}
+        # The archive file is consider stale if it is this many days older than
+        # the most recently updated account file.
 
     default_field = {default_field}
         # The name of the field to use for the value command when one is not
@@ -591,12 +599,24 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
 
     # PINs {section}
+    class Pin2(StealthAccount):
+        passcode = PIN(length=2)
+
+    class Pin3(StealthAccount):
+        passcode = PIN(length=3)
+
     class Pin4(StealthAccount):
         aliases = 'pin'
         passcode = PIN(length=4)
 
+    class Pin5(StealthAccount):
+        passcode = PIN(length=5)
+
     class Pin6(StealthAccount):
         passcode = PIN(length=6)
+
+    class Pin7(StealthAccount):
+        passcode = PIN(length=7)
 
     class Pin8(StealthAccount):
         aliases = 'num'
@@ -633,7 +653,7 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         passcode = PIN(length=64)
 
 
-    # Pass phrases {section}
+    # Passphrases {section}
     class Word1(StealthAccount):
         aliases = 'word'
         passcode = Passphrase(length=1)
