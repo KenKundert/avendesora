@@ -1,0 +1,9 @@
+# Avendesora Personal Key
+# vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding='utf8' :
+#
+# This is your personal encryption key.
+# DO NOT CHANGE THIS KEY.  DO NOT SHARE THIS KEY.
+user_key = (
+    "Yl9qNXVQM0dLNl0gOklHT215UStxLmc9X0doS3osPzAoZm9QTU0sbDIkYW9ffjt+W3lqcHA8"
+    "YyxlYllgbWZHM2E6d09Zd28r"
+)
