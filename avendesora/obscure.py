@@ -1,4 +1,4 @@
-# Obscure Information
+# ObscuredSecret Information
 #
 # Defines classes used to conceal or encrypt information found in the accounts
 # file.
@@ -73,8 +73,8 @@ DECORATED_TEXT = re.compile(
     re.DOTALL,
 )
 
-# Obscure {{{1
-class Obscure(object):
+# ObscuredSecret {{{1
+class ObscuredSecret(object):
     # obscurers() {{{2
     @classmethod
     def obscurers(cls):
@@ -149,29 +149,32 @@ class Obscure(object):
 
     # __repr__() {{{2
     def __repr__(self):
-        return "Hidden('%s')" % (Obscure.hide(self.plaintext, 'base64'))
+        return "Hidden('%s')" % (ObscuredSecret.hide(self.plaintext, 'base64'))
 
     # __str__() {{{2
     def __str__(self):
         return self.render()
 
 # Hide {{{1
-class Hide(Obscure):
+class Hide(ObscuredSecret):
+    """Hide text
+
+    Marks a value as being secret.
+
+    :arg str plaintext:
+        The value of interest.
+
+    :arg bool secure:
+        Indicates that this secret is of high value and so should not be
+        found in an unencrypted accounts file.
+    """
+
     NAME = 'base64'
     DESC = '''
         Marks a value as being secret but the secret is not encoded in any way.
         Generally used in encrypted accounts files or on very low-value secrets.
     '''
     def __init__(self, plaintext, secure=True):
-        """Hide text
-
-        Marks a value as being secret.
-        plaintext (str):
-            The value of interest.
-        secure (bool):
-            Indicates that this secret is of high value and so should not be
-            found in an unencrypted accounts file.
-        """
         self.plaintext = plaintext
 
     def initialize(self, account, field_name, field_key=None):
@@ -187,7 +190,22 @@ class Hide(Obscure):
 
 
 # Hidden {{{1
-class Hidden(Obscure):
+class Hidden(ObscuredSecret):
+    """Hidden text
+
+    This encoding obscures but does not encrypt the text.
+
+    :arg str encoded_text:
+        The value of interest encoded in base64.
+
+    :arg bool secure:
+        Indicates that this secret is of high value and so should not be
+        found in an unencrypted accounts file.
+
+    :arg str encoding:
+        The encoding to use for the decoded text.
+    """
+
     NAME = 'base64'
     DESC = '''
         This encoding obscures but does not encrypt the text. It can
@@ -196,17 +214,6 @@ class Hidden(Obscure):
         decode it.
     '''
     def __init__(self, encoded_text, secure=True, encoding=None):
-        """Hidden text
-
-        This encoding obscures but does not encrypt the text.
-        encoded_text (str):
-            The value of interest encoded in base64.
-        secure:
-            Indicates that this secret is of high value and so should not be
-            found in an unencrypted accounts file.
-        encoding:
-            The encoding to use for the decoded text.
-        """
         self.encoded_text = encoded_text
         encoding = encoding if encoding else get_setting('encoding')
         try:
@@ -252,7 +259,19 @@ class Hidden(Obscure):
 
 
 # GPG {{{1
-class GPG(Obscure, GnuPG):
+class GPG(ObscuredSecret, GnuPG):
+    """GPG encrypted text
+
+    The secret is fully encrypted with GPG. Both symmetric encryption and
+    key-based encryption are supported.
+
+    :arg str ciphertext:
+        The secret encrypted and armored by GPG.
+
+    :arg str encoding:
+        The encoding to use for the deciphered text.
+    """
+
     DESC = '''
         This encoding fully encrypts/decrypts the text with GPG key.
         By default your GPG key is used, but you can specify symmetric
@@ -268,15 +287,6 @@ class GPG(Obscure, GnuPG):
     # then use a symmetric key, or perhaps a separate private key, to protect an
     # individual piece of data, like a master seed.
     def __init__(self, ciphertext, secure=True, encoding=None):
-        """GPG encrypted text
-
-        The secret is fully encrypted with GPG. Both symmetric encryption and
-        key-based encryption are supported.
-        ciphertext (str):
-            The secret encrypted and armored by GPG.
-        encoding (str):
-            The encoding to use for the deciphered text.
-        """
         self.ciphertext = ciphertext
         self.encoding = encoding
 
@@ -343,7 +353,20 @@ class GPG(Obscure, GnuPG):
 # Scrypt {{{1
 try:
     import scrypt
-    class Scrypt(Obscure):
+    class Scrypt(ObscuredSecret):
+        """Scrypt encrypted text
+
+        The secret is fully encrypted with scrypt.
+
+        Only available if scrypt is installed (pip install scrypt).
+
+        :arg str ciphertext:
+            The secret encrypted and armored by GPG.
+
+        :arg str encoding:
+            The encoding to use for the deciphered text.
+        """
+
         # This encrypts/decrypts a string with scrypt. The user's key is used as the
         # passcode for this symmetric encryption.
         DESC = '''
@@ -351,15 +374,6 @@ try:
             you can decrypt it, secrets encoded with scrypt cannot be shared.
         '''
         def __init__(self, ciphertext, secure=True, encoding='utf8'):
-            """Scrypt encrypted text
-
-            The secret is fully encrypted with scrypt. Both symmetric encryption and
-            key-based encryption are supported.
-            ciphertext (str):
-                The secret encrypted and armored by GPG.
-            encoding (str):
-                The encoding to use for the deciphered text.
-            """
             self.ciphertext = ciphertext
             self.encoding = encoding
 

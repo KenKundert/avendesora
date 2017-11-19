@@ -22,8 +22,7 @@
 # Imports {{{1
 from .config import get_setting
 from shlib import to_path
-from inform import codicil, error, warn, os_error
-from textwrap import dedent, wrap
+from inform import error, os_error
 import hashlib
 
 
@@ -38,7 +37,7 @@ class Dictionary(object):
 
         # open the dictionary
         try:
-            contents= path.read_text()
+            contents = path.read_text()
         except OSError as err:
             error(os_error(err))
             contents = ''

@@ -63,6 +63,28 @@ class Recognizer(object):
 
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):
+    """Run script if all recognizers match.
+
+    Takes one or more recognizers. Script is run if all recognizers match.
+
+    :arg Recognizer recognizer:
+        One or more instances of Recognizer.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, *recognizers, **kwargs):
         self.recognizers = recognizers
         self.script = kwargs.pop('script', True)
@@ -93,6 +115,28 @@ class RecognizeAll(Recognizer):
 
 # RecognizeAny {{{1
 class RecognizeAny(Recognizer):
+    """Run script if any recognizers match.
+
+    Takes one or more recognizers. Script is run if any recognizers match.
+
+    :arg Recognizer recognizer:
+        One or more instances of Recognizer.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, *recognizers, **kwargs):
         self.recognizers = recognizers
         self.script = kwargs.pop('script', True)
@@ -123,6 +167,29 @@ class RecognizeAny(Recognizer):
 
 # RecognizeTitle {{{1
 class RecognizeTitle(Recognizer):
+    """Run script if window title matches.
+
+    Takes one or more glob strings.
+    Script is run if window title matches any of the glob strings.
+
+    :arg str title:
+        One or more glob strings.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, *titles, **kwargs):
         self.titles = flatten(titles, split=False)
         self.script = kwargs.pop('script', True)
@@ -156,6 +223,43 @@ class RecognizeTitle(Recognizer):
 
 # RecognizeURL {{{1
 class RecognizeURL(Recognizer):
+    """Run script if URL matches.
+
+    Takes one or more URLs.
+    Script is run if URL embedded in window title matches any of the given URLs.
+    Assumes that a browser plugin has embedded the URL in the browser's window
+    title.  This is generally safer and more robust that RecognizeTitle when
+    trying to match web pages.
+
+    When giving the URL, anything specified must match and globbing is
+    not supported. If you give a partial path, by default Avendesora
+    will match up to what you have given, but you can require an exact
+    match of the entire path by specifying exact_path=True to
+    RecognizeURL.  If you do not give the protocol, the default_protocol
+    (https) is assumed.
+
+    :arg str url:
+        One or more URLs.
+
+    :arg bool exact_path:
+        If True, path given in the URL must be matched completely, partial
+        matches are ignored.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, *urls, **kwargs):
         self.urls = flatten(urls, split=True)
         self.script = kwargs.pop('script', True)
@@ -227,6 +331,29 @@ class RecognizeURL(Recognizer):
 
 # RecognizeCWD {{{1
 class RecognizeCWD(Recognizer):
+    """Run script if current working directory matches.
+
+    Takes one or more paths.  Script is run if any path refers to the current
+    working directory.
+
+    :arg str path:
+        One or more directory paths.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, *dirs, **kwargs):
         self.dirs = flatten(dirs, split=True)
         self.script = kwargs.pop('script', True)
@@ -256,6 +383,29 @@ class RecognizeCWD(Recognizer):
 
 # RecognizeHost {{{1
 class RecognizeHost(Recognizer):
+    """Run script if host name matches.
+
+    Takes one or more host names.
+    Script is run if the current host name matches one of the given host names.
+
+    :arg str host:
+        One or more host names.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, *hosts, **kwargs):
         self.hosts = flatten(hosts, split=True)
         self.script = kwargs.pop('script', True)
@@ -285,6 +435,29 @@ class RecognizeHost(Recognizer):
 
 # RecognizeUser {{{1
 class RecognizeUser(Recognizer):
+    """Run script if user name matches.
+
+    Takes one or more user names.
+    Script is run if the current user name matches one of the given user names.
+
+    :arg str user:
+        One or more user names.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, *users, **kwargs):
         self.users = flatten(users, split=True)
         self.script = kwargs.pop('script', True)
@@ -312,6 +485,31 @@ class RecognizeUser(Recognizer):
 
 # RecognizeEnvVar {{{1
 class RecognizeEnvVar(Recognizer):
+    """Run script if environment variable matches.
+
+    Script is run if the environment variable exists and its value matches the value given.
+
+    :arg str name:
+        Name of environment variable.
+
+    :arg str value:
+        Value of environment variable.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
+    """
+
     def __init__(self, name, value, script=True):
         self.name = name
         self.value = value
@@ -335,11 +533,29 @@ class RecognizeEnvVar(Recognizer):
 
 # RecognizeNetwork {{{1
 class RecognizeNetwork(Recognizer):
-    """Recognize network from MAC address
+    """Recognize network from MAC address.
 
     Matches if any of the MAC addresses reported by /sbin/arp match any of those
     given as an argument.
+
+    :arg str mac:
+        MAC address given in the form: '00:c9:a9:f7:30:00'.
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
     """
+
     def __init__(self, *macs, **kwargs):
         self.macs = flatten(macs, split=True)
         self.script = kwargs.pop('script', True)
@@ -376,9 +592,32 @@ class RecognizeNetwork(Recognizer):
 
 # RecognizeFile {{{1
 class RecognizeFile(Recognizer):
-    """Recognize file
+    """Recognize file.
 
-    Triggers if file exists and was created within the last few seconds.
+    Matches if file exists and was created within the last few seconds.
+
+    :arg str filepath:
+        Path to file.
+
+    :arg str contents:
+        Expected file contents. If given, should match contents of file.
+
+    :arg str wait:
+        Do not match if file is older than this value (seconds).
+
+    :arg script:
+        A script that indicates the text that should be typed to active
+        application. The names of fields can be included in the script
+        surrounded by braces, in which case the value of the field replaces the
+        field reference.  For example, *Script('username: {username}, password:
+        {passcode}')*. In this case, *{username}* and *{passcode}* are replaced
+        by with the value of the corresponding account attribute. In addition to
+        the fields, *{tab}* and *{return}* are replaced by a tab or carriage
+        return character, and *{sleep N}* causes the typing to pause for *N*
+        seconds.
+
+        If True is give, the default field is produced followed by a return.
+    :type script: str or True
     """
     def __init__(self, filepath, contents=None, wait=60, **kwargs):
         self.filepath = to_path(filepath)

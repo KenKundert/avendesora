@@ -15,7 +15,19 @@ or:
 def exclude(chars, exclusions):
     """Exclude Characters
 
-    Use this to strip characters from a character set.
+    Use this to remove characters from a character set.
+
+    :arg str chars:
+        Character set to strip.
+
+    :arg str exclusions:
+        Characters to remove from character set.
+
+    Example::
+
+        >>> exclude('ABCDEF', 'AEF')
+        'BCD'
+
     """
     try:
         # this version is compatible with python3
@@ -26,15 +38,39 @@ def exclude(chars, exclusions):
 
 # Character sets
 # Use these to construct alphabets by summing together the ones you want.
+
+# Lower case ASCII letters.
 LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+
+# Upper case ASCII letters.
 UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+# Upper and lower case ASCII letters.
 LETTERS = LOWERCASE + UPPERCASE
+
+# ASCII digits.
 DIGITS = "0123456789"
+
+# ASCII letters and digits.
 ALPHANUMERIC = LETTERS + DIGITS
+
+# Hexidecimal digits.
 HEXDIGITS = "0123456789abcdef"
+
+# ASCII punctuation characters.
 PUNCTUATION = r"""!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"""
-SYMBOLS = exclude(PUNCTUATION, r"""'"`\\""")
+
+# ASCII punctuation characters excluding ', ", `, and \.
+SYMBOLS = exclude(PUNCTUATION, """'"`\\""")
+
+# ASCII white space characters (excluding newlines).
 WHITESPACE = " \t"
+
+# All ASCII printable characters (letters, digits, punctuation, whitespace).
 PRINTABLE = ALPHANUMERIC + PUNCTUATION + WHITESPACE
+
+# ASCII letters and digits with easily confused characters removed).
 DISTINGUISHABLE = exclude(ALPHANUMERIC, 'Il1O0')
+
+# ASCII characters that are typed using the shift key.
 SHIFTED = UPPERCASE + '~!@#$%^&*()_+{}|:"<>?'

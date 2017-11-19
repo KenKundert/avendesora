@@ -311,8 +311,6 @@ def test_credentials():
         Options:
             -S, --seed              Interactively request additional seed for
                                     generated secrets.
-            -v, --verbose           Add additional information to log file to
-                                    help identify issues in account discovery.
 
         The credentials can be specified explicitly using the credentials
         setting in your account. For example::
@@ -321,6 +319,7 @@ def test_credentials():
 
         If credentials is not specified then the first of the following will
         be used if available:
+
             id: username or email
             secret: passcode, password or passphrase
     """).strip()
@@ -475,6 +474,25 @@ def test_initialize():
     """).strip()
     assert result.decode('utf-8') == expected
 
+# test_log() {{{1
+def test_log():
+    try:
+        result = run('avendesora help log')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Open the logfile.
+
+        Usage:
+            avendesora log
+
+        Opens the logfile in your editor.
+
+        You can specify the editor by changing the 'edit_account' setting in
+        the config file (~/.config/avendesora/config).
+    """).strip()
+    assert result.decode('utf-8') == expected
+
 # test_new() {{{1
 def test_new():
     try:
@@ -505,6 +523,26 @@ def test_new():
         found on many computers.
 
         Add a '.gpg' extension to <name> to encrypt the file.
+    """).strip()
+    assert result.decode('utf-8') == expected
+
+# test_phonetic() {{{1
+def test_phonetic():
+    try:
+        result = run('avendesora help phonetic')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Display the NATO phonetic alphabet.
+
+        Usage:
+            avendesora alphebet [<text>]
+            avendesora phonetic [<text>]
+            avendesora p [<text>]
+
+        If <text> is given, it is converted character by character to the
+        phonetic alphabet. If not given, the entire phonetic alphabet is
+        displayed.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -767,26 +805,28 @@ def test_accounts():
 
         A dictionary is often used to hold account numbers:
 
-            accounts = {
-                'checking': '1234-56-7890',
-                'savings': '0123-45-6789',
-            }
+            class Bank(Account):
+                accounts = {
+                    'checking': '1234-56-7890',
+                    'savings': '0123-45-6789',
+                }
 
         You then access its values using:
 
-            > avendesora value newyorktimes accounts.checking
+            > avendesora value bank accounts.checking
             accounts.checking: 1234-56-7890
 
         You might consider your account numbers as sensitive information. In
         this case you can hide them with:
 
-            accounts = {
-                'checking': Hidden('MTIzNC01Ni03ODkw'),
-                'savings': Hidden('MDEyMy00NS02Nzg5'),
-            }
+            class Bank(Account):
+                accounts = {
+                    'checking': Hidden('MTIzNC01Ni03ODkw'),
+                    'savings': Hidden('MDEyMy00NS02Nzg5'),
+                }
 
         The values are now hidden, but not encrypted. They are simply
-        encoded with base64. Any knowledgable person with the encoded value
+        encoded with base64. Any knowledgeable person with the encoded value
         can decode it back to its original value. Using Hidden makes it
         harder to recognize and remember the value given only a quick
         over-the-shoulder glance. It also marks the value as sensitive, so
@@ -796,8 +836,8 @@ def test_accounts():
         You can find the specifics of how to specify or generate your
         secrets by running 'avendesora help secrets'.
 
-        Any value that is an instance of the Secret class (Password,
-        Passphrase, ...) or the Obscure class (Hidden, GPG, ...) are
+        Any value that is an instance of the GeneratedSecret class (Password,
+        Passphrase, ...) or the ObscuredSecret class (Hidden, GPG, ...) are
         considered sensitive. They are given out only in a controlled
         manner. For example, running 'avendesora values' displays all
         fields, but the values that are sensitive are replaced by
@@ -822,8 +862,8 @@ def test_accounts():
         of available browsers.
 
         The value of passcode is considered sensitive because it is an
-        instance of PasswordRecipe, which is a subclass of Secret.  If we
-        wish to see the passcode, use:
+        instance of PasswordRecipe, which is a subclass of GeneratedSecret.
+        If we wish to see the passcode, use:
 
             > avendesora value nyt
             passcode: TZuk8:u7qY8%
@@ -855,11 +895,11 @@ def test_accounts():
             > avendesora value wifi guest
             SSID: huron_guests, password: delimit ballcock fibber levitate
 
-        Use of Avendesora classes (Secret, Obscure, or Script) is confined
-        to the top two levels of account attributes, meaning that they can
-        be the value of the top-level attributes, or the top-level
-        attributes may be arrays or dictionaries that contain objects of
-        these classes, but it can go no further.
+        Use of Avendesora classes (GeneratedSecret, ObscuredSecret, or
+        Script) is confined to the top two levels of account attributes,
+        meaning that they can be the value of the top-level attributes, or
+        the top-level attributes may be arrays or dictionaries that contain
+        objects of these classes, but it can go no further.
 
         By default the account name is taken to be the class name converted
         to lower case.  So the name for the NewYorkTimes account given above
@@ -1325,7 +1365,7 @@ def test_overview():
         combinations for him to try (this represents a minimum entropy of 53
         bits).  Using six words results in 80 bits of entropy, which meets
         the threshold recommended by NIST for the most secure pass phrases.
-        For more on this, see 'avendesora help entropy' below.
+        For more on this, see 'avendesora help entropy'.
 
         For another perspective on the attractiveness of pass phrases, see
         http://xkcd.com/936/.

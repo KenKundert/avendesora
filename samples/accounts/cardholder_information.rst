@@ -16,7 +16,7 @@ on the Costco website.  You can configure Avendesora to automatically enter your
 credit card information into the Costco site with by adding an account discovery 
 entry to your Citibank account as follows::
 
-    class CostcoCitiVisa(Account): # {{{1
+    class CostcoCitiVisa(Account):
         aliases = 'citi costcovisa'
         username = 'giddy2050'
         email = 'herbie@telegen.com'
@@ -76,7 +76,7 @@ Now the account can be given in its final form. This differs from the one above
 in that the *account* and *cvv* values are concealed and the delays were added 
 to the Costco script.
 
-    class CostcoCitiVisa(Account): # {{{1
+    class CostcoCitiVisa(Account):
         aliases = 'citi costcovisa'
         username = 'giddy2050'
         email = 'herbie@telegen.com'

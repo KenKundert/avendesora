@@ -22,10 +22,10 @@
 from .browsers import StandardBrowser
 from .collection import Collection
 from .config import get_setting
-from .obscure import Obscure
+from .obscure import ObscuredSecret
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
-from .secrets import Secret
+from .secrets import GeneratedSecret
 from inform import (
     Color, codicil, conjoin, cull, debug, Error, is_collection, is_str, log,
     notify, output, warn, indent,
@@ -37,7 +37,6 @@ try:
 except ImportError:
     from urlparse import urlparse
 import re
-import sys
 
 
 # Globals {{{1
@@ -48,9 +47,11 @@ LabelColor = Color(
     enable=Color.isTTY()
 )
 
+
 # Utilities {{{1
 def canonicalize(name):
     return name.replace('-', '_').lower()
+
 
 # AccountValue class {{{1
 class AccountValue:
@@ -97,7 +98,7 @@ class AccountValue:
 
         # build list of arguments, deleting any that is not set
         args = {
-            k:v for k,v in [
+            k: v for k, v in [
                 ('f', self.field),
                 ('k', self.key),
                 ('n', self.name),
@@ -121,18 +122,19 @@ class AccountValue:
         for each in [str(self), self.is_secret, self.name, self.desc]:
             yield each
 
+
 # Script class {{{1
 class Script:
     """Script
 
     Takes a string that contains attributes. Those attributes are expanded
-    before being output. For example, 'username: {username}, password:
-    {passcode}'. In this case, {username} and {passcode} are replaced by with
+    before being output. For example, *Script('username: {username}, password:
+    {passcode}')*. In this case, *{username}* and *{passcode}* are replaced by with
     the value of the corresponding account attribute. In addition to the account
-    attributes, {tab} and {return} are replaced by a tab or carriage return
+    attributes, *{tab}* and *{return}* are replaced by a tab or carriage return
     character.
     """
-    def __init__(self, script = 'username: {username}, password: {passcode}'):
+    def __init__(self, script='username: {username}, password: {passcode}'):
         self.script = script
         self.is_secret = False
         self.account = None
@@ -166,6 +168,7 @@ class Script:
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.script)
+
 
 # Account class {{{1
 class Account(object):
@@ -214,7 +217,6 @@ class Account(object):
     @classmethod
     def request_seed(cls):
         return getattr(cls, '_interactive_seed', False)
-
 
     # preprocess() {{{2
     @classmethod
@@ -293,7 +295,6 @@ class Account(object):
                 elif target in value.lower():
                     return True
             except AttributeError:
-                # is not a string, and so 
                 pass
         return False
 
@@ -323,7 +324,7 @@ class Account(object):
             if host == data.get('host'):
                 if (protocol == data.get('protocol')):
                     if verbose:
-                        log('    %s: matches.' % self.get_name())
+                        log('    %s: matches.' % cls.get_name())
                     yield None, True
                     return
                 else:
@@ -354,35 +355,35 @@ class Account(object):
                 )
 
         # do some more error checking
-        if isinstance(getattr(cls, 'master', None), Secret):
+        if isinstance(getattr(cls, 'master', None), GeneratedSecret):
             raise Error(
-                'master must not be a subclass of Secret.',
+                'master must not be a subclass of GeneratedSecret.',
                 culprit=cls.get_name()
             )
 
     # keys() {{{2
     @classmethod
-    def keys(cls, all=False):
-        for key in sorted(cls.__dict__):
-            if not key.startswith('_') and (all or key not in TOOL_FIELDS):
-                yield key
+    def fields(cls, all=False):
+        for field in sorted(cls.__dict__):
+            if not field.startswith('_') and (all or field not in TOOL_FIELDS):
+                yield field
 
     # items() {{{2
     @classmethod
     def items(cls, all=False):
-        for key in cls.keys(all):
-            yield key, getattr(cls, key)
+        for field in cls.fields(all):
+            yield field, getattr(cls, field)
 
     # get_fields() {{{2
     @classmethod
     def get_fields(cls, all=False):
-        for key in sorted(cls.__dict__):
-            if not key.startswith('_') and (all or key not in TOOL_FIELDS):
-                value = getattr(cls, key)
+        for field in sorted(cls.__dict__):
+            if not field.startswith('_') and (all or field not in TOOL_FIELDS):
+                value = getattr(cls, field)
                 if is_collection(value):
-                    yield key, Collection(value).keys()
+                    yield field, Collection(value).keys()
                 else:
-                    yield key, None
+                    yield field, None
 
     # get_scalar() {{{2
     @classmethod
@@ -432,7 +433,7 @@ class Account(object):
         # initialize the value if needed
         try:
             value.initialize(cls, name, key)
-                 # if Secret or Script, initialize otherwise raise exception
+                # if Secret or Script, initialize otherwise raise exception
         except AttributeError as err:
             pass
         return value
@@ -442,10 +443,10 @@ class Account(object):
     def is_secret(cls, name, key=None):
         value = cls.__dict__.get(name)
         if key is None:
-            return isinstance(value, (Secret, Obscure))
+            return isinstance(value, (GeneratedSecret, ObscuredSecret))
         else:
             try:
-                return isinstance(value, (Secret, Obscure))
+                return isinstance(value, (GeneratedSecret, ObscuredSecret))
             except (IndexError, KeyError, TypeError):
                 raise Error('not found.', culprit=cls.combine_field(name, key))
 
@@ -469,10 +470,10 @@ class Account(object):
         if field is None:
             field = cls.get_scalar('default', default=None)
 
-        # convert field into integer if posible
+        # convert field into integer if possible
         try:
             field = int(field)
-        except:
+        except (ValueError, TypeError):
             pass
 
         # separate field into name and key
@@ -602,7 +603,6 @@ class Account(object):
                 desc = None
         return AccountValue(value, is_secret, name, key, desc)
 
-
     # get_values() {{{2
     @classmethod
     def get_values(cls, name):
@@ -645,21 +645,21 @@ class Account(object):
                 result = {}
                 for key in value.keys():
                     v = cls.get_scalar(name, key)
-                    if isinstance(v, Secret) or isinstance(v, Obscure):
+                    if isinstance(v, GeneratedSecret) or isinstance(v, ObscuredSecret):
                         v = str(v)
                     result[key] = v
             elif type(value) is list:
                 result = []
                 for index in range(len(value)):
                     v = cls.get_scalar(name, index)
-                    if isinstance(v, Secret) or isinstance(v, Obscure):
+                    if isinstance(v, GeneratedSecret) or isinstance(v, ObscuredSecret):
                         v = str(v)
                     result.append(v)
             else:
                 raise NotImplementedError
         else:
             result = cls.get_scalar(name)
-            if isinstance(result, Secret) or isinstance(result, Obscure):
+            if isinstance(result, GeneratedSecret) or isinstance(result, ObscuredSecret):
                 result = str(result)
         return result
 
@@ -688,7 +688,7 @@ class Account(object):
         def extract_collection(name, collection):
             lines = [fmt_field(key)]
             for k, v in Collection(collection).items():
-                if isinstance(v, (Secret, Obscure)):
+                if isinstance(v, (GeneratedSecret, ObscuredSecret)):
                     # is a secret, get description if available
                     v = ' '.join(cull([v.get_description(), reveal(name, k)]))
                 lines.append(fmt_field(k, v, level=1))
@@ -777,11 +777,30 @@ class Account(object):
             url = list(Collection(urls))[0]  # use the first url specified
             browser.run(url)
 
-
     # has_field() {{{2
     @classmethod
     def has_field(cls, name):
         return name in dir(cls)
+
+    # get_username() {{{2
+    @classmethod
+    def get_username(cls):
+        identities = Collection(get_setting('credential_ids'))
+        for identity in identities:
+            try:
+                return cls.get_value(identity)
+            except Error:
+                pass
+
+    # get_passcode() {{{2
+    @classmethod
+    def get_passcode(cls):
+        secrets = Collection(get_setting('credential_secrets'))
+        for passcode in secrets:
+            try:
+                return cls.get_value(passcode)
+            except Error:
+                pass
 
 
 # StealthAccount class {{{1
@@ -826,4 +845,3 @@ class StealthAccount(Account):
     def archive(cls):
         # do not archive stealth accounts
         pass
-

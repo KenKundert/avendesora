@@ -1,10 +1,10 @@
 # Secrets
 #
-# Secret is a base class that can be used to easily generate various types of 
-# secretes. Basically, it gathers together a collection of strings (the arguments 
-# of the constructor and the generate function) that are joined together and 
-# hashed. The 512 bit hash is then used to generate passwords, passphrases, and 
-# other secrets.
+# GeneratedSecret is a base class that can be used to easily generate various
+# types of secretes. Basically, it gathers together a collection of strings (the
+# arguments of the constructor and the generate function) that are joined
+# together and hashed. The 512 bit hash is then used to generate passwords,
+# passphrases, and other secrets.
 #
 
 # Ignore {{{1
@@ -12,20 +12,21 @@
 The following code should be ignored. It is defined here for the use of the 
 doctests::
 
->>> from avendesora.secrets import *
->>> class Account(object):
-...     def get_scalar(self, name, default=None):
-...          if name == 'master':
-...              return 'fux'
-...          else:
-...              return None
-...     def get_name(self):
-...          return 'pux'
-...     def get_seed(self):
-...          return 'pux'
-...     def request_seed(self):
-...          return False
->>> account = Account()
+    >>> from avendesora.secrets import *
+    >>> from avendesora.charsets import *
+    >>> class Account(object):
+    ...     def get_scalar(self, name, default=None):
+    ...          if name == 'master':
+    ...              return 'fux'
+    ...          else:
+    ...              return None
+    ...     def get_name(self):
+    ...          return 'pux'
+    ...     def get_seed(self):
+    ...          return 'pux'
+    ...     def request_seed(self):
+    ...          return False
+    >>> account = Account()
 
 """
 
@@ -53,7 +54,7 @@ from .charsets import (
 )
 from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
-from .obscure import Obscure
+from .obscure import ObscuredSecret
 from .utilities import error_source
 from inform import Error, cull, log, output, terminate, warn, is_str
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
@@ -76,12 +77,12 @@ def shift_sort_join(chars, sep=''):
 def simple_join(chars, sep=''):
     return sep.join(chars)
 
-# Secret {{{1
-class Secret(object):
+# GeneratedSecret {{{1
+class GeneratedSecret(object):
     """Base class for generated secrets"""
 
     def __new__(cls, *args, **kwargs):
-        self = super(Secret, cls).__new__(cls)
+        self = super(GeneratedSecret, cls).__new__(cls)
         self.reset()
         return self
 
@@ -217,7 +218,7 @@ class Secret(object):
         [0:radix). The sequence of numbers seems random, but it is determined by 
         the components that are passed into the constructor.
 
-        >>> secret = Secret()
+        >>> secret = GeneratedSecret()
         >>> secret.initialize(account, 'dux')
         >>> ' '.join([str(i) for i in secret._partition(100, 10)])
         '89 80 17 20 34 40 79 1 93 42'
@@ -240,7 +241,7 @@ class Secret(object):
         sequence is *num_symbols* and each symbol is chosen uniformly from the 
         alphabet.
 
-        >>> secret = Secret()
+        >>> secret = GeneratedSecret()
         >>> secret.initialize(account, 'dux')
         >>> ' '.join(secret._symbols([str(i) for i in range(100)], 10))
         '89 80 17 20 34 40 79 1 93 42'
@@ -275,7 +276,7 @@ class Secret(object):
         Can be called repeatedly with different values for the radix until the 
         secret is exhausted.
 
-        >>> secret = Secret()
+        >>> secret = GeneratedSecret()
         >>> secret.initialize(account, 'dux')
         >>> ' '.join([str(secret._get_index(100)) for i in range(10)])
         '89 80 17 20 34 40 79 1 93 42'
@@ -300,7 +301,7 @@ class Secret(object):
         Can be called repeatedly with different values for the radix until the 
         secret is exhausted.
 
-        >>> secret = Secret()
+        >>> secret = GeneratedSecret()
         >>> secret.initialize(account, 'dux')
         >>> ' '.join([str(secret._get_symbol(range(100))) for i in range(10)])
         '89 80 17 20 34 40 79 1 93 42'
@@ -333,29 +334,74 @@ class Secret(object):
 
     # __repr__() {{{2
     def __repr__(self):
-        return "Hidden('%s')" % Obscure.hide(str(self))
+        return "Hidden('%s')" % ObscuredSecret.hide(str(self))
 
     # __str__() {{{2
     def __str__(self):
         return self.render()
 
 # Password {{{1
-class Password(Secret):
-    """
-    A relatively high level subclass of Secret that is used to generate 
-    passwords and passphrases. For passwords, pass in a string containing all 
-    the characters available to the passwords as the alphabet and make sep an 
-    empty string.  For passphrases, pass in a list of words as the alphabet and 
-    make sep a space.
+class Password(GeneratedSecret):
+    """Generate password
 
-    >>> import string
-    >>> alphabet = string.ascii_letters + string.digits
-    >>> secret = Password()
-    >>> secret.initialize(account, 'dux')
-    >>> str(secret)
-    'tvA8mewbbig3'
+    Generates an arbitrary password by selecting symbols from the given
+    alphabet at random. The entropy of the generated password is
+    length*log2(len(alphabet)).
+
+    :arg int length:
+        The number of items to draw from the alphabet when creating the
+        password.
+
+    :arg str alphabet:
+        The reservoir of legal symbols to use when creating the password. By
+        default the set of easily distinguished alphanumeric characters are
+        used (DISTINGUISHABLE). Typically you would use the pre-imported
+        character sets to construct the alphabet. For example, you might pass:
+        ALPHANUMERIC + '+=_&%#@'
+
+    :arg str master:
+        Overrides the master seed that is used when generating the password.
+        Generally, there is one master seed shared by all accounts contained
+        in an account file.  This argument overrides that behavior and
+        instead explicitly specifies the master seed for this secret.
+
+    :arg str version:
+        An optional seed. Changing this value will change the generated
+        password.
+
+    :arg bool shift_sort:
+        If true, the characters in the password will be sorted so that the
+        characters that require the shift key when typing are placed last.
+
+    :arg str sep:
+        A string that is placed between each symbol in the generated
+        password.
+
+    :arg str prefix:
+        A string added to the front of the generated password.
+
+    :arg str suffix:
+        A string added to the end of the generated password.
+
+    Examples::
+
+        >>> secret = Password()
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        'tvA8mewbbig3'
+
+        >>> secret = Password(shift_sort=True)
+        >>> secret.initialize(account, 'flux')
+        >>> str(secret)
+        'wrncpipvtNPF'
 
     """
+    # A relatively high level subclass of GeneratedSecret that is used to generate 
+    # passwords and passphrases. For passwords, pass in a string containing all 
+    # the characters available to the passwords as the alphabet and make *sep* an 
+    # empty string.  For passphrases, pass in a list of words as the alphabet and 
+    # make *sep* a space::
+
     def __init__(self,
         length=12,
         alphabet=DISTINGUISHABLE,
@@ -366,40 +412,6 @@ class Password(Secret):
         prefix='',
         suffix='',
     ):
-        """Generate password
-
-        Generates an arbitrary password by selecting symbols from the given
-        alphabet at random. The entropy of the generated password is
-        length*log2(len(alphabet)).
-
-        length (int):
-            The number of items to draw from the alphabet when creating the
-            password.
-        alphabet (str):
-            The reservoir of legal symbols to use when creating the password. By
-            default the set of easily distinguished alphanumeric characters are
-            used. Typically you would use the pre-imported character sets to
-            construct the alphabet. For example, you might pass:
-                ALPHANUMERIC + '+=_&%#@'
-        master (str):
-            Overrides the master seed that is used when generating the password.
-            Generally, there is one master seed shared by all accounts contained
-            in an account file.  This argument overrides that behavior and
-            instead explicitly specifies the master seed for this secret.
-        version (str):
-            An optional seed. Changing this value will change the generated
-            password.
-        shift_sort (bool):
-            If true, the characters in the password will be sorted so that the
-            characters that require the shift key when typing are placed last.
-        sep (str):
-            A string that is placed between each symbol in the generated
-            password.
-        prefix (str):
-            A string added to the front of the generated password.
-        suffix (str):
-            A string added to the end of the generated password.
-        """
         try:
             self.length = int(length)
         except ValueError:
@@ -432,15 +444,47 @@ class Password(Secret):
 
 # Passphrase {{{1
 class Passphrase(Password):
-    """
-    Identical to Password() except with different default values that will by 
-    generate pass phrases rather than passwords.
+    """Generate passphrase
 
-    >>> import string
-    >>> secret = Passphrase()
-    >>> secret.initialize(account, 'dux')
-    >>> str(secret)
-    'graveyard cockle intone provider'
+    Similar to Password in that it generates an arbitrary pass phrase by
+    selecting symbols from the given alphabet at random, but in this case
+    the default alphabet is a dictionary containing about 10,000 words.
+
+    :arg int length:
+        The number of items to draw from the alphabet when creating the
+        password.
+
+    :arg alphabet:
+        The reservoir of legal symbols to use when creating the password.
+        By default this is a list of 10,000 words.
+    :type alphabet: list of strings
+
+    :arg str master:
+        Overrides the master seed that is used when generating the password.
+        Generally, there is one master seed shared by all accounts contained
+        in an account file.  This argument overrides that behavior and
+        instead explicitly specifies the master seed for this secret.
+
+    :arg str version:
+        An optional seed. Changing this value will change the generated
+        password.
+
+    :arg str sep:
+        A string that is placed between each symbol in the generated
+        password.
+
+    :arg str prefix:
+        A string added to the front of the generated password.
+
+    :arg str suffix:
+        A string added to the end of the generated password.
+
+    Example::
+
+        >>> secret = Passphrase()
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        'graveyard cockle intone provider'
 
     """
     def __init__(self,
@@ -452,33 +496,6 @@ class Passphrase(Password):
         prefix='',
         suffix='',
     ):
-        """Generate passphrase
-
-        Similar to Password in that it generates an arbitrary pass phrase by
-        selecting symbols from the given alphabet at random, but in this case
-        the default alphabet is a dictionary containing about 10,000 words.
-
-        length (int):
-            The number of items to draw from the alphabet when creating the
-            password.
-        alphabet (list of strs):
-            The reservoir of legal symbols to use when creating the password.
-        master (str):
-            Overrides the master seed that is used when generating the password.
-            Generally, there is one master seed shared by all accounts contained
-            in an account file.  This argument overrides that behavior and
-            instead explicitly specifies the master seed for this secret.
-        version (str):
-            An optional seed. Changing this value will change the generated
-            password.
-        sep (str):
-            A string that is placed between each symbol in the generated
-            password.
-        prefix (str):
-            A string added to the front of the generated password.
-        suffix (str):
-            A string added to the end of the generated password.
-        """
         try:
             self.length = int(length)
         except ValueError:
@@ -496,16 +513,46 @@ class Passphrase(Password):
 
 # PIN {{{1
 class PIN(Password):
-    """
-    Identical to Password() except with different default values that will by 
-    default generate pass PINs rather than passwords.
+    """Generate PIN
 
-    >>> import string
-    >>> alphabet = string.ascii_letters + string.digits
-    >>> secret = PIN()
-    >>> secret.initialize(account, 'dux')
-    >>> str(secret)
-    '9301'
+    Similar to Password in that it generates an arbitrary PIN by
+    selecting symbols from the given alphabet at random, but in this case
+    the default alphabet is the set of digits (0-9).
+
+    :arg int length:
+        The number of items to draw from the alphabet when creating the
+        password.
+
+    :arg str alphabet:
+        The reservoir of legal symbols to use when creating the password.
+        By default the alphabet is DIGITS.
+
+    :arg str master:
+        Overrides the master seed that is used when generating the password.
+        Generally, there is one master seed shared by all accounts contained
+        in an account file.  This argument overrides that behavior and
+        instead explicitly specifies the master seed for this secret.
+
+    :arg str version:
+        An optional seed. Changing this value will change the generated
+        password.
+
+    :arg str sep:
+        A string that is placed between each symbol in the generated
+        password.
+
+    :arg str prefix:
+        A string added to the front of the generated password.
+
+    :arg str suffix:
+        A string added to the end of the generated password.
+
+    Example::
+
+        >>> secret = PIN()
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        '9301'
 
     """
     def __init__(self,
@@ -514,33 +561,6 @@ class PIN(Password):
         master=None,
         version=None,
     ):
-        """Generate PIN
-
-        Similar to Password in that it generates an arbitrary PIN by
-        selecting symbols from the given alphabet at random, but in this case
-        the default alphabet is the set of digits (0-9).
-
-        length (int):
-            The number of items to draw from the alphabet when creating the
-            password.
-        alphabet (str):
-            The reservoir of legal symbols to use when creating the password.
-        master (str):
-            Overrides the master seed that is used when generating the password.
-            Generally, there is one master seed shared by all accounts contained
-            in an account file.  This argument overrides that behavior and
-            instead explicitly specifies the master seed for this secret.
-        version (str):
-            An optional seed. Changing this value will change the generated
-            password.
-        sep (str):
-            A string that is placed between each symbol in the generated
-            password.
-        prefix (str):
-            A string added to the front of the generated password.
-        suffix (str):
-            A string added to the end of the generated password.
-        """
         try:
             self.length = int(length)
         except ValueError:
@@ -558,16 +578,54 @@ class PIN(Password):
 
 # Question {{{1
 class Question(Passphrase):
-    """
-    Identical to Passphrase() except a question must be specified when
-    created and is taken to be the security question. The question is used
+    """Generate arbitrary answer to a given question
+
+    Similar to Passphrase() except a question must be specified when created
+    and it is taken to be the security question. The question is used as a seed
     rather than the field name when generating the secret.
 
-    >>> import string
-    >>> secret = Question('What city were you born in?')
-    >>> secret.initialize(account, 'dux')
-    >>> str(secret)
-    'dustcart olive label'
+    :arg str question:
+        The question to be answered. Be careful. Changing the question in
+        any way will change the resulting answer.
+
+    :arg int length:
+        The number of items to draw from the alphabet when creating the
+        password.
+
+    :arg alphabet:
+        The reservoir of legal symbols to use when creating the password.
+    :type alphabet: list of strings
+
+    :arg str master:
+        Overrides the master seed that is used when generating the password.
+        Generally, there is one master seed shared by all accounts contained
+        in an account file.  This argument overrides that behavior and
+        instead explicitly specifies the master seed for this secret.
+
+    :arg str version:
+        An optional seed. Changing this value will change the generated
+        password.
+
+    :arg str sep:
+        A string that is placed between each symbol in the generated
+        password.
+
+    :arg str prefix:
+        A string added to the front of the generated password.
+
+    :arg str suffix:
+        A string added to the end of the generated password.
+
+    :arg str answer:
+        The answer. If provided, this would override the generated answer.
+        May be a string, or it may be an Obscured object.
+
+    Example:
+
+        >>> secret = Question('What city were you born in?')
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        'dustcart olive label'
 
     """
     # Generally the user will want to give several security questions, which
@@ -592,39 +650,6 @@ class Question(Passphrase):
         suffix='',
         answer=None,
     ):
-        """Generate arbitrary answer to a given question
-
-        Similar to Passphrase() except a question must be specified when created
-        and it is taken to be the security question. The question is used rather
-        than the field name when generating the secret.
-
-        question (str):
-            The question to be answered. Be careful. Changing the question in
-            any way will change the resulting answer.
-        length (int):
-            The number of items to draw from the alphabet when creating the
-            password.
-        alphabet (list of strs):
-            The reservoir of legal symbols to use when creating the password.
-        master (str):
-            Overrides the master seed that is used when generating the password.
-            Generally, there is one master seed shared by all accounts contained
-            in an account file.  This argument overrides that behavior and
-            instead explicitly specifies the master seed for this secret.
-        version (str):
-            An optional seed. Changing this value will change the generated
-            password.
-        sep (str):
-            A string that is placed between each symbol in the generated
-            password.
-        prefix (str):
-            A string added to the front of the generated password.
-        suffix (str):
-            A string added to the end of the generated password.
-        answer:
-            The answer. If provided, this would override the generated answer.
-            May be a string, or it may be an Obscured object.
-        """
         self.question = question
         try:
             self.length = int(length)
@@ -655,11 +680,11 @@ class Question(Passphrase):
     # __repr__() {{{2
     def __repr__(self):
         return "Question(%r, answer=Hidden(%r))" % (
-            self.question, Obscure.hide(str(self))
+            self.question, ObscuredSecret.hide(str(self))
         )
 
 # MixedPassword {{{1
-class MixedPassword(Secret):
+class MixedPassword(GeneratedSecret):
     """
     A relatively low level method that is used to generate passwords from 
     a heterogeneous collection of alphabets. This is used to satisfy the 
@@ -667,20 +692,14 @@ class MixedPassword(Secret):
     a list of pairs. Each pair consists of an alphabet and the number of 
     characters required from that alphabet. All other characters are chosen 
     from the default alphabet (*def_alphabet*) until the password has the 
-    required number of characters (*num_symbols*).
+    required number of characters (*num_symbols*)::
 
-    >>> import string
-    >>> lowercase = string.ascii_lowercase
-    >>> uppercase = string.ascii_uppercase
-    >>> digits = string.digits
-    >>> punctuation = string.punctuation
-    >>> base = lowercase + uppercase + digits
-    >>> secret = MixedPassword(
-    ...     12, base, [(lowercase, 2), (uppercase, 2), (digits, 2)]
-    ... )
-    >>> secret.initialize(account, 'dux')
-    >>> str(secret)
-    'ZyW62fvxX0Fg'
+        >>> secret = MixedPassword(
+        ...     12, ALPHANUMERIC, [(LOWERCASE, 2), (UPPERCASE, 2), (DIGITS, 2)]
+        ... )
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        'ZyW62fvxX0Fg'
 
     """
     def __init__(
@@ -775,17 +794,17 @@ class PasswordRecipe(MixedPassword):
 
     The c class is special in that it allow you to explicitly specify the
     characters to use. For example, '12 2c!@#$%^&=' directs that a 12 character
-    password be generated, 2 of which are taken from the set !@#$%^&=.
+    password be generated, 2 of which are taken from the set !@#$%^&=::
 
-    >>> secret = PasswordRecipe('12 2u 2d 2s')
-    >>> secret.initialize(account, 'pux')
-    >>> str(secret)
-    '*m7Aqj=XBAs7'
+        >>> secret = PasswordRecipe('12 2u 2d 2s')
+        >>> secret.initialize(account, 'pux')
+        >>> str(secret)
+        '*m7Aqj=XBAs7'
 
-    >>> secret = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
-    >>> secret.initialize(account, 'bux')
-    >>> str(secret)
-    'YO8K^68J9oC!'
+        >>> secret = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
+        >>> secret.initialize(account, 'bux')
+        >>> str(secret)
+        'YO8K^68J9oC!'
 
     """
 
@@ -857,14 +876,14 @@ class PasswordRecipe(MixedPassword):
 
 
 # BirthDate {{{1
-class BirthDate(Secret):
+class BirthDate(GeneratedSecret):
     """
     This function can be used to generate an arbitrary date using::
 
-    >>> secret = BirthDate(2015, 18, 65)
-    >>> secret.initialize(account, 'dux')
-    >>> str(secret)
-    '1970-03-22'
+        >>> secret = BirthDate(2015, 18, 65)
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        '1970-03-22'
 
     For year, enter the year the entry that contains BirthDate was created.  
     Doing so anchors the age range. In this example, the creation date is 2015,
@@ -875,10 +894,10 @@ class BirthDate(Secret):
     You can use the fmt argument to change the way in which the date is 
     formatted::
 
-    >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
-    >>> secret.initialize(account, 'dux')
-    >>> str(secret)
-    '3/22/70'
+        >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        '3/22/70'
 
     """
     def __init__(

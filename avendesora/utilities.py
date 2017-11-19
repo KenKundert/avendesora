@@ -19,9 +19,7 @@
 # Imports {{{1
 from .config import get_setting
 from shlib import Run, to_path
-from inform import (
-    codicil, fatal, os_error, output, warn, is_str, is_collection, indent
-)
+from inform import codicil, fatal, os_error, output, warn, is_str, indent
 from textwrap import dedent, wrap
 from pkg_resources import resource_filename
 from stat import ST_MODE
@@ -29,16 +27,19 @@ import hashlib
 import os
 import sys
 
+
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
-import socket
 def gethostname():
+    import socket
     return socket.gethostname().split('.')[0]
 
+
 # getusername {{{1
-import getpass
 def getusername():
+    import getpass
     return getpass.getuser()
+
 
 # generate_random_string {{{1
 def generate_random_string(length=64):
@@ -48,8 +49,8 @@ def generate_random_string(length=64):
     import random
     rand = random.SystemRandom()
 
-    # Create alphabet from letters, digits, and punctuation, but 
-    # replace double quote with a space so password can be safely 
+    # Create alphabet from letters, digits, and punctuation, but
+    # replace double quote with a space so password can be safely
     # represented as a double-quoted string.
     alphabet = (ascii_letters + digits + punctuation).replace('"', ' ')
 
@@ -61,7 +62,6 @@ def generate_random_string(length=64):
 
 # validate_components {{{1
 def validate_components():
-
     # check permissions on the settings directory
     path = get_setting('settings_dir')
     mask = get_setting('config_dir_mask')
@@ -84,8 +84,8 @@ def validate_components():
     # Check that files that are critical to the integrity of the generated
     # secrets have not changed
     for path, kind in [
-        (to_path(resource_filename(__name__,  'secrets.py')), 'secrets_hash'),
-        (to_path(resource_filename(__name__,  'charsets.py')), 'charsets_hash'),
+        (to_path(resource_filename(__name__, 'secrets.py')), 'secrets_hash'),
+        (to_path(resource_filename(__name__, 'charsets.py')), 'charsets_hash'),
         (dict_path, 'dict_hash'),
     ]:
         try:
@@ -106,6 +106,7 @@ def validate_components():
             lines.append("     {kind} = '{md5}'".format(kind=kind, md5=md5))
             codicil(*lines, sep='\n')
 
+
 # pager {{{1
 def pager(text):
     program = get_setting('use_pager')
@@ -116,6 +117,7 @@ def pager(text):
     else:
         output(text)
 
+
 # two_columns {{{1
 def two_columns(col1, col2, width=16, indent=True):
     indent = get_setting('indent') if indent else ''
@@ -124,7 +126,30 @@ def two_columns(col1, col2, width=16, indent=True):
             indent, col1, indent, '  '+width*' ', col2
         )
     else:
-        return '%s%-*s  %s' % (indent, width, col1, col2) 
+        return '%s%-*s  %s' % (indent, width, col1, col2)
+
+
+# columns {{{1
+def columns(array, pagewidth=79, alignment='<', leader='    '):
+    # This has been moved into inform. Switch to that version once inform 1.10
+    # has been out for a while.
+    "Distribute array over enough columns to fill the screen."
+    textwidth = pagewidth - len(leader)
+    width = max([len(e) for e in array])+1
+    numcols = max(1, textwidth//(width+1))
+    stride = len(array)//numcols + 1
+    fmt = '{{:{align}{width}s}}'.format(align=alignment, width=width)
+    table = []
+    for i in range(len(array)//numcols+1):
+        row = []
+        for j in range(numcols):
+            try:
+                row.append(fmt.format(array[stride*j+i]))
+            except IndexError:
+                pass
+        table.append(leader + ' '.join(row).rstrip())
+    return '\n'.join(table)
+
 
 # to_python {{{1
 def to_python(obj, _level=0):
@@ -167,6 +192,7 @@ def to_python(obj, _level=0):
         code += [repr(obj)]
     return '\n'.join(code)
 
+
 # error_source {{{1
 def error_source():
     """Source of error
@@ -183,10 +209,10 @@ def error_source():
     except SyntaxError:
         # extract_stack() does not work on binary encrypted files. It generates
         # a syntax error that indicates that the file encoding is missing
-        # because the function tries to read the file and sees binary data. This
-        # is not a problem with ascii encrypted files as we don't actually show
-        # code, which is gibberish, but does not require an encoding. In this
-        # case, extract the line number from the trace.
+        # because the function tries to read the file and sees binary data.
+        # This is not a problem with ascii encrypted files as we don't actually
+        # show code, which is gibberish, but does not require an encoding. In
+        # this case, extract the line number from the trace.
         from .gpg import get_active_python_file
         filename = get_active_python_file()
         line = tb.tb_next.tb_lineno
@@ -194,10 +220,10 @@ def error_source():
         return None
     return filename, 'line %s' % line
 
+
 # query_user {{{1
 def query_user(msg):
-     if sys.version_info.major < 3:
+    if sys.version_info.major < 3:
         return raw_input(msg + ' ')
-     else:
+    else:
         return input(msg + ' ')
-

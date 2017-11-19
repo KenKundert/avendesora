@@ -17,12 +17,12 @@ Options:
 # an absolute path or paths to the ssh key files in a string.
 
 from avendesora import PasswordGenerator, PasswordError
-from inform import Error, Inform, codicil, error, fatal, narrate, is_str
+from inform import Inform, codicil, error, fatal, narrate
 from docopt import docopt
 from pathlib import Path
 import pexpect
 
-SSHkeys = ['primary', 'digitalocean', 'tunnelr', 'github', 'backups']
+SSHkeys = ['primary', 'github', 'backups']
 SSHadd = 'ssh-add'
 
 cmdline = docopt(__doc__.format(keys = ', '.join(SSHkeys)))
@@ -30,14 +30,14 @@ Inform(narrate=cmdline['--verbose'])
 
 try:
     pw = PasswordGenerator()
-except PasswordError as error:
-    fatal(error)
+except PasswordError as e:
+    e.terminate()
 
 for key in SSHkeys:
     name = key + '-ssh-key'
     try:
         account = pw.get_account(name)
-        passphrase = account.get_value('passcode').value
+        passphrase = account.get_passcode().value
         if account.has_field('keyfiles'):
             keyfiles = account.get_value('keyfiles').value
         else:
@@ -59,5 +59,5 @@ for key in SSHkeys:
             error('failed.', culprit=path)
             codicil('response:', sshadd.before.decode('utf8'), culprit=SSHadd)
             codicil('exit status:', sshadd.exitstatus , culprit=SSHadd)
-    except PasswordError as error:
-        fatal(error, culprit=path)
+    except PasswordError as e:
+        fatal(e, culprit=path)

@@ -74,7 +74,6 @@ try:
             if event.type == gdk.EventType._2BUTTON_PRESS:
                 self.accept()
 
-
     class ErrorDialog (gtk.MessageDialog):
         def __init__(self, message, description=None):
             gtk.MessageDialog.__init__(
@@ -86,7 +85,6 @@ try:
 
             if description:
                 self.format_secondary_text(description)
-
 
     def show_list_dialog(title, choices):
         dialog = ListDialog(title, choices)

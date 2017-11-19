@@ -23,23 +23,24 @@ from .config import get_setting, override_setting
 from .editors import GenericEditor
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
-from .obscure import Obscure
-from .utilities import query_user, two_columns
+from .obscure import ObscuredSecret
+from .utilities import query_user, two_columns, columns
 from .writer import get_writer
 from inform import (
-    Error, codicil, cull, debug, error, output, warn, conjoin, os_error,
-    is_collection, is_str, indent, render, ddd, ppp, vvv
+    Error, codicil, cull, debug, error, full_stop, output, warn, conjoin,
+    os_error, is_collection, indent, render, ddd, ppp, vvv
 )
-from shlib import chmod, mv, rm, to_path
+from shlib import chmod, cp, rm, to_path
 from docopt import docopt
-from textwrap import dedent, fill
+from textwrap import dedent
 import re
 import sys
 
 
 # Utilities {{{1
 def title(text):
-    return text[0].upper() + text[1:] + '.'
+    return full_stop(text[0].upper() + text[1:])
+
 
 # Command base class {{{1
 class Command(object):
@@ -142,9 +143,11 @@ class Add(Command):
             The available accounts files are (the default is given first):
             {files}
         """).strip()
+
         def indented_list(l):
             indent = get_setting('indent')
             return indent + ('\n'+indent).join(sorted(l))
+
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
             default=get_setting('default_account_template'),
@@ -230,7 +233,7 @@ class Add(Command):
 
                 # hide the values that should be hidden
                 def hide(match):
-                    return 'Hidden(%r)' % Obscure.hide(match.group(1))
+                    return 'Hidden(%r)' % ObscuredSecret.hide(match.group(1))
                 new = re.sub("<<(.*?)>>", hide, new)
 
                 # add new account to the contents
@@ -321,7 +324,7 @@ class Archive(Command):
             previous_archive = get_setting('previous_archive_file')
             if previous_archive and archive_file.is_file():
                 rm(previous_archive)
-                mv(archive_file, previous_archive)
+                cp(archive_file, previous_archive)
         except OSError as e:
             raise Error(os_error(e))
 
@@ -345,7 +348,7 @@ class Archive(Command):
         import arrow
         contents = ARCHIVE_FILE_CONTENTS.format(
             encoding = get_setting('encoding'),
-            date=str(arrow.now()),
+            date = str(arrow.now()),
             accounts = '\n\n'.join(entries)
         )
 
@@ -432,6 +435,7 @@ class Browse(Command):
         account.open_browser(
             cmdline['<key>'], cmdline['--browser'], cmdline['--list']
         )
+
 
 # Changed {{{1
 class Changed(Command):
@@ -567,7 +571,7 @@ class Conceal(Command):
     @classmethod
     def help(cls):
         encodings = []
-        for name, desc in Obscure.encodings():
+        for name, desc in ObscuredSecret.encodings():
             encodings.append('%s:\n%s' % (name, indent(desc, '    ')))
         encodings = '\n\n'.join(encodings)
         text = dedent("""
@@ -585,7 +589,7 @@ class Conceal(Command):
             sensitive secret, you should simply run 'avendesora conceal' and
             then enter the secret text when prompted.
         """).strip()
-        default_encoding = Obscure.default_encoding()
+        default_encoding = ObscuredSecret.default_encoding()
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE, encodings=encodings,
             default_encoding=' (default encoding is %s)' % default_encoding,
@@ -616,7 +620,7 @@ class Conceal(Command):
             text = sys.stdin.read()[:-1]
 
         # transform and output the string
-        output(Obscure.hide(text, encoding, True, symmetric, gpg_ids))
+        output(ObscuredSecret.hide(text, encoding, True, symmetric, gpg_ids))
 
 
 # Edit {{{1
@@ -652,7 +656,6 @@ class Edit(Command):
         generator = PasswordGenerator()
 
         # determine the account file and back it up
-        backup = None
         try:
             account = generator.get_account(cmdline['<account>'])
             accounts_file = PythonFile(account._file_info.path)
@@ -893,7 +896,7 @@ class Initialize(Command):
 # Log {{{1
 class Log(Command):
     NAMES = 'log',
-    DESCRIPTION = 'edit the logfile'
+    DESCRIPTION = 'open the logfile'
     USAGE = dedent("""
         Usage:
             avendesora log
@@ -928,7 +931,7 @@ class Log(Command):
 
 # Login Credentials {{{1
 class LoginCredentials(Command):
-    NAMES = 'login', 'credentials', 'l'
+    NAMES = 'credentials', 'login', 'l'
     DESCRIPTION = 'show login credentials'
     USAGE = dedent("""
         Displays the account's login credentials, which generally consist of an
@@ -942,8 +945,6 @@ class LoginCredentials(Command):
         Options:
             -S, --seed              Interactively request additional seed for
                                     generated secrets.
-            -v, --verbose           Add additional information to log file to
-                                    help identify issues in account discovery.
     """).strip()
 
 
@@ -963,6 +964,7 @@ class LoginCredentials(Command):
 
             If credentials is not specified then the first of the following will
             be used if available:
+
                 id: {idents}
                 secret: {secrets}
         """).strip()
@@ -1063,6 +1065,57 @@ class New(Command):
         )
 
 
+# Phonetic Alphabet {{{1
+class PhoneticAlphabet(Command):
+    NAMES = 'phonetic alphabet p'.split()
+    DESCRIPTION = 'Display the NATO phonetic alphabet.'
+    USAGE = dedent("""
+        Usage:
+            avendesora alphebet [<text>]
+            avendesora phonetic [<text>]
+            avendesora p [<text>]
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+
+            If <text> is given, it is converted character by character to the
+            phonetic alphabet. If not given, the entire phonetic alphabet is
+            displayed.
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        words = """
+            Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo
+            Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform
+            Victor Whiskey X-ray Yankee Zulu
+        """.split()
+        mapping = {w[0]:w.lower() for w in words}
+        mapping.update({
+            '0':'zero', '1':'one', '2':'two', '3':'three', '4':'four',
+            '5':'five', '6':'six', '7':'seven', '8':'eight', '9':'nine'
+        })
+
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        arg = cmdline['<text>']
+
+        if arg:
+            converted = []
+            for c in arg:
+                converted.append(mapping.get(c, c))
+            output(' '.join(converted))
+        else:
+            output('Phonetic alphabet:')
+            output(columns(words))
+
+
 # Reveal {{{1
 class Reveal(Command):
     NAMES = 'reveal', 'r'
@@ -1108,7 +1161,7 @@ class Reveal(Command):
             text = sys.stdin.read()
 
         # transform and output the string
-        output(Obscure.show(text))
+        output(ObscuredSecret.show(text))
 
 
 # Search {{{1
@@ -1137,7 +1190,7 @@ class Search(Command):
             aliases = ', '.join(Collection(getattr(acct, 'aliases', [])).values())
             aliases = ' (%s)' % (aliases) if aliases else ''
             to_print += [acct.get_name() + aliases]
-        output(cmdline['<text>']+ ':')
+        output(cmdline['<text>'] + ':')
         output('    ' + ('\n    '.join(sorted(to_print))))
 
 
@@ -1264,6 +1317,7 @@ class Values(Command):
         # determine the account
         account = generator.get_account(cmdline['<account>'])
         account.write_summary()
+
 
 # Version {{{1
 class Version(Command):

@@ -112,12 +112,12 @@ CONFIG_DEFAULTS = {
                     Question("_QUESTION3_?"),
                 ]
                 urls = '_URL_'
-            # Avendesora: specify urls if there are multiple recognizers.
+            # Avendesora: specify urls to indicate the url to be used by the browse command.
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
                 )
-            # Avendesora: Specify list of urls to recognizer if multiple pages need same script.
+            # Avendesora: Specify multiple urls to recognizer if several pages need same script.
             # Avendesora: Specify list of recognizers if multiple pages need different scripts.
 
             # Avendesora: Tailor the account entry to suit you needs.
@@ -170,12 +170,12 @@ CONFIG_DEFAULTS = {
                     Question("_QUESTION3_?"),
                 ]
                 urls = '_URL_'
-            # Avendesora: specify urls if there are multiple recognizers.
+            # Avendesora: specify urls to indicate the url to be used by the browse command.
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
                 )
-            # Avendesora: Specify list of urls to recognizer if multiple pages need same script.
+            # Avendesora: Specify multiple urls to recognizer if several pages need same script.
             # Avendesora: Specify list of recognizers if multiple pages need different scripts.
 
             # Avendesora: Tailor the account entry to suit you needs.

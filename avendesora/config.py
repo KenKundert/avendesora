@@ -26,6 +26,7 @@ from inform import Error, comment, warn, is_str
 # Globals {{{1
 Config = {}
 
+
 # read_config() {{{1
 def read_config():
     if Config.get('READ'):
@@ -90,8 +91,11 @@ def read_config():
         except Error as err:
             pass
 
+
+# add_setting() {{{1
 def add_setting(name, default):
     CONFIG_DEFAULTS[name] = default
+
 
 # get_setting() {{{1
 def get_setting(name, default=None, expand=True):
@@ -114,6 +118,7 @@ def get_setting(name, default=None, expand=True):
         value = to_path(get_setting('settings_dir'), value)
     return value
 
+
 # setting_path() {{{1
 def setting_path(name, index=None):
     # this returns a path to a particular setting that is useful as a culprit
@@ -121,6 +126,7 @@ def setting_path(name, index=None):
         return (get_setting('config_file'), name)
     else:
         return (get_setting('config_file'), name, index)
+
 
 # override_setting() {{{1
 def override_setting(name, value):

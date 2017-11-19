@@ -10,7 +10,7 @@ answer to your challenge questions. So the current approach is to simply
 recognize each of those pages individually.  You can use something like this for 
 your Gmail/Google account entry::
 
-    class Gmail(Account): # {{{1
+    class Gmail(Account):
         aliases = 'gmail google'
         username = '_YOUR_USERNAME_'
         passcode = Passphrase()

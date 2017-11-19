@@ -629,8 +629,9 @@ get_scalar(name, key=None, default=False):
     desired if the field is a composite. If default is False, an error is raise 
     if the value is not present, otherwise the default value itself is returned.
 
-    If the value returned is an Avendesora object (Secret, Obscure, Script), 
-    then you should cast it to a string to get its resolved value.
+    If the value returned is an Avendesora object (GeneratedSecret,
+    ObscuredSecret, Script), then you should cast it to a string to get its
+    resolved value.
 
 get_composite(name):
     A lower level interface than get_value that given a name returns the value 
@@ -639,8 +640,9 @@ get_composite(name):
     returned, not a object that contains multiple facets of the value.  Also, 
     the name and key must match exactly.
 
-    If the value returned is an Avendesora object (Secret, Obscure, Script), 
-    then you should cast it to a string to get its resolved value.
+    If the value returned is an Avendesora object (GeneratedSecret,
+    ObscuredSecret, Script), then you should cast it to a string to get its
+    resolved value.
 
 API Example
 -----------
@@ -725,3 +727,12 @@ Then, for information on a specific topic use::
 
 It is worth browsing all of the available topics at least once to get a sense of 
 all that Avendesora can do.
+
+
+Contributing
+------------
+
+Please ask questions or report bugs on ``Github Issues <???>``_. I will 
+entertain pull requests if you make improvements. I am particularly interested 
+in adapting *Avendesora* for other editors. I would also like installation 
+instructions for other distributions.
