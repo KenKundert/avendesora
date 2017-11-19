@@ -28,6 +28,7 @@ Releases
 **Latest development release**:
     | Version: 1.7.19
     | Released: 2017-11-18
+
     - created the manual
     - use keyboard writer if there is no access to TTY
     - shifted to skinny config file

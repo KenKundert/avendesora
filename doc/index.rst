@@ -247,6 +247,7 @@ Contents:
    api
    examples
    upgrading
+   releases
 
 
 Indices and tables
