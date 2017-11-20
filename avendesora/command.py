@@ -103,6 +103,14 @@ class Command(object):
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
         )
 
+    @classmethod
+    def get_help_url(cls):
+        try:
+            anchor = '-'.join(e.lower() for e in [cls.NAMES[0]] + cls.DESCRIPTION.split())
+            return '/commands.html#' + anchor
+        except (AttributeError, TypeError):
+            pass
+
 
 # Add {{{1
 class Add(Command):
@@ -443,7 +451,7 @@ class Browse(Command):
 # Changed {{{1
 class Changed(Command):
     NAMES = 'changed', 'C'
-    DESCRIPTION = 'identify any changes that have occurred since the archive was created'
+    DESCRIPTION = 'show changes since archive was created'
     USAGE = dedent("""
         Usage:
             avendesora changed
@@ -737,6 +745,7 @@ class Help(Command):
 
         Options:
             -s, --search            list topics that include <topic> as a search term.
+            -b, --browse            open the topic in your default browser.
     """).strip()
 
     @classmethod
@@ -748,7 +757,7 @@ class Help(Command):
         override_setting('discard_logfile', True)
 
         from .help import HelpMessage
-        HelpMessage.show(cmdline['<topic>'], cmdline['--search'])
+        HelpMessage.show(cmdline['<topic>'], cmdline['--browse'], cmdline['--search'])
 
 
 # Identity {{{1
@@ -1073,7 +1082,7 @@ class New(Command):
 # Phonetic Alphabet {{{1
 class PhoneticAlphabet(Command):
     NAMES = 'phonetic alphabet p'.split()
-    DESCRIPTION = 'Display the NATO phonetic alphabet.'
+    DESCRIPTION = 'Display NATO phonetic alphabet.'
     USAGE = dedent("""
         Usage:
             avendesora alphebet [<text>]

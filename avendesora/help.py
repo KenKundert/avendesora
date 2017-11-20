@@ -28,6 +28,7 @@
 
 
 # Imports {{{1
+from .browsers import StandardBrowser
 from .command import Command
 from .config import get_setting
 from .utilities import pager, two_columns
@@ -36,6 +37,8 @@ from textwrap import dedent
 
 # HelpMessage base class {{{1
 class HelpMessage(object):
+    URL = None
+
     # get_name() {{{2
     @classmethod
     def get_name(cls):
@@ -54,7 +57,15 @@ class HelpMessage(object):
 
     # show {{{2
     @classmethod
-    def show(cls, name=None, search=False):
+    def show(cls, name=None, browse=False, search=False):
+        def show_in_browser(url):
+            base_url = get_setting('help_url')
+            if base_url:
+                url = base_url if url is None else base_url + '/' + url
+                StandardBrowser().run(url)
+                return
+            output('online help not available.', culprit=name)
+
         if name and search:
             import re
             term = re.compile(r'\b'+name+r'\b', re.I)
@@ -69,12 +80,20 @@ class HelpMessage(object):
         elif name:
             cmd = Command.find(name)
             if cmd:
-                return pager(cmd.help())
+                if browse:
+                    return show_in_browser(cmd.get_help_url())
+                else:
+                    return pager(cmd.help())
             for topic in cls.topics():
                 if name == topic.get_name():
-                    return pager(topic.help())
+                    if browse:
+                        return show_in_browser(topic.URL)
+                    else:
+                        return pager(topic.help())
             error('topic not found.', culprit=name)
         else:
+            if browse:
+                return show_in_browser('')
             cls.help()
 
     # summarize {{{2
@@ -98,6 +117,7 @@ class HelpMessage(object):
 # Abraxas class {{{1
 class Abraxas(HelpMessage):
     DESCRIPTION = "exporting accounts from Abraxas"
+    URL = '/advanced.html#upgrading-from-abraxas'
 
     @staticmethod
     def help():
@@ -111,7 +131,7 @@ class Abraxas(HelpMessage):
 
             It will create a collection of Avendesora accounts files in
             ~/.config/abraxas/avendesora. You need to manually add these files
-            to your list of accounts files in Avendesora. Say one such file in
+            to your list of accounts files in Avendesora. Say one such file is
             created: ~/.config/abraxas/avendesora/accounts.gpg.  This could be
             added to Avendesora as follows:
 
@@ -146,6 +166,7 @@ class Abraxas(HelpMessage):
 # Accounts class {{{1
 class Accounts(HelpMessage):
     DESCRIPTION = "describing an account"
+    URL = '/accounts.html'
 
     @staticmethod
     def help():
@@ -325,6 +346,7 @@ class Accounts(HelpMessage):
 # Collaborate class {{{1
 class Collaborate(HelpMessage):
     DESCRIPTION = "collaborate"
+    URL = '/advanced.html#collaborating-with-a-partner'
 
     @staticmethod
     def help():
@@ -393,6 +415,7 @@ class Collaborate(HelpMessage):
 # Discovery class {{{1
 class Discovery(HelpMessage):
     DESCRIPTION = "account discovery"
+    URL = '/advanced.html#account-discovery'
 
     @staticmethod
     def help():
@@ -598,6 +621,7 @@ class Discovery(HelpMessage):
 # Entropy class {{{1
 class Entropy(HelpMessage):
     DESCRIPTION = "how much entropy is enough?"
+    URL = '/concepts.html#entropy'
 
     @staticmethod
     def help():
@@ -699,6 +723,7 @@ class Entropy(HelpMessage):
 # Misdirection class {{{1
 class Misdirection(HelpMessage):
     DESCRIPTION = "misdirection in secrets generation"
+    URL = '/advanced.html#misdirection'
 
     @staticmethod
     def help():
@@ -744,6 +769,7 @@ class Misdirection(HelpMessage):
 # Overview class {{{1
 class Overview(HelpMessage):
     DESCRIPTION = "overview of Avendesora"
+    URL = ''
 
     @staticmethod
     def help():
@@ -816,6 +842,7 @@ class Overview(HelpMessage):
 # Questions class {{{1
 class Questions(HelpMessage):
     DESCRIPTION = "security questions"
+    URL = '/advanced.html#security-questions'
 
     @staticmethod
     def help():
@@ -885,9 +912,10 @@ class Questions(HelpMessage):
         return text
 
 
-# Questions class {{{1
+# Phishing class {{{1
 class Phishing(HelpMessage):
     DESCRIPTION = "avoiding phishing attacks"
+    URL = '/advanced.html#avoiding-phishing-attacks'
 
     @staticmethod
     def help():
@@ -921,6 +949,7 @@ class Phishing(HelpMessage):
 # Scripts class {{{1
 class Scripts(HelpMessage):
     DESCRIPTION = "scripts"
+    URL = '/advanced.html#scripts'
 
     @staticmethod
     def help():
@@ -1017,6 +1046,7 @@ class Scripts(HelpMessage):
 # Secrets class {{{1
 class Secrets(HelpMessage):
     DESCRIPTION = "secrets"
+    URL = '/helpers.html#account-helpers'
 
     @staticmethod
     def help():
@@ -1444,6 +1474,7 @@ class Secrets(HelpMessage):
 # Stealth class {{{1
 class Stealth(HelpMessage):
     DESCRIPTION = "stealth secrets"
+    URL = '/advanced.html#stealth-accounts'
 
     @staticmethod
     def help():
@@ -1493,5 +1524,3 @@ class Stealth(HelpMessage):
             master seeds that you can share with your associates.
         """).strip()
         return text
-
-

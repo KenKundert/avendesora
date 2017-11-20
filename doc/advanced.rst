@@ -702,3 +702,50 @@ simply prints out the phonetic alphabet::
 Now you can easily do the conversion yourself. Having *Avendesora* do the 
 conversion for you helps you distinguish similar looking characters such as 
 I and 1 and O and 0.
+
+
+.. index::
+    single: abraxas
+
+.. _abraxas:
+
+Upgrading from Abraxas
+----------------------
+
+Avendesora generalizes and replaces Abraxas, its predecessor.  To
+transition from Abraxas to Avendesora, you will first need to
+upgrade Abraxas to version 1.8 or higher (use 'abraxas -v' to
+determine version). Then run::
+
+    abraxas --export
+
+It will create a collection of Avendesora accounts files in
+~/.config/abraxas/avendesora. You need to manually add these files
+to your list of accounts files in Avendesora. Say one such file is
+created: ~/.config/abraxas/avendesora/accounts.gpg.  This could be
+added to Avendesora as follows:
+
+1. create a symbolic link from
+   ~/.config/avendesora/abraxas_accounts.gpg to
+   ~/.config/abraxas/avendesora/accounts.gpg::
+
+    cd ~/.config/avendesora
+    ln -s ../abraxas/avendesora/accounts.gpg abraxas_accounts.gpg
+
+2. add abraxas_accounts.gpg to account_files list in accounts_files.
+
+Now all of the Abraxas accounts contained in abraxas_accounts.gpg
+should be available though Avendesora and the various features of
+the account should operate as expected. However, secrets in accounts
+exported by Abraxas are no longer generated secrets. Instead, the
+actual secrets are placed in a hidden form in the exported accounts
+files.
+
+If you would like to enhance the imported accounts to take advantage
+of the new features of Avendesora, it is recommended that you do not
+manually modify the imported files. Instead, copy the account
+information to one of your own account files before modifying it.
+To avoid conflict, you must then delete the account from the
+imported file. To do so, create ~/.config/abraxas/do-not-export if
+it does not exist, then add the account name to this file, and
+reexport your accounts from Abraxas.

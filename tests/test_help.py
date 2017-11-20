@@ -158,7 +158,7 @@ def test_changed():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Identify any changes that have occurred since the archive was created.
+        Show changes since archive was created.
 
         Usage:
             avendesora changed
@@ -377,6 +377,7 @@ def test_help():
 
         Options:
             -s, --search            list topics that include <topic> as a search term.
+            -b, --browse            open the topic in your default browser.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -533,7 +534,7 @@ def test_phonetic():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Display the NATO phonetic alphabet.
+        Display NATO phonetic alphabet.
 
         Usage:
             avendesora alphebet [<text>]
@@ -716,7 +717,7 @@ def test_abraxas():
 
         It will create a collection of Avendesora accounts files in
         ~/.config/abraxas/avendesora. You need to manually add these files
-        to your list of accounts files in Avendesora. Say one such file in
+        to your list of accounts files in Avendesora. Say one such file is
         created: ~/.config/abraxas/avendesora/accounts.gpg.  This could be
         added to Avendesora as follows:
 

@@ -67,6 +67,7 @@ CONFIG_DEFAULTS = {
         't':  'torbrowser {url}',
         'x':  'xdg-open {url}', # system default browser
     },
+    'help_url': 'https://avendesora.readthedocs.io/en/latest',
     'default_field': 'passcode password passphrase',
     'default_vector_field': 'questions',
     'default_browser': 'x',
@@ -293,6 +294,9 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         # is the name to be used for the browser, and the value is string that
         # contains the command that invokes the browser. The value may contain
         # {{url}}, which is replaced by the URL to open.
+
+    help_url = {help_url}
+        # The base URL for Avendesora's online documentation.
 
     default_browser = {default_browser}
         # The name of the default browser. This name should be one of the keys

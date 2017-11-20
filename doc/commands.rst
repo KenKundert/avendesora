@@ -130,8 +130,8 @@ service, which generally can only be accessed using torbrowser:
 
 .. _changed command:
 
-**changed** -- Identify any changes that have occurred since the archive was created
-------------------------------------------------------------------------------------
+**changed** -- Show changes since archive was created
+-----------------------------------------------------
 
 Usage:
 
@@ -294,6 +294,7 @@ Options:
 
     ======================= ==================================================
     -s, --search            list topics that include <topic> as a search term.
+    -b, --browse            open the topic in your default browser.
     ======================= ==================================================
 
 
