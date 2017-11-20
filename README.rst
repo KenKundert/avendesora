@@ -20,7 +20,7 @@ Avendesora Collaborative Password Utility
         :target: https://pypi.python.org/pypi/avendesora/
 
 | Version: 1.7.20
-| Released: 2017-11-18
+| Released: 2017-11-19
 |
 
 Avendesora replaces the Abraxas, which are both alternatives to the traditional 
