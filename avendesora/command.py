@@ -21,13 +21,14 @@
 from .collection import Collection
 from .config import get_setting, override_setting
 from .editors import GenericEditor
+from .error import PasswordError
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import ObscuredSecret
 from .utilities import query_user, two_columns, columns
 from .writer import get_writer
 from inform import (
-    Error, codicil, cull, debug, error, full_stop, output, warn, conjoin,
+    codicil, cull, debug, error, full_stop, output, warn, conjoin,
     os_error, is_collection, indent, render, ddd, ppp, vvv
 )
 from shlib import chmod, cp, rm, to_path
@@ -169,9 +170,9 @@ class Add(Command):
                 if p.startswith(prefix)
             ]
             if not candidates:
-                raise Error('not found.', cuplrit=cmdline['--file'])
+                raise PasswordError('not found.', cuplrit=cmdline['--file'])
             if len(candidates) > 1:
-                raise Error(
+                raise PasswordError(
                     'ambiguous, matches %s.' % conjoin(candidates),
                     cuplrit=prefix
                 )
@@ -188,7 +189,7 @@ class Add(Command):
                 template_name = get_setting('default_account_template')
             template = dedent(templates[template_name]).strip() + '\n'
         except KeyError:
-            raise Error(
+            raise PasswordError(
                 'unknown account template, choose from %s.' % conjoin(
                     sorted(templates.keys())
                 ), culprit=template_name
@@ -211,7 +212,7 @@ class Add(Command):
             tmpfile = GnuPG(tmpfilename)
             tmpfile.save(template, get_setting('gpg_ids'))
         except OSError as e:
-            raise Error(os_error(e))
+            raise PasswordError(os_error(e))
 
         # open template in the editor
         try:
@@ -247,13 +248,15 @@ class Add(Command):
                 try:
                     new_accounts_file.run()
                     break
-                except Error as e:
+                except PasswordError as e:
                     error(e)
                     response = query_user('Try again?')
                     if response.lower() not in ['y', 'yes']:
-                        raise Error('Giving up, restoring original file.')
+                        raise PasswordError(
+                            'Giving up, restoring original file.'
+                        )
 
-        except (Error, OSError) as e:
+        except (PasswordError, OSError) as e:
             orig_accounts_file.restore()
             if isinstance(e, OSError):
                 e = os_error(e)
@@ -326,7 +329,7 @@ class Archive(Command):
                 rm(previous_archive)
                 cp(archive_file, previous_archive)
         except OSError as e:
-            raise Error(os_error(e))
+            raise PasswordError(os_error(e))
 
         # run the generator
         generator = PasswordGenerator()
@@ -359,7 +362,7 @@ class Archive(Command):
             archive.save(contents)
             chmod(0o600, archive_file)
         except OSError as e:
-            raise Error(os_error(e), culprit=archive_file)
+            raise PasswordError(os_error(e), culprit=archive_file)
 
 
 # Browse {{{1
@@ -479,7 +482,7 @@ class Changed(Command):
             output('archive created: %s' % created)
         archive_accounts = archive.get('ACCOUNTS')
         if not archive_accounts:
-            raise Error(
+            raise PasswordError(
                 'corrupt archive, ACCOUNTS missing.', culprit=archive_path
             )
 
@@ -662,7 +665,7 @@ class Edit(Command):
             accounts_file.backup('.saved')
             account_name = account.__name__
         except OSError as e:
-            raise Error(os_error(e))
+            raise PasswordError(os_error(e))
 
         # allow the user to edit, and then check and make sure it is valid
         try:
@@ -673,21 +676,23 @@ class Edit(Command):
                 try:
                     accounts_file.run()
                     break
-                except Error as e:
+                except PasswordError as e:
                     error(e)
                     if sys.version_info.major < 3:
                         response = raw_input('Try again? ')
                     else:
                         response = input('Try again? ')
                     if response.lower() not in ['y', 'yes']:
-                        raise Error('Giving up, restoring original version.')
+                        raise PasswordError(
+                            'Giving up, restoring original version.'
+                        )
 
-        except Error:
+        except PasswordError:
             accounts_file.restore()
             raise
         except OSError as e:
             accounts_file.restore()
-            raise Error(os_error(e))
+            raise PasswordError(os_error(e))
 
 
 # Find {{{1
@@ -830,7 +835,7 @@ class Identity(Command):
                 c, r = generator.challenge_response(name, challenge)
                 output(c, culprit='challenge')
                 output(r, culprit='response')
-            except Error as e:
+            except PasswordError as e:
                 e.report()
         else:
             names = sorted(generator.shared_secrets.keys())
@@ -1004,7 +1009,7 @@ class LoginCredentials(Command):
             else:
                 secret = None
             if not identity and not secret:
-                raise Error('credentials not found.')
+                raise PasswordError('credentials not found.')
             credentials = [identity, secret]
         for each in cull(credentials):
             writer.display_field(account, each)

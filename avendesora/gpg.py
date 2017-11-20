@@ -22,9 +22,10 @@
 
 # Imports {{{1
 from .config import get_setting, override_setting, setting_path
+from .error import PasswordError
 from shlib import to_path, cp, mkdir
 from inform import (
-    conjoin, cull, display, Error, log, narrate, os_error, warn, is_str,
+    conjoin, cull, display, log, narrate, os_error, warn, is_str,
     full_stop
 )
 import gnupg
@@ -88,7 +89,7 @@ class GnuPG(object):
         if is_str(gpg_ids):
             gpg_ids = gpg_ids.split()
         if not gpg_ids:
-            raise Error('must specify GPG ID.')
+            raise PasswordError('must specify GPG ID.')
 
         use_gpg, use_armor = self._choices()
         if use_gpg:
@@ -100,11 +101,11 @@ class GnuPG(object):
                         'unable to encrypt.',
                         getattr(encrypted, 'stderr', None)
                     ]))
-                    raise Error(msg, culprit=path, sep='\n')
+                    raise PasswordError(msg, culprit=path, sep='\n')
                 else:
                     path.write_bytes(encrypted.data)
-            except ValueError as err:
-                raise Error(full_stop(err), culprit=path)
+            except ValueError as e:
+                raise PasswordError(full_stop(e), culprit=path)
         else:
             path.write_text(contents, encoding=get_setting('encoding'))
         path.chmod(0o600)
@@ -121,11 +122,11 @@ class GnuPG(object):
                             'unable to decrypt.',
                             getattr(decrypted, 'stderr', None)
                         ]))
-                        raise Error(msg, culprit=path, sep='\n')
-            except ValueError as err:
-                raise Error(full_stop(err), culprit=path)
-            except (IOError, OSError) as err:
-                raise Error(os_error(err))
+                        raise PasswordError(msg, culprit=path, sep='\n')
+            except ValueError as e:
+                raise PasswordError(full_stop(e), culprit=path)
+            except (IOError, OSError) as e:
+                raise PasswordError(os_error(e))
             return decrypted.data.decode(get_setting('encoding'))
         else:
             return path.read_text(encoding=get_setting('encoding'))
@@ -199,7 +200,7 @@ class BufferedFile(GnuPG):
         contents = self.stream.getvalue()
         try:
             self.save(contents, get_setting('gpg_ids'))
-        except Error:
+        except PasswordError:
             if not self.ignore_errors_on_close:
                 raise
 
@@ -215,18 +216,18 @@ class PythonFile(GnuPG):
         try:
             self.code = self.read()
                 # need to save the code for the new command
-        except OSError as err:
-            raise Error(os_error(err))
+        except OSError as e:
+            raise PasswordError(os_error(e))
 
         try:
             compiled = compile(self.code, str(path), 'exec')
-        except SyntaxError as err:
-            culprit = (err.filename, err.lineno)
-            if err.text is None or err.offset is None:
-                raise Error(full_stop(err.msg), culprit=culprit)
+        except SyntaxError as e:
+            culprit = (e.filename, e.lineno)
+            if e.text is None or e.offset is None:
+                raise PasswordError(full_stop(e.msg), culprit=culprit)
             else:
-                raise Error(
-                    err.msg + ':', err.text.rstrip(), (err.offset-1)*' ' + '^',
+                raise PasswordError(
+                    e.msg + ':', e.text.rstrip(), (e.offset-1)*' ' + '^',
                     culprit=culprit, sep='\n'
                 )
                 # File "/home/ken/.config/avendesora/config", line 18
@@ -236,9 +237,9 @@ class PythonFile(GnuPG):
         contents = {}
         try:
             exec(compiled, contents)
-        except Exception as err:
+        except Exception as e:
             from .utilities import error_source
-            raise Error(full_stop(err), culprit=error_source())
+            raise PasswordError(full_stop(e), culprit=error_source())
         ActivePythonFile = None
         return contents
 
@@ -263,5 +264,5 @@ class PythonFile(GnuPG):
                 # file is not encrypted
                 with path.open('wb') as f:
                     f.write(contents.encode(get_setting('encoding')))
-        except OSError as err:
-            raise Error(os_error(err))
+        except OSError as e:
+            raise PasswordError(os_error(e))

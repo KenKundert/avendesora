@@ -20,8 +20,9 @@
 
 # Imports {{{1
 from .config import get_setting, add_setting, setting_path
+from .error import PasswordError
 from shlib import Run
-from inform import log, Error, os_error
+from inform import log, os_error
 
 # Editor base class {{{1
 class Editor(object):
@@ -44,10 +45,11 @@ class GenericEditor(Editor):
 
             log("running '%s'." % ' '.join(cmd))
             Run(cmd, 'soeW')
-        except OSError as err:
-            raise Error(os_error(err))
-        except KeyError as err:
-            raise Error(
-                'invalid field: %s.' % err.args[0],
+        except OSError as e:
+            raise PasswordError(os_error(e))
+        except KeyError as e:
+            raise PasswordError(
+                *e.args,
+                template='invalid field: {0}',
                 culprit=setting_path(editor_setting)
             )

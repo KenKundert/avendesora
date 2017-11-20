@@ -53,11 +53,11 @@ from .charsets import (
     ALPHANUMERIC, DIGITS, DISTINGUISHABLE, LOWERCASE, SYMBOLS, UPPERCASE, SHIFTED
 )
 from .config import get_setting, override_setting
+from .error import PasswordError
 from .dictionary import DICTIONARY
 from .obscure import ObscuredSecret
 from .utilities import error_source
-from inform import Error, cull, log, output, terminate, warn, is_str
-from binascii import a2b_base64, b2a_base64, Error as BinasciiError
+from inform import cull, log, output, terminate, warn, is_str
 from textwrap import dedent
 import math
 import hashlib
@@ -65,7 +65,13 @@ import getpass
 import re
 
 # Exceptions {{{1
-class SecretExhausted(Error):
+class SecretExhausted(PasswordError):
+    """Secret exhausted.
+
+    This generally results if the length of the requested secret is too long.
+
+    This exception subclasses :exc:`avendesora.PasswordError`.
+    """
     def __init__(self, **kwargs):
         self.args = ['entropy exhausted.']
         self.kwargs = kwargs
@@ -248,7 +254,7 @@ class GeneratedSecret(object):
 
         This function can be used to generate a password as follows:
         >>> import string
-        >>> alphabet =  alphabet = string.ascii_letters + string.digits
+        >>> alphabet = alphabet = string.ascii_letters + string.digits
         >>> ''.join(secret._symbols(alphabet, 16))
         'O7Dm0vMjJSMX2w30'
 
@@ -342,46 +348,46 @@ class GeneratedSecret(object):
 
 # Password {{{1
 class Password(GeneratedSecret):
-    """Generate password
+    """Generate password.
 
     Generates an arbitrary password by selecting symbols from the given
     alphabet at random. The entropy of the generated password is
     length*log2(len(alphabet)).
 
-    :arg int length:
-        The number of items to draw from the alphabet when creating the
-        password.
+    Args:
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            password.
+        alphabet (collection of symbols):
+            The reservoir of legal symbols to use when creating the password. By
+            default the set of easily distinguished alphanumeric characters are
+            used (:attr:`avendesora.DISTINGUISHABLE`). Typically you would use
+            the pre-imported character sets to construct the alphabet. For
+            example, you might pass: :attr:`avendesora.ALPHANUMERIC` + '+=_&%#@'
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        shift_sort (bool):
+            If true, the characters in the password will be sorted so that the
+            characters that require the shift key when typing are placed last.
+            This make the password easier to type.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
 
-    :arg str alphabet:
-        The reservoir of legal symbols to use when creating the password. By
-        default the set of easily distinguished alphanumeric characters are
-        used (DISTINGUISHABLE). Typically you would use the pre-imported
-        character sets to construct the alphabet. For example, you might pass:
-        ALPHANUMERIC + '+=_&%#@'
-
-    :arg str master:
-        Overrides the master seed that is used when generating the password.
-        Generally, there is one master seed shared by all accounts contained
-        in an account file.  This argument overrides that behavior and
-        instead explicitly specifies the master seed for this secret.
-
-    :arg str version:
-        An optional seed. Changing this value will change the generated
-        password.
-
-    :arg bool shift_sort:
-        If true, the characters in the password will be sorted so that the
-        characters that require the shift key when typing are placed last.
-
-    :arg str sep:
-        A string that is placed between each symbol in the generated
-        password.
-
-    :arg str prefix:
-        A string added to the front of the generated password.
-
-    :arg str suffix:
-        A string added to the end of the generated password.
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
 
     Examples::
 
@@ -415,7 +421,7 @@ class Password(GeneratedSecret):
         try:
             self.length = int(length)
         except ValueError:
-            raise Error(
+            raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
         self.alphabet = alphabet
@@ -444,40 +450,39 @@ class Password(GeneratedSecret):
 
 # Passphrase {{{1
 class Passphrase(Password):
-    """Generate passphrase
+    """Generate passphrase.
 
-    Similar to Password in that it generates an arbitrary pass phrase by
+    Similar to Password in that it generates an arbitrary passphrase by
     selecting symbols from the given alphabet at random, but in this case
     the default alphabet is a dictionary containing about 10,000 words.
 
-    :arg int length:
-        The number of items to draw from the alphabet when creating the
-        password.
+    Args:
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            password.
+        alphabet (collection of symbols):
+            The reservoir of legal symbols to use when creating the password.
+            By default this is a list of 10,000 words.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
 
-    :arg alphabet:
-        The reservoir of legal symbols to use when creating the password.
-        By default this is a list of 10,000 words.
-    :type alphabet: list of strings
-
-    :arg str master:
-        Overrides the master seed that is used when generating the password.
-        Generally, there is one master seed shared by all accounts contained
-        in an account file.  This argument overrides that behavior and
-        instead explicitly specifies the master seed for this secret.
-
-    :arg str version:
-        An optional seed. Changing this value will change the generated
-        password.
-
-    :arg str sep:
-        A string that is placed between each symbol in the generated
-        password.
-
-    :arg str prefix:
-        A string added to the front of the generated password.
-
-    :arg str suffix:
-        A string added to the end of the generated password.
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
 
     Example::
 
@@ -499,7 +504,7 @@ class Passphrase(Password):
         try:
             self.length = int(length)
         except ValueError:
-            raise Error(
+            raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
         self.alphabet = alphabet if alphabet else DICTIONARY.words
@@ -513,39 +518,39 @@ class Passphrase(Password):
 
 # PIN {{{1
 class PIN(Password):
-    """Generate PIN
+    """Generate PIN.
 
     Similar to Password in that it generates an arbitrary PIN by
     selecting symbols from the given alphabet at random, but in this case
     the default alphabet is the set of digits (0-9).
 
-    :arg int length:
-        The number of items to draw from the alphabet when creating the
-        password.
+    Args:
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            password.
+        alphabet (collection of symbols):
+            The reservoir of legal symbols to use when creating the password.
+            By default the alphabet is DIGITS.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
 
-    :arg str alphabet:
-        The reservoir of legal symbols to use when creating the password.
-        By default the alphabet is DIGITS.
-
-    :arg str master:
-        Overrides the master seed that is used when generating the password.
-        Generally, there is one master seed shared by all accounts contained
-        in an account file.  This argument overrides that behavior and
-        instead explicitly specifies the master seed for this secret.
-
-    :arg str version:
-        An optional seed. Changing this value will change the generated
-        password.
-
-    :arg str sep:
-        A string that is placed between each symbol in the generated
-        password.
-
-    :arg str prefix:
-        A string added to the front of the generated password.
-
-    :arg str suffix:
-        A string added to the end of the generated password.
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
 
     Example::
 
@@ -564,7 +569,7 @@ class PIN(Password):
         try:
             self.length = int(length)
         except ValueError:
-            raise Error(
+            raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
         self.alphabet = alphabet
@@ -578,47 +583,44 @@ class PIN(Password):
 
 # Question {{{1
 class Question(Passphrase):
-    """Generate arbitrary answer to a given question
+    """Generate arbitrary answer to a given question.
 
     Similar to Passphrase() except a question must be specified when created
     and it is taken to be the security question. The question is used as a seed
     rather than the field name when generating the secret.
 
-    :arg str question:
-        The question to be answered. Be careful. Changing the question in
-        any way will change the resulting answer.
+    Args:
+        question (str):
+            The question to be answered. Be careful. Changing the question in
+            any way will change the resulting answer.
+        length (int):
+            The number of items to draw from the alphabet when creating the
+            answer.
+        alphabet (collection of symbols):
+            The reservoir of legal symbols to use when creating the password.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            password.
+        sep (str):
+            A string that is placed between each symbol in the generated
+            password.
+        prefix (str):
+            A string added to the front of the generated password.
+        suffix (str):
+            A string added to the end of the generated password.
+        answer (str):
+            The answer. If provided, this would override the generated answer.
+            May be a string, or it may be an Obscured object.
 
-    :arg int length:
-        The number of items to draw from the alphabet when creating the
-        password.
-
-    :arg alphabet:
-        The reservoir of legal symbols to use when creating the password.
-    :type alphabet: list of strings
-
-    :arg str master:
-        Overrides the master seed that is used when generating the password.
-        Generally, there is one master seed shared by all accounts contained
-        in an account file.  This argument overrides that behavior and
-        instead explicitly specifies the master seed for this secret.
-
-    :arg str version:
-        An optional seed. Changing this value will change the generated
-        password.
-
-    :arg str sep:
-        A string that is placed between each symbol in the generated
-        password.
-
-    :arg str prefix:
-        A string added to the front of the generated password.
-
-    :arg str suffix:
-        A string added to the end of the generated password.
-
-    :arg str answer:
-        The answer. If provided, this would override the generated answer.
-        May be a string, or it may be an Obscured object.
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
 
     Example:
 
@@ -654,7 +656,7 @@ class Question(Passphrase):
         try:
             self.length = int(length)
         except ValueError:
-            raise Error(
+            raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
         self.alphabet = alphabet if alphabet else DICTIONARY.words
@@ -685,14 +687,43 @@ class Question(Passphrase):
 
 # MixedPassword {{{1
 class MixedPassword(GeneratedSecret):
-    """
+    """Generate mixed password.
+
     A relatively low level method that is used to generate passwords from 
     a heterogeneous collection of alphabets. This is used to satisfy the 
-    character type count requirements of many websites.  *requirements* is 
-    a list of pairs. Each pair consists of an alphabet and the number of 
-    characters required from that alphabet. All other characters are chosen 
-    from the default alphabet (*def_alphabet*) until the password has the 
-    required number of characters (*num_symbols*)::
+    character type count requirements of many websites.  It is recommended that
+    user use :class:`avendesora.PasswordRecipe` rather than directly use this class.
+
+    Args:
+        length (int):
+            The number of items to draw from the various alphabets when creating
+            the password.
+        def_alphabet (collection of symbols):
+            The alphabet to use when filling up the password after all the
+            constraints are satisfied.
+        requirements (list of tuples):
+            Each tuple has two members, the first is a string or list that is
+            used as an alphabet, and the second is a number that indicates how
+            many symbols should be drawn from that alphabet.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            answer.
+        shift_sort (bool):
+            If true, the characters in the password will be sorted so that the
+            characters that require the shift key when typing are placed last.
+            This make the password easier to type.
+
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
+
+    Example::
 
         >>> secret = MixedPassword(
         ...     12, ALPHANUMERIC, [(LOWERCASE, 2), (UPPERCASE, 2), (DIGITS, 2)]
@@ -711,34 +742,10 @@ class MixedPassword(GeneratedSecret):
         version=None,
         shift_sort=False,
     ):
-        """Mixed Password
-
-        length (int):
-            The number of items to draw from the various alphabets when creating
-            the password.
-        def_alphabet (list of strs):
-            The alphabet to use when filling up the password after all the
-            constraints are satisfied.
-        requirements (list of tuples):
-            Each tuple has two members, the first is a string or list that is
-            used as an alphabet, and the second is a number that indicates how
-            many symbols should be drawn from that alphabet.
-        master (str):
-            Overrides the master seed that is used when generating the password.
-            Generally, there is one master seed shared by all accounts contained
-            in an account file.  This argument overrides that behavior and
-            instead explicitly specifies the master seed for this secret.
-        version (str):
-            An optional seed. Changing this value will change the generated
-            answer.
-        shift_sort (bool):
-            If true, the characters in the password will be sorted so that the
-            characters that require the shift key when typing are placed last.
-        """
         try:
             self.length = int(length)
         except ValueError:
-            raise Error(
+            raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
         self.def_alphabet = def_alphabet
@@ -778,7 +785,8 @@ class MixedPassword(GeneratedSecret):
 
 # PasswordRecipe{{{1
 class PasswordRecipe(MixedPassword):
-    """
+    """Generate password from recipe.
+
     A version of MixedPassword where the requirements are specified with a short
     string rather than using the more flexible but more cumbersome method of
     MixedPassword. The string consists of a series of terms separated by white
@@ -792,14 +800,40 @@ class PasswordRecipe(MixedPassword):
     remaining characters will be chosen from the base character set, which by
     default is the set of alphanumeric characters.
 
-    The c class is special in that it allow you to explicitly specify the
-    characters to use. For example, '12 2c!@#$%^&=' directs that a 12 character
-    password be generated, 2 of which are taken from the set !@#$%^&=::
+    Args:
+        recipe (str):
+            A string that describes how the password should be constructed.
+        def_alphabet (collection of symbols):
+            The alphabet to use when filling up the password after all the
+            constraints are satisfied.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            answer.
+        shift_sort (bool):
+            If true, the characters in the password will be sorted so that the
+            characters that require the shift key when typing are placed last.
+            This make the password easier to type.
+
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
+
+    Example::
 
         >>> secret = PasswordRecipe('12 2u 2d 2s')
         >>> secret.initialize(account, 'pux')
         >>> str(secret)
         '*m7Aqj=XBAs7'
+
+    The c class is special in that it allow you to explicitly specify the
+    characters to use. For example, '12 2c!@#$%^&=' directs that a 12 character
+    password be generated, 2 of which are taken from the set !@#$%^&=::
 
         >>> secret = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
         >>> secret.initialize(account, 'bux')
@@ -825,31 +859,11 @@ class PasswordRecipe(MixedPassword):
         version=None,
         shift_sort=False,
     ):
-        """Password Recipe
-
-        recipe (str):
-            A string that describes how the password should be constructed.
-        def_alphabet (list of strs):
-            The alphabet to use when filling up the password after all the
-            constraints are satisfied.
-        master (str):
-            Overrides the master seed that is used when generating the password.
-            Generally, there is one master seed shared by all accounts contained
-            in an account file.  This argument overrides that behavior and
-            instead explicitly specifies the master seed for this secret.
-        version (str):
-            An optional seed. Changing this value will change the generated
-            answer.
-        shift_sort (bool):
-            If true, the characters in the password will be sorted so that the
-            characters that require the shift key when typing are placed last.
-        """
-
         requirements = []
         try:
             parts = recipe.split()
-        except (ValueError, AttributeError) as err:
-            raise Error(
+        except (ValueError, AttributeError):
+            raise PasswordError(
                 'recipe must be a string, found %s.' % recipe,
                 culprit=error_source()
             )
@@ -861,9 +875,10 @@ class PasswordRecipe(MixedPassword):
                 if self.ALPHABETS[kind]:
                     alphabet = self.ALPHABETS[kind]
                 requirements += [(alphabet, int('0' + num))]
-        except (ValueError, AttributeError) as err:
-            raise Error(
-                "%s: invalid term in recipe '%s'." % (each, recipe),
+        except (ValueError, AttributeError):
+            raise PasswordError(
+                each, recipe,
+                template="{0}: invalid term in recipe '{1}'.",
                 culprit=error_source()
             )
 
@@ -877,7 +892,8 @@ class PasswordRecipe(MixedPassword):
 
 # BirthDate {{{1
 class BirthDate(GeneratedSecret):
-    """
+    """Generates an arbitrary birthdate for someone in a specified age range.
+
     This function can be used to generate an arbitrary date using::
 
         >>> secret = BirthDate(2015, 18, 65)
@@ -885,7 +901,7 @@ class BirthDate(GeneratedSecret):
         >>> str(secret)
         '1970-03-22'
 
-    For year, enter the year the entry that contains BirthDate was created.  
+    For year, enter the year the account that contains BirthDate was created.  
     Doing so anchors the age range. In this example, the creation date is 2015,
     the minimum age is 18 and the maximum age is 65, meaning that a birthdate
     will be chosen such that in 2015 the birth date could correspond to someone
@@ -899,18 +915,7 @@ class BirthDate(GeneratedSecret):
         >>> str(secret)
         '3/22/70'
 
-    """
-    def __init__(
-        self,
-        year,
-        min_age=18,
-        max_age=65,
-        fmt='YYYY-MM-DD',
-        master=None,
-        version=None,
-    ):
-        """Generates an arbitrary birthdate for someone in a specified age range
-
+    Args:
         year (int):
             The year the age range was established.
         min_age (int):
@@ -930,8 +935,21 @@ class BirthDate(GeneratedSecret):
         version (str):
             An optional seed. Changing this value will change the generated
             answer.
-        """
 
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
+    """
+    def __init__(
+        self,
+        year,
+        min_age=18,
+        max_age=65,
+        fmt='YYYY-MM-DD',
+        master=None,
+        version=None,
+    ):
         self.fmt = fmt
         self.last_year = year-min_age
         self.first_year = year-max_age

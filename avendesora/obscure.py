@@ -24,10 +24,11 @@
 from .charsets import DIGITS, DISTINGUISHABLE
 from .config import get_setting, override_setting
 from .dictionary import DICTIONARY
+from .error import PasswordError
 from .gpg import GnuPG
 from .utilities import error_source
 from inform import (
-    debug, Error, log, indent, is_str, output, terminate, warn, full_stop, cull
+    debug, log, indent, is_str, output, terminate, warn, full_stop, cull
 )
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
@@ -109,7 +110,7 @@ class ObscuredSecret(object):
                 return obscurer.conceal(
                     text, decorate, symmetric=symmetric, gpg_ids=gpg_ids
                 )
-        raise Error('not found.', culprit=encoding)
+        raise PasswordError('not found.', culprit=encoding)
 
     # show() {{{2
     @classmethod
@@ -122,7 +123,7 @@ class ObscuredSecret(object):
             for obscurer in cls.obscurers():
                 if name == obscurer.__name__:
                     return obscurer.reveal(value)
-            raise Error('not found.', culprit=name)
+            raise PasswordError('not found.', culprit=name)
 
         match = DECORATED_TEXT.match(text)
         if match:
@@ -132,7 +133,7 @@ class ObscuredSecret(object):
             for obscurer in cls.obscurers():
                 if name == obscurer.__name__:
                     return obscurer.reveal(value.strip('"' "'"))
-            raise Error('not found.', culprit=name)
+            raise PasswordError('not found.', culprit=name)
 
         return Hidden.reveal(text)
 
@@ -161,12 +162,12 @@ class Hide(ObscuredSecret):
 
     Marks a value as being secret.
 
-    :arg str plaintext:
-        The value of interest.
-
-    :arg bool secure:
-        Indicates that this secret is of high value and so should not be
-        found in an unencrypted accounts file.
+    Args:
+        plaintext (str):
+            The value of interest.
+        secure (bool):
+            Indicates that this secret is of high value and so should not be
+            found in an unencrypted accounts file.
     """
 
     NAME = 'base64'
@@ -195,15 +196,17 @@ class Hidden(ObscuredSecret):
 
     This encoding obscures but does not encrypt the text.
 
-    :arg str encoded_text:
-        The value of interest encoded in base64.
+    Args:
+        encoded_text (str):
+            The value of interest encoded in base64.
+        secure (bool):
+            Indicates that this secret is of high value and so should not be
+            found in an unencrypted accounts file.
+        encoding (str):
+            The encoding to use for the decoded text.
 
-    :arg bool secure:
-        Indicates that this secret is of high value and so should not be
-        found in an unencrypted accounts file.
-
-    :arg str encoding:
-        The encoding to use for the decoded text.
+    Raises:
+        :exc:`avendesora.PasswordError`: invalid value.
     """
 
     NAME = 'base64'
@@ -219,9 +222,9 @@ class Hidden(ObscuredSecret):
         try:
             self.plaintext = a2b_base64(encoded_text).decode(encoding)
             self.secure = secure
-        except BinasciiError as err:
-            raise Error(
-                'invalid value specified to Hidden(): %s.' % str(err),
+        except BinasciiError as e:
+            raise PasswordError(
+                'invalid value specified to Hidden(): %s.' % str(e),
                 culprit=error_source()
             )
 
@@ -252,10 +255,12 @@ class Hidden(ObscuredSecret):
         try:
             value = a2b_base64(value.encode('ascii'))
             return value.decode(encoding)
-        except BinasciiError as err:
-            raise Error('Unable to decode base64 string: %s.' % str(err))
+        except BinasciiError as e:
+            raise PasswordError(
+                str(e), template='Unable to decode base64 string: {0}.'
+            )
         except UnicodeDecodeError:
-            raise Error('Unable to decode base64 string.')
+            raise PasswordError('Unable to decode base64 string.')
 
 
 # GPG {{{1
@@ -265,11 +270,14 @@ class GPG(ObscuredSecret, GnuPG):
     The secret is fully encrypted with GPG. Both symmetric encryption and
     key-based encryption are supported.
 
-    :arg str ciphertext:
-        The secret encrypted and armored by GPG.
+    Args:
+        ciphertext (str):
+            The secret encrypted and armored by GPG.
+        encoding (str):
+            The encoding to use for the deciphered text.
 
-    :arg str encoding:
-        The encoding to use for the deciphered text.
+    Raises:
+        :exc:`avendesora.PasswordError`: invalid value.
     """
 
     DESC = '''
@@ -301,7 +309,7 @@ class GPG(ObscuredSecret, GnuPG):
                 msg = '%s: %s' % (msg, decrypted.stderr)
             except AttributeError:
                 msg += '.'
-            raise Error(msg, culprit=error_source())
+            raise PasswordError(msg, culprit=error_source())
         encoding = self.encoding
         if not self.encoding:
             encoding = get_setting('encoding')
@@ -330,7 +338,7 @@ class GPG(ObscuredSecret, GnuPG):
                 'unable to encrypt.',
                 getattr(encrypted, 'stderr', None)
             ]))
-            raise Error(msg)
+            raise PasswordError(msg)
         ciphertext = str(encrypted)
         if decorate:
             return 'GPG("""\n%s""")' % indent(ciphertext)
@@ -346,7 +354,7 @@ class GPG(ObscuredSecret, GnuPG):
                 msg = '%s: %s' % (msg, decrypted.stderr)
             except AttributeError:
                 pass
-            raise Error(full_stop(msg))
+            raise PasswordError(full_stop(msg))
         plaintext = str(decrypted)
         return plaintext
 
@@ -360,11 +368,14 @@ try:
 
         Only available if scrypt is installed (pip install scrypt).
 
-        :arg str ciphertext:
-            The secret encrypted and armored by GPG.
+        Args:
+            ciphertext (str):
+                The secret encrypted and armored by GPG.
+            encoding (str):
+                The encoding to use for the deciphered text.
 
-        :arg str encoding:
-            The encoding to use for the deciphered text.
+        Raises:
+            :exc:`avendesora.PasswordError`: invalid value.
         """
 
         # This encrypts/decrypts a string with scrypt. The user's key is used as the

@@ -18,6 +18,9 @@ Generated Secret Classes
 
 .. autoclass:: avendesora.BirthDate
 
+.. autoexception:: avendesora.SecretExhausted
+    :members: report, terminate
+
 
 Character Sets
 --------------
@@ -26,43 +29,42 @@ These are useful when constructing generated secrets.
 
 .. autofunction:: avendesora.exclude
 
-avendesora.LOWERCASE = "abcdefghijklmnopqrstuvwxyz":
+.. attribute:: avendesora.LOWERCASE = "abcdefghijklmnopqrstuvwxyz":
     Lower case ASCII letters.
 
-avendesora.UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+.. attribute:: avendesora.UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
     Upper case ASCII letters.
 
-avendesora.LETTERS = LOWERCASE + UPPERCASE:
+.. attribute:: avendesora.LETTERS = avendesora.LOWERCASE  + avendesora.UPPERCASE:
     Upper and lower case ASCII letters.
 
-avendesora.DIGITS = "0123456789":
+.. attribute:: avendesora.DIGITS = "0123456789":
     ASCII digits.
 
-avendesora.ALPHANUMERIC = LETTERS + DIGITS
+.. attribute:: avendesora.ALPHANUMERIC = avendesora.LETTERS + avendesora.DIGITS
     ASCII letters and digits.
 
-avendesora.HEXDIGITS = "0123456789abcdef":
+.. attribute:: avendesora.HEXDIGITS = "0123456789abcdef":
     Hexidecimal digits.
 
-avendesora.PUNCTUATION = "!"#$%&'()\*+,-./:;<=>?@[\\]^_`{|}~":
+.. attribute:: avendesora.PUNCTUATION = "!"#$%&'()\*+,-./:;<=>?@[\\]^_`{|}~":
     ASCII punctuation characters.
 
-avendesora.SYMBOLS = exclude(PUNCTUATION, "'"\`\\"):
+.. attribute:: avendesora.SYMBOLS = exclude(avendesora.PUNCTUATION, "'"\`\\"):
     ASCII punctuation characters excluding ', ", \`, and \\.
 
-avendesora.WHITESPACE = " \\t":
+.. attribute:: avendesora.WHITESPACE = " \\t":
     ASCII white space characters (excluding newlines).
 
-avendesora.PRINTABLE = ALPHANUMERIC + PUNCTUATION + WHITESPACE:
+.. attribute:: avendesora.PRINTABLE = avendesora.ALPHANUMERIC + avendesora.PUNCTUATION + avendesora.WHITESPACE:
     All ASCII printable characters (letters, digits, punctuation, whitespace).
 
-avendesora.DISTINGUISHABLE = exclude(ALPHANUMERIC, 'Il1O0'):
+.. attribute:: avendesora.DISTINGUISHABLE = exclude(avendesora.ALPHANUMERIC, 'Il1O0'):
     ASCII letters and digits with easily confused characters removed).
 
-avendesora.SHIFTED = UPPERCASE + '~!@#$%^&*()_+{}|:"<>?':
-    # ASCII characters that are typed using the shift key.
-
-
+.. attribute::
+    avendesora.SHIFTED = UPPERCASE + '~!@#$%^&*()_+{}|:"<>?':
+    ASCII characters that are typed using the shift key.
 
 
 Obscured Secret Classes

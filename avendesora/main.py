@@ -37,8 +37,9 @@ Use 'avendesora help' for list of available help topics.
 # Imports {{{1
 from .command import Command
 from .config import read_config, get_setting
+from .error import PasswordError
 from .gpg import GnuPG, BufferedFile
-from inform import Inform, Error, fatal, output, terminate, debug, os_error
+from inform import Inform, Error, done, fatal, output, terminate, debug, os_error
 from shlib import to_path
 from docopt import docopt
 import sys
@@ -46,25 +47,26 @@ import sys
 
 # Main {{{1
 def main():
-    # read config file
-    read_config()
+    try:
+        # read config file
+        read_config()
 
-    # read command line
-    cmdline = docopt(
-        __doc__.format(commands=Command.summarize()),
-        options_first=True
-    )
+        # read command line
+        cmdline = docopt(
+            __doc__.format(commands=Command.summarize()),
+            options_first=True
+        )
 
-    # start logging
-    logfile = BufferedFile(get_setting('log_file'), True)
-    with Inform(logfile=logfile, hanging_indent=False):
-        try:
+        # start logging
+        logfile = BufferedFile(get_setting('log_file'), True)
+        with Inform(logfile=logfile, hanging_indent=False):
             Command.execute(cmdline['<command>'], cmdline['<args>'])
-        except KeyboardInterrupt:
-            output('Terminated by user.')
-        except Error as err:
-            err.terminate()
-        except OSError as err:
-            fatal(os_error(err))
-
+            done()
+    except KeyboardInterrupt:
+        output('Terminated by user.')
         terminate()
+    except (PasswordError, Error) as e:
+        e.terminate()
+    except OSError as e:
+        fatal(os_error(e))
+    done()

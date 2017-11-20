@@ -1,12 +1,10 @@
+from .account import Account, StealthAccount, Script, AccountValue
 from .charsets import (
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
     HEXDIGITS, PUNCTUATION, SYMBOLS, WHITESPACE, PRINTABLE, DISTINGUISHABLE
 )
-from .account import Account, StealthAccount, Script
-from .secrets import (
-    Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
-    BirthDate, SecretExhausted
-)
+from .error import PasswordError
+from .generator import PasswordGenerator
 from .obscure import Hide, Hidden, GPG
 try:
     from .obscure import Scrypt
@@ -17,8 +15,14 @@ from .recognize import (
     RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
     RecognizeFile
 )
-from .generator import PasswordGenerator
-from inform import Error as PasswordError
+from .secrets import (
+    Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
+    BirthDate, SecretExhausted
+)
+
+# the following are used when generating the documentation and are not needed
+# otherwise
+from . import command
 
 __version__ = '1.7.20'
 __released__ = '2017-11-18'

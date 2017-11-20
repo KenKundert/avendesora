@@ -18,8 +18,9 @@
 
 # Imports {{{1
 from .config import get_setting
+from .error import PasswordError
 from shlib import Run, to_path
-from inform import codicil, fatal, os_error, output, warn, is_str, indent
+from inform import codicil, os_error, output, warn, is_str, indent
 from textwrap import dedent, wrap
 from pkg_resources import resource_filename
 from stat import ST_MODE
@@ -90,8 +91,8 @@ def validate_components():
     ]:
         try:
             contents = path.read_text()
-        except OSError as err:
-            fatal(os_error(err))
+        except OSError as e:
+            raise PasswordError(os_error(e))
         md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
         # Check that file has not changed.
         if md5 != get_setting(kind):

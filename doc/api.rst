@@ -38,120 +38,50 @@ programming interface are described next.
 Components
 ----------
 
-PasswordGenerator():
+This section documents the programming interface for *Avendesora*.  You can view 
+the *Avendesora* source code, particularly :mod:`avendesora.command`, for 
+further examples on how to use this interface.
 
-    Initializes the password generator. You should pass no arguments.
-    Calling this class causes Avendesora to open all the various account files 
-    and returns an object that allows you access to the accounts. Specifically 
-    you can use the *get_account()* or *all_accounts()* methods to access an 
-    account or all the accounts.
+PasswordGenerator Class
+"""""""""""""""""""""""
 
-PasswordError():
+This is the entry class to *Avendesora*. It is the only class you need 
+instantiate directly. By instantiating it you cause *Avendesora* to read the 
+user's account files.
 
-    *Avendesora* uses `Inform <http://nurdletech.com/linux-utilities/inform>`_ 
-    for messaging, and Avendesora's *PasswordError* is actually Inform's *Error* 
-    class. So *PasswordError* provides all of the features that Inform's *Error* 
-    class does. Specifically it provides the *report* and *terminate* methods 
-    that prints the message or prints a message and terminates.
-    *PasswordError* also provides get_message() and get_culprit() methods, which 
-    return the message and the culprit. You can also cast the exception to 
-    a string to get a string that contains both the message and the culprit 
-    formatted so that it can be shown to the user.
+.. autoclass:: avendesora.PasswordGenerator
+    :members:
 
-PasswordGenerator.all_accounts():
 
-    Iterates through all normal accounts (no stealth accounts are returned.
+Account Class
+"""""""""""""
 
-PasswordGenerator.get_account(name, request_seed=False, stealth_name=None):
+.. autoclass:: avendesora.Account
+    :members:
+        get_name, get_value, get_username, get_passcode, get_fields, get_values, 
+        get_scalar, get_composite
 
-    Accesses a particular account. Takes a string for the account name or alias.  
-    Optionally takes a second string that is used as an additional seed (see: 
-    :ref:`misdirection`).
 
-    The stealth name is used as account name if the account is a stealth 
-    account.
+AccountValue Class
+""""""""""""""""""
 
-Account.get_name():
+.. autoclass:: avendesora.AccountValue
+    :members:
 
-    Returns the primary account name. This is generally the class name converted 
-    to lower case unless it was overridden with the NAME attribute.
 
-Account.get_value(field):
+PasswordError Exception
+"""""""""""""""""""""""
 
-    Returns the value of a particular account attribute given a user-oriented 
-    string that describes the desired attribute.  The value requested must be 
-    a scalar value, meaning that you must individually request members of arrays 
-    or dictionary attibutes. Here are some examples that demonstrate the various 
-    ways of accessing the various kinds of attributes::
+.. autoexception:: avendesora.PasswordError
+    :members: get_message, get_culprit, report, terminate
+    :inherited-members:
 
-        passcode = account.get_value()
-        username = account.get_value('username')
-        both = account.get_value('username: {username}, password: {passcode}')
-        checking = account.get_value('accounts.checking')
-        savings = account.get_value('accounts[checking]')
-        answer0 = account.get_value(0)
-        answer1 = account.get_value('questions.1')
-        answer2 = account.get_value('questions[2]')
+    This exception subclasses `inform.Error <https://github.com/KenKundert/inform#exception>`_.
 
-    The value is returned as an object that contains six attributes, *value* 
-    (the actual value), *is_secret* (whether the value is secret or contains 
-    a secret), *name* (the name of the value), *desc* (the description, contains 
-    the actual question of the answer to a question is requested), *field* (the 
-    field name) and *key* (the key name, if any).  Converting the object to 
-    a string returns the value rendered as a string.  There is also the render() 
-    method that returns a string that combines the name and the description with 
-    the value. You can pass in a collection of format strings into render() 
-    where the following attributes are replaced by the corresponding values:
 
-      | n -- name (identifier for the first level of a field)
-      | k -- key (identifier for the second level of a field)
-      | f -- field (name.key)
-      | d -- description
-      | v -- value
 
-    If a format string references an attribute that is not set, it is skipped.  
-    The first format string that has all of the interpolated values is used.
-
-Account.get_scalar(name, key=None, default=False):
-
-    A lower level interface than *get_value()* that given a name and perhaps 
-    a key returns a scalar value.  Also takes an optional default value that is 
-    returned if the value is not found. Unlike *get_value()*, the actual value 
-    is returned, not a object that contains multiple facets of the value.
-
-    The *name* is the field name, and the *key* would identity which value is 
-    desired if the field is a composite. If default is False, an error is raised 
-    if the value is not present, otherwise the default value itself is returned.
-
-Account.get_composite(name):
-
-    A lower level interface than *get_value()* that given a name returns the 
-    value of the associated field, which may be a scalar (string or integer) or 
-    a composite (array of dictionary).  Unlike *get_value()*, the actual value 
-    is returned, not a object that contains multiple facets of the value.
-
-Account.get_username():
-
-    Like *get_value()*, but tries the *credential_ids* in order and returns the 
-    first found. *credential_ids* is an Avendesora configuration setting that by 
-    default is *username* and *email*.
-
-Account.get_passcode():
-
-    Like *get_value()*, but tries the *credential_secrets* in order and returns 
-    the first found. *credential_secrets* is an Avendesora configuration setting 
-    that by default is *password*, *passphrase* and *passcode*.
-
-Account.get_fields():
-
-    Iterates through the field returning 2-tuple that contains both field name 
-    and the key names.  None is returned for the key names if the field holds 
-    a scalar value.
-
-Account.get_values(name):
-    Iterates through each value of a particular field, returning the key and the 
-    value. The value is an AccountValue. If field is a scalar, the key is None.
-
+Example: Displaying Account Values
+----------------------------------
 
 The following example prints out all account values for account whose name are 
 found in a list.

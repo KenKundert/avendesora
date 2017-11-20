@@ -19,9 +19,10 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
+from .error import PasswordError
 from .preferences import CONFIG_DEFAULTS, NONCONFIG_SETTINGS
 from shlib import to_path
-from inform import Error, comment, warn, is_str
+from inform import comment, warn, is_str
 
 # Globals {{{1
 Config = {}
@@ -58,7 +59,7 @@ def read_config():
                     )
             Config[k] = v
         Config['READ'] = True
-    except Error as err:
+    except PasswordError:
         comment('not found.', culprit=config_file)
 
     # Now open the hashes file
@@ -66,7 +67,7 @@ def read_config():
     try:
         contents = hashes_file.run()
         Config.update({k.lower(): v for k,v in contents.items()})
-    except Error as err:
+    except PasswordError:
         pass
 
     # Now open the account list file
@@ -74,7 +75,7 @@ def read_config():
     try:
         contents = account_list_file.run()
         Config.update({k.lower(): v for k,v in contents.items()})
-    except Error as err:
+    except PasswordError:
         pass
 
     # initilize GPG
@@ -88,7 +89,7 @@ def read_config():
         try:
             contents = user_key_file.run()
             Config.update({k.lower(): v for k,v in contents.items()})
-        except Error as err:
+        except PasswordError:
             pass
 
 

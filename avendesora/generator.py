@@ -21,6 +21,7 @@
 from .account import Account
 from .config import read_config, get_setting
 from .dialog import show_list_dialog
+from .error import PasswordError
 from .gpg import GnuPG, PythonFile, GPG_EXTENSIONS
 from .obscure import Hidden
 from .preferences import (
@@ -33,7 +34,7 @@ from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_components
 from inform import (
-    codicil, conjoin, debug, Error, error, notify, log, os_error, render, warn
+    codicil, conjoin, debug, error, notify, log, os_error, render, warn
 )
 from shlib import to_path, mv, rm
 from textwrap import dedent, fill
@@ -42,6 +43,24 @@ import os
 
 # PasswordGenerator class{{{1
 class PasswordGenerator(object):
+    """Initializes the password generator.
+    You should pass no arguments unless you are creating the user's Avendesora
+    data directory.
+
+    Calling this class causes Avendesora to open all the various account files
+    and returns an object that allows you access to the accounts. Specifically
+    you can use the get_account() or all_accounts() methods to access an account
+    or all the accounts.
+
+    Args:
+        init (bool): Create user's directory.
+        gpg_ids (list of strings):
+            List of GPG identities to use when creating user's directory.
+
+    Raises:
+        :exc:`avendesora.PasswordError`:
+            Indicates an issue opening the user's accounts.
+    """
 
     # Constructor {{{2
     def __init__(self, init=False, gpg_ids=None):
@@ -55,7 +74,7 @@ class PasswordGenerator(object):
 
         # create the avendesora data directory
         if init:
-            self.initialize(gpg_ids, init)
+            self._initialize(gpg_ids, init)
             return
 
         # read the accounts files
@@ -99,8 +118,8 @@ class PasswordGenerator(object):
                     "to create the archive."
                 )
 
-    # initialize() {{{2
-    def initialize(self, gpg_ids, filename):
+    # _initialize() {{{2
+    def _initialize(self, gpg_ids, filename):
         # If filename is True, this is being called as part of the Avendesora
         # 'initialize' command, in which case all missing files should be created.
         # If filename is a string, this is being called as part of the
@@ -144,7 +163,7 @@ class PasswordGenerator(object):
         if filename is True:
             path = to_path(get_setting('account_list_file'))
             if path.suffix in GPG_EXTENSIONS:
-                raise Error('encryption is not supported.', culprit=path)
+                raise PasswordError('encryption is not supported.', culprit=path)
 
             # Assure that the default initial set of files is present
             for path, contents in [
@@ -170,9 +189,9 @@ class PasswordGenerator(object):
                 # do not sort, the first file is treated special
             path = to_path(get_setting('settings_dir'), filename)
             if path.exists():
-                raise Error('exists.', culprit=path)
+                raise PasswordError('exists.', culprit=path)
             if path.suffix in GPG_EXTENSIONS and not gpg_ids:
-                raise Error('Must specify GPG IDs.')
+                raise PasswordError('Must specify GPG IDs.')
             log('creating accounts file.', culprit=path)
             f = PythonFile(path)
             f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
@@ -187,18 +206,58 @@ class PasswordGenerator(object):
                 mv(path, str(path) + '~')
                 f.create(ACCOUNT_LIST_FILE_CONTENTS.format(**fields), gpg_ids)
             except OSError as e:
-                raise Error(os_error(e))
+                raise PasswordError(os_error(e))
 
     # get_account() {{{2
     def get_account(self, name, request_seed=False, stealth_name=None):
+        """Return a specific account.
+
+        Args:
+            name (str):
+                Looks up an account by name and returns it. This name must match
+                an account name or an account alias. The matching algorithm
+                ignores case and treats dash and underscore as equivalent.
+            request_seed (str or bool):
+                If specified an additional seed is provided to the account (see:
+                :ref:`misdirection <misdirection>`).  It may be specified as a
+                string, in which case it is used as the seed.  Otherwise if
+                true, the seed it requested directly from the user.
+            stealth_name (str):
+                The name used as the account name if the account is a stealth
+                account.
+
+        Returns:
+            :class:`avendesora.Account`: An account. The class itself is
+            returned, and not an instance of the class.
+
+        Raises:
+            :exc:`avendesora.PasswordError`:
+                There is no account that matches the given name.
+        """
         if not name:
-            raise Error('no account specified.')
+            raise PasswordError('no account specified.')
         account = Account.get_account(name)
         account.initialize(request_seed, stealth_name)
         return account
 
     # discover_account() {{{2
     def discover_account(self, title=None, verbose=False):
+        """Discover the account from the environment.
+
+        Examine the environment and return the account that matches. If more
+        than one account/secret matches, user is queried to resolve the
+        ambiguity.
+
+        Args:
+            title (str): Override the window title. This is used for debugging.
+            verbose (bool):
+                Run the discovery process in verbose mode (adds more information
+                to log file that can help debug account discovery.
+
+        Raises:
+            :exc:`avendesora.PasswordError`:
+                There is no account that matches the given environment.
+        """
         log('Account Discovery ...')
 
         if not verbose:
@@ -227,7 +286,7 @@ class PasswordGenerator(object):
         if not matches:
             msg = 'cannot find appropriate account.'
             notify(msg)
-            raise Error(msg)
+            raise PasswordError(msg)
         if len(matches) > 1:
             choice = show_list_dialog('Choose Secret', sorted(matches.keys()))
             if choice:
@@ -239,29 +298,51 @@ class PasswordGenerator(object):
 
     # all_accounts() {{{2
     def all_accounts(self):
+        "Iterate through all accounts."
         for account in Account.all_accounts():
             yield account
 
     # find_acounts() {{{2
     def find_accounts(self, target):
+        """Find accounts with names or aliases that contain a substring.
+
+        Args:
+            target (str): The desired substring.
+
+        Returns:
+            :class:`avendesora.Account`: Iterates through matching accounts.
+        """
         for account in self.all_accounts():
             if account.id_contains(target):
                 yield account
 
     # search_acounts() {{{2
     def search_accounts(self, target):
+        """Find accounts with values that contain a substring.
+
+        Args:
+            target (str): The desired substring.
+
+        Returns:
+            :class:`avendesora.Account`: Iterates through matching accounts.
+        """
         for account in self.all_accounts():
             if account.account_contains(target):
                 yield account
 
     # challenge_response() {{{2
     def challenge_response(self, name, challenge):
-        """Generate a response to a challenge
+        """Generate a response to a challenge.
 
         Given the name of a master seed (actually the basename of the file that
         contains the master seed), returns an identifying response to a
         challenge. If no challenge is provided, one is generated based on the
-        time and date. Returns both the challenge and the response as a tuple.
+        time and date. Returns both the challenge and the expected response as a
+        tuple.
+
+        Args:
+            name (str): The name of the master seed.
+            challenge (str): The challenge (may be empty).
         """
 
         try:
@@ -277,8 +358,7 @@ class PasswordGenerator(object):
             return challenge, response
         except KeyError:
             choices = conjoin(sorted(self.shared_secrets.keys()))
-            raise Error(
+            raise PasswordError(
                 'Unknown partner. Choose from %s.' % choices,
                 culprit=name
             )
-

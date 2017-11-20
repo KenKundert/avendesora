@@ -38,8 +38,8 @@ class Dictionary(object):
         # open the dictionary
         try:
             contents = path.read_text()
-        except OSError as err:
-            error(os_error(err))
+        except OSError as e:
+            error(os_error(e))
             contents = ''
 
         self.hash = hashlib.md5(contents.encode('utf-8')).hexdigest()

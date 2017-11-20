@@ -22,12 +22,13 @@
 from .browsers import StandardBrowser
 from .collection import Collection
 from .config import get_setting
+from .error import PasswordError
 from .obscure import ObscuredSecret
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import GeneratedSecret
 from inform import (
-    Color, codicil, conjoin, cull, debug, Error, is_collection, is_str, log,
+    Color, codicil, conjoin, cull, debug, is_collection, is_str, log,
     notify, output, warn, indent,
     ddd, ppp, vvv
 )
@@ -55,12 +56,13 @@ def canonicalize(name):
 
 # AccountValue class {{{1
 class AccountValue:
-    """An Account Value
+    """An account value.
 
-    Contains three attributes:
-        value: the actual value
-        is_secret: whether the value is secret or contains a secret
-        label: a descriptive name for the value if the value of a  simple field is requested
+    This is the object returned by :meth:`avendesora.Account.get_value` and
+    :meth:`avendesora.Account.get_values`.
+    It contains information about a single account value. Specifically, it
+    provides the following attributes: *value*, *is_secret*, *name*, *key*,
+    *field*, and *desc*.
     """
     def __init__(self, value, is_secret, name=None, key=None, desc=None):
         self.value = value
@@ -78,17 +80,23 @@ class AccountValue:
         return str(self.value)
 
     def render(self, fmts=('{f} ({d}): {v}', '{f}: {v}')):
-        """Uses fmts to generate a string containing the value.
+        """Return value formatted as a string.
 
-        fmts contains a sequence of format strings that are tried in sequence.
-        The first one for which all keys are known is used.
-        The possible keys are:
-            n -- name (identifier for the first level of a field)
-            k -- key (identifier for the second level of a field)
-            f -- field (name.key)
-            d -- description
-            v -- value
-        In none work, the value alone is returned.
+        Args:
+            fmts (collection of strings):
+                *fmts* contains a sequence of format strings that are tried in
+                sequence.  The first one for which all keys are known is used.
+                The possible keys are:
+
+                | n -- name (identifier for the first level of a field)
+                | k -- key (identifier for the second level of a field)
+                | f -- field (name.key)
+                | d -- description
+                | v -- value
+
+                If none work, the value alone is returned.
+        Returns:
+            The value rendered as a string.
         """
         value = str(self.value)
         if '\n' in value:
@@ -117,22 +125,26 @@ class AccountValue:
         # nothing worked, just return the value
         return value
 
-    def __iter__(self):
-        "Cast AccountValue to a tuple to get value, is_secret, name, and desc."
-        for each in [str(self), self.is_secret, self.name, self.desc]:
-            yield each
-
 
 # Script class {{{1
 class Script:
     """Script
 
     Takes a string that contains attributes. Those attributes are expanded
-    before being output. For example, *Script('username: {username}, password:
-    {passcode}')*. In this case, *{username}* and *{passcode}* are replaced by with
-    the value of the corresponding account attribute. In addition to the account
+    before being output. For example::
+
+        Script('username: {username}, password: {passcode}')
+
+    In this case, *{username}* and *{passcode}* are replaced by with the value
+    of the corresponding account attribute. In addition to the account
     attributes, *{tab}* and *{return}* are replaced by a tab or carriage return
     character.
+
+    Args:
+        script (str):  The script.
+
+    Raises:
+        :exc:`avendesora.PasswordError`: attribute not found.
     """
     def __init__(self, script='username: {username}, password: {passcode}'):
         self.script = script
@@ -172,6 +184,8 @@ class Script:
 
 # Account class {{{1
 class Account(object):
+    """Class that holds all the information specific to an account."""
+
     __NO_MASTER = True
         # prevents master seed from being added to this base class
     _accounts = {}
@@ -193,11 +207,19 @@ class Account(object):
         try:
             return Account._accounts[canonical]
         except KeyError:
-            raise Error('account not found.', culprit=name)
+            raise PasswordError('account not found.', culprit=name)
 
     # get_name() {{{2
     @classmethod
     def get_name(cls):
+        """Get account name.
+
+        Returns:
+            Returns the primary account name. This is generally the class name
+            converted to lower case unless it was overridden with the NAME
+            attribute.
+        """
+
         try:
             return cls.NAME
         except AttributeError:
@@ -330,7 +352,7 @@ class Account(object):
                 else:
                     msg = 'url matches, but uses wrong protocol.'
                     notify(msg)
-                    raise Error(msg, culprit=cls.get_name())
+                    raise PasswordError(msg, culprit=cls.get_name())
 
     # initialize() {{{2
     @classmethod
@@ -344,7 +366,7 @@ class Account(object):
                         'high value master seed not contained in encrypted',
                         'account file.', culprit=cls.get_name()
                     )
-        except AttributeError as err:
+        except AttributeError:
             pass
         for bad, good in get_setting('commonly_mistaken_attributes').items():
             if hasattr(cls, bad):
@@ -356,7 +378,7 @@ class Account(object):
 
         # do some more error checking
         if isinstance(getattr(cls, 'master', None), GeneratedSecret):
-            raise Error(
+            raise PasswordError(
                 'master must not be a subclass of GeneratedSecret.',
                 culprit=cls.get_name()
             )
@@ -377,6 +399,31 @@ class Account(object):
     # get_fields() {{{2
     @classmethod
     def get_fields(cls, all=False):
+        """Iterate through fields.
+
+        Iterates through the field names.
+
+        Example::
+
+            for name, keys in account.get_fields():
+                if keys:
+                    display(name + ':')
+                    for key, value in account.get_values(name):
+                        display(indent(
+                            value.render(('{k}) {d}: {v}', '{k}: {v}'))
+                        ))
+                else:
+                    value = account.get_value(name)
+                    display(value.render('{n}: {v}'))
+
+        Args:
+            all (bool):
+                If False, ignore the tool fields.
+
+        Returns:
+            A pair (2-tuple) that contains both field name and the key names.
+            None is returned for the key names if the field holds a scalar value.
+        """
         for field in sorted(cls.__dict__):
             if not field.startswith('_') and (all or field not in TOOL_FIELDS):
                 value = getattr(cls, field)
@@ -388,13 +435,34 @@ class Account(object):
     # get_scalar() {{{2
     @classmethod
     def get_scalar(cls, name, key=None, default=False):
-        "Get field Value given a field name and key"
+        """Get field Value given a field name and key.
+
+        A lower level interface than *get_value()* that given a name and perhaps
+        a key returns a scalar value.  Also takes an optional default value that is
+        returned if the value is not found. Unlike *get_value()*, the actual value
+        is returned, not a object that contains multiple facets of the value.
+
+        The *name* is the field name, and the *key* would identity which value is
+        desired if the field is a composite. If default is False, an error is raised
+        if the value is not present, otherwise the default value itself is returned.
+
+        Args:
+            name (str):
+                The name of the field.
+            key (str or int)
+                The key for the desired value (should be None for scalar values).
+            default:
+                The value to return if the requested value is not available.
+
+        Returns:
+            The requested value.
+        """
         value = getattr(cls, name, None)
         if value is None:
             if name == 'NAME':
                 return cls.get_name()
             if default is False:
-                raise Error(
+                raise PasswordError(
                     'field not found.',
                     culprit=(cls.get_name(), cls.combine_field(name, key))
                 )
@@ -412,7 +480,7 @@ class Account(object):
                         choices['   %s: %s' % (k, desc)] = k
                     else:
                         choices['   %s:' % k] = k
-                raise Error(
+                raise PasswordError(
                     'composite value found, need key. Choose from:',
                     *sorted(choices.keys()),
                     sep = '\n',
@@ -428,13 +496,15 @@ class Account(object):
                     warn('not a composite value, key ignored.', culprit=name)
                     key = None
             except (IndexError, KeyError, TypeError):
-                raise Error('key not found.', culprit=cls.combine_field(name, key))
+                raise PasswordError(
+                    'key not found.', culprit=cls.combine_field(name, key)
+                )
 
         # initialize the value if needed
         try:
             value.initialize(cls, name, key)
                 # if Secret or Script, initialize otherwise raise exception
-        except AttributeError as err:
+        except AttributeError:
             pass
         return value
 
@@ -448,7 +518,9 @@ class Account(object):
             try:
                 return isinstance(value, (GeneratedSecret, ObscuredSecret))
             except (IndexError, KeyError, TypeError):
-                raise Error('not found.', culprit=cls.combine_field(name, key))
+                raise PasswordError(
+                    'not found.', culprit=cls.combine_field(name, key)
+                )
 
     # split_field() {{{2
     @classmethod
@@ -484,7 +556,7 @@ class Account(object):
             elif len(field) == 2:
                 name, key = field[0], field[1]
             else:
-                raise Error('too many values.', culprit=field)
+                raise PasswordError('too many values.', culprit=field)
         elif is_str(field):
             # split field if given in the form: name[key]
             match = VECTOR_PATTERN.match(field)
@@ -505,14 +577,14 @@ class Account(object):
                     name, key = default, None
                     break
             else:
-                raise Error(
+                raise PasswordError(
                     'no default available, you must request a specific value.',
                     culprit=cls.get_name()
                 )
         elif type(field) is int:
             name, key = get_setting('default_vector_field'), int(field)
         else:
-            raise Error('invalid field.', culprit=field)
+            raise PasswordError('invalid field.', culprit=field)
 
         # look up name and key
         return cls.find_field(name, key)
@@ -529,7 +601,7 @@ class Account(object):
         try:
             name = names[name.replace('-', '_').lower()]
         except KeyError:
-            raise Error('field not found.', culprit=name)
+            raise PasswordError('field not found.', culprit=name)
 
         # name is now the true field name, now resolve key
         if key is None:
@@ -547,7 +619,7 @@ class Account(object):
             try:
                 key = keys[key.replace('-', '_').lower()]
             except KeyError:
-                raise Error('key not found.', culprit=key)
+                raise PasswordError('key not found.', culprit=key)
         except AttributeError:
             key = None
         return name, key
@@ -565,18 +637,26 @@ class Account(object):
     # get_value() {{{2
     @classmethod
     def get_value(cls, field=None):
-        """Get Account Value
+        """Get account value.
 
         Return value from the account given a user friendly identifier or
         script. User friendly identifiers include:
-            None: value of default attribute
-            name: scalar value
-            name.key or name[key]:
-                member of a dictionary or array
-                key is string for dictionary, integer for array
-        Scripts are simply strings with embedded attributes. Ex:
-            'username: {username}, password: {passcode}'
-        Returns a tuple: value, is_secret, label
+
+         |  *None*: value of default field
+         |  *name*: scalar value
+         |  *name.key* or *name[key]*:
+         |      member of a dictionary or array
+         |      key is string for dictionary, integer for array
+
+        Scripts are simply strings with embedded attributes.
+        Ex: *'username: {username}, password: {passcode}'*
+
+        Args:
+            field (str):
+                Field identifier or script.
+
+        Returns:
+            :class:`avendesora.AccountValue`: the desired value.
         """
         # get default if field was not given
         if field is None:
@@ -608,9 +688,14 @@ class Account(object):
     def get_values(cls, name):
         """Iterate through the values for a field.
 
-        Takes a field name and generates all the values of that field. The key
-        and an AccountValue object is returned for each value. If the value is a
-        scalar, the key is None.
+        Args:
+            name (str):
+                The name of the field.
+
+        Returns:
+            Returns a pair (2-tuple) that contains the key and the value given
+            as an :class:`avendesora.AccountValue` for each of the values.  If
+            the value is a scalar, the key is None.
         """
         name, key = cls.find_field(name)
         value = getattr(cls, name, None)
@@ -633,7 +718,21 @@ class Account(object):
     # get_composite() {{{2
     @classmethod
     def get_composite(cls, name):
-        "Get field value given a field name"
+        """Get field value given a field name.
+
+        A lower level interface than *get_value()* that given a name returns the
+        value of the associated field, which may be a scalar (string or integer)
+        or a composite (array of dictionary).  Unlike *get_value()*, the actual
+        value is returned, not a object that contains multiple facets of the
+        value.
+
+        Args:
+            name (str):
+                The name of the field.
+
+        Returns:
+            The requested value.
+        """
         value = getattr(cls, name, None)
         if value is None:
             if name == 'NAME':
@@ -762,9 +861,9 @@ class Account(object):
                     msg = 'unknown key, choose from {}.'
                 else:
                     msg = 'key required, choose from {}.'
-                raise Error(msg.format(conjoin(keys)), culprit=key)
+                raise PasswordError(msg.format(conjoin(keys)), culprit=key)
             else:
-                raise Error(
+                raise PasswordError(
                     'keys are not supported with urls on this account.',
                     culprit=key
                 )
@@ -785,21 +884,39 @@ class Account(object):
     # get_username() {{{2
     @classmethod
     def get_username(cls):
+        """Get the username.
+
+        Like *get_value()*, but tries the *credential_ids* in order and returns
+        the first found. *credential_ids* is an Avendesora configuration setting
+        that by default is *username* and *email*.
+
+        Returns:
+            The username or email address.
+        """
         identities = Collection(get_setting('credential_ids'))
         for identity in identities:
             try:
                 return cls.get_value(identity)
-            except Error:
+            except PasswordError:
                 pass
 
     # get_passcode() {{{2
     @classmethod
     def get_passcode(cls):
+        """Get the passcode.
+
+        Like *get_value()*, but tries the *credential_secrets* in order and returns
+        the first found. *credential_secrets* is an Avendesora configuration setting
+        that by default is *password*, *passphrase*, and *passcode*.
+
+        Returns:
+            The passcode.
+        """
         secrets = Collection(get_setting('credential_secrets'))
         for passcode in secrets:
             try:
                 return cls.get_value(passcode)
-            except Error:
+            except PasswordError:
                 pass
 
 

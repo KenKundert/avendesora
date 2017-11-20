@@ -23,12 +23,13 @@
 # Imports {{{1
 from . import cursor
 from .config import get_setting
+from .error import PasswordError
 from .dialog import show_list_dialog
 from .preferences import INITIAL_AUTOTYPE_DELAY
 from shlib import Run
 from inform import (
-    Color, Error,
-    codicil, cull, error, fatal, log, output, warn, indent, os_error,
+    Color,
+    codicil, cull, error, log, output, warn, indent, os_error,
     ddd, ppp, vvv
 )
 from time import sleep
@@ -109,10 +110,7 @@ class Writer(object):
         # treat field as name rather than script if it there are not attributes
         if '{' not in field:
             name, key = account.split_field(field)
-            try:
-                value = account.get_scalar(name, key)
-            except Error as err:
-                err.terminate()
+            value = account.get_scalar(name, key)
             is_secret = account.is_secret(name, key)
             label = account.combine_field(name, key)
             try:
@@ -140,13 +138,10 @@ class Writer(object):
                     pass
                 else:
                     name, key = account.split_field(cmd)
-                    try:
-                        value = account.get_scalar(name, key)
-                        out.append(dedent(str(value)).strip())
-                        if account.is_secret(name, key):
-                            is_secret = True
-                    except Error as err:
-                        err.terminate()
+                    value = account.get_scalar(name, key)
+                    out.append(dedent(str(value)).strip())
+                    if account.is_secret(name, key):
+                        is_secret = True
             else:
                 out.append(term)
         return ''.join(out), is_secret, None
@@ -223,8 +218,8 @@ class ClipboardWriter(Writer):
         log('Writing to clipboard.')
         try:
             Run(base_cmd + ['-i'], 'soeW', stdin=value+'\n')
-        except Error as err:
-            err.terminate()
+        except OSError as e:
+            raise PasswordError(os_error(e))
 
         if is_secret:
             # produce count down
@@ -239,8 +234,8 @@ class ClipboardWriter(Writer):
             # clear the clipboard
             try:
                 Run(base_cmd + ['-c'], 'soew')
-            except Error as err:
-                err.terminate()
+            except OSError as e:
+                raise PasswordError(os_error(e))
 
         # Use Gobject Introspection (GTK) to put the information on the
         # clipboard (for some reason I cannot get this to work).
@@ -264,12 +259,9 @@ class StdoutWriter(Writer):
         # get string to display
         value = account.get_value(field)
 
-        try:
-            # don't use inform otherwise password shows up in logfile
-            print(str(value))
-            log('writing secret to standard output.')
-        except Error as err:
-            err.terminate()
+        # don't use inform otherwise password shows up in logfile
+        print(str(value))
+        log('writing secret to standard output.')
 
 
 # KeyboardWriter class {{{1
@@ -284,8 +276,8 @@ class KeyboardWriter(Writer):
             try:
                 #[get_setting('xdotool_executable'), 'getactivewindow'] +
                 Run(get_setting('xdotool_executable').split() + args, 'soeW')
-            except OSError as err:
-                fatal(os_error(err))
+            except OSError as e:
+                raise PasswordError(os_error(e))
 
         keysyms = []
         for char in text:
@@ -303,11 +295,8 @@ class KeyboardWriter(Writer):
         # get string to display
         value = account.get_value(field)
 
-        try:
-            log('writing secret to keyboard writer.')
-            self._autotype(str(value))
-        except Error as err:
-            err.terminate()
+        log('writing secret to keyboard writer.')
+        self._autotype(str(value))
 
     def run_script(self, account, script, dryrun):
 
@@ -345,17 +334,18 @@ class KeyboardWriter(Writer):
                             out = []
                         sleep(float(cmd[1]))
                         scrubbed.append('<sleep %s>' % cmd[1])
-                    except (AssertionError, TypeError):
-                        raise
-                        fatal('syntax error in keyboard script.', culprit=term)
+                    except TypeError:
+                        raise PasswordError(
+                            'syntax error in keyboard script.', culprit=term
+                        )
                 else:
                     name, key = account.split_field(cmd)
                     try:
                         value = account.get_scalar(name, key)
-                    except Error as err:
-                        if err.is_collection and len(err.collection):
+                    except PasswordError as e:
+                        if e.is_collection and len(e.collection):
                             # is composite value, ask user which one is desired
-                            choices = err.collection
+                            choices = e.collection
                             if len(choices) == 1:
                                 choice = choices.keys()[0]
                             else:
@@ -363,13 +353,10 @@ class KeyboardWriter(Writer):
                                     'Choose from %s' % name,
                                     sorted(choices.keys())
                                 )
-                            try:
-                                key = choices[choice]
-                                value = account.get_scalar(name, key)
-                            except Error as err:
-                                err.terminate()
+                            key = choices[choice]
+                            value = account.get_scalar(name, key)
                         else:
-                            err.terminate()
+                            raise
                     value = dedent(str(value)).strip()
                     out.append(value)
                     if account.is_secret(name, key):

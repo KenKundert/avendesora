@@ -26,8 +26,9 @@
 
 # Imports {{{1
 from .config import get_setting, setting_path
+from .error import PasswordError
 from shlib import Run
-from inform import Error, log
+from inform import log
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -57,7 +58,7 @@ class Title(object):
         else:
             xdotool = get_setting('xdotool_executable')
             if not xdotool:
-                raise Error(
+                raise PasswordError(
                     "must set xdotool_executable'.",
                     culprit=setting_path('xdotool_executable')
                 )
@@ -66,8 +67,8 @@ class Title(object):
                     [xdotool, 'getactivewindow', 'getwindowname'],
                     'sOeW'
                 )
-            except OSError as err:
-                raise Error(str(err))
+            except OSError as e:
+                raise PasswordError(str(e))
             title = output.stdout.strip()
         log('Focused window title:\n    %s' % title)
         data = {'rawtitle': title}
