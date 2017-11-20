@@ -3,7 +3,7 @@
 Avendesora Collaborative Password Utility
 =========================================
 
-| Version: 1.7.20
+| Version: 1.7.21
 | Released: 2017-11-19
 | Please report all bugs and suggestions at
   `Github <https://github.com/KenKundert/avendesora/issues>`_

@@ -26,7 +26,7 @@ Releases
     - add credentials command.
 
 **Latest development release**:
-    | Version: 1.7.20
+    | Version: 1.7.21
     | Released: 2017-11-19
 
     - created the manual
