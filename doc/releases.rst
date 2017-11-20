@@ -26,8 +26,8 @@ Releases
     - add credentials command.
 
 **Latest development release**:
-    | Version: 1.7.21
-    | Released: 2017-11-19
+    | Version: 1.7.22
+    | Released: 2017-11-20
 
     - created the manual
     - use keyboard writer if there is no access to TTY
