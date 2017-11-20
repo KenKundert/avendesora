@@ -125,6 +125,11 @@ class AccountValue:
         # nothing worked, just return the value
         return value
 
+    def __iter__(self):
+        "Cast AccountValue to a tuple to get value, is_secret, name, and desc."
+        for each in [str(self), self.is_secret, self.name, self.desc]:
+            yield each
+
 
 # Script class {{{1
 class Script:
