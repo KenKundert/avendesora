@@ -29,60 +29,76 @@ These are useful when constructing generated secrets.
 
 .. autofunction:: avendesora.exclude
 
-.. attribute:: avendesora.LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+.. attribute:: avendesora.LOWERCASE
 
-    Lower case ASCII letters.
+    Lower case ASCII letters:
+    :attr:`avendesora.LOWERCASE` = "abcdefghijklmnopqrstuvwxyz"
 
-.. attribute:: avendesora.UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-    Upper case ASCII letters.
+.. attribute:: avendesora.UPPERCASE
 
-.. attribute:: avendesora.LETTERS = avendesora.LOWERCASE  + avendesora.UPPERCASE
+    Upper case ASCII letters:
+    :attr:`avendesora.UPPERCASE` = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-    Upper and lower case ASCII letters.
 
-.. attribute:: avendesora.DIGITS = "0123456789"
+.. attribute:: avendesora.LETTERS
 
-    ASCII digits.
+    Upper and lower case ASCII letters:
+    :attr:`avendesora.LETTERS` = :attr:`avendesora.LOWERCASE` + :attr:`avendesora.UPPERCASE`
 
-.. attribute:: avendesora.ALPHANUMERIC = avendesora.LETTERS + avendesora.DIGITS
 
-    ASCII letters and digits.
+.. attribute:: avendesora.DIGITS
 
-.. attribute:: avendesora.HEXDIGITS = "0123456789abcdef"
+    ASCII digits:
+    :attr:`avendesora.DIGITS` = "0123456789"
 
-    Hexidecimal digits.
 
-.. attribute:: avendesora.PUNCTUATION = "!"#$%&'()\*+,-./:;<=>?@[\\]^_`{|}~"
+.. attribute:: avendesora.ALPHANUMERIC
 
-    ASCII punctuation characters.
+    ASCII letters and digits:
+    :attr:`avendesora.ALPHANUMERIC` = :attr:`avendesora.LETTERS` + :attr:`avendesora.DIGITS`
 
-.. attribute:: avendesora.SYMBOLS = exclude(avendesora.PUNCTUATION, "'"\`\\")
 
-    ASCII punctuation characters excluding ', ", \`, and \\.
+.. attribute:: avendesora.HEXDIGITS
 
-.. attribute:: avendesora.WHITESPACE = " \\t"
+    Hexidecimal digits:
+    :attr:`avendesora.HEXDIGITS` = "0123456789abcdef"
 
-    ASCII white space characters (excluding newlines).
+
+.. attribute:: avendesora.PUNCTUATION
+
+    ASCII punctuation characters:
+    :attr:`avendesora.PUNCTUATION` = "!"#$%&'()\*+,-./:;<=>?@[\\]^_`{|}~"
+
+
+.. attribute:: avendesora.SYMBOLS
+
+    ASCII punctuation characters excluding ', ", \`, and \\:
+    :attr:`avendesora.SYMBOLS` = exclude(avendesora.PUNCTUATION, "'"\`\\")
+
+
+.. attribute:: avendesora.WHITESPACE
+
+    ASCII white space characters (excluding newlines):
+    :attr:`avendesora.WHITESPACE` = " \\t"
 
 
 .. attribute:: avendesora.PRINTABLE
 
-    All ASCII printable characters (letters, digits, punctuation, whitespace).
-
+    All ASCII printable characters (letters, digits, punctuation, whitespace):
     :attr:`avendesora.PRINTABLE` = :attr:`avendesora.ALPHANUMERIC` + :attr:`avendesora.PUNCTUATION` + :attr:`avendesora.WHITESPACE`
 
 
 .. attribute:: avendesora.DISTINGUISHABLE
 
-    ASCII letters and digits with easily confused characters removed).
-
+    ASCII letters and digits with easily confused characters removed):
     :attr:`avendesora.DISTINGUISHABLE` = exclude(:attr:`avendesora.ALPHANUMERIC`, 'Il1O0')
 
 
-.. attribute:: avendesora.SHIFTED = UPPERCASE + '~!@#$%^&*()_+{}|:"<>?'
+.. attribute:: avendesora.SHIFTED
 
-    ASCII characters that are typed using the shift key.
+    ASCII characters that are typed using the shift key:
+    :attr:`avendesora.SHIFTED` = :attr:`avendesora.UPPERCASE` + '~!@#$%^&*()_+{}|:"<>?'
 
 
 Obscured Secret Classes

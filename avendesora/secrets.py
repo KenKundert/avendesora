@@ -530,7 +530,7 @@ class PIN(Password):
             password.
         alphabet (collection of symbols):
             The reservoir of legal symbols to use when creating the password.
-            By default the alphabet is DIGITS.
+            By default the alphabet is :attr:`avendesora.DIGITS`.
         master (str):
             Overrides the master seed that is used when generating the password.
             Generally, there is one master seed shared by all accounts contained
