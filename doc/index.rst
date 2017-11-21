@@ -242,9 +242,9 @@ Contents:
    concepts
    installing
    overview
-   accounts
    advanced
    commands
+   accounts
    helpers
    configuring
    api
