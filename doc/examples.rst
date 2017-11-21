@@ -341,3 +341,14 @@ and everything else is updated automatically.
                 name=n,
             ) for i, n in enumerate(usernames)
         ]
+
+Now, running the :ref:`credentials command <credentials command>` gives::
+
+    > avendesora yandex
+    usernames: bill.langston594
+    usernames: elias.peters876
+    usernames: lonny.fay383
+    usernames: lionel.silva100
+    usernames: jeromy.cherry518
+    passcode: B-F?i0z8GcDL
+
