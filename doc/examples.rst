@@ -219,6 +219,7 @@ entry to your Citibank account as follows:
             Question("Last name of high school best friend?"),
             Question("Name of first pet?"),
         ]
+        urls = 'https://online.citi.com'
         discovery = [
             RecognizeURL(
                 'https://online.citi.com',

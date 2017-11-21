@@ -11,47 +11,47 @@ Advanced Usage
 Avoiding Phishing Attacks
 -------------------------
 
-Phishing is a very common method used on the web to get people to
-unknowingly divulge sensitive information such as account
-credentials.  It is generally accomplished by sending misleading
-URLs in email or placing them on websites. When you visit these
-URLs you are taken to a site that looks identical to the site you
-were expecting to go to in the hope that you are tricked into giving
-up your account credentials.  It used to be that if you carefully
-inspected the url you could spot deception, but even that is no
-longer true.
+Phishing is a very common method used on the web to get people to unknowingly 
+divulge sensitive information such as account credentials.  It is generally 
+accomplished by sending misleading URLs in email or placing them on websites. 
+When you visit these URLs you are taken to a site that looks identical to the 
+site you were expecting to go to in the hope that you are tricked into giving up 
+your account credentials.  It used to be that if you carefully inspected the url 
+you could spot deception, but even that is no longer true.
 
-Avendesora helps you avoid phishing attacks in two ways. First, you
-should never go to one of your secure sites by clicking on a link.
-Instead, you should use Avendesora's :ref:`browse command <browse command>`::
+*Avendesora* helps you avoid phishing attacks in two ways. First, you should 
+never go to one of your secure sites by clicking on a link.  Instead, you should 
+use *Avendesora*'s :ref:`browse command <browse command>`::
 
     avendesora browse chase
 
-In this way you use the URL stored in Avendesora rather than
-trusting a url link provided by a third party. Second, you should
-auto-type the account credentials using Avendesora's account
-discovery based on RecognizeURL() (be sure to use RecognizeURL() for
-websites rather than RecognizeTitle() when configuring account
-discovery). RecogniseURL() will not be fooled by a phishing site).
+In this way you use the URL stored in *Avendesora* rather than trusting a url 
+link provided by a third party. Second, you should auto-type the account 
+credentials using *Avendesora*'s account discovery based on 
+:class:`avendesora.RecognizeURL` (be sure to use 
+:class:`avendesora.RecognizeURL` for websites rather than 
+:class:`avendesora.RecognizeTitle` when configuring account discovery).  
+:class:`avendesora.RecogniseURL` will not be fooled by a phishing site).
 
 
 .. index::
     single: discovery
     single: account discovery
+    single: configuring browser
+    single: browser configuration
 
 .. _discovery:
 
 Account Discovery
 -----------------
 
-If you do not give an account to 'avendesora value', Avendesora will
-try to determine the account by simply asking each account. An
-account can look at the window title, the user name, the host name,
-the working directory, and the environment variables to determine if
-it is suitable. If so, it nominates itself. If there is only one
-account nominated, that account is used. If there are multiple
-nominees, then a small window pops up allowing you to choose
-which account you wish to use.
+If you do not give an account to 'avendesora value', *Avendesora* tries to 
+determine the account by simply asking each account if it is suitable. An 
+account can look at the window title, the user name, the host name, the working 
+directory, and the environment variables to determine if it is suitable. If so, 
+it nominates itself. If there is only one account nominated, that account is 
+used. If there are multiple nominees, then a small window pops up allowing you 
+to choose which account you wish to use.
 
 .. index::
     single: RecognizeTitle
@@ -67,10 +67,9 @@ seen, use:
     )
 
 The title is a glob string, meaning that '*' matches any combination
-of characters. The script describes what Avendesora should output
+of characters. The script describes what *Avendesora* should output
 when their is a match. In this case it outputs the username field,
-then a tab, then the passcode field, then a return (see 'avendesora
-help scripts').
+then a tab, then the passcode field, then a return (see :ref:`scripts`).
 
 Matching window titles can be fragile, especially for websites
 because the titles can vary quite a bit across the site and over
@@ -88,11 +87,14 @@ patterns:
 .. index::
     single: RecognizeURL
 
-If you use Firefox, you can install the 'Add URL to Window Title'
+If you use Firefox, you can install the `Add URL to Window Title 
+<https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title>`_
 extension.  It is a plugin that makes discovery easier and more
 robust by adding the URL to the title.  For Chrome the appropriate
-plugin is  is 'URL in Title'.  It is recommended that you install
-the appropriate one into your browser.  For AddURLToWindowTitle, set
+plugin is  is `URL in Title 
+<https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb>`_.  
+It is recommended that you install
+the appropriate one into your browser.  For *Add URL To Window Title*, set
 the following options:
 
 .. code-block:: python
@@ -101,11 +103,12 @@ the following options:
     separator string = '-'
     show field attributes = no
 
-For URLinTitle, set::
+For *URL in Title*, set::
 
     tab title format = '{title} - {protocol}://{hostname}{port}/{path}'
 
-RecognizeURL designed to recognize such titles. Once you have
+:class:`avendesora.RecognizeURL` is designed to recognize such titles. Once you 
+have
 deployed the appropriate plugin, you can use:
 
 .. code-block:: python
@@ -117,30 +120,38 @@ deployed the appropriate plugin, you can use:
     )
 
 When giving the URL, anything specified must match and globbing is
-not supported. If you give a partial path, by default Avendesora
-will match up to what you have given, but you can require an exact
+not supported. If you give a partial path, by default *Avendesora*
+matches up to what you have given, but you can require an exact
 match of the entire path by specifying exact_path=True to
-RecognizeURL.  If you do not give the protocol, the default_protocol
+:class:`avendesora.RecognizeURL`.  If you do not give the protocol, the 
+default_protocol
 (https) is assumed.
 
-In general you should use RecognizeURL() rather than
-RecognizeTitle() for websites if you can. Doing so will help protect
-you from phishing attacks by carefully examining the URL.
+In general you should use :class:`avendesora.RecognizeURL` rather than 
+:class:`avendesora.RecognizeTitle` for websites if you can. Doing so helps 
+protect you from phishing attacks by carefully examining the URL.
 
-When account discovery fails it can be difficult to determine what
-is going wrong. When this occurs, you should first examine the log
-file. It should show you the window title and the recognized title
-components. You should first assure the title is as expected. If Add
-URL to Window Title generated the title, then the various title
-components should also be shown.  Then run Avendesora as follows::
+When account discovery fails it can be difficult to determine what is going 
+wrong. When this occurs, you should first examine the log file::
 
-    avendesora value --verbose --title '<title>'
+    > avenedesora log
+
+It should show you the window title and the recognized title components. You 
+should first assure the title is as expected. If *Add URL to Window Title* or 
+*URL in Title* generated the title, then the various title components should 
+also be shown.  Then run *Avendesora* as follows::
+
+    > avendesora value --verbose --title '<title>'
 
 The title should be copied from the log file. The verbose option
 causes the result of each test to be included in the log file, so
 you can determine which recognizer is failing to trigger.  You can
 either specify the verbose option on the command line or in the
 config file.
+
+
+Recognizers
+"""""""""""
 
 The following recognizers are available::
 
@@ -159,7 +170,8 @@ The following recognizers are available::
     single: RecognizeAll
     single: RecognizeAny
 
-RecognizeAll() and RecognizeAny() can be used to combine several
+:class:`avendesora.RecognizeAll` and :class:`avendesora.RecognizeAny` can be 
+used to combine several
 recognizers. For example:
 
 .. code-block:: python
@@ -188,13 +200,12 @@ that match are offered. For example:
         ),
     ]
 
-In this case, both recognizers recognize the same URL, thus they
-will both be offered for this site.  But each has a different
-script. The name allows the user to distinguish the available
-choices.
+In this case, both recognizers recognize the same URL, thus they are both be 
+offered for this site.  But each has a different script. The name allows the 
+user to distinguish the available choices.
 
-If there is a need to distinguish URLs where is one is a substring
-of another, you can use *exact_path*:
+If there is a need to distinguish URLs where is one is a substring of another, 
+you can use *exact_path*:
 
 .. code-block:: python
 
@@ -214,16 +225,15 @@ of another, you can use *exact_path*:
 .. index::
     single: RecognizeFile
 
-RecognizeFile checks to determine whether a particular file has been
-created recently.  This can be use in scripts to force secret
-recognition.  For example, the titles used by Firefox and
-Thunderbird when collecting the master password is either
-non-existent or undistinguished.  These programs also produce a
-large amount of uninteresting chatter on their output, so it is
-common to write a shell script to run the program that redirects
-their output to /dev/null.  Such a script can be modified to
-essentially notify Avendesora that a particular password is desired.
-For example, for Thunderbird::
+:class:`avendesora.RecognizeFile` checks to determine whether a particular file 
+has been created recently.  This can be use in scripts to force secret 
+recognition.  For example, the titles used by Firefox and Thunderbird when 
+collecting the master password is either non-existent or undistinguished.  These 
+programs also produce a large amount of uninteresting chatter on their output, 
+so it is common to write a shell script to run the program that redirects their 
+output to /dev/null.  Such a script can be modified to essentially notify 
+*Avendesora* that a particular password is desired.  For example, for 
+Thunderbird::
 
     #!/bin/sh
     touch /tmp/thunderbird-1024
@@ -243,15 +253,14 @@ adding:
             '/tmp/thunderbird-1024', wait=60, script='{passcode}{return}'
         )
 
-If the specified file exists and has been updated within the last 60
-seconds, then secret is recognized.  You can specify the amount of
-time you can wait in between running the script and running
-Avendesora with the 'wait' argument, which takes a number of
-seconds.  It defaults to 60.
+If the specified file exists and has been updated within the last 60 seconds, 
+then secret is recognized.  You can specify the amount of time you can wait in 
+between running the script and running *Avendesora* with the 'wait' argument, 
+which takes a number of seconds.  It defaults to 60.
 
-Using this particular approach, every secret would need its own
-file. But you can share a file by specifying the file contents.
-Then the script could be rewritten as::
+Using this particular approach, every secret needs its own file. But you can 
+share a file by specifying the file contents.  Then the script could be 
+rewritten as::
 
     #!/bin/sh
     echo thunderbird > ~/.avendesora-password-request
@@ -287,7 +296,7 @@ security of your account. In fact they often do the opposite by
 creating additional avenues of access to your account. Their real
 purpose is to allow you to regain access to your account in case you
 lose your password. If you are careful, this is not needed (you do
-back up your Avendesora accounts, right?). In this case it is better
+back up your *Avendesora* accounts, right?). In this case it is better
 to randomly generate your answers.
 
 Security questions are handled by adding something like the
@@ -305,7 +314,10 @@ following to your account:
 
 The string identifying the question does not need to contain the
 question verbatim, a abbreviated version is sufficient as long as it
-allows you to distinguish the question.  The questions are given as
+allows you to distinguish the question. However, once set, you should not change 
+the question in the slightest; doing so changes the generated answer.
+
+The questions are given as
 an array, and so are accessed with an index that starts at 0. Thus,
 to get the answer to who is your 'oldest aunt', you would use::
 
@@ -325,7 +337,7 @@ to use with::
         4: childhood vacation spot <reveal with 'avendesora value <accountname> questions.4'>
     ...
 
-By default, Avendesora generates a response that consists of 3
+By default, *Avendesora* generates a response that consists of 3
 random words. This makes it easy to read to a person over the phone
 if asked to confirm your identity.  Occasionally you will not be
 able to enter your own answer, but must choose one that is offered
@@ -363,11 +375,16 @@ example:
 
     'username: {username}, password: {passcode}'
 
-When processed by Advendesora the attributes are replaced by their
+When processed by *Avendesora* the attributes are replaced by their
 value from the chosen account.  For example, this script might
 be rendered as::
 
     username: jman, password: R7ibHyPjWtG2
+
+You can specify a script directly to the :ref:`value command <value command>`.  
+You can specify them as account attributes (in this case then need to be 
+embedded in :class:`avendesora.Script`), or you can specify them to 
+:ref:`account discovery recognizers <discovery>`.
 
 Scripts are useful if you need to combine an account value with
 other text, if you need to combine more than one account value, or
@@ -388,13 +405,11 @@ or more for the network passwords.  Such an account might look like:
         privileged = Script('SSID: {networks.0}, password: {network_passwords.0}')
         guest = Script('SSID: {networks.1}, password: {network_passwords.1}')
 
-Now the credentials for the privileged network are accessed with::
+Notice that *privileged* and *guest* were specified as scripts. Now the 
+credentials for the privileged network are accessed with::
 
     > avendesora value wifi privileged
     SSID: Occam's Router, password: overdraw cactus devotion saying
-
-Most account attributes that expect a string can also accept a
-script given in this manner.
 
 You can also give a script rather than a field on the command line
 when running the :ref:`value command <value command>`::
@@ -402,14 +417,13 @@ when running the :ref:`value command <value command>`::
     > avendesora value scc '{username}: {passcode}'
     jman: R7ibHyPjWtG2
 
-It is also possible to specify a script for the value of the
-*default* attribute. This attribute allows you to specify the
-default field (which attribute name and key to use if one is not
-given on the command line).  It also accepts a script rather than a
-field, but in this case it should be a simple string and not an
-instance of the Script class.  If you passed it as a Script, it
-would be expanded before being interpreted as a field name, and so
-would result in a 'not found' error.
+It is also possible to specify a script for the value of the *default* 
+attribute. This attribute allows you to specify the default field (which 
+attribute name and key to use if one is not given on the command line).  It also 
+accepts a script rather than a field, but in this case it should be a simple 
+string and not an instance of the :class:`avendesora.Script` class.  If you 
+passed it as a :class:`avendesora.Script`, it would be expanded before being 
+interpreted as a field name, and so would result in a 'not found' error.
 
 .. code-block:: python
 
@@ -424,11 +438,11 @@ You can access the script by simply not providing a field::
     > avendesora value scc
     username: jman, password: *m7Aqj=XBAs7
 
-Finally, you pass a script to the account discovery recognizers.
-They specify the action that should be taken when a particular
-recognizer triggers. These scripts would also be simple strings and
-not instances of the Script class. For example, this recognizer
-could be used to recognize Gmail:
+Finally, you pass a script to the account discovery recognizers.  They specify 
+the action that should be taken when a particular recognizer triggers. These 
+scripts would also be simple strings and not instances of the 
+:class:`avendesora.Script` class. For example, this recognizer could be used to 
+recognize Gmail:
 
 .. code-block:: python
 
@@ -443,12 +457,11 @@ could be used to recognize Gmail:
         ),
     ]
 
-Besides the account attributes, you can use several other special
-attributes including: *{tab}*, *{return}*, and *{sleep N}*.  *{tab}* is
-replaced by a tab character, *{return}* is replaced by a carriage
-return character, and *{sleep N}* causes a pause of N seconds. The
-sleep function is only active when autotyping after account
-discovery.
+Besides the account attributes, you can use several other special attributes 
+including: *{tab}*, *{return}*, and *{sleep N}*.  *{tab}* is replaced by a tab 
+character, *{return}* is replaced by a carriage return character, and *{sleep 
+N}* causes a pause of N seconds. The sleep function is only active when 
+autotyping after account discovery.
 
 
 .. index::
@@ -459,49 +472,42 @@ discovery.
 Stealth Accounts
 ----------------
 
-Normally Avendesora uses information from an account that is
-contained in an account file to generate the secrets for that
-account. In some cases, the presence of the account itself, even
-though it is contained within an encrypted file can be problematic.
-The mere presence of an encrypted file may result in you being
-compelled to open it. For the most damaging secrets, it is best if
-there is no evidence that the secret exists at all. This is the
-purpose of stealth accounts. (Misdirection is an alternative to
-stealth accounts; see 'avendesora help misdirection').
+Normally *Avendesora* uses information from an account that is contained in an 
+account file to generate the secrets for that account. In some cases, the 
+presence of the account itself, even though it is contained within an encrypted 
+file can be problematic.  The mere presence of an encrypted file may result in 
+you being compelled to open it. For the most damaging secrets, it is best if 
+there is no evidence that the secret exists at all. This is the purpose of 
+stealth accounts. (:ref:`Misdirection` is an alternative to stealth accounts).
 
-Generally one uses the predefined stealth accounts, which all have
-names that are descriptive of the form of the secret they generate,
-for example word4 generates a 4-word pass phrase (also referred as
-the xkcd pattern)::
+The stealth accounts are predefined and have names that are descriptive of the 
+form of the secret they generate, for example word4 generates a 4-word pass 
+phrase (also referred as the xkcd pattern)::
 
     > avendesora value word4
     account: my_secret_account
     gulch sleep scone halibut
 
-The predefined accounts are kept in
-~/.config/avendesora/stealth_accounts.  You are free to add new
-accounts or modify the existing accounts.
+The predefined accounts are kept in ~/.config/avendesora/stealth_accounts.  You 
+are free to add new accounts or modify the existing accounts.
 
-Stealth accounts are subclasses of the StealthAccount class. These
-accounts differ from normal accounts in that they do not contribute
-the account name to the secrets generators for use as a seed.
-Instead, the user is requested to provide the account name every
-time the secret is generated. The secret depends strongly
-on this account name, so it is essential you give precisely the same
-name each time. The term 'account name' is being use here, but you
-can enter any text you like.  Best to make this text very difficult
-to guess if you are concerned about being compelled to disclose your
-GPG keys.
+Stealth accounts are subclasses of the :class:`avendesora.StealthAccount` class.  
+These accounts differ from normal accounts in that they do not contribute the 
+account name to the secrets generators for use as a seed.  Instead, the user is 
+requested to provide the account name every time the secret is generated. The 
+secret depends strongly on this account name, so it is essential you give 
+precisely the same name each time. The term 'account name' is being use here, 
+but you can enter any text you like.  Best to make this text very difficult to 
+guess if you are concerned about being compelled to disclose your GPG keys.
 
-The secret generator will combine the account name with the master
-seed before generating the secret. This allows you to use simple
-predictable account names and still get an unpredictable secret.
-The master seed used is taken from master_seed in the file
-that contains the stealth account if it exists, or the user_key if
-it does not. By default the stealth accounts file does not contain a
-master seed, which makes it difficult to share stealth accounts.
-You can create additional stealth account files that do contain
-master seeds that you can share with your associates.
+The secret generator will combine the account name with the master seed before 
+generating the secret. This allows you to use simple predictable account names 
+and still get an unpredictable secret.  The master seed used is taken from 
+master_seed in the file that contains the stealth account if it exists, or the 
+user_key if it does not. By default the stealth accounts file does not contain 
+a master seed, which makes it difficult to share stealth accounts.  You can 
+create additional stealth account files that do contain master seeds that you 
+can share with your associates.
 
 
 .. index::
@@ -514,10 +520,10 @@ Misdirection
 
 One way to avoid being compelled to disclose a secret is to disavow
 any knowledge of the secret.  However, the presence of an account in
-Avendesora that pertains to that secret undercuts this argument.
+*Avendesora* that pertains to that secret undercuts this argument.
 This is the purpose of stealth accounts. They allow you to generate
-secrets for accounts for which Avendesora has no stored information.
-In this case Avendesora asks you for the minimal amount of
+secrets for accounts for which *Avendesora* has no stored information.
+In this case *Avendesora* asks you for the minimal amount of
 information that it needs to generate the secret. However in some
 cases, the amount of information that must be retained is simply too
 much to keep in your head. In that case another approach, referred
@@ -529,11 +535,11 @@ say something like "I changed the password and then forgot it", or
 "The account is closed". To support this ruse, you must use the
 --seed (or -S) option to 'avendsora value' when generating your
 secret (secrets misdirection only works with generated passwords,
-not stored passwords). This causes Avendesora to ask you for an
+not stored passwords). This causes *Avendesora* to ask you for an
 additional seed at the time you request the secret. If you do not
 use --seed or you do and give the wrong seed, you will get a
 different value for your secret.  In effect, using --seed when
-generating the original value of the secret causes Avendesora to
+generating the original value of the secret causes *Avendesora* to
 generate the wrong secret by default, allowing you to say "See, I
 told you it would not work". But when you want it to work, you just
 interactively provide the correct seed.
@@ -571,7 +577,7 @@ information can be shared over an insecure channel. For example, it
 could be sent in a text message or from a phone where trustworthy
 encryption is not available.
 
-The first step in using Avendesora to collaborate with a partner is
+The first step in using *Avendesora* to collaborate with a partner is
 for one of the partners to generate and then share an accounts file
 that is dedicated to the shared accounts.  This file contains the
 master seed, and it is critical to keep this value secure. Thus, it
@@ -587,7 +593,7 @@ the company rather than your partner.  To share accounts with Bob,
 you start by getting Bob's public GPG key.  Then, create the new
 accounts file with something like::
 
-    avendesora new -g alice@teneya.com -g bob@teneya.com teneya.gpg
+    avendesora new -g alice@teneya.com,bob@teneya.com teneya.gpg
 
 This generates a new accounts file, ~/.config/avendesora/teneya.gpg,
 and encrypts it so only you and Bob can open it.  Mail this file to
@@ -647,8 +653,8 @@ based on the time and date.
 
 Consider an example that illustrates the process. In this example,
 Ahmed is confirming the identity of Reza, where both Ahmed and Reza
-are assumed to have shared Avendesora accounts.  Ahmed runs
-Avendesora as follows and remembers the response::
+are assumed to have shared *Avendesora* accounts.  Ahmed runs
+*Avendesora* as follows and remembers the response::
 
     > avendesora identity reza
     challenge: slouch emirate bedeck brooding
@@ -658,7 +664,7 @@ This assumes that reza is the name, with any extension removed, of the file that
 Ahmed uses to contain their shared accounts.
 
 Ahmed communicates the challenge to Reza but not the response.  Reza then runs 
-Avendesora with the given challenge::
+*Avendesora* with the given challenge::
 
     > avendesora identity ahmed slouch emirate bedeck brooding
     challenge: slouch emirate bedeck brooding
@@ -671,6 +677,12 @@ To complete the process, Reza returns the response to Ahmed, who compares it to
 the response he received to confirm Reza's identity.  If Ahmed has forgotten the 
 desired response, he can also specify the challenge to the :ref:`identity 
 command <identity command>` to regenerate the expected response.
+
+Alternately, when Ahmed sends a message to Reza, he can proactively prove his 
+identity by providing both the challenge and the response. Reza could then run 
+the *identity* command with the challenge and confirm that he gets the same 
+response. Other than himself, only Ahmad could predict the correct response to 
+any challenge.
 
 
 .. index::
@@ -713,18 +725,18 @@ I and 1 and O and 0.
 Upgrading from Abraxas
 ----------------------
 
-Avendesora generalizes and replaces Abraxas, its predecessor.  To
-transition from Abraxas to Avendesora, you will first need to
+*Avendesora* generalizes and replaces *Abraxas*, its predecessor.  To
+transition from *Abraxas* to *Avendesora*, you will first need to
 upgrade Abraxas to version 1.8 or higher (use 'abraxas -v' to
 determine version). Then run::
 
     abraxas --export
 
-It will create a collection of Avendesora accounts files in
+It will create a collection of *Avendesora* accounts files in
 ~/.config/abraxas/avendesora. You need to manually add these files
-to your list of accounts files in Avendesora. Say one such file is
+to your list of accounts files in *Avendesora*. Say one such file is
 created: ~/.config/abraxas/avendesora/accounts.gpg.  This could be
-added to Avendesora as follows:
+added to *Avendesora* as follows:
 
 1. create a symbolic link from
    ~/.config/avendesora/abraxas_accounts.gpg to
@@ -736,14 +748,14 @@ added to Avendesora as follows:
 2. add abraxas_accounts.gpg to account_files list in accounts_files.
 
 Now all of the Abraxas accounts contained in abraxas_accounts.gpg
-should be available though Avendesora and the various features of
+should be available though *Avendesora* and the various features of
 the account should operate as expected. However, secrets in accounts
 exported by Abraxas are no longer generated secrets. Instead, the
 actual secrets are placed in a hidden form in the exported accounts
 files.
 
 If you would like to enhance the imported accounts to take advantage
-of the new features of Avendesora, it is recommended that you do not
+of the new features of *Avendesora*, it is recommended that you do not
 manually modify the imported files. Instead, copy the account
 information to one of your own account files before modifying it.
 To avoid conflict, you must then delete the account from the

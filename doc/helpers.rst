@@ -1,8 +1,12 @@
+.. _helpers:
+
 Account Helpers
 ===============
 
 Generated Secret Classes
 ------------------------
+
+Sublasses of :class:`avendesora.GeneratedSecret`.
 
 .. autoclass:: avendesora.Password
 
@@ -103,6 +107,8 @@ These are useful when constructing generated secrets.
 
 Obscured Secret Classes
 -----------------------
+
+Sublasses of :class:`avendesora.ObscuredSecret`.
 
 .. autoclass:: avendesora.Hide
 

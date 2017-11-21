@@ -208,7 +208,6 @@ INITIAL_AUTOTYPE_DELAY = 0.25
 # Initial config file {{{1
 CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Configuration
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
     #
     # This file is read by Avendesora. Use it to change any configuration
     # settings from their default values.  See {config_doc_file} for the list of
@@ -217,12 +216,13 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
 
     # Default identity to use when creating encrypted files.
     gpg_ids = {gpg_ids}
+
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
 ''')
 
 # Initial config.doc file {{{1
 CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Configuration Documentation
-    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
     #
     # This file is generated and updated by Avendesora using the initialize
     # command. It documents the supported configuration settings and gives the
@@ -373,6 +373,8 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     xsel_executable = {xsel_executable}
         # recommend '/usr/bin/xsel -p' if you wish to use mouse middle click
         # recommend '/usr/bin/xsel -b' if you wish to use mouse right click then paste
+
+    # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
 ''')
 
 

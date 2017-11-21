@@ -44,7 +44,7 @@ For example, consider the following rather abbreviated accounts file::
         username = 'herbie'
         passcode = Passphrase()
 
-This file contains one secret, the login passphrase for herbie.  In this case, 
+This file contains one secret, the login passphrase for Herbie.  In this case, 
 the master seed is combined with the words 'login' and 'passcode', the 
 combination is hashed, and that is used to generate the passphrase. The words in 
 the passphrase are chosen at random from a dictionary of roughly 10,000 words.  
@@ -75,22 +75,23 @@ Entropy
 -------
 A 4 word Avendesora password provides 53 bits of entropy, which seems like 
 a lot, but NIST is recommending 80 bits for your most secure passwords.  So, how 
-much is actually required. It is worth exploring this question.  Entropy is 
-a measure of how hard the password is to guess. Specifically, it is the base two 
-logarithm of the likelihood of guessing the password in a single guess. Every 
-increase by one in the entropy represents a doubling in the difficulty of 
-guessing your password. The actual entropy is hard to pin down, so generally we 
-talk about the minimum entropy, which is the likelihood of an adversary guessing 
-the password if he or she knows everything about the scheme used to generate the 
-password but does not know the password itself.  So in this case the minimum 
-entropy is the likelihood of guessing the password if it is known that we are 
-using 4 space separated words as our passphrase where the works are selected at 
-random with a uniform distribution from a known list.  This is very easy to 
-compute.  There are roughly 10,000 words in our dictionary, so if there was only 
-one word in our passphrase, the chance of guessing it would be one in 10,000 or 
-13 bits of entropy.  If we used a two word passphrase the chance of guessing it 
-in a single guess is one in 10,000*10,000 or one in 100,000,000 or 26 bits of 
-entropy.
+much is actually required? It is worth exploring this question.
+
+Entropy is a measure of how hard the password is to guess. Specifically, it is 
+the base two logarithm of the likelihood of guessing the password in a single 
+guess. Every increase by one in the entropy represents a doubling in the 
+difficulty of guessing your password. The actual entropy is hard to pin down, so 
+generally we talk about the minimum entropy, which is the likelihood of an 
+adversary guessing the password if he or she knows everything about the scheme 
+used to generate the password but does not know the password itself.  So in this 
+case the minimum entropy is the likelihood of guessing the password if it is 
+known that we are using 4 space separated words as our passphrase where the 
+works are selected at random with a uniform distribution from a known list.  
+This is very easy to compute.  There are roughly 10,000 words in our dictionary, 
+so if there was only one word in our passphrase, the chance of guessing it would 
+be one in 10,000 or 13 bits of entropy.  If we used a two word passphrase the 
+chance of guessing it in a single guess is one in 10,000*10,000 or one in 
+100,000,000 or 26 bits of entropy.
 
 The probability of guessing our passphrase in one guess is not our primary 
 concern. Really what we need to worry about is given a determined attack, how 
@@ -136,10 +137,10 @@ In most cases you have no control over how your passwords are stored on the
 machines or services that you log into.  Your best defense against the 
 notoriously poor security practices of most sites is to always use a unique 
 password for sites where you are not in control of the secrets.  That way the 
-poor security practices of one site do not compromise your other accounts. For 
-example, you might consider using the same passphrase for you login password and 
-the passphrase for an ssh key on a machine that you administer, but never use 
-the same password for two different websites unless you do not care if the 
+poor security practices of one site would not compromise your other accounts.  
+For example, you might consider using the same passphrase for you login password 
+and the passphrase for an ssh key on a machine that you administer, but never 
+use the same password for two different websites unless you do not care if the 
 content of those sites become public.
 
 So, if we return to the question of how much entropy is enough, you can say that 

@@ -14,8 +14,9 @@ given in ~/.config/avendesora/accounts_files.  New account files are created
 using ``avendesora new``, but to delete an accounts file, you must manually 
 remove it from accounts_files. Once an accounts file exists, you may add 
 accounts to it using ``account add``. Use the -f option to specify which file is 
-to contain the new account.  Deleting an account is done with ``account edit 
-<account_name>``.  Simply remove all lines associated with the account.
+to contain the new account.  Modifying or deleting an account is done with 
+``account edit <account_name>``.  To delete the account, simply remove all lines 
+associated with the account.
 
 An account is basically a collection of attributes organized as a subclass of 
 the Python Account class. For example:
@@ -119,20 +120,21 @@ base64. Any knowledgeable person with the encoded value can decode it back to
 its original value. Using Hidden makes it harder to recognize and remember the 
 value given only a quick over-the-shoulder glance. It also marks the value as 
 sensitive, so it will only be displayed for a minute. You generate the encoded 
-value using ``avendesora conceal``.
+value using the :ref:`conceal command <conceal command>`.
 
 If this is not enough security, you can encrypt the values and access them using 
-*GPG* or *Scrypt*.
+:class:`avendesora.GPG` or :class:`avendesora.Scrypt`.
 
-You can find the specifics of how to specify or generate your secrets by running 
-``avendesora help secrets``.
+You can find the specifics of how to specify or generate your secrets in 
+:ref:`helpers`.
 
-Any value that is an instance of the *GeneratedSecret* class (*Password*,
-*Passphrase*, ...) or the *ObscuredSecret* class (*Hidden*, *GPG*, ...) are
-considered sensitive.  They are given out only in a controlled manner. For
-example, running ``avendesora values`` displays all fields, but the values that
-are sensitive are replaced by instructions on how to view them. They can only be
-viewed individually::
+Any value that is an instance of the :class:`avendesora.GeneratedSecret` class 
+(:class:`avendesora.Password`, :class:`avendesora.Passphrase`, ...) or the 
+:class:`avendesora.ObscuredSecret` class (:class:`avendesora.Hidden`, 
+:class:`avendesora.GPG`, ...) are considered sensitive.  They are given out only 
+in a controlled manner. For example, running the :ref:`values command <values 
+command>` displays all fields, but the values that are sensitive are replaced by 
+instructions on how to view them. They can only be viewed individually::
 
     > avendesora values newyorktimes
     names: newyorktimes, nyt
@@ -142,17 +144,17 @@ viewed individually::
 
 The *aliases* and *discovery* fields are not shown because they are considered 
 tool fields. Other tool fields include *NAME*, *default*, *master*, *browser*, 
-and *default_url*. For more information on discovery, run ``avendesora help 
-discovery``.  *default* is the name of the default field, which is the field you 
-get if you do not request a particular field. Its value defaults to *passcode* 
-but it can be set to any account attribute name or it can be a script (see 
-``avendesora help scripts``).  *browser* is the default browser to use when 
-opening the account, run ``avendesora help browse`` to see a list of available 
-browsers.
+and *default_url*. See :ref:`discovery` for more information on discovery.  
+*default* is the name of the default field, which is the field you get if you do 
+not request a particular field. Its value defaults to *password*, *pasphrase*, 
+or *passcode* (as set by *default_field* setting), but it can be set to any 
+account attribute name or it can be a :ref:`script <scripts>`.  *browser* is the 
+default browser to use when opening the account, run the :ref:`browse command 
+<browse command>` to see a list of available browsers.
 
-The value of *passcode*is considered sensitive because it is an instance of 
-*PasswordRecipe*, which is a subclass of *GeneratedSecret*.  If we wish to see the 
-*passcode*, use::
+The value of *passcode* is considered sensitive because it is an instance of 
+*PasswordRecipe*, which is a subclass of *GeneratedSecret*.  If you wish to see 
+the *passcode*, use::
 
     > avendesora value nyt
     passcode: TZuk8:u7qY8%
@@ -161,8 +163,8 @@ This value will be displayed for a minute and then hidden. If you would like to
 hide it early, simply type Ctrl-C.
 
 An attribute value can incorporate other attribute values through use of the 
-Script class. For example, consider an account for your wireless router that 
-contains the following:
+:class:`avendesora.Script` class as described in :ref:`scripts`. For example, 
+consider an account for your wireless router that contains the following:
 
 .. code-block:: python
 
@@ -175,22 +177,23 @@ contains the following:
         guest = Script('SSID: huron_guests, password: {ssid.huron_guests}')
         privileged = Script('SSID: huron_drugs, password: {ssid.huron_drugs}')
 
-The *ssid* field is a dictionary that contains the SSID and pass phrases for 
-each of the wireless networks provided by the router.  This is a natural an 
-compact representation for this information, but accessing it as a user in this 
-form would require two steps to access the information, one to get the SSID and 
+The *ssid* field is a dictionary that contains the SSID and passphrases for each 
+of the wireless networks provided by the router.  This is a natural an compact 
+representation for this information, but accessing it as a user in this form 
+would require two steps to access the information, one to get the SSID and 
 another to get the passphrase. This issue is addressed by adding the guest and 
 privileged attributes. The guest and privileged attributes are a script that 
-gives the SSID and interpolate the pass phrase. Now both can easily accessed at 
+gives the SSID and interpolate the passphrase. Now both can easily accessed at 
 once with::
 
     > avendesora value wifi guest
     SSID: huron_guests, password: delimit ballcock fibber levitate
 
-Use of *Avendesora* classes (*GeneratedSecret* or *ObscuredSecret*) is confined
-to the top two levels of account attributes, meaning that they can be the value
-of the top-level attributes, or the top-level attributes may be arrays or
-dictionaries that contain objects of these classes, but it can go no further.
+Use of *Avendesora* classes (:class:`avendesora.GeneratedSecret` or 
+:class:`avendesora.ObscuredSecret`) is confined to the top two levels of account 
+attributes, meaning that they can be the value of the top-level attributes, or 
+the top-level attributes may be arrays or dictionaries that contain objects of 
+these classes, but it can go no further.
 
 It is important to remember that any generated secrets use the account name and 
 the field name when generating their value, so if you change the account name or 

@@ -20,13 +20,13 @@ through your web browser. For example,
 
     > avendesora help -b accounts
 
-And when things go wrong, you can use :ref:`log command <log command>` to 
-quickly view the log file::
+When things go wrong, you can use :ref:`log command <log command>` to quickly 
+view the log file::
 
     > avendesora log
 
-The logfile is kept in the ~/.config/avendesora directory, and this command 
-opens it directly in your editor.  It can be very helpful in debugging account 
+The logfile is kept in the ~/.config/avendesora directory and this command opens 
+it directly in your editor.  It can be very helpful in debugging account 
 discovery issues.
 
 At this point you should have :ref:`initialized your accounts <initializing 
@@ -43,8 +43,8 @@ Shell Account
 
 In this example an account is provisioned to hold your Unix login password. You 
 will not be able to use *Avendesora* to autotype your passcode when you login 
-into your account, but you will be able to enter the passcode when running shell 
-commands like *sudo*.
+into your account, but you will be able to use it to enter the passcode when 
+running shell commands like *sudo*.
 
 To start, run the command to add an account. By default, three account templates 
 are available. They are, in order of complexity: shell, website, and bank. The 
@@ -78,7 +78,7 @@ Your editor should open with something that looks like this:
     # Avendesora: All lines that begin with '# Avendesora:' are deleted.
 
 In this example it is assumed that your editor is Vim. You would jump to the 
-first field by typing 'n' (next) and then modified the field by typing 'cw' 
+first field by typing 'n' (next) and then modify the field by typing 'cw' 
 (change word). In this example the first 'n' takes you to *_NAME_* and you would 
 use 'cw' to change it to *LinuxLogin*.  You should choose your account name 
 carefully. Once set, you should never change an account name because it will 
@@ -158,8 +158,8 @@ command <values command>`::
     passcode: <reveal with 'avendesora value linuxlogin passcode'>
     username: x57107048
 
-Notice that the passcode is considered secret, so it does not actually show it 
-when displaying all of the values. To see it, use::
+Notice that the passcode is considered secret, so *Avendesora* does not actually 
+show it when displaying all of the values. To see it, use::
 
     > avendesora value LinuxLogin passcode
     passcode: wigwam mistrust afflict refit
@@ -168,15 +168,21 @@ The value command will also write the secret directly to the clipboard::
 
     > avendesora value --clipboard LinuxLogin passcode
 
-By default *Avendesora* is configured to use the write to the primary clipboard.  
-You use the middle mouse button to paste from the primary clipboard. You can 
-also modify the *xsel_executable* to modify this behavior.
+By default *Avendesora* is configured to use the primary clipboard.  You use the 
+middle mouse button to paste from the primary clipboard. You can also modify the 
+*xsel_executable* to modify this behavior.
 
 You can also write directly to the standard output (normally *Avendesora* writes 
-directly to the TTY so that it can erase any secrets after a minute has elapsed.  
-You can also direct *Avendesora* to write to the standard output. In this way 
-you can use *Avendesora* within shell scripts (but you should consider rewriting 
-you script in Python and then using the :ref:`Avendesora API <api>`.
+to the TTY so that it can erase any secrets after a minute has elapsed).  In 
+this way you can use *Avendesora* within shell scripts (but you should consider 
+rewriting you script in Python using the :ref:`Avendesora API <api>`)::
+
+    > pw value -s login 'user="{username}:{passcode}"' | curl -K - https://mywork.com/~x57107048/latest
+
+In this example, I needed to create a arbitrary string containing the username 
+and password, so I combined *Avendesora's* :ref:`script <scripts>` feature with 
+the --stdout (-s) option to produce and pass the needed string to curl through 
+a pipe.
 
 You can also have *Avendesora* attempt to show you your :ref:`login credentials 
 <credentials command>` for the account using::
@@ -237,7 +243,7 @@ You *LinuxLogin* account was provisioned with account discovery by way of the
 window title. This assumes that your shell adds the currently running command to 
 the window title. Most shells are configured to do this by default, or can be 
 configured to do so, though it may take some digging on the web to find the 
-magic incantation to do so. Notice that one window title was given, 'sudo \*'.  
+magic incantation to do so. Notice that one window title was given: 'sudo \*'.  
 This matches a sudo command with arguments ('\*' is a wildcard character that 
 matches any string of characters). To try out the account discovery, type::
 
@@ -390,6 +396,11 @@ example::
 
     > avendesora browse virgin
 
+This can generally be done directly from your window manager, allowing your to 
+open your account without needing to use a shell.  In Gnome you can do so with 
+Alt-F2 (Run Command).  You can get the same functionality from other window 
+managers by installing and assigning *dmenu* to a keyboard shortcut.
+
 The *discovery* field is used to recognize that this is the account to use when 
 *Avendesora* is asked to login into the *virginamerica.com* site. Notice that 
 several URLs are given to RecognizeURL(), this is necessary when the website 
@@ -428,8 +439,8 @@ confirm you are really you. This becomes easier with:
 In this case if you trigger *Avendesora* (using :ref:`Alt-p<configure window 
 manager>`) while on the Virgin America website, it will respond by asking you if 
 you want to login or answer a challenge question (in this case both recognizers 
-trigger, forcing the choice). You can give different URLs for each case, which 
-eliminates the need to choose:
+trigger, forcing the choice). You can give different URLs for each case so that 
+the choice is made automatically for you:
 
 .. code-block:: python
 
@@ -483,7 +494,7 @@ After you edit the various fields you may end up with something like this:
             credit cards: 800-730-6259
             banking: 800-861-5715
         '''
-        urls = 'https://secure.mechanicsbank.com/cms/elevate-frequent-flyer'
+        urls = 'https://secure.mechanicsbank.com/login'
         discovery = RecognizeURL(
             'https://mechanicsbank.com',
             'https://www.mechanicsbank.com',
@@ -504,7 +515,7 @@ protection in that it stops people that know you well, such as your ex, from
 calling in and impersonating you. A short passphrase is perfect for this use as 
 it is easy to communicate to someone over the phone.
 
-In this example separate fields are used for each account numbers. If you have 
+In this example separate fields are used for each account number. If you have 
 access to the accounts of several people, for example you and your children, you 
 might use a dictionary for the accounts of each person, as follows:
 
@@ -530,21 +541,20 @@ Now to get Timmy's checking account number you would use::
 
 Security questions and account discovery are handled as given above.
 
-The *ccn* or credit card number field is given as a script.  This is useful if 
-you have the ability to run a command directly from your window manager.  In 
-Gnome you can do so Alt-F2 (Run Command). You can get the same functionality 
-from other window managers by installing and assigning *dmenu* to a keyboard 
-shortcut.  With this feature, you can navigate to any website that needs your 
-credit card number and CCV, and you can enter it by typing::
+The *ccn* or credit card number field is given as a script.
+With this you can navigate to any website that needs your credit card number and 
+CCV and enter it by typing::
 
     <Alt-F2> avendesora bank ccn
 
-Doing so causes your credit card number, followed by a tab, followed by your 
-CCV, and followed by another tab to be typed into the page. You could 
-conceivably start by typing your name and follow with your address, but there is 
-enough variability in websites that this would likely not work on all of them, 
-so it is generally best to limit the script to a small number of the most 
-helpful fields.
+Here <Alt-F2> is assumed to be the hot key sequence that runs a shell command 
+directly from the window manager (Gnome uses Alt-F2, but yours may be 
+different).  Doing so causes your credit card number, followed by a tab, 
+followed by your CCV, and followed by another tab to be typed into the page. You 
+could conceivably start by typing your name and follow with your address, but 
+there is enough variability in websites that this would likely not work on all 
+of them, so it is generally best to limit the script to a small number of the 
+most helpful fields.
 
 
 .. _finding accounts:
@@ -574,7 +584,7 @@ account values.  For example::
     wellsfargo (wf)
 
 In both cases the name of the account is listed first followed by the account 
-aliases (with in parentheses).
+aliases (within parentheses).
 
 
 .. _modifying accounts:
@@ -600,21 +610,21 @@ Additional Features
 In addition what has already been introduced, *Avendesora* provides a collection 
 of advanced features. Those include ...
 
-1. The :ref:`archive <archive command>` and :ref:`changed <changed command>` 
+-  The :ref:`archive <archive command>` and :ref:`changed <changed command>` 
    commands provide an ability to create a backup copy of all your passwords.  
    These command are described in the section on :ref:`upgrading <upgrading>`.
-2. Two techniques that provide an extra measure of security for accounts are 
+-  Two techniques that provide an extra measure of security for accounts are 
    :ref:`stealth accounts <stealth accounts>` and :ref:`misdirection 
    <misdirection>`.
-3. *Advendesora* provides several ways that help protect you from :ref:`phishing 
+-  *Advendesora* provides several ways that help protect you from :ref:`phishing 
    <phishing>`. You should be aware of these methods to make sure you use 
    them.
-4. *Advendesora* allows you to share master seeds with a partner, and once done 
+-  *Advendesora* allows you to share master seeds with a partner, and once done 
    allow you to easily and securely create new shared secrets. This is described 
-   in the section on :ref:`collaboration <collaboration>`.  Once you share 
-   a master seed, you can then use the :ref:`identity command <identity 
-   command>` as described in :ref:`confirming identity <confirming identity>` to 
-   securely verify that you are communicating with your partner.
-5. You can quickly print out the :ref:`NATO phonetic alphabet <phonetic>`, which 
+   in the section on :ref:`collaboration <collaboration>`.
+-  Once you share a master seed, you can use the :ref:`identity command 
+   <identity command>` as described in :ref:`confirming identity <confirming 
+   identity>` to securely verify that you are communicating with your partner.
+-  You can quickly print out the :ref:`NATO phonetic alphabet <phonetic>`, which 
    can be useful when trying to communicate complex character sequences over the 
    phone.

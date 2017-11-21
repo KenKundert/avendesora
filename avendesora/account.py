@@ -189,7 +189,10 @@ class Script:
 
 # Account class {{{1
 class Account(object):
-    """Class that holds all the information specific to an account."""
+    """Class that holds all the information specific to an account.
+
+    Add desired account information as attributes of the class.
+    """
 
     __NO_MASTER = True
         # prevents master seed from being added to this base class
@@ -927,6 +930,15 @@ class Account(object):
 
 # StealthAccount class {{{1
 class StealthAccount(Account):
+    """Empty account that defines how to generate a secret.
+
+    With stealth accounts the actual account name is requested directly from the
+    user. Only one attribute is generally given for stealth accounts, which is
+    suitable as a default such as password, passphrase or passcode, and that
+    contains the method for generating the desired secret based on the account
+    name and the master seed in the stealth_accounts file.
+    """
+
     __NO_MASTER = True
         # prevents master password from being added to this base class
 

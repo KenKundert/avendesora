@@ -105,13 +105,14 @@ Initial Configuration
 ---------------------
 
 The config file (~/.config/avendesora/config) allows you to personalize 
-*Avendesora* to your needs. After initializing your account you should take the 
-time to review the config file and adjust it to fit your needs. You should be 
-very thoughtful in this initial configuration, because some decisions (or 
-non-decisions) you make can be very difficult to change later.  The reason for 
-this is that they may affect the passwords you generate, and if you change them 
-you may change existing generated passwords. In particular, be careful with 
-*dictionary_file*. Changing this value when first initializing *Avendesora* is 
+*Avendesora* to your needs. The available configuration settings are documented 
+in ~/.config/avendesora/config.doc. After initializing your account you should 
+take the time to review your configuration and adjust it to fit your needs. You 
+should be very thoughtful in this initial configuration, because some decisions 
+(or non-decisions) you make can be very difficult to change later.  The reason 
+for this is that they may affect the passwords you generate, and if you change 
+them you may change existing generated passwords. In particular, be careful with 
+*dictionary_file*.  Changing this value when first initializing *Avendesora* is 
 fine, but should not be done or done very carefully once you start creating 
 accounts and secrets.
 
@@ -144,45 +145,50 @@ Configuring Your Window Manager
 -------------------------------
 
 You will want to configure your window manager to run *Avendesora* when you type 
-a special hot key, such as ``Alt p``.  The idea is that you are in a situation 
-where you need a secret, such as visiting your bank's website in your browser, 
-then you click on the username field with your mouse and type your hot key.  
-This runs *Avendesora* without an account name. In this case, *Avendesora* uses 
-secret discovery to determine which secret to use and the script that should be 
-used to produce the required information. Generally the script would be to enter 
-the username or email, then tab, then the passcode, and finally return, but you 
-can configure the script as you choose. This is all done as part of configuring 
-discovery. The method for associating *Avendesora* to a particular hot key is 
-dependent on your window manager.
+a special hot key, such as ``Alt p``.  The idea is that when you are in 
+a situation where you need a secret, such as visiting your bank's website in 
+your browser, you can click on the username field with your mouse and type your 
+hot key.  This runs *Avendesora* without an account name. In this case, 
+*Avendesora* uses :ref:`account discovery <discovery>` to determine which secret 
+to use and the script that should be used to produce the required information.  
+Generally the script would be to enter the username or email, then tab, then the 
+passcode, and finally return, but you can configure the script as you choose.  
+This is all done as part of configuring discovery. The method for associating 
+*Avendesora* to a particular hot key is dependent on your window manager.
+
+Gnome:
+
+    With Gnome, you must open your Keyboard Shortcuts preferences and create 
+    a new shortcut. When you do this, choose 'avendesora value' as the command 
+    to run.
+
+I3:
+
+    Add the following to your I3 config file (~/.config/i3/config)::
+
+        bindsym $mod+p exec --no-startup-id avendesora value
 
 
-Gnome
-"""""
+OpenBox:
 
-With Gnome, you must open your Keyboard Shortcuts preferences and create a new 
-shortcut. When you do this, choose 'avendesora value' as the command to run.
+    Key bindings are found in the <keyboard> section of your rc.xml 
+    configuration file. Add a key binding for *Avendesora* like this::
+
+        <keyboard>
+        ...
+            <keybind key="A-p">
+                <action name="Execute">
+                    <command>avendesora value</command>
+                </action>
+            </keybind>
+        ...
+        </keyboard>
 
 
-I3
-""
+Configuring Your Browser
+------------------------
 
-Add the following to your I3 config file (~/.config/i3/config)::
+Finally, to improve account discovery, it is recommended that you add a plugin 
+to your web browser that puts the URL into the window title. How to do so is 
+described in :ref:`discovery`.
 
-    bindsym $mod+p exec --no-startup-id avendesora value
-
-
-OpenBox
-"""""""
-
-Key bindings are found in the <keyboard> section of your rc.xml configuration 
-file. Add a key binding for *Avendesora* like this::
-
-    <keyboard>
-    ...
-        <keybind key="A-p">
-            <action name="Execute">
-                <command>avendesora value</command>
-            </action>
-        </keybind>
-    ...
-    </keyboard>
