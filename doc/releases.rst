@@ -26,7 +26,7 @@ Releases
     - add :ref:`credentials command <credentials command>`.
 
 **Latest development release**:
-    | Version: 1.7.23
+    | Version: 1.7.24
     | Released: 2017-11-20
 
     - created the manual
