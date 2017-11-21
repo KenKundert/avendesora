@@ -65,13 +65,20 @@ These are useful when constructing generated secrets.
 
     ASCII white space characters (excluding newlines).
 
-.. attribute:: avendesora.PRINTABLE = avendesora.ALPHANUMERIC + avendesora.PUNCTUATION + avendesora.WHITESPACE
+
+.. attribute:: avendesora.PRINTABLE
 
     All ASCII printable characters (letters, digits, punctuation, whitespace).
 
-.. attribute:: avendesora.DISTINGUISHABLE = exclude(avendesora.ALPHANUMERIC, 'Il1O0')
+    :attr:`avendesora.PRINTABLE` = :attr:`avendesora.ALPHANUMERIC` + :attr:`avendesora.PUNCTUATION` + :attr:`avendesora.WHITESPACE`
+
+
+.. attribute:: avendesora.DISTINGUISHABLE
 
     ASCII letters and digits with easily confused characters removed).
+
+    :attr:`avendesora.DISTINGUISHABLE` = exclude(:attr:`avendesora.ALPHANUMERIC`, 'Il1O0')
+
 
 .. attribute:: avendesora.SHIFTED = UPPERCASE + '~!@#$%^&*()_+{}|:"<>?'
 
