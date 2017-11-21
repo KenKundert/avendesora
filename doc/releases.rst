@@ -23,7 +23,7 @@ Releases
     - Fix issues in sleep feature in autotype scripts.
 
 **1.7 (2017-06-01)**:
-    - add credentials command.
+    - add :ref:`credentials command <credentials command>`.
 
 **Latest development release**:
     | Version: 1.7.23
@@ -39,6 +39,6 @@ Releases
     - Allow default_field to be a list.
     - Add render method to AccountValue.
     - Changed the way multiple gpg ids are specified.
-    - Improved browse command.
+    - Improved :ref:`browse command <browse command>`.
     - Added shift_sort to password generators.
-    - Added log command.
+    - Added :ref:`log command <log command>`.

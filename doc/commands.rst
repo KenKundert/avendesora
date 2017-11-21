@@ -53,25 +53,24 @@ Usage::
     avendesora archive
     avendesora A
 
-This command creates an encrypted archive that contains all the
-information in your accounts files, including the fully generated
-secrets.  You should never need this file, but its presence protects
-you in case you lose access to Avendesora. To access your secrets
-without Avendesora, simply decrypt the archive file with GPG.  The
+This command creates an encrypted archive that contains all the information in 
+your accounts files, including the fully generated secrets.  You should never 
+need this file, but its presence protects you in case you lose access to 
+Avendesora. To access your secrets without Avendesora, simply decrypt the 
+archive file with GPG.  The
 
-without Avendesora. When hidden, the secrets are encoded in base64.
-You can decode it by running 'base64 -d -' and pasting the encoded
-secret into the terminal.
+without Avendesora. When hidden, the secrets are encoded in base64.  You can 
+decode it by running 'base64 -d -' and pasting the encoded secret into the 
+terminal.
 
-When you run this command it overwrites the existing archive. If you
-have accidentally deleted an account or changed a secret, then
-replacing the archive could cause the last copy of the original
-information to be lost. To prevent this from occurring it is a good
-practice to run the 'changed' command before regenerating the
-archive.  It describes all of the changes that have occurred since
-the last time the archive was generated. You should only regenerate
-the archive once you have convinced yourself all of the changes are
-as expected.
+When you run this command it overwrites the existing archive. If you have 
+accidentally deleted an account or changed a secret, then replacing the archive 
+could cause the last copy of the original information to be lost. To prevent 
+this from occurring it is a good practice to run the :ref:`changed command 
+<changed command>` before regenerating the archive.  It describes all of the 
+changes that have occurred since the last time the archive was generated. You 
+should only regenerate the archive once you have convinced yourself all of the 
+changes are as expected.
 
 
 .. index::
@@ -96,23 +95,21 @@ Options:
                                       first.
     ================================= =======================================
 
-The account is examined for URLS, a URL is chosen, and then that URL
-is opened in the chosen browser.  First URLS are gathered from the
-'urls' account attribute, which can be a string containing one or
-more URLS, a list, or a dictionary.  If 'urls' is a dictionary, the
-desired URL can be chosen by entering the key as an argument to the
-browse command. If a key is not given, then the 'default_url'
-account attribute is used to specify the key to use by default. If
-'urls' is not a dictionary, then the first URL specified is used.
-URLs are also taken from RecognizeURL objects in the 'discovery'
-account attribute.  If the 'name' argument is specified, the
+The account is examined for URLS, a URL is chosen, and then that URL is opened 
+in the chosen browser.  First URLS are gathered from the 'urls' account 
+attribute, which can be a string containing one or more URLS, a list, or 
+a dictionary.  If 'urls' is a dictionary, the desired URL can be chosen by 
+entering the key as an argument to the :ref:`browse command <browse command>`. 
+If a key is not given, then the 'default_url' account attribute is used to 
+specify the key to use by default. If 'urls' is not a dictionary, then the first 
+URL specified is used.  URLs are also taken from RecognizeURL objects in the 
+'discovery' account attribute.  If the 'name' argument is specified, the 
 corresponding URL can be chosen using a key.
 
-The default browser is x. You can override the default
-browser on a per-account basis by adding an attribute named
-'browser' to the account.  An example of when you would specify the
-browser in an account would be an account associated with Tor hidden
-service, which generally can only be accessed using torbrowser:
+The default browser is x. You can override the default browser on a per-account 
+basis by adding an attribute named 'browser' to the account.  An example of when 
+you would specify the browser in an account would be an account associated with 
+Tor hidden service, which generally can only be accessed using torbrowser:
 
 .. index::
     single: changed command
@@ -138,15 +135,14 @@ Usage:
 |   avendesora changed
 |   avendesora C
 
-When you run the 'archive' command it overwrites the existing
-archive. If you have accidentally deleted an account or changed a
-secret, then replacing the archive could cause the last copy of the
-original information to be lost. To prevent this from occurring it
-is a good practice to run the 'changed' command before regenerating
-the archive.  It describes all of the changes that have occurred
-since the last time the archive was generated. You should only
-regenerate the archive once you have convinced yourself all of the
-changes are as expected.
+When you run the :ref:`archive command <archive command>` it overwrites the 
+existing archive. If you have accidentally deleted an account or changed 
+a secret, then replacing the archive could cause the last copy of the original 
+information to be lost. To prevent this from occurring it is a good practice to 
+run the :ref:`changed command <changed command>` before regenerating the 
+archive.  It describes all of the changes that have occurred since the last time 
+the archive was generated.  You should only regenerate the archive once you have 
+convinced yourself all of the changes are as expected.
 
 
 .. index::
@@ -356,11 +352,10 @@ then runs Avendesora with the given challenge::
 In this example, ahmed is the name of the file that Reza uses to
 contain their shared accounts.
 
-To complete the process, Reza returns the response to Ahmed, who
-compares it to the response he received to confirm Reza's identity.
-If Ahmed has forgotten the desired response, he can also specify the
-challenge to the *identity* command to regenerate the expected
-response.
+To complete the process, Reza returns the response to Ahmed, who compares it to 
+the response he received to confirm Reza's identity.  If Ahmed has forgotten the 
+desired response, he can also specify the challenge to the :ref:`identity 
+command <identity command>` to regenerate the expected response.
 
 
 .. index::

@@ -37,9 +37,8 @@ One creates an account using::
     > avendesora add <type>
 
 where *<type>* is either *shell*, *website* or *bank*.  Choose the template that 
-seems most appropriate (see :ref:`adding accounts <adding accounts>` and 
-:ref:`add command <add command>` for more information) and edit it to your 
-needs.
+seems most appropriate (see :ref:`overview <overview>` and :ref:`add command 
+<add command>` for more information) and edit it to your needs.
 
 If after configuring your account you feel the need to change it, you can use 
 the :ref:`edit command <edit command>` to do so::

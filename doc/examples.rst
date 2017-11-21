@@ -51,21 +51,21 @@ In this case 5 questions are supported. When you are first required to set up
 your challenge questions the website generally presents you with 20 or 30 to 
 choose form.  Simply choose the first few and add them to your account.
 
-Then use the *value* command to generate the answers and copy them into the 
-website.  You need not enter the questions into Avendesora exactly, but once you 
-provide your website with the generated answers you must not change the 
-questions in any way because doing so would change the answers.  Finally, the 
-first time you are required to enter answers to the challenge questions, take 
-note of the URL and add a discovery entry that matches the url and generates the 
-questions. In most cases you will not be able to specify a single question, so 
-simply specify the array and Avendesora will allow you to choose a particular 
-question when you request an answer. Specifically, when the website takes you to 
-the challenge question page, click in the field for the first answer and type 
-the hotkey that runs Avendesora in autotype mode.  Avendesora should recognize 
-the page and allow you to identify the question. It will then autotype the 
-answer into the field and then move to the next field.  Alternately, if you 
-terminate the script with '{return}' rather than '{tab}', it will take you to 
-the next page.
+Then use the :ref:`value command <value command>` to generate the answers and 
+copy them into the website.  You need not enter the questions into Avendesora 
+exactly, but once you provide your website with the generated answers you must 
+not change the questions in any way because doing so would change the answers.  
+Finally, the first time you are required to enter answers to the challenge 
+questions, take note of the URL and add a discovery entry that matches the url 
+and generates the questions. In most cases you will not be able to specify 
+a single question, so simply specify the array and Avendesora will allow you to 
+choose a particular question when you request an answer. Specifically, when the 
+website takes you to the challenge question page, click in the field for the 
+first answer and type the hotkey that runs Avendesora in autotype mode.  
+Avendesora should recognize the page and allow you to identify the question. It 
+will then autotype the answer into the field and then move to the next field.  
+Alternately, if you terminate the script with '{return}' rather than '{tab}', it 
+will take you to the next page.
 
 In some cases the website makes you choose from a fixed set of answers. In this 
 case you would save the answer with the question as follows:

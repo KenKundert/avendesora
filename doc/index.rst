@@ -144,15 +144,16 @@ There are various tricks available to reduce the amount you type. For example::
     username: orchid3649
     passcode: 0GPD;mc3XC?c
 
-If you give an account name without a command, the *credentials* command it run, 
-which outputs the username and password for the specified account.
+If you give an account name without a command, the :ref:`credentials command 
+<credentials command>` is run, which displays the username and password for the 
+specified account.
 
     > avendesora fastrak pin
     pin: 2728
 
 In this case the account and field name was given, but not a command name. When 
 more than one argument is given, and the first is not recognized as a command, 
-the value command is run.
+the :ref:`value command <value command>` is run.
 
 The *discovery* attribute is used by Avendesora to associate an account to a URL 
 or URLs.  You can visit the FasTrak website using::
@@ -186,13 +187,14 @@ This approach is a very secure way to access your account because:
 
 Here are some other convenient *Avendesora* commands.
 
-The *edit* command opens an account in your editor, allowing you to update the 
-account values::
+The :ref:`edit command <edit command>` opens an account in your editor, allowing 
+you to update the account values::
 
     > avendesora edit amtrak
 
-The *find* command finds accounts whose name contain a string of characters in 
-the name or alias. Notice that I tend to add common misspellings as aliases.
+The :ref:`find command <find command>` finds accounts whose name contain 
+a string of characters in the name or alias. Notice that I tend to add common 
+misspellings as aliases.
 
 ::
 
@@ -202,8 +204,9 @@ the name or alias. Notice that I tend to add common misspellings as aliases.
         fastrak (fastrack, fasttrack)
         python-bug-tracker
 
-The *search* command finds accounts whose attributes contain a string of 
-characters.  Only attributes whose values are not secret are examined.
+The :ref:`search command <search command>` finds accounts whose attributes 
+contain a string of characters.  Only attributes whose values are not secret are 
+examined.
 
 ::
 
@@ -212,8 +215,8 @@ characters.  Only attributes whose values are not secret are examined.
         gmail
         fidelity
 
-The *values* command prints out a summary of all the account attributes. The 
-secrets are not printed with this command.
+The :ref:`values command <values command>` prints out a summary of all the 
+account attributes.  The secrets are not printed with this command.
 
 ::
 
@@ -228,8 +231,8 @@ secrets are not printed with this command.
     username: orchid3649
 
 
-Finally, you can use ``avendesora help`` to get information on the various 
-commands and other useful topics.
+Finally, you can use the :ref:`help command <help command>` to get information 
+on the various commands and other useful topics.
 
 Contents:
 
@@ -238,8 +241,8 @@ Contents:
 
    concepts
    installing
+   overview
    accounts
-   adding-accounts
    advanced
    commands
    helpers

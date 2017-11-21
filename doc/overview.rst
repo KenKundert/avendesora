@@ -1,11 +1,38 @@
-.. _adding accounts:
+.. _overview:
 
-Adding Accounts
-===============
+Overview
+========
 
-Adding typical accounts are illustrated by examples.  At this point it is 
-assumed that you have :ref:`initialized your accounts <initializing avendesora>` 
-and :ref:`configured your window manager <configure window manager>`.
+Use of *Avendesora* will be illustrated through a series of examples.  However, 
+before starting it is helpful to know that *Avendesora* provides several 
+commands to help you use it. First, it provides a :ref:`help command <help 
+command>`::
+
+    > avendesora help
+
+This lists the available help topics. You can ask about a specific topic 
+using:
+
+    > avendesora help <topic>
+
+Adding the --browse option allows you to access the online version of the manual 
+through your web browser. For example,
+
+    > avendesora help -b accounts
+
+And when things go wrong, you can use :ref:`log command <log command>` to 
+quickly view the log file::
+
+    > avendesora log
+
+The logfile is kept in the ~/.config/avendesora directory, and this command 
+opens it directly in your editor.  It can be very helpful in debugging account 
+discovery issues.
+
+At this point you should have :ref:`initialized your accounts <initializing 
+avendesora>` and :ref:`configured your window manager <configure window 
+manager>` and done the :ref:`initial configuration <initial configuration>` of 
+*Avendesora*.
 
 
 .. index::
@@ -123,7 +150,8 @@ you should see something like this:
 
 Notice that all the *Avendesora* instructions were removed.
 
-You can show all the values associated with this account using::
+You can show all the values associated with this account using the :ref:`values 
+command <values command>`::
 
     > avendesora values LinuxLogin
     names: linuxlogin, linux, login
@@ -136,8 +164,22 @@ when displaying all of the values. To see it, use::
     > avendesora value LinuxLogin passcode
     passcode: wigwam mistrust afflict refit
 
-You can also have *Avendesora* attempt to show you your login credentials for 
-the account using::
+The value command will also write the secret directly to the clipboard::
+
+    > avendesora value --clipboard LinuxLogin passcode
+
+By default *Avendesora* is configured to use the write to the primary clipboard.  
+You use the middle mouse button to paste from the primary clipboard. You can 
+also modify the *xsel_executable* to modify this behavior.
+
+You can also write directly to the standard output (normally *Avendesora* writes 
+directly to the TTY so that it can erase any secrets after a minute has elapsed.  
+You can also direct *Avendesora* to write to the standard output. In this way 
+you can use *Avendesora* within shell scripts (but you should consider rewriting 
+you script in Python and then using the :ref:`Avendesora API <api>`.
+
+You can also have *Avendesora* attempt to show you your :ref:`login credentials 
+<credentials command>` for the account using::
 
     > avendesora login LinuxLogin
     username: x57107048
@@ -171,8 +213,8 @@ particular:
     username: x57107048
     passcode: wigwam mistrust afflict refit
 
-4. On the value command, if you do not specify a field, it will offer the 
-   passcode, password, or passphrase if available::
+4. On the :ref:`value command <value command>`, if you do not specify a field, 
+   it will offer the passcode, password, or passphrase if available::
 
     > avendesora v linux
     passcode: wigwam mistrust afflict refit
@@ -219,7 +261,7 @@ box and you choose the one you want.
     single: website account
 
 Website Account
----------------
+"""""""""""""""
 
 In this example an account is provisioned to hold information typical to 
 a website::
@@ -317,8 +359,8 @@ protected.  There are two ways of doing that.
    Hidden("Y2F0Y2gyMg=="). This makes it harder for anybody that happens to 
    glance over your shoulder while you have your account file open to recognize 
    and remember your password. In this case the encoded password is not 
-   encrypted, and it is easy to recover using *Avendesora*'s reveal command or 
-   the linux  base64 command.
+   encrypted, and it is easy to recover using *Avendesora*'s :ref:`reveal 
+   command <reveal command>` or the linux base64 command.
 
 Many websites ask 'security' questions. These questions represent a back door 
 into your account. If you forget your password, you can access your account by 
@@ -342,20 +384,24 @@ answer along with the question:
     ]
 
 Lastly this account sets up the web interface by specifying *urls* and 
-*discovery*. The *urls* field is used by the browse command, which opens your 
-browser and navigates to the login page.  The *discovery* field is used to 
-recognize that this is the account to use when *Avendesora* is asked to login 
-into the *virginamerica.com* site. Notice that several URLs are given to 
-RecognizeURL(), this is necessary when the website allows you to login using 
-different domain names. RecognizeURL() is a variant of RecognizeTitle() that is 
-attuned to the titles generated by browsers that have been configured to place 
-the URL in the window title bar. This makes it more robust in this particular 
-case. Also notice that the expected protocol is given with the URLs (https). In 
-this way, *Avendesora* will refuse to send your login credentials if the 
-connection is not encrypted using https protocol.  The final argument to 
-RecognizeURL() is the script that logs you in. In this case the script specifies 
-that the value of the email field should be typed into the browser, followed by 
-a tab, then the passcode, then a return.
+*discovery*. The *urls* field is used by the :ref:`browse command <browse 
+command>`, which opens your browser and navigates to the login page.  For 
+example::
+
+    > avendesora browse virgin
+
+The *discovery* field is used to recognize that this is the account to use when 
+*Avendesora* is asked to login into the *virginamerica.com* site. Notice that 
+several URLs are given to RecognizeURL(), this is necessary when the website 
+allows you to login using different domain names. RecognizeURL() is a variant of 
+RecognizeTitle() that is attuned to the titles generated by browsers that have 
+been configured to place the URL in the window title bar. This makes it more 
+robust in this particular case. Also notice that the expected protocol is given 
+with the URLs (https). In this way, *Avendesora* will refuse to send your login 
+credentials if the connection is not encrypted using https protocol.  The final 
+argument to RecognizeURL() is the script that logs you in. In this case the 
+script specifies that the value of the email field should be typed into the 
+browser, followed by a tab, then the passcode, then a return.
 
 It is possible to configure account discovery to support several secrets. To do 
 so, place the recognizers in a list and specify different scripts for each. For 
@@ -405,7 +451,7 @@ eliminates the need to choose:
     single: bank account
 
 Bank Account
-------------
+""""""""""""
 
 Bank accounts are similar to web accounts, but generally contain multiple 
 account numbers and even more secrets.  Create a bank account using::
@@ -480,7 +526,7 @@ might use a dictionary for the accounts of each person, as follows:
 
 Now to get Timmy's checking account number you would use::
 
-    avendesora bank tommy.checking
+    avendesora bank timmy.checking
 
 Security questions and account discovery are handled as given above.
 
@@ -499,3 +545,76 @@ conceivably start by typing your name and follow with your address, but there is
 enough variability in websites that this would likely not work on all of them, 
 so it is generally best to limit the script to a small number of the most 
 helpful fields.
+
+
+.. _finding accounts:
+
+Finding Accounts
+----------------
+
+*Avendesora* provides two ways of finding account names if you do not remember 
+them.  First is the :ref:`find command <find command>`, which given a bit of 
+text lists all of the accounts that contain that text in their names or their 
+aliases. For example::
+
+    > avendesora find bank
+    bank-america (ba, boa, bofa)
+    citibank-mastercard (mc, mastercard, citibank)
+    mechanicsbank (mb bank)
+
+The next is the :ref:`search command <search command>`, which given a bit of 
+text lists all of the accounts that contain that text in any of the non-secret 
+account values.  For example::
+
+    > avendesora search bank
+    bank-america (ba, boa, bofa)
+    capitalone (co, ing)
+    citibank-mastercard (mc, mastercard, citibank)
+    mechanicsbank (mb bank)
+    wellsfargo (wf)
+
+In both cases the name of the account is listed first followed by the account 
+aliases (with in parentheses).
+
+
+.. _modifying accounts:
+
+Modifying Accounts
+------------------
+
+Once an account exists, it can modified using the :ref:`edit command <edit 
+command>`::
+
+    > avendesora edit bank
+
+This opens the MechanicsBank account in your editor (you can select your editor 
+by modifying the *edit_account* setting).  Once you modify your account, you 
+should save the file and exit the editor. The change will be checked and if 
+there are any errors, you will be given a chance to reopen the account file and 
+fix the account.
+
+
+Additional Features
+-------------------
+
+In addition what has already been introduced, *Avendesora* provides a collection 
+of advanced features. Those include ...
+
+1. The :ref:`archive <archive command>` and :ref:`changed <changed command>` 
+   commands provide an ability to create a backup copy of all your passwords.  
+   These command are described in the section on :ref:`upgrading <upgrading>`.
+2. Two techniques that provide an extra measure of security for accounts are 
+   :ref:`stealth accounts <stealth accounts>` and :ref:`misdirection 
+   <misdirection>`.
+3. *Advendesora* provides several ways that help protect you from :ref:`phishing 
+   <phishing>`. You should be aware of these methods to make sure you use 
+   them.
+4. *Advendesora* allows you to share master seeds with a partner, and once done 
+   allow you to easily and securely create new shared secrets. This is described 
+   in the section on :ref:`collaboration <collaboration>`.  Once you share 
+   a master seed, you can then use the :ref:`identity command <identity 
+   command>` as described in :ref:`confirming identity <confirming identity>` to 
+   securely verify that you are communicating with your partner.
+5. You can quickly print out the :ref:`NATO phonetic alphabet <phonetic>`, which 
+   can be useful when trying to communicate complex character sequences over the 
+   phone.

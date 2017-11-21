@@ -769,7 +769,7 @@ class Misdirection(HelpMessage):
 # Overview class {{{1
 class Overview(HelpMessage):
     DESCRIPTION = "overview of Avendesora"
-    URL = ''
+    URL = '/overview.html'
 
     @staticmethod
     def help():

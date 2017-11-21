@@ -16,10 +16,11 @@ should archive your passwords before you upgrade with::
    avendesora changed
    avendesora archive
 
-The *changed* command should always be run before an *archive* command. It 
-allows you to review all the changes that have occurred so that you can verify 
-that they were all intentional.  Once you are comfortable, run the *archive* 
-command to save all the changes.  This creates a file 
+The :ref:`changed command <changed command>` should always be run before an 
+:ref:`archive command <archive command>`.  It allows you to review all the 
+changes that have occurred so that you can verify that they were all 
+intentional.  Once you are comfortable, run the :ref:`archive command <archive 
+command>` to save all the changes.  This creates a file 
 (~/.config/avendesora/archive.gpg) that contains all of your account 
 information, including the secrets. Be sure to keep it safe.
 
@@ -28,6 +29,10 @@ Once you have created/updated your archive, you can upgrade Avendesora with::
    pip install -upgrade --user avendesora
 
 Finally, run::
+
+   avendesora version
+
+to confirm that your version of *Avendesora* was updated and::
 
    avendesora changed
 

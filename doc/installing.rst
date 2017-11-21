@@ -131,6 +131,8 @@ Any files that already exist will not be touched, but any missing files will be
 recreated, and this time they will be encrypted or not based on the extensions 
 you gave.
 
+More information on the various configuration options can be found in 
+:ref:`configuring`.
 
 .. index::
     single: configuring window manager

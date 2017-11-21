@@ -1,3 +1,5 @@
+.. _advanced usage:
+
 Advanced Usage
 ==============
 
@@ -21,7 +23,7 @@ longer true.
 
 Avendesora helps you avoid phishing attacks in two ways. First, you
 should never go to one of your secure sites by clicking on a link.
-Instead, you should use Avendesora's browse command::
+Instead, you should use Avendesora's :ref:`browse command <browse command>`::
 
     avendesora browse chase
 
@@ -395,7 +397,7 @@ Most account attributes that expect a string can also accept a
 script given in this manner.
 
 You can also give a script rather than a field on the command line
-when running the value command::
+when running the :ref:`value command <value command>`::
 
     > avendesora value scc '{username}: {passcode}'
     jman: R7ibHyPjWtG2
@@ -547,9 +549,9 @@ will instead be the misdirected value.
 
 
 .. index::
-    single: sollaboration
+    single: collaboration
 
-.. _sollaboration:
+.. _collaboration:
 
 Collaborating with a Partner
 ----------------------------
@@ -603,8 +605,8 @@ generate the secrets, but now both partners can. At a minimum you
 would need to share only the account name and the user name if one
 is needed. With that, the other partner can generate the passcode.
 
-Once you have shared an accounts file, you can also use the identity
-command to prove your identity to your partner.
+Once you have shared an accounts file, you can also use the :ref:`identity
+command <identity command>` to prove your identity to your partner.
 
 You cannot share secrets encrypted with Scrypt. Also, you cannot
 share stealth accounts unless the file that contains the account
@@ -622,9 +624,9 @@ account templates and add a master seed to that file manually.
 Confirming Identity of a Partner
 --------------------------------
 
-The identity command allows you to generate a response to any challenge.
-The response identifies you to a remote partner with whom you have shared
-an account.
+The :ref:`identity command <identity command>` allows you to generate a response 
+to any challenge.  The response identifies you to a remote partner with whom you 
+have shared an account.
 
 If you run the command with no arguments, it prints the list of
 valid names. If you run it with no challenge, one is created for you
@@ -652,24 +654,23 @@ Avendesora as follows and remembers the response::
     challenge: slouch emirate bedeck brooding
     response: spear disable local marigold
 
-This assumes that reza is the name, with any extension removed, of
-the file that Ahmed uses to contain their shared accounts.
+This assumes that reza is the name, with any extension removed, of the file that 
+Ahmed uses to contain their shared accounts.
 
-Ahmed communicates the challenge to Reza but not the response.  Reza
-then runs Avendesora with the given challenge::
+Ahmed communicates the challenge to Reza but not the response.  Reza then runs 
+Avendesora with the given challenge::
 
     > avendesora identity ahmed slouch emirate bedeck brooding
     challenge: slouch emirate bedeck brooding
     response: spear disable local marigold
 
-In this example, ahmed is the name of the file that Reza uses to
-contain their shared accounts.
+In this example, ahmed is the name of the file that Reza uses to contain their 
+shared accounts.
 
-To complete the process, Reza returns the response to Ahmed, who
-compares it to the response he received to confirm Reza's identity.
-If Ahmed has forgotten the desired response, he can also specify the
-challenge to the *identity* command to regenerate the expected
-response.
+To complete the process, Reza returns the response to Ahmed, who compares it to 
+the response he received to confirm Reza's identity.  If Ahmed has forgotten the 
+desired response, he can also specify the challenge to the :ref:`identity 
+command <identity command>` to regenerate the expected response.
 
 
 .. index::

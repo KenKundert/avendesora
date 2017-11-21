@@ -1,3 +1,5 @@
+.. _configuring:
+
 Configuring
 ===========
 
@@ -12,9 +14,9 @@ files:
 
     This file contains the list of known account files. The first file in the 
     list is the default account file (this is where new accounts go by default).  
-    You can use the *new* command to add additional files to this list, but to 
-    delete account file you must manually edit this file and remove them from 
-    the list.
+    You can use the :ref:`new command <new command>` to add additional files to 
+    this list, but to delete account file you must manually edit this file and 
+    remove them from the list.
 
 .. index::
     single: config file
@@ -37,17 +39,19 @@ files:
     One of the risks in using a password generator is that changed in the code 
     can result in the passwords changing. Thus there is a risk that when you 
     upgrade Avendesora that your passwords will change. Avendesora provides the 
-    *archive* and *changed* commands to help detect these situations.  It also 
-    keeps hashes of several key parts of the code that if changed could result 
-    in the passwords changing. When Avendesora runs, it recomputes these hashes 
-    on itself and compares them to the hashes saved in this file. If any of the 
-    hashes have changed a warning message is produced, which can alert you to 
-    changes that you might have otherwise missed.
+    :ref:`archive <archive command>` and :ref:`changed <changed command>`  
+    commands to help detect these situations.  It also keeps hashes of several 
+    key parts of the code that if changed could result in the passwords 
+    changing. When Avendesora runs, it recomputes these hashes on itself and 
+    compares them to the hashes saved in this file. If any of the hashes have 
+    changed a warning message is produced, which can alert you to changes that 
+    you might have otherwise missed.
 
     It is normal that these hashes change when the program is updated. When you 
-    see the message that the hashes have changed you should run the *changed* 
-    command to assure that none of your generated secrets have changed. This 
-    assumes that you have created an archive file and kept it up to date.
+    see the message that the hashes have changed you should run the 
+    :ref:`changed command <changed command>` to assure that none of your 
+    generated secrets have changed.  This assumes that you have created an 
+    archive file and kept it up to date.
 
 .. index::
     single: stealth_accounts file
@@ -129,20 +133,21 @@ specifying the desired value sin *config*.  The available settings are:
 
 **default_field** = 'passcode password passphrase':
 
-    The name of the field to use for the value command when one is not
-    given. May be a space separated list of names, in which case the first
-    that is found is used.
+    The name of the field to use for the :ref:`value command <value command>` 
+    when one is not given. May be a space separated list of names, in which case 
+    the first that is found is used.
 
 .. index::
     single: default_vector_field setting
 
 **default_vector_field** = 'questions':
 
-    The name of the field to use when an integer is given as the argument
-    to the value command. In this case the field is expected to be a list
-    and the argument is taken to be the index of the desired value.
-    For example, if default_vector_field is 'question' and the argument
-    given with the value command is 1, then question[1] is produced.
+    The name of the field to use when an integer is given as the argument to the 
+    :ref:`value command <value command>`. In this case the field is expected to 
+    be a list and the argument is taken to be the index of the desired value.  
+    For example, if default_vector_field is 'question' and the argument given 
+    with the :ref:`value command <value command>` is 1, then question[1] is 
+    produced.
 
 .. index::
     single: credential_ids setting
@@ -150,7 +155,8 @@ specifying the desired value sin *config*.  The available settings are:
 **credential_ids** = 'username email':
 
     A string that contains the field names (space separated) that should be
-    considered by the credentials command for the account identity.
+    considered by the :ref:`credentials command <credentials command>` for the 
+    account identity.
 
 .. index::
     single: credential_secrets setting
@@ -158,7 +164,8 @@ specifying the desired value sin *config*.  The available settings are:
 **credential_secrets** = 'passcode password passphrase':
 
     A string that contains the field names (space separated) that should be
-    considered by the credentials command for the primary account secret.
+    considered by the :ref:`credentials command <credentials command>` for the 
+    primary account secret.
 
 .. index::
     single: display_time setting
