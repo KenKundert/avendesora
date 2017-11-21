@@ -91,7 +91,7 @@ These are useful when constructing generated secrets.
 
 .. attribute:: avendesora.DISTINGUISHABLE
 
-    ASCII letters and digits with easily confused characters removed):
+    ASCII letters and digits with easily confused characters removed:
     :attr:`avendesora.DISTINGUISHABLE` = exclude(:attr:`avendesora.ALPHANUMERIC`, 'Il1O0')
 
 
