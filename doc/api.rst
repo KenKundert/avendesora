@@ -27,7 +27,11 @@ relatively high-level interface as shown in this example:
         e.terminate()
 
     try:
-        curl = Run(f'curl --user {username!s}:{passcode!s} {url!s}', 'sOEW0')
+        curl = Run(
+            f'curl -K - {url!s}',
+            stdin = f'user="{username!s}:{passcode!s}"',
+            modes='sOEW0'
+        )
         Path(f'{name!s}.ofx').write_text(curl.stdout)
     except OSError as e:
         fatal(os_error(e))

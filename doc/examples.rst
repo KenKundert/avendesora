@@ -17,8 +17,8 @@ browser because your cookie expired or was deleted. As such, people need to
 answer their challenge questions with much more frequency. Generally the site 
 will save your answers to 4 or 5 challenge questions, and will present you with 
 1 or 2 at random. You must answer them correctly before you are allowed to 
-login.  To accommodate these needs, Avendesora saves the challenge questions and 
-either stores or generates the answers. It is also makes it easy for you to 
+login.  To accommodate these needs, *Avendesora* saves the challenge questions 
+and either stores or generates the answers. It is also makes it easy for you to 
 autotype the answer to any of your questions.
 
 The following shows how to configure an account to support challenge questions.
@@ -52,18 +52,18 @@ your challenge questions the website generally presents you with 20 or 30 to
 choose form.  Simply choose the first few and add them to your account.
 
 Then use the :ref:`value command <value command>` to generate the answers and 
-copy them into the website.  You need not enter the questions into Avendesora 
+copy them into the website.  You need not enter the questions into *Avendesora* 
 exactly, but once you provide your website with the generated answers you must 
 not change the questions in any way because doing so would change the answers.  
 Finally, the first time you are required to enter answers to the challenge 
 questions, take note of the URL and add a discovery entry that matches the url 
 and generates the questions. In most cases you will not be able to specify 
-a single question, so simply specify the array and Avendesora will allow you to 
-choose a particular question when you request an answer. Specifically, when the 
-website takes you to the challenge question page, click in the field for the 
-first answer and type the hotkey that runs Avendesora in autotype mode.  
-Avendesora should recognize the page and allow you to identify the question. It 
-will then autotype the answer into the field and then move to the next field.  
+a single question, so simply specify the array and *Avendesora* will allow you 
+to choose a particular question when you request an answer. Specifically, when 
+the website takes you to the challenge question page, click in the field for the 
+first answer and type the hotkey that runs *Avendesora* in autotype mode.  
+*Avendesora* should recognize the page and allow you to identify the question.  
+It will then autotype the answer into the field and then move to the next field.  
 Alternately, if you terminate the script with '{return}' rather than '{tab}', it 
 will take you to the next page.
 
@@ -94,9 +94,9 @@ Google and Gmail
 Google always seems to keep futzing with there security protocols in order to 
 make them more secure, but at the same time also seem to make them more 
 annoying. As such, I have gone through several approaches to making the Google 
-login work with Avendesora. The latests, as of 2017, is shown below. Google uses 
-a different page when requesting your username or email, your passcode, and the 
-answer to your challenge questions. So the current approach is to simply 
+login work with *Avendesora*. The latests, as of 2017, is shown below. Google 
+uses a different page when requesting your username or email, your passcode, and 
+the answer to your challenge questions. So the current approach is to simply 
 recognize each of those pages individually.  You can use something like this for 
 your Gmail/Google account entry:
 
@@ -194,14 +194,15 @@ resulting in the release of credit card information.  So all careful denizens of
 the web are reluctant to let the websites keep their information. This results 
 in you being forced into the tedious task of re-entering this information.
 
-Avendesora can help with this. If you have a website that you find yourself 
+*Avendesora* can help with this. If you have a website that you find yourself 
 entering credit card information into routinely, then you can use the account 
-discovery and autotype features of Avendesora to enter the information for you.
+discovery and autotype features of *Avendesora* to enter the information for 
+you.
 
 For example, imagine that you have a Citibank credit card that you use routinely 
-on the Costco website.  You can configure Avendesora to automatically enter your 
-credit card information into the Costco site with by adding an account discovery 
-entry to your Citibank account as follows:
+on the Costco website.  You can configure *Avendesora* to automatically enter 
+your credit card information into the Costco site with by adding an account 
+discovery entry to your Citibank account as follows:
 
 .. code-block:: python
 
@@ -233,7 +234,7 @@ entry to your Citibank account as follows:
             ),
         ]
 
-This represents a relatively standard Avendesora description of an account.  
+This represents a relatively standard *Avendesora* description of an account.  
 Notice that it contains the credit card number (*account*), the expiration date 
 (*expriration*) and the CVV number (*cvv*). This is raw information the autotype 
 script will pull from. The credit card and the CVV values are sensitive 
@@ -257,7 +258,7 @@ Javascript helpers to interpret the fields. These helpers are intended to give
 you immediate feedback if you typed something incorrectly, but they are slow and 
 can get confused if you type too fast. As is, the first one or two fields would 
 be entered properly, but the rest would be empty because they were entered by 
-Avendesora before the page was ready for them. To address this issue, you can 
+*Avendesora* before the page was ready for them. To address this issue, you can 
 put delays in the script::
 
     {account}{tab}{sleep 0.5}{expiration}{tab}{sleep 0.5}{cvv}{tab}{sleep 0.5}Herbie Thudpucker{return},
@@ -294,6 +295,28 @@ to the Costco script.
                 name='card holder information'
             ),
         ]
+
+This approach requires that you anticipate those sites into which you well enter 
+the credit card information.  Alternatively, you add a script to your credit 
+card account that outputs the credit card information, and then run *Avendesora* 
+in such a way that the credit card information into the webpage. To do this 
+requires two things. First, add a script to the account that combines and 
+outputs the credit card information. For example:
+
+.. code-block:: python
+
+        ccn = Script('{account}{tab}{cvv}{tab}')
+
+In this case the amount of information is limited to increase the chance that 
+the result will be compatible with a large number of websites.  Then run 
+*Avendesora* from the window manager::
+
+    Alt-F2 avendesora citi ccn
+
+Here, Alt-F2 is the hot key Gnome uses to execute a command. This causes 
+*Avendesora* to run the *ccn* script. Since *Avendesora* running from the window 
+manager does not have access to a TTY, it will instead mimic the keyboard to 
+autotype the credit card information, will go to the active window.
 
 
 .. index::
