@@ -130,28 +130,6 @@ def two_columns(col1, col2, width=16, indent=True):
         return '%s%-*s  %s' % (indent, width, col1, col2)
 
 
-# columns {{{1
-def columns(array, pagewidth=79, alignment='<', leader='    '):
-    # This has been moved into inform. Switch to that version once inform 1.10
-    # has been out for a while.
-    "Distribute array over enough columns to fill the screen."
-    textwidth = pagewidth - len(leader)
-    width = max([len(e) for e in array])+1
-    numcols = max(1, textwidth//(width+1))
-    stride = len(array)//numcols + 1
-    fmt = '{{:{align}{width}s}}'.format(align=alignment, width=width)
-    table = []
-    for i in range(len(array)//numcols+1):
-        row = []
-        for j in range(numcols):
-            try:
-                row.append(fmt.format(array[stride*j+i]))
-            except IndexError:
-                pass
-        table.append(leader + ' '.join(row).rstrip())
-    return '\n'.join(table)
-
-
 # to_python {{{1
 def to_python(obj, _level=0):
     """Recursively convert object to string with reasonable formatting"""

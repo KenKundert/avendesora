@@ -25,10 +25,10 @@ from .error import PasswordError
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import ObscuredSecret
-from .utilities import query_user, two_columns, columns
+from .utilities import query_user, two_columns
 from .writer import get_writer
 from inform import (
-    codicil, cull, debug, error, full_stop, output, warn, conjoin,
+    codicil, columns, cull, debug, error, full_stop, output, warn, conjoin,
     os_error, is_collection, indent, render, ddd, ppp, vvv
 )
 from shlib import chmod, cp, rm, to_path

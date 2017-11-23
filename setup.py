@@ -24,7 +24,7 @@ setup(
         'appdirs',
         'arrow',
         'docopt',
-        'inform>=1.9',
+        'inform>=1.10',
         #'pygobject',
             # pygobject seems broken in pypi. Instead, do the following:
             # git clone git://git.gnome.org/pygobject
