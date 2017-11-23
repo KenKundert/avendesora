@@ -25,13 +25,10 @@ Releases
 **1.7 (2017-06-01)**:
     - add :ref:`credentials command <credentials command>`.
 
-**Latest development release**:
-    | Version: 1.7.25
-    | Released: 2017-11-21
-
-    - created the manual
-    - use keyboard writer if there is no access to TTY
-    - shifted to skinny config file
+**1.8 (2017-11-23)**:
+    - Created the manual.
+    - Use keyboard writer if there is no access to TTY.
+    - Shifted to skinny config file.
     - Warn the user if the archive is missing or stale.
     - Improved get_value(), added add get_values(), add get_fields().
     - Canonicalize names.
@@ -42,3 +39,8 @@ Releases
     - Improved :ref:`browse command <browse command>`.
     - Added shift_sort to password generators.
     - Added :ref:`log command <log command>`.
+
+**Latest development release**:
+    | Version: 1.7.25
+    | Released: 2017-11-21
+
