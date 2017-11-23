@@ -732,7 +732,7 @@ all that Avendesora can do.
 Contributing
 ------------
 
-Please ask questions or report bugs on ``Github Issues 
-<https://github.com/KenKundert/avendesora/issues>``_. I will entertain pull 
+Please ask questions or report bugs on `Github Issues 
+<https://github.com/KenKundert/avendesora/issues>`_. I will entertain pull 
 requests if you make improvements. I am particularly interested in help adapting 
 *Avendesora* for other editors, window managers and distributions.
