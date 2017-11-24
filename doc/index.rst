@@ -37,21 +37,13 @@ into your browser, email client, shell, etc.  The information *Avendesora*
 provides can be used to log you in, answer security questions, enter your credit 
 card number, etc.
 
-Avendesora is a program that is deeply steeped in Unix traditions.  It operates 
-primarily from the command line and leans heavily oo be the hot key sequence that runs a shell command 
-directly from the window manager (Gnome uses Alt-F2, but yours may be 
-different).
-Doing so causes your credit card number, followed by a tab, followed by your 
-CCV, and followed by another tab to be typed into the page. You could 
-conceivably start by typing your name and follow with your address, but there is 
-enough variability in websites that this would likely not work on all of them, 
-so it is generally best to limit the script to a small number of the most 
-hn programs you are likely 
-already familiar with, such as Python, GPG, and Vim.  As such, it should be both 
-welcoming and powerful for those that are comfortable with Unix and its 
+*Avendesora* is a program that is deeply steeped in Unix traditions.  It 
+operates primarily from the command line and leans heavily on programs you are 
+likely already familiar with, such as Python, GPG, and Vim.  As such, it should 
+be both welcoming and powerful for those that are comfortable with Unix and its 
 utilities.  Also, it is fully open source, so you can change it if you do not 
 like some aspect of it. Please consider contributing your enhancements back to 
-the project. Here are some of the ways Avendesora differs from other available 
+the project. Here are some of the ways *Avendesora* differs from other available 
 password managers:
 
 #. Completely offline
@@ -67,10 +59,10 @@ password managers:
 Quick Tour
 ----------
 
-With Avendesora you create files that contain information about your accounts.  
-Avendesora accesses that information and shows it to you when you need it.  The 
-files can be encrypted with GPG, and so are quite secure. The information itself 
-is grouped into accounts, with an account consisting of both secret and 
+With *Avendesora* you create files that contain information about your accounts.  
+*Avendesora* accesses that information and shows it to you when you need it.  
+The files can be encrypted with GPG, and so are quite secure. The information 
+itself is grouped into accounts, with an account consisting of both secret and 
 non-secret information.  The non-secret information includes such things as user 
 names, email addresses, phone numbers, etc.  The secret information includes 
 passwords, pins, security questions and such.  Information is free form. You 
@@ -113,12 +105,12 @@ your needs. For example, your entry for FasTrak might look like this::
         pin = PIN(length=4)
 
 This is Python code.  An account is created by declaring a subclass of Account.  
-The account information is given as class attributes. Avendesora supports 
+The account information is given as class attributes. *Avendesora* supports 
 string, list, and dictionary attributes. You create secrets by instantiating 
 a Secrets class. This example uses three different secrets, all of which are 
 generated: PasswordRecipe(), Question() and PIN(). First consider PIN(). Notice 
 that you do not give a PIN number, you instead just specify how long it should 
-be. Avendesora generates a PIN for you at random. With PasswordRecipe() you do 
+be. *Avendesora* generates a PIN for you at random. With PasswordRecipe() you do 
 not specify the password, you specify how long it should be and what kind of 
 characters it should use (in this case, 12 long including 2 uppercase, 2 digits, 
 and 2 symbols). Question() is used to generate random answers to security 
@@ -144,7 +136,7 @@ You can also access the account values that are not secret in a similar manner::
     > avendesora value fastrak username
     username: orchid3649
 
-The difference is that Avendesora erases secrets from the screen after 
+The difference is that *Avendesora* erases secrets from the screen after 
 displaying them for a minute, which is not done with non-secrets.
 
 There are various tricks available to reduce the amount you type. For example::
@@ -164,16 +156,16 @@ In this case the account and field name was given, but not a command name. When
 more than one argument is given, and the first is not recognized as a command, 
 the :ref:`value command <value command>` is run.
 
-The *discovery* attribute is used by Avendesora to associate an account to a URL 
-or URLs.  You can visit the FasTrak website using::
+The *discovery* attribute is used by *Avendesora* to associate an account to 
+a URL or URLs.  You can visit the FasTrak website using::
 
     > avendesora b fastrak
 
-The *b* is short for :ref:`browse <browse command>` (the most common Avendesora 
-commands have single character aliases). Running that command opens your browser 
-if it is not already open, and navigates to the FasTrak URL. Generally you would 
-run this command directly from your window manager, which allows you to navigate 
-to your account without opening a shell.
+The *b* is short for :ref:`browse <browse command>` (the most common 
+*Avendesora* commands have single character aliases). Running that command opens 
+your browser if it is not already open, and navigates to the FasTrak URL.  
+Generally you would run this command directly from your window manager, which 
+allows you to navigate to your account without opening a shell.
 
 The information provided to :ref:`discovery <discovery>` also allows the desired 
 account to be recognized, which allows you to directly enter values into an 
