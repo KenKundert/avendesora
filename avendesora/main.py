@@ -59,9 +59,11 @@ def main():
 
         # start logging
         logfile = BufferedFile(get_setting('log_file'), True)
-        with Inform(logfile=logfile, hanging_indent=False):
-            Command.execute(cmdline['<command>'], cmdline['<args>'])
-            done()
+        Inform(logfile=logfile, hanging_indent=False)
+
+        # run the requested command
+        Command.execute(cmdline['<command>'], cmdline['<args>'])
+        done()
     except KeyboardInterrupt:
         output('Terminated by user.')
         terminate()
