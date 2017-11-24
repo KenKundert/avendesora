@@ -570,8 +570,8 @@ generated secrets is based on the master seed, and that seed is
 contained in the accounts file that is shared in a secure manner
 once at the beginning.  For example, imagine one partner creates an
 account at the US Postal Service website and then informs the
-partner that the name of the new account is usps and the username is
-justus.  That is enough information for the second partner to
+partner that the name of the new account is *USPS* and the username is
+*justus*.  That is enough information for the second partner to
 generate the password and login. And notice that the necessary
 information can be shared over an insecure channel. For example, it
 could be sent in a text message or from a phone where trustworthy
