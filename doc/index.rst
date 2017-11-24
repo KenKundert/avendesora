@@ -1,6 +1,6 @@
 .. Avendesora documentation master file
 
-Avendesora Collaborative Password Utility
+Avendesora Collaborative Password Manager
 =========================================
 
 | Version: 1.8.0
