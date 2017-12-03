@@ -41,6 +41,6 @@ Releases
     - Added :ref:`log command <log command>`.
 
 **Latest development release**:
-    | Version: 1.8.1
-    | Released: 2017-11-24
+    | Version: 1.8.2
+    | Released: 2017-12-02
 
