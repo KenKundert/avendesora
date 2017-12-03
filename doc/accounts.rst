@@ -52,7 +52,7 @@ example::
     > avendesora value newyorktimes username
     username: derrickAsh
 
-In general, values can be strings, arrays, dictionaries, and special Advendesora 
+In general, values can be strings, arrays, dictionaries, and special Avendesora 
 classes. For example, you could have an array of security questions:
 
 .. code-block:: python

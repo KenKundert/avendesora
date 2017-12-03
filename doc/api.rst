@@ -36,7 +36,7 @@ relatively high-level interface as shown in this example:
     except OSError as e:
         fatal(os_error(e))
 
-Bascially, the approach is to open the password generator, open an account, and 
+Basically, the approach is to open the password generator, open an account, and 
 then accessing values of that account. The various components of the Avendesora 
 programming interface are described next.
 

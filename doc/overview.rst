@@ -616,10 +616,9 @@ of advanced features. Those include ...
 -  Two techniques that provide an extra measure of security for accounts are 
    :ref:`stealth accounts <stealth accounts>` and :ref:`misdirection 
    <misdirection>`.
--  *Advendesora* provides several ways that help protect you from :ref:`phishing 
-   <phishing>`. You should be aware of these methods to make sure you use 
-   them.
--  *Advendesora* allows you to share master seeds with a partner, and once done 
+-  *Avendesora* provides several ways that help protect you from :ref:`phishing 
+   <phishing>`. You should be aware of these methods to make sure you use them.
+-  *Avendesora* allows you to share master seeds with a partner, and once done 
    allow you to easily and securely create new shared secrets. This is described 
    in the section on :ref:`collaboration <collaboration>`.
 -  Once you share a master seed, you can use the :ref:`identity command 

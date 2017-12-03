@@ -1,4 +1,4 @@
-Avendesora Collaborative Password Utility
+Avendesora Collaborative Password Manager
 =========================================
 
 *Avendesora, the leaf of the Tree of Life is the key.*
@@ -92,7 +92,7 @@ You will also need to install some operating system commands. On Fedora use::
 You should also install python-gobject. Conceivably this could be installed with 
 the above pip command, but gobject appears broken in pypi, so it is better use 
 the operating system's package manager to install it.  See the setup.py file for 
-more information.  On Redhat systms use::
+more information.  On Redhat systems use::
 
    yum install python3-gobject
 
@@ -458,7 +458,7 @@ Avendesora uses secret discovery to determine which secret to use and the script
 that should be used to produce the required information. Generally the script 
 would be to enter the account name, then tab, then the password, and finally 
 return, but you can configure the script as you choose. This is all done as part 
-of configuring discovery. The method for associating Advendesora to a particular 
+of configuring discovery. The method for associating Avendesora to a particular 
 hot key is dependent on your window manager. With Gnome, it requires that you 
 open your Keyboard Shortcuts preferences and create a new shortcut. When you do 
 this, choose 'avendesora value' as the command to run.
@@ -501,7 +501,7 @@ get_account(name, request_seed=False, stealth_name=None):
     Accesses a particular account. Takes a string for the account name or alias.  
     The name is case insensitive and the '-' may be given for '_'.
 
-    Optionally takes a second argument (*request_seed*) that may be a boolean, 
+    Optionally takes a second argument (*request_seed*) that may be a Boolean, 
     a string, or a function that returns a string. The string is used as an 
     additional seed (see: `avendesora help misdirection`), and if True is passed 
     in, the user in queried for the seed.
@@ -517,7 +517,7 @@ get_value(field):
     Returns the value of a particular account attribute given a user-oriented 
     string that describes the desired attribute.  The value requested must be 
     a scalar value, meaning that you must individually request members of arrays 
-    or dictionary attibutes. Here are some examples that demonstrate the various 
+    or dictionary attributes. Here are some examples that demonstrate the various 
     ways of accessing the various kinds of attributes:
 
     .. code-block:: python
@@ -562,7 +562,7 @@ get_value(field):
 
     If a composite field is requested get_value() raises a PasswordError, and 
     the exception contains the *is_collection* and *collection* attributes. The 
-    first is a boolean and the second is the list of available keys.  
+    first is a Boolean and the second is the list of available keys.  
     PassworError returns None for unknown attributes, so it is always safe to 
     access these attributes without checking whether they exist.
 
@@ -613,7 +613,7 @@ get_fields():
                 value = acct.get_value(name)
                 lines += value.render('{n}: {v}').split('\n')
 
-    get_fields() accepts a boolean argument that if specified and is true will 
+    get_fields() accepts a Boolean argument that if specified and is true will 
     iterate through all fields, including those generally only used by 
     Avendesora, such as aliases and discovery.
 

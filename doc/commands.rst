@@ -480,7 +480,7 @@ Example::
 
 .. index::
     single: reveal command
-    single: command; areveal
+    single: command; reveal
 
 .. _reveal command:
 

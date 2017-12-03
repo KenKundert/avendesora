@@ -94,7 +94,7 @@ Google and Gmail
 Google always seems to keep futzing with there security protocols in order to 
 make them more secure, but at the same time also seem to make them more 
 annoying. As such, I have gone through several approaches to making the Google 
-login work with *Avendesora*. The latests, as of 2017, is shown below. Google 
+login work with *Avendesora*. The latest, as of 2017, is shown below. Google 
 uses a different page when requesting your username or email, your passcode, and 
 the answer to your challenge questions. So the current approach is to simply 
 recognize each of those pages individually.  You can use something like this for 
@@ -236,7 +236,7 @@ discovery entry to your Citibank account as follows:
 
 This represents a relatively standard *Avendesora* description of an account.  
 Notice that it contains the credit card number (*account*), the expiration date 
-(*expriration*) and the CVV number (*cvv*). This is raw information the autotype 
+(*expiration*) and the CVV number (*cvv*). This is raw information the autotype 
 script will pull from. The credit card and the CVV values are sensitive 
 information and should probably be concealed.
 

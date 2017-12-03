@@ -16,7 +16,7 @@ divulge sensitive information such as account credentials.  It is generally
 accomplished by sending misleading URLs in email or placing them on websites. 
 When you visit these URLs you are taken to a site that looks identical to the 
 site you were expecting to go to in the hope that you are tricked into giving up 
-your account credentials.  It used to be that if you carefully inspected the url 
+your account credentials.  It used to be that if you carefully inspected the URL 
 you could spot deception, but even that is no longer true.
 
 *Avendesora* helps you avoid phishing attacks in two ways. First, you should 
@@ -25,7 +25,7 @@ use *Avendesora*'s :ref:`browse command <browse command>`::
 
     avendesora browse chase
 
-In this way you use the URL stored in *Avendesora* rather than trusting a url 
+In this way you use the URL stored in *Avendesora* rather than trusting a URL 
 link provided by a third party. Second, you should auto-type the account 
 credentials using *Avendesora*'s account discovery based on 
 :class:`avendesora.RecognizeURL` (be sure to use 
@@ -134,7 +134,7 @@ protect you from phishing attacks by carefully examining the URL.
 When account discovery fails it can be difficult to determine what is going 
 wrong. When this occurs, you should first examine the log file::
 
-    > avenedesora log
+    > avendesora log
 
 It should show you the window title and the recognized title components. You 
 should first assure the title is as expected. If *Add URL to Window Title* or 
@@ -283,7 +283,7 @@ Then you would add something like the following to your accounts file:
 .. index::
     single: questions
     single: security questions
-    single: chalenge questions
+    single: challenge questions
 
 .. _questions:
 
@@ -327,7 +327,7 @@ to get the answer to who is your 'oldest aunt', you would use::
 You can get a list of your questions so you can identify which index
 to use with::
 
-    > avenedesora values <accountname>
+    > avendesora values <accountname>
     ...
     questions:
         0: oldest aunt <reveal with 'avendesora value <accountname> questions.0'>
@@ -427,7 +427,7 @@ interpreted as a field name, and so would result in a 'not found' error.
 
 .. code-block:: python
 
-    class SCC(Acount):
+    class SCC(Account):
         aliases = 'scc'
         username = 'jman'
         password = PasswordRecipe('12 2u 2d 2s')
@@ -533,7 +533,7 @@ With secret misdirection, you do not disavow any knowledge of the
 secret, instead you say your knowledge is out of date. So you would
 say something like "I changed the password and then forgot it", or
 "The account is closed". To support this ruse, you must use the
---seed (or -S) option to 'avendsora value' when generating your
+--seed (or -S) option to 'avendesora value' when generating your
 secret (secrets misdirection only works with generated passwords,
 not stored passwords). This causes *Avendesora* to ask you for an
 additional seed at the time you request the secret. If you do not
@@ -681,7 +681,7 @@ command <identity command>` to regenerate the expected response.
 Alternately, when Ahmed sends a message to Reza, he can proactively prove his 
 identity by providing both the challenge and the response. Reza could then run 
 the *identity* command with the challenge and confirm that he gets the same 
-response. Other than himself, only Ahmad could predict the correct response to 
+response. Other than himself, only Ahmed could predict the correct response to 
 any challenge.
 
 

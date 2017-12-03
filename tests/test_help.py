@@ -1483,7 +1483,7 @@ def test_questions():
         You can get a list of your questions so you can identify which index
         to use with:
 
-            > avenedesora values <accountname>
+            > avendesora values <accountname>
             ...
             questions:
                 0: oldest aunt <reveal with 'avendesora value <accountname> questions.0'>
