@@ -1085,7 +1085,7 @@ class PhoneticAlphabet(Command):
     DESCRIPTION = 'Display NATO phonetic alphabet.'
     USAGE = dedent("""
         Usage:
-            avendesora alphebet [<text>]
+            avendesora alphabet [<text>]
             avendesora phonetic [<text>]
             avendesora p [<text>]
     """).strip()
