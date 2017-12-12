@@ -70,13 +70,13 @@ class PasswordGenerator(object):
         read_config()
         GnuPG.initialize()
 
-        # check the integrity of avendesora
-        validate_components()
-
         # create the avendesora data directory
         if init:
             self._initialize(gpg_ids, init)
             return
+
+        # check the integrity of avendesora
+        validate_components()
 
         # read the accounts files
         self.shared_secrets = {}

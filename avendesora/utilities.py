@@ -66,7 +66,10 @@ def validate_components():
     # check permissions on the settings directory
     path = get_setting('settings_dir')
     mask = get_setting('config_dir_mask')
-    permissions = os.stat(path)[ST_MODE]
+    try:
+        permissions = os.stat(path)[ST_MODE]
+    except FileNotFoundError:
+        raise Error('missing, must run initialize.', culprit=path)
     violation = permissions & mask
     recommended = permissions & ~mask & 0o777
     if violation:
