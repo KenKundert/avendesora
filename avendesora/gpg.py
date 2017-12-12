@@ -23,7 +23,7 @@
 # Imports {{{1
 from .config import get_setting, override_setting, setting_path
 from .error import PasswordError
-from shlib import to_path, cp, mkdir
+from shlib import to_path, cp
 from inform import (
     conjoin, cull, display, log, narrate, os_error, warn, is_str,
     full_stop
@@ -89,13 +89,17 @@ class GnuPG(object):
         if is_str(gpg_ids):
             gpg_ids = gpg_ids.split()
         if not gpg_ids:
-            raise PasswordError('must specify GPG ID.')
+            # raise PasswordError('must specify GPG ID.')
+            log('no gpg id is available, using symmetric encryption.')
 
         use_gpg, use_armor = self._choices()
         if use_gpg:
             try:
                 encoded = contents.encode(get_setting('encoding'))
-                encrypted = self.gpg.encrypt(encoded, gpg_ids, armor=use_armor)
+                if gpg_ids:
+                    encrypted = self.gpg.encrypt(encoded, gpg_ids, armor=use_armor)
+                else:
+                    encrypted = self.gpg.encrypt(encoded, None, symmetric='AES256', armor=use_armor)
                 if not encrypted.ok:
                     msg = ' '.join(cull([
                         'unable to encrypt.',
@@ -246,13 +250,14 @@ class PythonFile(GnuPG):
     def create(self, contents, gpg_ids):
         path = self.path
         try:
-            mkdir(get_setting('settings_dir'))
+            # check to see if file already exists
             if path.exists():
                 # file creation (init) requested, but file already exists
                 # don't overwrite the file, instead read it so the information 
                 # can be used to create any remaining files.
                 display("%s: already exists." % path)
                 return
+
             # create the file
             display('%s: creating.' % path)
             if path.suffix in ['.gpg', '.asc']:

@@ -133,6 +133,12 @@ class PasswordGenerator(object):
             chunks = ['    "%s"' % s[i:i+l] for i in range(0, len(s), l)]
             return '\n' + '\n'.join(chunks) + '\n'
 
+        # create settings directory if it does not exist
+        settings_dir = to_path(get_setting('settings_dir'))
+        if not settings_dir.exists():
+            settings_dir.mkdir(mode=0o700, parents=True)
+            settings_dir.chmod(0o700)
+
         # Create dictionary of available substitutions for CONTENTS strings
         fields = {}
         for key in CONFIG_DEFAULTS:
