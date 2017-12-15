@@ -43,7 +43,7 @@ Releases
     - Added browser version of :ref:`help command <help command>`.
 
 **Latest development release**:
-    | Version: 1.8.5
-    | Released: 2017-12-12
+    | Version: 1.8.6
+    | Released: 2017-12-15
 
     Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
