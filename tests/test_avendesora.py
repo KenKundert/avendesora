@@ -4,6 +4,7 @@ from textwrap import dedent
 import subprocess
 import os
 import pexpect
+import pyotp
 
 # set various environment variables so avendesora uses local gpg key and config
 # directory rather than the users.
@@ -156,6 +157,7 @@ def test_summary():
             savings: <reveal with 'avendesora value mybank accounts.savings'>
         customer service: 1-866-229-6633
         email: pizzaman@pizza.com
+        otp: <reveal with 'avendesora value mybank otp'>
         passcode: <reveal with 'avendesora value mybank passcode'>
         pin: <reveal with 'avendesora value mybank pin'>
         questions:
@@ -242,3 +244,11 @@ def test_alertscc_seed():
     except OSError as err:
         result = os_error(err)
     assert result.strip() == 'tRT7vXLeZrbz'
+# test_mybank_otp() {{{1
+def test_mybank_otp():
+    otp = pyotp.TOTP('JBSWY3DPEHPK3PXP')
+    try:
+        result = run('avendesora value --stdout mybank otp')
+    except OSError as err:
+        result = os_error(err)
+    assert result.decode('ascii').strip() == otp.now()

@@ -281,6 +281,60 @@ Then you would add something like the following to your accounts file:
 
 
 .. index::
+    single: OTP
+    single: Google Authenticator
+    single: One-Time passwords
+    single: second factor
+    single: 2FA
+
+.. _otp:
+
+One-Time Passwords
+------------------
+
+One-time passwords are often used as a second factor to provide an additional 
+level of protection. They are especially useful when you are concerned about 
+keyloggers.
+
+*Avendesora* supports time-based one-time passwords (TOTP) that are fully 
+compatible with, and can act as an alternative to or a replacement for, Google 
+Authenticator.
+
+When first enabling one-time passwords you are generally presented with a QR 
+code and a string of characters that are often referred to as the backup code.  
+You would provide this string of characters to the OTP class to configure an 
+account for a one-time password. For example, here is an account that requests 
+your username and password on one page, and your one time password on another:
+
+.. code-block:: python
+
+    class OverflowFinancial(Account):
+        email = 'moses.powers572@yahoo.com'
+        passcode = PasswordRecipe('16 2u 2d 2s')
+        otp = OTP('JBSWY3DPEHPK3PXP')
+        credentials = 'email passcode otp'
+        urls = 'https://www.overflow.com/login.html'
+        discovery = [
+            RecognizeURL(
+                'https://www.overflow.com/login.html',
+                script='{email}{tab}{passcode}{return}',
+                name='email & password',
+            ),
+            RecognizeURL(
+                'https://www.overflow.com/googleVerify.html',
+                script='{otp}{return}',
+                name='one-time password',
+            ),
+        ]
+
+This account adds a one time password as *otp*. It adds a *credentials* field 
+that adds the one-time password to the output of the :ref:`credentials command 
+<credentials command>`. It also adds a URL recognizer to allow semiautomatic 
+entry of the one-time password to the browser. And finally it adds the *urls* to 
+specify which URL the :ref:`browse command <browse command>` should use.
+
+
+.. index::
     single: questions
     single: security questions
     single: challenge questions

@@ -440,7 +440,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
         # Secrets
         Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
-        BirthDate,
+        BirthDate, OTP,
 
         # Account Discovery
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
@@ -777,7 +777,7 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
     #
 
     from avendesora import (
-        Hidden, Question, Script,
+        Hidden, Question, Script, OTP,
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
         RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
         RecognizeFile

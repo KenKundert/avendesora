@@ -981,6 +981,10 @@ class LoginCredentials(Command):
 
                 id: {idents}
                 secret: {secrets}
+
+            If your credentials include more than one secret they will be
+            presented one at a time for one minute each. You can cut the minute
+            short by typing Ctrl-C.
         """).strip()
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
@@ -1001,7 +1005,7 @@ class LoginCredentials(Command):
         account = generator.get_account(account_name, cmdline['--seed'])
         credentials = account.get_scalar('credentials', default=None)
         if credentials:
-            credentials = Collection(credentials)
+            credentials = credentials.split()
         else:
             ids = Collection(get_setting('credential_ids'))
             secrets = Collection(get_setting('credential_secrets'))

@@ -25,6 +25,7 @@ setup(
         'arrow',
         'docopt',
         'inform>=1.10',
+        # 'inform>=1.11',  KSK -- switch to 1.11 when it is available
         #'pygobject',
             # pygobject seems broken in pypi. Instead, do the following:
             # git clone git://git.gnome.org/pygobject
@@ -43,6 +44,8 @@ setup(
             # Be careful.  There's a package called 'gnupg' that's an 
             # incompatible fork of 'python-gnupg'.  If both are installed, the 
             # user will probably have compatibility issues.
+        'pyotp',
+            # pyotp is optional, it provides OTP secrets.
         #'scrypt',
             # scrypt is optional. If you install it then Avendesora will offer
             # it. It is not required because it involves compiling C code and so

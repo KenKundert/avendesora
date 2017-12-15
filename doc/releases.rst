@@ -39,8 +39,11 @@ Releases
     - Improved :ref:`browse command <browse command>`.
     - Added shift_sort to password generators.
     - Added :ref:`log command <log command>`.
+    - Added :ref:`phonetic command <phonetic command>`.
+    - Added browser version of :ref:`help command <help command>`.
 
 **Latest development release**:
     | Version: 1.8.5
     | Released: 2017-12-12
 
+    Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).

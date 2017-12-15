@@ -21,7 +21,7 @@ from avendesora import (
     HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
 
     # Secrets
-    Password, Passphrase, PIN, Question, MixedPassword, BirthDate,
+    Password, Passphrase, PIN, Question, MixedPassword, BirthDate, OTP,
 
     # Account Discovery
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
@@ -113,6 +113,7 @@ class MyBank(Account):
         'creditcard': Hidden('MzQ1Njc4OTA='),
     }
     customer_service = '1-866-229-6633'
+    otp = OTP('JBSWY3DPEHPK3PXP')
 
 # Include a few unicode characters, but to make sure they work: ±αβγδε
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

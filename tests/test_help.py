@@ -322,6 +322,10 @@ def test_credentials():
 
             id: username or email
             secret: passcode, password or passphrase
+
+        If your credentials include more than one secret they will be
+        presented one at a time for one minute each. You can cut the minute
+        short by typing Ctrl-C.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -1806,7 +1810,7 @@ def test_secrets():
             suffix (str):
                 A string added to the end of the generated password.
 
-        Examples:
+        Example:
 
             passcode = Password(10)
 
@@ -1847,7 +1851,7 @@ def test_secrets():
             suffix (str):
                 A string added to the end of the generated password.
 
-        Examples:
+        Example:
 
             passcode = Passphrase()
 
@@ -1878,7 +1882,7 @@ def test_secrets():
                 An optional seed. Changing this value will change the generated
                 PIN.
 
-        Examples:
+        Example:
 
             passcode = PIN()
 
@@ -1930,7 +1934,7 @@ def test_secrets():
                 The answer. If provided, this would override the generated
                 answer.  May be a string, or it may be an Obscured object.
 
-        Examples:
+        Example:
 
             questions = [
                 Question('Favorite foreign city'),
@@ -1989,7 +1993,7 @@ def test_secrets():
                 last, making it easier to type. Use this option if you expect to
                 be typing the password by hand.
 
-        Examples:
+        Example:
 
             passcode = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
 
@@ -2026,9 +2030,23 @@ def test_secrets():
                 An optional seed. Changing this value will change the generated
                 answer.
 
-        Examples:
+        Example:
 
             birthdate = BirthDate(2015, 21, 55)
+
+
+        OTP
+        ---
+
+        Generates a secret that changes once per minute that generally is used
+        as a second factor when authenticating.  It can act as a replacement
+        for, and is fully compatible with, Google Authenticator.  You would
+        provide the text version of the shared secret (the backup code) that is
+        presented to you when first configuring your second factor authentication.
+
+        Example:
+
+            otp = OTP('JBSWY3DPEHPK3PXP')
     """).strip()
     assert result.decode('utf-8') == expected
 

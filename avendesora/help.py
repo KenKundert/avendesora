@@ -1244,7 +1244,7 @@ class Secrets(HelpMessage):
             suffix (str):
                 A string added to the end of the generated password.
 
-        Examples:
+        Example:
 
             passcode = Password(10)
 
@@ -1285,7 +1285,7 @@ class Secrets(HelpMessage):
             suffix (str):
                 A string added to the end of the generated password.
 
-        Examples:
+        Example:
 
             passcode = Passphrase()
 
@@ -1316,7 +1316,7 @@ class Secrets(HelpMessage):
                 An optional seed. Changing this value will change the generated
                 PIN.
 
-        Examples:
+        Example:
 
             passcode = PIN()
 
@@ -1368,7 +1368,7 @@ class Secrets(HelpMessage):
                 The answer. If provided, this would override the generated
                 answer.  May be a string, or it may be an Obscured object.
 
-        Examples:
+        Example:
 
             questions = [
                 Question('Favorite foreign city'),
@@ -1427,7 +1427,7 @@ class Secrets(HelpMessage):
                 last, making it easier to type. Use this option if you expect to
                 be typing the password by hand.
 
-        Examples:
+        Example:
 
             passcode = PasswordRecipe('12 2u 2d 2c!@#$%^&*')
 
@@ -1464,9 +1464,23 @@ class Secrets(HelpMessage):
                 An optional seed. Changing this value will change the generated
                 answer.
 
-        Examples:
+        Example:
 
             birthdate = BirthDate(2015, 21, 55)
+
+
+        OTP
+        ---
+
+        Generates a secret that changes once per minute that generally is used
+        as a second factor when authenticating.  It can act as a replacement
+        for, and is fully compatible with, Google Authenticator.  You would
+        provide the text version of the shared secret (the backup code) that is
+        presented to you when first configuring your second factor authentication.
+
+        Example:
+
+            otp = OTP('JBSWY3DPEHPK3PXP')
         """).strip()
         return text
 

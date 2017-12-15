@@ -10,6 +10,10 @@ try:
     from .obscure import Scrypt
 except ImportError:  # no cover
     pass
+try:
+    from .otp import OTP
+except ImportError:  # no cover
+    pass
 from .recognize import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
     RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,

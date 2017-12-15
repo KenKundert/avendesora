@@ -60,12 +60,14 @@ def main():
         # start logging
         logfile = BufferedFile(get_setting('log_file'), True)
         Inform(logfile=logfile, hanging_indent=False)
+        #KSK replace the above line with the one below once inform is formally updated
+        #Inform(logfile=logfile, hanging_indent=False, stream_policy='header')
 
         # run the requested command
         Command.execute(cmdline['<command>'], cmdline['<args>'])
         done()
     except KeyboardInterrupt:
-        output('Terminated by user.')
+        output('\nTerminated by user.')
         terminate()
     except (PasswordError, Error) as e:
         e.terminate()

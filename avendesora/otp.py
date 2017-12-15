@@ -1,0 +1,79 @@
+# One-Time Passwords
+#
+# GeneratedSecret is a base class that can be used to easily generate various
+# types of secretes. Basically, it gathers together a collection of strings (the
+# arguments of the constructor and the generate function) that are joined
+# together and hashed. The 512 bit hash is then used to generate passwords,
+# passphrases, and other secrets.
+#
+
+# License {{{1
+# Copyright (C) 2016-17 Kenneth S. Kundert
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see http://www.gnu.org/licenses/.
+
+
+# Imports {{{1
+from .error import PasswordError
+from .secrets import GeneratedSecret
+from .utilities import error_source
+from base64 import b32decode, b32encode
+from binascii import Error as BinasciiError
+
+from inform import Error, is_str
+
+# OTP {{{1
+try:
+    from pyotp import TOTP
+    class OTP(GeneratedSecret):
+        """One Time Password
+
+        Generates a secret that changes once per minute that generally is used
+        as a second factor when authenticating.  It can act as a replacement
+        for, and is fully compatible with, Google Authenticator.  You would
+        provide the text version of the shared secret that is presented to you
+        when first configuring your second factor authentication.
+
+        Only available if pyotp is installed (pip install pyotp).
+
+        Args:
+            shared_secret (str):
+                The shared secret in base32.
+        """
+
+        def __init__(self, shared_secret):
+            try:
+                b32decode(shared_secret)
+            except BinasciiError:
+                raise PasswordError(
+                    'invalid value specified to OTP: %s.' % str(shared_secret),
+                    culprit=error_source()
+                )
+            self.shared_secret = shared_secret
+
+        def initialize(self, account, field_name, field_key=None):
+            self.totp = TOTP(self.shared_secret)
+
+        def render(self):
+            return self.totp.now()
+
+        # __repr__() {{{2
+        def __repr__(self):
+            # this is used to create the archive, archive the shared secret
+            # rather than OTP
+            return "OTP({!r})".format(self.shared_secret)
+
+
+except ImportError:
+    pass
