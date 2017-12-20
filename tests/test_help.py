@@ -486,7 +486,7 @@ def test_log():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Open the logfile.
+        Show the logfile.
 
         Usage:
             avendesora log
@@ -611,6 +611,7 @@ def test_value():
             avendesora value [options] [<account> [<field>]]
             avendesora val   [options] [<account> [<field>]]
             avendesora v     [options] [<account> [<field>]]
+            avendesora vc    [options] [<account> [<field>]]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
@@ -622,6 +623,8 @@ def test_value():
                                     help identify issues in account discovery.
             -T <title>, --title <title>
                                     Use account discovery on this title.
+
+        The 'vc' command is a shortcut for 'value --clipboard'.
 
         You request a scalar value by specifying its name after the account.
         For example:
@@ -654,6 +657,26 @@ def test_value():
         script produces a one line output if it contains secrets. If not a
         script, the value of 'default' should be the name of another attribute,
         and the value of that attribute is shown.
+
+        Normally the value command attempts to protects secrets. It does so
+        clearing the screen after a minute. If multiple secrets are requested,
+        you must either wait a minute to see each subsequent secret or type
+        Ctrl-C to clear the current secret and move on.  If you use --clipboard,
+        the clipboard is cleared after a minute.  However, if you use --stdout
+        this clearing of the secret does not occur. The --stdout option is
+        generally used with communicating with other Linux commands.  For
+        example, you can send a passcode to the standard input of a command as
+        follows:
+
+            avendesora value --stdout gpg | gpg --passphrase-fd 0 ...
+
+        You can place the username and password on a command line as follows:
+
+            curl --user `avendesora value -s apache '{username}:{passcode}'` ...
+
+        Be aware that it is possible for other users on shared Linux machines to
+        see the command line arguments of your commands, so passing secrets as
+        command arguments should only be used for low value secrets.
 
         If no account is requested, then Avendesora attempts to determine the
         appropriate account through discovery (see 'avendesora help discovery').

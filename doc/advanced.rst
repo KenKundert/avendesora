@@ -519,6 +519,11 @@ when running the :ref:`value command <value command>`::
     > avendesora value scc '{username}: {passcode}'
     jman: R7ibHyPjWtG2
 
+For example, a place where this is useful is when specifying a username and 
+password to curl::
+
+    > curl --user `avendesora value -s apache '{username}:{passcode}'` ...
+
 It is also possible to specify a script for the value of the *default* 
 attribute. This attribute allows you to specify the default field (which 
 attribute name and key to use if one is not given on the command line).  It also 

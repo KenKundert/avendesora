@@ -47,3 +47,4 @@ Releases
     | Released: 2017-12-15
 
     Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
+    Added 'vc' command as an alias for 'value --clipboard'.
