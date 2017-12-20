@@ -39,20 +39,29 @@ try:
     class OTP(GeneratedSecret):
         """One Time Password
 
-        Generates a secret that changes once per minute that generally is used
+        Generates a secret that changes over time that generally is used
         as a second factor when authenticating.  It can act as a replacement
-        for, and is fully compatible with, Google Authenticator.  You would
-        provide the text version of the shared secret that is presented to you
-        when first configuring your second factor authentication.
+        for, and is fully compatible with, Google Authenticator or Authy.  You
+        would provide the text version of the shared secret that is presented to
+        you when first configuring your second factor authentication. See
+        :ref:`otp` for more information.
 
         Only available if pyotp is installed (pip install pyotp).
 
         Args:
             shared_secret (str):
                 The shared secret in base32.
+            interval (int):
+                Update interval in seconds.
+                Use 30 to mimic Google Authenticator, 10 to mimic Authy.
+            digits (int):
+                Number of digits to output, choose between 6, 7, or 8.
+                Use 6 to mimic Google Authenticator, 7 to mimic Authy.
         """
 
-        def __init__(self, shared_secret):
+        def __init__(self, shared_secret, interval=30, digits=6):
+            self.interval = interval
+            self.digits = digits
             try:
                 b32decode(shared_secret)
             except BinasciiError:
@@ -63,7 +72,9 @@ try:
             self.shared_secret = shared_secret
 
         def initialize(self, account, field_name, field_key=None):
-            self.totp = TOTP(self.shared_secret)
+            self.totp = TOTP(
+                self.shared_secret, interval=self.interval, digits=self.digits
+            )
 
         def render(self):
             return self.totp.now()

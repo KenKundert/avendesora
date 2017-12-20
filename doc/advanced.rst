@@ -283,6 +283,7 @@ Then you would add something like the following to your accounts file:
 .. index::
     single: OTP
     single: Google Authenticator
+    single: Authy
     single: One-Time passwords
     single: second factor
     single: 2FA
@@ -298,7 +299,7 @@ keyloggers.
 
 *Avendesora* supports time-based one-time passwords (TOTP) that are fully 
 compatible with, and can act as an alternative to or a replacement for, Google 
-Authenticator.
+Authenticator  or Authy.
 
 When first enabling one-time passwords you are generally presented with a QR 
 code and a string of characters that are often referred to as the backup code.  
@@ -332,6 +333,53 @@ that adds the one-time password to the output of the :ref:`credentials command
 <credentials command>`. It also adds a URL recognizer to allow semiautomatic 
 entry of the one-time password to the browser. And finally it adds the *urls* to 
 specify which URL the :ref:`browse command <browse command>` should use.
+
+It is easy to mimic Google Authenticator. Mimicing Authy is more difficult. To 
+do so, follow `these instructions 
+<https://randomoracle.wordpress.com/2017/02/15/extracting-otp-seeds-from-authy>`_.  
+Basically, the idea is to install the Authy Chrome app, start it, open the 
+desired account, then back in Chrome open chrome://extensions, select Developer 
+Mode, then click on  'Inspect views: main.html', search for totp function, set 
+break point, then copy the value of the e argument once break point is reached, 
+and copy that 32 digit hexadecimal number to hex_seed in the code below:
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+
+    from base64 import b32encode, b32decode
+    from pyotp import TOTP
+    from time import sleep
+
+    def int_to_bytes(x):
+        return x.to_bytes((x.bit_length() + 7) // 8, 'big')
+
+    hex_seed = 0xNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    seed = b32encode(int_to_bytes(hex_seed))
+    print('SEED: %s' % seed)
+
+    otp = TOTP(seed, interval=10, digits=7)
+    print(otp.now())
+    sleep(10)
+    print(otp.now())
+    sleep(10)
+    print(otp.now())
+    sleep(10)
+    print(otp.now())
+    sleep(10)
+    print(otp.now())
+
+Substitute your number for *NNN...NN*. Then run the script to display the seed 
+or shared secret.  It will also show five codes, one every 10 seconds. Every 
+other code should match the value produced by the Chrome app. Once you are 
+convinced that your seed is correct, add something like the following to your 
+account to generate the one-time password:
+
+.. code-block:: python
+
+        otp = OTP('UM0HJVLT4HVWJQJC47Q8YXX4TU======', interval=10, digits=7)
+
+The *interval* and *digits* are specific to Authy.
 
 
 .. index::

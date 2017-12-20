@@ -863,7 +863,7 @@ class Account(object):
         try:
             urls = urls[key]
         except KeyError:
-            keys = cull(urls.keys())
+            keys = cull(list(urls.keys()))
             if keys:
                 if key:
                     msg = 'unknown key, choose from {}.'

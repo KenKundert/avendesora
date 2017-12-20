@@ -22,6 +22,8 @@ Sublasses of :class:`avendesora.GeneratedSecret`.
 
 .. autoclass:: avendesora.BirthDate
 
+.. autoclass:: avendesora.OTP
+
 .. autoexception:: avendesora.SecretExhausted
     :members: report, terminate
 
