@@ -89,11 +89,16 @@ files:
     account information, and so it is best if it is encrypted.
 
 
+.. _settings:
+.. index::
+    single: settings
+
 Settings
 --------
 
 The settings are documented in *config.doc*, and can be overwritten by 
-specifying the desired value sin *config*.  The available settings are:
+specifying the desired values in the *config* file (found in 
+~/.config/avendesora).  The available settings are:
 
 .. index::
     single: log_file setting

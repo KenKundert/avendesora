@@ -8,7 +8,7 @@ Usage:
     avendesora [options] <command> [<args>...]
 
 Options:
-    -h, --help              Output basic usage information.
+    -h, --help        output basic usage information.
 
 Commands:
 {commands}

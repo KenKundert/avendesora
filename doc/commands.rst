@@ -553,6 +553,8 @@ Options:
     -T <title>, --title <title> Use account discovery on this title.
     =========================== =============================================
 
+The 'vc' command is a shortcut for 'value --clipboard'.
+
 You request a scalar value by specifying its name after the account.
 For example::
 
@@ -560,14 +562,13 @@ For example::
 
 If the requested value is composite (an array or dictionary), you should
 also specify a key that indicates which of the composite values you
-want. For example, if the 'accounts' field is a dictionary, you specify
+want. For example, if the *accounts* field is a dictionary, you specify
 accounts.checking or accounts[checking] to get information on your
 checking account. If the value is an array, you give the index of the
 desired value. For example, questions.0 or questions[0]. If you only
-specify a number, then the name is assumed to be 'questions', as in the
+specify a number, then the name is assumed to be *questions*, as in the
 list of security questions (this can be changed by specifying the
-desired name as the 'default_vector_field' in the account or the config
-file).
+desired name as the :ref:`default_vector_field setting <settings>`.
 
 The field may be also be a script, with is nothing but a string that it
 output as given except that embedded attributes are replaced by account
@@ -576,14 +577,14 @@ field values. For example::
     avendesora value bank '{accounts.checking}: {passcode}'
 
 If no value is requested the result produced is determined by the value
-of the 'default' attribute. If no value is given for 'default', then the
-'passcode' attribute is produced (this can be changed by specifying
-'default_field' in the config file).  If 'default' is a script (see
-'avendesora help scripts') then the script is executed. A typical script
-might be 'username: {username}, password: {passcode}'. It is best if the
-script produces a one line output if it contains secrets. If not a
-script, the value of 'default' should be the name of another attribute,
-and the value of that attribute is shown.
+of the *default* attribute. If no value is given for *default*, then the
+*passcode*, *password*, or *passphrase* attribute is produced (this can
+be changed by specifying the :ref:`default_field setting <settings>`.
+If *default* is a script (see 'avendesora help scripts') then the script
+is executed.  A typical script might be 'username: {username}, password:
+{passcode}'.  It is best if the script produces a one line output if it
+contains secrets. If not a script, the value of *default* should be the
+name of another attribute, and the value of that attribute is shown.
 
 If no account is requested, then Avendesora attempts to determine the
 appropriate account through discovery (see 'avendesora help discovery').

@@ -334,7 +334,7 @@ that adds the one-time password to the output of the :ref:`credentials command
 entry of the one-time password to the browser. And finally it adds the *urls* to 
 specify which URL the :ref:`browse command <browse command>` should use.
 
-It is easy to mimic Google Authenticator. Mimicing Authy is more difficult. To 
+It is easy to mimic Google Authenticator. Mimicking Authy is more difficult. To 
 do so, follow `these instructions 
 <https://randomoracle.wordpress.com/2017/02/15/extracting-otp-seeds-from-authy>`_.  
 Basically, the idea is to install the Authy Chrome app, start it, open the 
