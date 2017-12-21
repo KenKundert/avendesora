@@ -19,7 +19,7 @@ Avendesora Collaborative Password Manager
     .. image:: https://img.shields.io/pypi/dm/avendesora.svg
         :target: https://pypi.python.org/pypi/avendesora/
 
-| Version: 1.8.7
+| Version: 1.8.8
 | Released: 2017-12-20
 |
 
