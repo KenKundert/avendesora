@@ -568,7 +568,7 @@ checking account. If the value is an array, you give the index of the
 desired value. For example, questions.0 or questions[0]. If you only
 specify a number, then the name is assumed to be *questions*, as in the
 list of security questions (this can be changed by specifying the
-desired name as the :ref:`default_vector_field setting <settings>`.
+desired name as the :ref:`default_vector_field setting <settings>`).
 
 The field may be also be a script, with is nothing but a string that it
 output as given except that embedded attributes are replaced by account
@@ -579,7 +579,7 @@ field values. For example::
 If no value is requested the result produced is determined by the value
 of the *default* attribute. If no value is given for *default*, then the
 *passcode*, *password*, or *passphrase* attribute is produced (this can
-be changed by specifying the :ref:`default_field setting <settings>`.
+be changed by specifying the :ref:`default_field setting <settings>`).
 If *default* is a script (see 'avendesora help scripts') then the script
 is executed.  A typical script might be 'username: {username}, password:
 {passcode}'.  It is best if the script produces a one line output if it
