@@ -59,9 +59,7 @@ def main():
 
         # start logging
         logfile = BufferedFile(get_setting('log_file'), True)
-        Inform(logfile=logfile, hanging_indent=False)
-        #KSK replace the above line with the one below once inform is formally updated
-        #Inform(logfile=logfile, hanging_indent=False, stream_policy='header')
+        Inform(logfile=logfile, hanging_indent=False, stream_policy='header')
 
         # run the requested command
         Command.execute(cmdline['<command>'], cmdline['<args>'])

@@ -1316,6 +1316,17 @@ class Value(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         use_clipboard = cmdline['--clipboard'] or cmdline['vc']
 
+        # mute any warnings if using --stdout
+        try:
+            from inform import get_informer
+            if cmdline['--stdout']:
+                get_informer().suppress_output()
+        except ImportError:
+            # remove this once the version 1.11 of inform is formally released
+            # --KSK
+            pass
+
+
         # run the generator
         generator = PasswordGenerator()
 

@@ -649,14 +649,16 @@ def test_value():
             avendesora value bank '{accounts.checking}: {passcode}'
 
         If no value is requested the result produced is determined by the value
-        of the 'default' attribute. If no value is given for 'default', then the
-        'passcode' attribute is produced (this can be changed by specifying
-        'default_field' in the config file).  If 'default' is a script (see
-        'avendesora help scripts') then the script is executed. A typical script
-        might be 'username: {username}, password: {passcode}'. It is best if the
-        script produces a one line output if it contains secrets. If not a
-        script, the value of 'default' should be the name of another attribute,
-        and the value of that attribute is shown.
+        of the 'default' attribute (this can be changed by specifying
+        'default_field' in the config file). If no value is given for 'default',
+        then the *passcode*, *password*, or *passphrase* attribute is produced
+        (this can be changed by specifying the 'default_field' in the account or
+        the config file).  If 'default' is a script (see 'avendesora help
+        scripts') then the script is executed. A typical script might be
+        'username: {username}, password: {passcode}'. It is best if the script
+        produces a one line output if it contains secrets. If not a script, the
+        value of 'default' should be the name of another attribute, and the
+        value of that attribute is shown.
 
         Normally the value command attempts to protects secrets. It does so
         clearing the screen after a minute. If multiple secrets are requested,
