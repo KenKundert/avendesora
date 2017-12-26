@@ -91,6 +91,7 @@ the fields needed for a typical website account. You should modify it to suit
 your needs. For example, your entry for FasTrak might look like this::
 
     class FasTrak(Account):
+        desc = 'payment service for automated toll collection'
         aliases = 'fastrack fasttrack'
         username = 'orchid3649'
         email = 'orchid3649@yahoo.com'
@@ -149,6 +150,8 @@ There are various tricks available to reduce the amount you type. For example::
 If you give an account name without a command, the :ref:`credentials command 
 <credentials command>` is run, which displays the username and password for the 
 specified account.
+
+::
 
     > avendesora fastrak pin
     pin: 2728
@@ -238,7 +241,8 @@ account attributes.  The secrets are not printed with this command.
 Finally, you can use the :ref:`help command <help command>` to get information 
 on the various commands and other useful topics.
 
-Contents:
+Contents
+--------
 
 .. toctree::
    :maxdepth: 1
@@ -258,7 +262,7 @@ Contents:
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

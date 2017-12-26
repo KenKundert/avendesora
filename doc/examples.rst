@@ -27,7 +27,7 @@ The following shows how to configure an account to support challenge questions.
 
     class BankOfAmerica(Account):
         aliases = 'boa bankamerica'
-        username = 'sheldoncooper'
+        username = 'matrim'
         passcode = PasswordRecipe('12 2l 2u 2d 2s')
         questions = [
             Question('elementary school?'),
@@ -104,7 +104,7 @@ your Gmail/Google account entry:
 
     class Gmail(Account):
         aliases = 'gmail google'
-        username = '_YOUR_USERNAME_'
+        username = 'matrim'
         passcode = Passphrase()
         urls = 'https://accounts.google.com/signin/v2/identifier'
         discovery = [
@@ -125,6 +125,9 @@ your Gmail/Google account entry:
                 name='challenge',
             ),
         ]
+
+See :ref:`otp` to see how to configure two-factor authentication for Google 
+accounts.
 
 
 Wireless Router
@@ -208,9 +211,9 @@ discovery entry to your Citibank account as follows:
 
     class CostcoCitiVisa(Account):
         aliases = 'citi costcovisa'
-        username = 'giddy2050'
-        email = 'herbie@telegen.com'
-        account = '1234 5678 8901 2345'
+        username = 'mcauthon'
+        email = 'matrim@gmail.com'
+        account = '1234567889012345'
         expiration = '03/2019'
         cvv = '233'
         passcode = PasswordRecipe('12 2u 2d 2s')
@@ -229,7 +232,7 @@ discovery entry to your Citibank account as follows:
             ),
             RecognizeURL(
                 'https://www.costco.com/CheckoutPaymentView',
-                script='{account}{tab}{expiration}{tab}{cvv}{tab}Herbie Thudpucker{return}',
+                script='{account}{tab}{expiration}{tab}{cvv}{tab}Matrim Cauthon{return}',
                 name='card holder information'
             ),
         ]
@@ -240,11 +243,11 @@ Notice that it contains the credit card number (*account*), the expiration date
 script will pull from. The credit card and the CVV values are sensitive 
 information and should probably be concealed.
 
-Also notice the two *RecognizeURL* entries in *discovery*. The first recognizes 
-the CitiBank website. The second recognizes the Costco check-out page. When it 
-does, it runs the following script::
+Also notice the two :class:`avendesora.RecognizeURL` entries in *discovery*.  
+The first recognizes the CitiBank website. The second recognizes the Costco 
+check-out page. When it does, it runs the following script::
 
-    {account}{tab}{expiration}{tab}{cvv}{tab}Herbie Thudpucker{return}
+    {account}{tab}{expiration}{tab}{cvv}{tab}Matrim Cauthon{return}
 
 That script enters the account number, tabs to the next field, enters the 
 expiration date, tabs to the next field, enters the CVV, tabs to the next field, 
@@ -261,7 +264,7 @@ be entered properly, but the rest would be empty because they were entered by
 *Avendesora* before the page was ready for them. To address this issue, you can 
 put delays in the script::
 
-    {account}{tab}{sleep 0.5}{expiration}{tab}{sleep 0.5}{cvv}{tab}{sleep 0.5}Herbie Thudpucker{return},
+    {account}{tab}{sleep 0.5}{expiration}{tab}{sleep 0.5}{cvv}{tab}{sleep 0.5}Matrim Cauthon{return},
 
 Now the account can be given in its final form. This differs from the one above 
 in that the *account* and *cvv* values are concealed and the delays were added 
@@ -271,8 +274,8 @@ to the Costco script.
 
     class CostcoCitiVisa(Account):
         aliases = 'citi costcovisa'
-        username = 'giddy2050'
-        email = 'herbie@telegen.com'
+        username = 'mcauthon'
+        email = 'matrim@gmail.com'
         account = Hidden('MTIzNCA1Njc4IDg5MDEgMjM0NQ==')
         expiration = '03/2019'
         cvv = Hidden('MjMz')
@@ -291,7 +294,7 @@ to the Costco script.
             ),
             RecognizeURL(
                 'https://www.costco.com/CheckoutPaymentView',
-                script='{account}{tab}{sleep 0.5}{expiration}{tab}{sleep 0.5}{cvv}{tab}{sleep 0.5}Herbie Thudpucker{return}',
+                script='{account}{tab}{sleep 0.5}{expiration}{tab}{sleep 0.5}{cvv}{tab}{sleep 0.5}Matrim Cauthon{return}',
                 name='card holder information'
             ),
         ]
@@ -342,13 +345,7 @@ and everything else is updated automatically.
 
     class YandexMail(Account):
         aliases = 'yandex'
-        usernames = [
-            'bill.langston594',
-            'elias.peters876',
-            'lonny.fay383',
-            'lionel.silva100',
-            'jeromy.cherry518',
-        ]
+        usernames = 'rand.alThor aviendha rhuarc sorilea amys'.split()
         credentials = ' '.join(
             ['usernames.%d' % i for i in range(len(usernames))] + ['passcode']
         )
@@ -369,10 +366,13 @@ and everything else is updated automatically.
 Now, running the :ref:`credentials command <credentials command>` gives::
 
     > avendesora yandex
-    usernames: bill.langston594
-    usernames: elias.peters876
-    usernames: lonny.fay383
-    usernames: lionel.silva100
-    usernames: jeromy.cherry518
+    usernames: rand.alThor
+    usernames: aviendha
+    usernames: rhuarc
+    usernames: sorilea
+    usernames: amys
     passcode: B-F?i0z8GcDL
 
+This example shows that the capabilities of the Python language can be used in 
+the accounts files to increase the capabilities of *Avendesora* in unexpected 
+ways.

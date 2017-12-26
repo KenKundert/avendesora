@@ -28,14 +28,15 @@ you are using the Vim editor, it is preconfigured to jump to the next
 field when you press 'n'.  If the field is surrounded by '<<' and '>>',
 as in '<<_ACCOUNT_NUMBER_>>', the value you enter will be concealed.
 
-You can create your own templates by adding them to 'account_templates'
-in the ~/.config/avendesora/config file.
+You can create your own templates by adding them to :ref:`account_templates 
+<settings>` in the ~/.config/avendesora/config file.
 
 You can change the editor used when adding account by changing the
-'edit_template', also found in the ~/.config/avendesora/config file.
+:ref:`edit_template <settings>`, also found in the ~/.config/avendesora/config 
+file.
 
-The default template is bank. The available templates are: bank, shell, and 
-website.
+The default template is *bank*. The available templates are: *bank*, *shell*, 
+and *website*.
 
 
 .. index::
@@ -57,11 +58,10 @@ This command creates an encrypted archive that contains all the information in
 your accounts files, including the fully generated secrets.  You should never 
 need this file, but its presence protects you in case you lose access to 
 Avendesora. To access your secrets without Avendesora, simply decrypt the 
-archive file with GPG.  The
-
-without Avendesora. When hidden, the secrets are encoded in base64.  You can 
-decode it by running 'base64 -d -' and pasting the encoded secret into the 
-terminal.
+archive file with GPG.  The actual secrets will be hidden, but it easy to 
+retrieve them even without Avendesora. When hidden, the secrets are encoded in 
+*base64*.  You can decode it by running 'base64 -d -' and pasting the encoded 
+secret into the terminal.
 
 When you run this command it overwrites the existing archive. If you have 
 accidentally deleted an account or changed a secret, then replacing the archive 
@@ -95,21 +95,26 @@ Options:
                                       first.
     ================================= =======================================
 
-The account is examined for URLS, a URL is chosen, and then that URL is opened 
-in the chosen browser.  First URLS are gathered from the 'urls' account 
-attribute, which can be a string containing one or more URLS, a list, or 
-a dictionary.  If 'urls' is a dictionary, the desired URL can be chosen by 
-entering the key as an argument to the :ref:`browse command <browse command>`. 
-If a key is not given, then the 'default_url' account attribute is used to 
-specify the key to use by default. If 'urls' is not a dictionary, then the first 
-URL specified is used.  URLs are also taken from RecognizeURL objects in the 
-'discovery' account attribute.  If the 'name' argument is specified, the 
-corresponding URL can be chosen using a key.
+The account is examined for URLs, a URL is chosen, and then that URL is opened 
+in the chosen browser.  First URLs are gathered from the *urls* account 
+attribute, which can be a string containing one or more URLs, a list, or 
+a dictionary.  If *urls* is a dictionary, the desired URL can be chosen by 
+entering the key as an argument to the :ref:`browse command <browse command>`.  
+If a key is not given, then the *default_url* account attribute is used to 
+specify the key to use by default. If *urls* is not a dictionary, then the first 
+URL specified is used.
 
-The default browser is x. You can override the default browser on a per-account 
-basis by adding an attribute named 'browser' to the account.  An example of when 
-you would specify the browser in an account would be an account associated with 
-Tor hidden service, which generally can only be accessed using torbrowser:
+If the *urls* attribute is not available then URLs are taken from 
+:class:`avendesora.RecognizeURL` objects in the *discovery* account attribute.  
+In this case if the *name* argument is specified to 
+:class:`avendesora.RecognizeURL`, the corresponding URL can be chosen using 
+a key.
+
+The default browser is *x*, which uses the system default browser. You can 
+override the default browser on a per-account basis by adding an attribute named 
+*browser* to the account.  An example of when you would specify the browser in 
+an account would be an account associated with Tor hidden service, which 
+generally can only be accessed using *torbrowser*:
 
 .. index::
     single: changed command
@@ -253,8 +258,8 @@ Usage::
 
 Opens an existing account in your editor.
 
-You can specify the editor by changing the 'edit_account' setting in
-the config file (~/.config/avendesora/config).
+You can specify the editor by changing the :ref:`edit_account <settings>` 
+setting in the config file (~/.config/avendesora/config).
 
 
 .. index::
@@ -269,6 +274,7 @@ the config file (~/.config/avendesora/config).
 Find accounts whose name contains the search text.
 
 Usage::
+
     avendesora find <text>
     avendesora f    <text>
 
@@ -283,6 +289,7 @@ Usage::
 -----------------------------------------------------------
 
 Usage::
+
     avendesora help [options] [<topic>]
     avendesora h    [options] [<topic>]
 
@@ -293,6 +300,8 @@ Options:
     -b, --browse            open the topic in your default browser.
     ======================= ==================================================
 
+You can also use ``avendesora --help`` or ``avendesora -h`` to see the global 
+options for *Avendesora*.
 
 .. index::
     single: identity command
@@ -314,7 +323,7 @@ The response identifies you to a partner with whom you have shared
 an account.
 
 If you run the command with no arguments, it prints the list of
-valid names. If you run it with no challenge, one is created for you
+available accounts. If you run it with no challenge, one is created for you
 based on the current time and date.
 
 If you have a remote partner to whom you wish to prove your
@@ -330,32 +339,7 @@ the same challenge twice. As such, it is recommended that you not
 provide the challenge. In this situation, one is generated for you
 based on the time and date.
 
-Consider an example that illustrates the process. In this example,
-Ahmed is confirming the identity of Reza, where both Ahmed and Reza
-are assumed to have shared Avendesora accounts.  Ahmed runs
-Avendesora as follows and remembers the response::
-
-    > avendesora identity reza
-    challenge: slouch emirate bedeck brooding
-    response: spear disable local marigold
-
-This assumes that reza is the name, with any extension removed, of
-the file that Ahmed uses to contain their shared accounts.
-
-Ahmed communicates the challenge to Reza but not the response.  Reza
-then runs Avendesora with the given challenge::
-
-    > avendesora identity ahmed slouch emirate bedeck brooding
-    challenge: slouch emirate bedeck brooding
-    response: spear disable local marigold
-
-In this example, ahmed is the name of the file that Reza uses to
-contain their shared accounts.
-
-To complete the process, Reza returns the response to Ahmed, who compares it to 
-the response he received to confirm Reza's identity.  If Ahmed has forgotten the 
-desired response, he can also specify the challenge to the :ref:`identity 
-command <identity command>` to regenerate the expected response.
+See :ref:`confirming identity` for an example that illustrates the process.
 
 
 .. index::
@@ -405,8 +389,8 @@ Usage::
 
 Opens the logfile in your editor.
 
-You can specify the editor by changing the 'edit_account' setting in the config 
-file (~/.config/avendesora/config).
+You can specify the editor by changing the :ref:`edit_account <settings>` 
+setting in the config file (~/.config/avendesora/config).
 
 
 .. index::
@@ -580,27 +564,39 @@ If no value is requested the result produced is determined by the value
 of the *default* attribute. If no value is given for *default*, then the
 *passcode*, *password*, or *passphrase* attribute is produced (this can
 be changed by specifying the :ref:`default_field setting <settings>`).
-If *default* is a script (see 'avendesora help scripts') then the script
+If *default* is a :ref:`script <scripts>` then the script
 is executed.  A typical script might be 'username: {username}, password:
 {passcode}'.  It is best if the script produces a one line output if it
 contains secrets. If not a script, the value of *default* should be the
 name of another attribute, and the value of that attribute is shown.
 
-If no account is requested, then Avendesora attempts to determine the
-appropriate account through discovery (see 'avendesora help discovery').
-Normally Avendesora is called in this manner from your window manager.
-You would arrange for it to be run when you type a hot key. In this case
-Avendesora determines which account to use from information available
+If no account is requested, then *Avendesora* attempts to determine the
+appropriate account through :ref:`discovery <discovery>`.  Normally
+*Avendesora* is called in this manner from your window manager.  You
+would arrange for it to be run when you type a hot key. In this case
+*Avendesora* determines which account to use from information available
 from the environment, information like the title on active window. In
-this mode, Avendesora mimics the keyboard when producing its output.
+this mode, *Avendesora* mimics the keyboard when producing its output.
 
-The verbose and title options are used when debugging account
-discovery. The verbose option adds more information about the
+The *verbose* and *title* options are used when debugging account
+discovery. The *verbose* option adds more information about the
 discovery process to the logfile (~/.config/avendesora/log.gpg). The
-title option allows you to override the active window title so you can
-debug title-based discovery. Specifying the title option also scrubs
+*title* option allows you to override the active window title so you can
+debug title-based discovery. Specifying the *title* option also scrubs
 the output and outputs directly to the standard output rather than
 mimicking the keyboard so as to avoid exposing your secret.
+
+If the *stdout* option is not specified, the value command still writes
+to the standard output if it is associated with a TTY (if *Avendesora* is
+outputting directly to a terminal). If the standard output is not a TTY,
+*Avendesora* mimics the keyboard and types the desired value directly into
+the active window.  There are two common situations where standard
+output is not a TTY: when *Avendesora* is being run by your window manager
+in response to you pressing a hot key or when the output of *Avendesora*
+is fed into a pipeline.  In the second case, mimicking the keyboard is
+not what you want; you should use ``--stdout`` to assure the chosen value is
+sent to the pipeline as desired.  This also has the added benefit of stripping 
+off all decorations from the value.
 
 
 .. index::
@@ -620,6 +616,10 @@ Usage::
     avendesora vals   <account>
     avendesora V      <account>
 
+The values of secrets are not actually shown. Rather instructions for viewing 
+the secret value is given. Also, account attributes that are intended only to 
+control *Avendesora*, such as :ref:`discovery <discovery>`, are not shown at 
+all.
 
 .. index::
     single: add command

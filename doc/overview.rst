@@ -47,9 +47,9 @@ into your account, but you will be able to use it to enter the passcode when
 running shell commands like *sudo*.
 
 To start, run the command to add an account. By default, three account templates 
-are available. They are, in order of complexity: shell, website, and bank. The 
-shell template assumes that there is only a passcode and any account discovery 
-would be through the window title rather than by examining a URL.
+are available. They are, in order of complexity: *shell*, *website*, and *bank*.  
+The *shell* template assumes that there is only a passcode and any account 
+discovery would be through the window title rather than by examining a URL.
 
 To provision the new account use::
 
@@ -83,7 +83,7 @@ first field by typing 'n' (next) and then modify the field by typing 'cw'
 use 'cw' to change it to *LinuxLogin*.  You should choose your account name 
 carefully. Once set, you should never change an account name because it will 
 result in the generated secrets associated with the account changing. If there 
-is a chance that you might have more than one linux login, you should add more 
+is a chance that you might have more than one linux account, you should add more 
 to the account name to make it unique. You can always provide a short easy to 
 type alternative as an alias. For example, in this case the account username is 
 x57107048, so you might want to add that to the account name to make it unique.
@@ -170,7 +170,7 @@ The value command will also write the secret directly to the clipboard::
 
 By default *Avendesora* is configured to use the primary clipboard.  You use the 
 middle mouse button to paste from the primary clipboard. You can also modify the 
-*xsel_executable* to modify this behavior.
+:ref:`xsel_executable setting <settings>` to modify this behavior.
 
 You can also write directly to the standard output (normally *Avendesora* writes 
 to the TTY so that it can erase any secrets after a minute has elapsed).  In 
@@ -196,48 +196,63 @@ To show the login credentials *Avendesora* looks for candidate usernames
 
 .. index::
     single: typing, reducing
+    single: short cuts
     single: abbreviations
+
+Short Cuts
+""""""""""
 
 *Avendesora* offers many ways to allow you to reduce or simplify your typing. In 
 particular:
 
-1. The account name is case insensitive::
+#. The account name is case insensitive::
 
     > avendesora login linuxlogin
     username: x57107048
     passcode: wigwam mistrust afflict refit
 
-2. You can give an alias rather than the account name::
+#. You can give an alias rather than the account name::
 
     > avendesora login linux
     username: x57107048
     passcode: wigwam mistrust afflict refit
 
-3. You can replace many command names with a single letter abbreviation::
+#. Many of the command names have single letter abbreviations::
 
     > avendesora l linux
     username: x57107048
     passcode: wigwam mistrust afflict refit
 
-4. On the :ref:`value command <value command>`, if you do not specify a field, 
+#. On the :ref:`value command <value command>`, if you do not specify a field, 
    it will offer the passcode, password, or passphrase if available::
 
     > avendesora v linux
     passcode: wigwam mistrust afflict refit
 
-5. If the first argument is not recognized as a command name, it is treated as 
-   the account name and your login credentials are displayed::
+#. If there is one argument and it is not recognized as a command name, it is 
+   treated as the account name and your login credentials are displayed::
 
     > avendesora linux
     username: x57107048
     passcode: wigwam mistrust afflict refit
 
-6. Finally, people often alias 'pw' to 'avendesora' in their shell to make 
+#. If there is more than one argument and the first is not recognized as 
+   a command name, it is treated as the account name and the :ref:`value command 
+   <value command>` is run::
+
+    > avendesora linux username
+    x57107048
+
+#. Finally, people often alias 'pw' to 'avendesora' in their shell to make 
    running *Avendesora* easier::
 
     > pw linux
     username: x57107048
     passcode: wigwam mistrust afflict refit
+
+
+Auto Entry
+""""""""""
 
 You *LinuxLogin* account was provisioned with account discovery by way of the 
 window title. This assumes that your shell adds the currently running command to 
@@ -267,7 +282,7 @@ box and you choose the one you want.
     single: website account
 
 Website Account
-"""""""""""""""
+---------------
 
 In this example an account is provisioned to hold information typical to 
 a website::
@@ -320,7 +335,7 @@ instructions have been removed:
         aliases = 'elevate virgin virginamerica'
         phone = '1.877.FLY.VIRGIN'
         account = '8493-215-3377'
-        email = 'catharine.stephens658@gmail.com'
+        email = 'perrin.aybara@gmail.com'
         passcode = PasswordRecipe('12 2u 2d 2s')
         questions = [
             Question('mothers maiden name?')),
@@ -401,18 +416,24 @@ open your account without needing to use a shell.  In Gnome you can do so with
 Alt-F2 (Run Command).  You can get the same functionality from other window 
 managers by installing and assigning *dmenu* to a keyboard shortcut.
 
+If you use the :ref:`browse command <browse command>` on an account without 
+a *urls* field, *Avendesora* will try to find one in the *discovery* field (it 
+looks for URLs given to an instance of *RecognizeURL*, however it can get 
+complicated if there is more than one instance of *RecognizeURL*. In such cases 
+it is generallybetter to explicitly specify *urls*.
+
 The *discovery* field is used to recognize that this is the account to use when 
 *Avendesora* is asked to login into the *virginamerica.com* site. Notice that 
 several URLs are given to RecognizeURL(), this is necessary when the website 
 allows you to login using different domain names. RecognizeURL() is a variant of 
 RecognizeTitle() that is attuned to the titles generated by browsers that have 
 been configured to place the URL in the window title bar. This makes it more 
-robust in this particular case. Also notice that the expected protocol is given 
-with the URLs (https). In this way, *Avendesora* will refuse to send your login 
-credentials if the connection is not encrypted using https protocol.  The final 
-argument to RecognizeURL() is the script that logs you in. In this case the 
-script specifies that the value of the email field should be typed into the 
-browser, followed by a tab, then the passcode, then a return.
+robust in this particular case. Also notice that the expected protocol (https) 
+is given with the URLs. In this way, *Avendesora* will refuse to send your login 
+credentials if the connection is not encrypted using the https protocol.  The 
+final argument to RecognizeURL() is the script that logs you in. In this case 
+the script specifies that the value of the email field should be entered into 
+the browser, followed by a tab, then the passcode, then a return.
 
 It is possible to configure account discovery to support several secrets. To do 
 so, place the recognizers in a list and specify different scripts for each. For 
@@ -462,7 +483,7 @@ the choice is made automatically for you:
     single: bank account
 
 Bank Account
-""""""""""""
+------------
 
 Bank accounts are similar to web accounts, but generally contain multiple 
 account numbers and even more secrets.  Create a bank account using::
@@ -475,11 +496,11 @@ After you edit the various fields you may end up with something like this:
 
     class MechanicsBank(Account):
         aliases = 'mb bank'
-        username = Passphrase(length=2)
-        email = 'regina.hale481@aol.com'
+        username = Passphrase(length=2, sep='_')
+        email = 'brandelwyn.alVere@aol.com'
         checking = <<008860636145>>,
         savings = <<029370021509>>,
-        creditcard = <<5251-0148-2064-4156>>,
+        creditcard = <<5251014820644156>>,
         ccv = <<588>>
         expiration = <<03/2020>>
         ccn = Script('{account.creditcard}{tab}{ccv}{tab}')
@@ -509,11 +530,11 @@ making very unlikely that anyone could guess your username. Furthermore, your
 account numbers and your credit-cards CCV number are hidden by decorating them 
 with << >> (you could also just use Hide()).
 
-Also, a verbal password is include. Many financial institutions allow you to set 
-up a verbal password that you use when calling in. This is an important 
-protection in that it stops people that know you well, such as your ex, from 
-calling in and impersonating you. A short passphrase is perfect for this use as 
-it is easy to communicate to someone over the phone.
+Also, a verbal password is included. Many financial institutions allow you to 
+set up a verbal password that you use when calling in. This is an important 
+protection in that it stops people that know you well, such as your evil twin, 
+from calling in and impersonating you. A short passphrase is perfect for this 
+use as it is easy to communicate to someone over the phone.
 
 In this example separate fields are used for each account number. If you have 
 access to the accounts of several people, for example you and your children, you 
@@ -521,23 +542,23 @@ might use a dictionary for the accounts of each person, as follows:
 
 .. code-block:: python
 
-    regina = dict(
+    brandelwyn = dict(
         checking = <<008860636145>>,
         savings = <<029370021509>>,
         creditcard = <<5251-0148-2064-4156>>,
     )
-    timmy = dict(
+    marin = dict(
         checking = <<275137908190>>,
         savings = <<874647693848>>,
     )
-    katie = dict(
+    egwene = dict(
         checking = <<718467200674>>,
         savings = <<623691894130>>,
     )
 
-Now to get Timmy's checking account number you would use::
+Now to get Egwene's checking account number you would use::
 
-    avendesora bank timmy.checking
+    avendesora bank egwene.checking
 
 Security questions and account discovery are handled as given above.
 
@@ -568,23 +589,24 @@ text lists all of the accounts that contain that text in their names or their
 aliases. For example::
 
     > avendesora find bank
-    bank-america (ba, boa, bofa)
-    citibank-mastercard (mc, mastercard, citibank)
-    mechanicsbank (mb bank)
+    bank-america (ba, boa, bofa) -- home mortgage
+    citibank-mastercard (mc, mastercard, citibank) -- credit card
+    mechanicsbank (mb bank) -- bank
 
 The next is the :ref:`search command <search command>`, which given a bit of 
 text lists all of the accounts that contain that text in any of the non-secret 
 account values.  For example::
 
     > avendesora search bank
-    bank-america (ba, boa, bofa)
-    capitalone (co, ing)
-    citibank-mastercard (mc, mastercard, citibank)
-    mechanicsbank (mb bank)
-    wellsfargo (wf)
+    bank-america (ba, boa, bofa) -- home mortgage
+    capitalone (co, ing) -- savings bank
+    citibank-mastercard (mc, mastercard, citibank) -- credit card
+    mechanicsbank (mb bank)  -- bank
+    wellsfargo (wf) -- old bank
 
 In both cases the name of the account is listed first followed by the account 
-aliases (within parentheses).
+aliases (within parentheses).  The description, if available, is appended to the 
+end.
 
 
 .. _modifying accounts:
@@ -598,10 +620,10 @@ command>`::
     > avendesora edit bank
 
 This opens the MechanicsBank account in your editor (you can select your editor 
-by modifying the *edit_account* setting).  Once you modify your account, you 
-should save the file and exit the editor. The change will be checked and if 
-there are any errors, you will be given a chance to reopen the account file and 
-fix the account.
+by modifying the :ref:`edit_account setting <settings>`).  Once you modify your 
+account, you should save the file and exit the editor. The change will be 
+checked and if there are any errors, you will be given a chance to reopen the 
+account file and fix the problem.
 
 
 Additional Features
@@ -610,6 +632,9 @@ Additional Features
 In addition what has already been introduced, *Avendesora* provides a collection 
 of advanced features. Those include ...
 
+-  *Avendesora* supports a wide variety of types of secrets, including support 
+   for :ref:`one-time passwords <otp>`. These secrets are described in 
+   :ref:`helpers`.
 -  The :ref:`archive <archive command>` and :ref:`changed <changed command>` 
    commands provide an ability to create a backup copy of all your passwords.  
    These command are described in the section on :ref:`upgrading <upgrading>`.
@@ -617,7 +642,7 @@ of advanced features. Those include ...
    :ref:`stealth accounts <stealth accounts>` and :ref:`misdirection 
    <misdirection>`.
 -  *Avendesora* provides several ways that help protect you from :ref:`phishing 
-   <phishing>`. You should be aware of these methods to make sure you use them.
+   <phishing>`. You should be aware of these methods and make sure you use them.
 -  *Avendesora* allows you to share master seeds with a partner, and once done 
    allow you to easily and securely create new shared secrets. This is described 
    in the section on :ref:`collaboration <collaboration>`.

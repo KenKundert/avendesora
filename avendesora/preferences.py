@@ -39,6 +39,7 @@ NONCONFIG_SETTINGS = {
     'commonly_mistaken_attributes': {
         'url': 'urls',
         'alias': 'aliases',
+        'description': 'desc',
     }
 }
 

@@ -39,7 +39,8 @@ to confirm that your version of *Avendesora* was updated and::
 to confirm that none of your generated passwords have changed.
 
 It is a good idea to run 'avendesora changed' and 'avendesora archive' on 
-a routine basis to keep your archive up to date.
+a routine basis to keep your archive up to date. Doing so can help protect you 
+against common mistake you might make.
 
 Upon updating you may find that Avendesora produces a message that a 'hash' has 
 changed.  This is an indication that something has changed in the program that 

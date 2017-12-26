@@ -37,7 +37,7 @@ relatively high-level interface as shown in this example:
         fatal(os_error(e))
 
 Basically, the approach is to open the password generator, open an account, and 
-then accessing values of that account. The various components of the Avendesora 
+then access values of that account. The various components of the Avendesora 
 programming interface are described next.
 
 
@@ -130,6 +130,10 @@ found in a list.
 Example: Add SSH Keys
 ---------------------
 
+This example adds SSH keys to your SSH agent. It uses *pexpect* to manage the 
+interaction between this script and *ssh-add*.
+
+
 .. code-block:: python
 
     #!/usr/bin/env python3
@@ -209,13 +213,10 @@ This is a program that generates messages for a person's children and business
 partners. It is assumed that these messages would be placed into a safe place to 
 be found and read upon the person's death.
 
-Modify the program so that it goes through all accounts and look for 
-a particular fields, such as target and value. The target would be a string that 
-contains the name of the person for which it is a message, and value would 
-contain an estimate of the total account value.
-
-It generates an encrypted file for each of the recipients that contains accounts 
-that contain an *postmortem_recipient* whose value matches the recipient.
+It examines all accounts looking for a special field, *postmortem_recipient*. If 
+the field exists, then that account is included in the file of accounts sent to 
+that recipient.  The generated files are encrypted so that only the intended 
+recipients can read them.
 
 .. code-block:: python
 
@@ -227,7 +228,7 @@ that contain an *postmortem_recipient* whose value matches the recipient.
 
     recipients = dict(
         kids='dominique@chappell.name lonny@chappell.name tabatha@chappell.name',
-        henry='dominique@chappell.name  lynna.titus625@gmail.com',
+        partners='dominique@chappell.name  lynna.titus625@gmail.com',
     )
 
     try:

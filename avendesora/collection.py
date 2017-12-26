@@ -57,6 +57,48 @@ class Collection(object):
         except AttributeError:
             return enumerate(self.collection)
 
+    def render(self, fmt='{v}', sep=', '):
+        """Convert the collection into a string
+
+        fmt (str):
+            fmt is a format string applied to each of the items in the
+            collection where {k} is replaced with the key and {v} replaced with
+            the value.
+        sep (str):
+            The string used to join the formatted items.
+        the value.  The second component is the separator. Thus:
+
+            >>> dogs = Collection({'collie': 3, 'beagle':1, 'sheppard': 2})
+            >>> print('dogs: {}.'.format(c.render('{k} ({v})', ', ')))
+            dogs: collie (3), beagle (1), sheppard (2).
+        """
+        return sep.join([tmpl.format(k=k, v=v) for k, v in self.items()])
+
+    def __format__(self, template):
+        """Convert the collection into a string
+
+        The template consists of two components separated by a vertical bar. The
+        first component specifies the formatting from each item. The key and
+        value are interpolated using \k to represent the key and \v to represent
+        the value.  The second component is the separator. Thus:
+
+            >>> dogs = Collection({'collie': 3, 'beagle':1, 'sheppard': 2})
+            >>> print('dogs: {dogs:\k (\v)|, }.'.format(names=c))
+            dogs: collie (3), beagle (1), sheppard (2).
+        """
+        components = template.split('|')
+        if len(components) == 2:
+            tmpl, sep = components
+        elif len(components) == 1:
+            tmpl, sep = components[0], ', '
+        else:
+            raise ValueError('invalid format string for {!r}', self)
+
+        return sep.join([
+            tmpl.replace('\k', str(k)).replace('\v', str(v))
+            for k, v in self.items()
+        ])
+
     def __contains__(self, item):
         return item in self.values()
 

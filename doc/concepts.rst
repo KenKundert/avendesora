@@ -86,7 +86,7 @@ adversary guessing the password if he or she knows everything about the scheme
 used to generate the password but does not know the password itself.  So in this 
 case the minimum entropy is the likelihood of guessing the password if it is 
 known that we are using 4 space separated words as our passphrase where the 
-works are selected at random with a uniform distribution from a known list.  
+words are selected at random with a uniform distribution from a known list.  
 This is very easy to compute.  There are roughly 10,000 words in our dictionary, 
 so if there was only one word in our passphrase, the chance of guessing it would 
 be one in 10,000 or 13 bits of entropy.  If we used a two word passphrase the 

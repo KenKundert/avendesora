@@ -28,8 +28,8 @@ from .obscure import ObscuredSecret
 from .utilities import query_user, two_columns
 from .writer import get_writer
 from inform import (
-    codicil, columns, cull, debug, error, full_stop, output, warn, conjoin,
-    os_error, is_collection, indent, render, ddd, ppp, vvv
+    codicil, columns, cull, debug, error, full_stop, join, output, warn,
+    conjoin, os_error, is_collection, indent, render, ddd, ppp, vvv
 )
 from shlib import chmod, cp, rm, to_path
 from docopt import docopt
@@ -726,10 +726,16 @@ class Find(Command):
         # find accounts whose name matches the criteria
         to_print = []
         for acct in generator.find_accounts(cmdline['<text>']):
-            aliases = Collection(getattr(acct, 'aliases', [])).values()
-
-            aliases = ' (%s)' % (', '.join(aliases)) if aliases else ''
-            to_print += [acct.get_name() + aliases]
+            aliases = Collection(getattr(acct, 'aliases', []))
+            desc = getattr(acct, 'desc', None)
+            to_print.append(
+                join(acct.get_name(), aliases=aliases, desc=desc, template=(
+                    '{} ({aliases:\v|, }) -- {desc}',
+                    '{} ({aliases:\v|, })',
+                    '{} -- {desc}',
+                    '{}'
+                ))
+            )
         output(cmdline['<text>']+ ':')
         output('    ' + ('\n    '.join(sorted(to_print))))
 
@@ -1205,16 +1211,23 @@ class Search(Command):
         # search for accounts that match search criteria
         to_print = []
         for acct in generator.search_accounts(cmdline['<text>']):
-            aliases = ', '.join(Collection(getattr(acct, 'aliases', [])).values())
-            aliases = ' (%s)' % (aliases) if aliases else ''
-            to_print += [acct.get_name() + aliases]
+            aliases = Collection(getattr(acct, 'aliases', []))
+            desc = getattr(acct, 'desc', None)
+            to_print.append(
+                join(acct.get_name(), aliases=aliases, desc=desc, template=(
+                    '{} ({aliases:\v|, }) -- {desc}',
+                    '{} ({aliases:\v|, })',
+                    '{} -- {desc}',
+                    '{}'
+                ))
+            )
         output(cmdline['<text>'] + ':')
         output('    ' + ('\n    '.join(sorted(to_print))))
 
 
 # Value {{{1
 class Value(Command):
-    NAMES = 'value', 'val', 'v'
+    NAMES = 'value', 'val', 'v', 'vc'
     DESCRIPTION = 'show an account value'
     USAGE = dedent("""
         Produce an account value. If the value is secret, it is produced only
@@ -1308,6 +1321,17 @@ class Value(Command):
         debug title-based discovery. Specifying the title option also scrubs
         the output and outputs directly to the standard output rather than
         mimicking the keyboard so as to avoid exposing your secret.
+
+        If the --stdout option is not specified, the value command still writes
+        to the standard output if it is associated with a TTY (if Avendesora is
+        outputting directly to a terminal). If standard output is not a TTY,
+        Avendesora mimics the keyboard and types the desired value directly into
+        the active window.  There are two common situations where standard
+        output is not a TTY: when Avendesora is being run by your window manager
+        in response to you pressing a hot key or when the output of Avendesora
+        is fed into a pipeline.  In the second case, mimicking the keyboard is
+        not what you want; you should use --stdout to assure the chosen value is
+        sent to the pipeline as desired.
     """).strip()
 
     @classmethod

@@ -8,6 +8,15 @@ Generated Secret Classes
 
 Sublasses of :class:`avendesora.GeneratedSecret`.
 
+These classes are used when creating account secrets (see :ref:`accounts`).
+
+Every class starts with a pool of 512 bits of entropy. Each symbol generated 
+consumes some of that entropy, the amount of which is determine by the number of 
+symbols that are available in the alphabet. For example, passphrases pull words 
+from a dictionary containing 10,000 words. As such, each word in the passphrase 
+consumes 14 bits of entropy (ceil(log2(10000))). If too many words are 
+requested, :exc:`avendesora.SecretExhausted` is raised.
+
 .. autoclass:: avendesora.Password
 
 .. autoclass:: avendesora.Passphrase
@@ -112,6 +121,8 @@ Obscured Secret Classes
 
 Sublasses of :class:`avendesora.ObscuredSecret`.
 
+These classes are used when creating account secrets (see :ref:`accounts`).
+
 .. autoclass:: avendesora.Hide
 
 .. autoclass:: avendesora.Hidden
@@ -123,6 +134,8 @@ Sublasses of :class:`avendesora.ObscuredSecret`.
 
 Recognizer Classes
 ------------------
+
+These classes are used in :ref:`account discovery <discovery>`.
 
 .. autoclass:: avendesora.RecognizeAll
 
@@ -147,5 +160,7 @@ Recognizer Classes
 
 Utility Classes
 ---------------
+
+These classes are used as account values, (see :ref:`scripts`).
 
 .. autoclass:: avendesora.Script

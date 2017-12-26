@@ -59,7 +59,10 @@ def main():
 
         # start logging
         logfile = BufferedFile(get_setting('log_file'), True)
-        Inform(logfile=logfile, hanging_indent=False, stream_policy='header')
+        Inform(
+            logfile=logfile, hanging_indent=False, stream_policy='header',
+            notify_if_no_tty=True
+        )
 
         # run the requested command
         Command.execute(cmdline['<command>'], cmdline['<args>'])

@@ -31,8 +31,10 @@
 from .browsers import StandardBrowser
 from .command import Command
 from .config import get_setting
+from .error import PasswordError
 from .utilities import pager, two_columns
-from inform import error, output
+from difflib import get_close_matches
+from inform import conjoin, full_stop, output
 from textwrap import dedent
 
 # HelpMessage base class {{{1
@@ -90,7 +92,18 @@ class HelpMessage(object):
                         return show_in_browser(topic.URL)
                     else:
                         return pager(topic.help())
-            error('topic not found.', culprit=name)
+
+            # topic not found, give some alternatives
+            topics = (
+                [c.get_name() for c in Command.commands()]
+              + [t.get_name() for t in cls.topics()]
+            )
+            candidates = get_close_matches(name, topics, 3, 0.6)
+            msg = ['topic not found']
+            candidates = conjoin(candidates, conj=' or ')
+            if candidates:
+                msg.append('did you mean {}?'.format(candidates))
+            raise PasswordError(full_stop(', '.join(msg)), culprit=name)
         else:
             if browse:
                 return show_in_browser('')

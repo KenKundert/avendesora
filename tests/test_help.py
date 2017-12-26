@@ -695,6 +695,17 @@ def test_value():
         debug title-based discovery. Specifying the title option also scrubs
         the output and outputs directly to the standard output rather than
         mimicking the keyboard so as to avoid exposing your secret.
+
+        If the --stdout option is not specified, the value command still writes
+        to the standard output if it is associated with a TTY (if Avendesora is
+        outputting directly to a terminal). If standard output is not a TTY,
+        Avendesora mimics the keyboard and types the desired value directly into
+        the active window.  There are two common situations where standard
+        output is not a TTY: when Avendesora is being run by your window manager
+        in response to you pressing a hot key or when the output of Avendesora
+        is fed into a pipeline.  In the second case, mimicking the keyboard is
+        not what you want; you should use --stdout to assure the chosen value is
+        sent to the pipeline as desired.
     """).strip()
     assert result.decode('utf-8') == expected
 

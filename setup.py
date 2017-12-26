@@ -24,8 +24,7 @@ setup(
         'appdirs',
         'arrow',
         'docopt',
-        'inform>=1.10',
-        # 'inform>=1.11',  KSK -- switch to 1.11 when it is available
+        'inform>=1.11',
         #'pygobject',
             # pygobject seems broken in pypi. Instead, do the following:
             # git clone git://git.gnome.org/pygobject

@@ -27,8 +27,9 @@ from .obscure import ObscuredSecret
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
 from .secrets import GeneratedSecret
+from difflib import get_close_matches
 from inform import (
-    Color, codicil, conjoin, cull, debug, is_collection, is_str, log,
+    Color, codicil, conjoin, cull, debug, full_stop, is_collection, is_str, log,
     notify, output, warn, indent,
     ddd, ppp, vvv
 )
@@ -215,7 +216,26 @@ class Account(object):
         try:
             return Account._accounts[canonical]
         except KeyError:
-            raise PasswordError('account not found.', culprit=name)
+            # account not found, assemble message giving suggested account names
+            names = Account._accounts.keys()
+            candidates = get_close_matches(canonical, names, 9, 0.6)
+
+            # do not want to give multiple options all of which are aliases for
+            # the same accounts, so look for up to three unique accounts
+            accounts = []
+            for candidate in candidates:
+                account = Account._accounts[candidate]
+                if account not in accounts:
+                    accounts.append(account)
+                if len(accounts) >= 3:
+                    break
+
+            # generate the message handling 0, 1, 2 or 3 candidates gracefully
+            msg = ['account not found']
+            candidates = conjoin((a.get_name() for a in accounts), conj=' or ')
+            if candidates:
+                msg.append('did you mean {}?'.format(candidates))
+            raise PasswordError(full_stop(', '.join(msg)), culprit=name)
 
     # get_name() {{{2
     @classmethod
@@ -286,7 +306,7 @@ class Account(object):
                     warn('duplicate account name.', culprit=name)
                 else:
                     warn('alias duplicates existing name.', culprit=name)
-                codicil('Seen in %s in %s.' % seen[name])
+                codicil('Seen in %s in %s.' % seen[canonical])
                 codicil('And in %s in %s.' % (account_name, path))
                 break
             else:

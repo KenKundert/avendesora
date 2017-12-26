@@ -26,12 +26,12 @@ use *Avendesora*'s :ref:`browse command <browse command>`::
     avendesora browse chase
 
 In this way you use the URL stored in *Avendesora* rather than trusting a URL 
-link provided by a third party. Second, you should auto-type the account 
+link provided by a third party. Second, you should auto-enter the account 
 credentials using *Avendesora*'s account discovery based on 
 :class:`avendesora.RecognizeURL` (be sure to use 
 :class:`avendesora.RecognizeURL` for websites rather than 
-:class:`avendesora.RecognizeTitle` when configuring account discovery).  
-:class:`avendesora.RecogniseURL` will not be fooled by a phishing site).
+:class:`avendesora.RecognizeTitle` when configuring account discovery, 
+:class:`avendesora.RecognizeURL` is not fooled by phishing sites).
 
 
 .. index::
@@ -45,13 +45,13 @@ credentials using *Avendesora*'s account discovery based on
 Account Discovery
 -----------------
 
-If you do not give an account to 'avendesora value', *Avendesora* tries to 
-determine the account by simply asking each account if it is suitable. An 
-account can look at the window title, the user name, the host name, the working 
-directory, and the environment variables to determine if it is suitable. If so, 
-it nominates itself. If there is only one account nominated, that account is 
-used. If there are multiple nominees, then a small window pops up allowing you 
-to choose which account you wish to use.
+If you do not give an account to ':ref:`avendesora value <value command>`', 
+*Avendesora* tries to determine the account by simply asking each account if it 
+is suitable.  An account can look at the window title, the user name, the host 
+name, the working directory, and the environment variables to determine if it is 
+suitable.  If so, it nominates itself. If there is only one account nominated, 
+that account is used. If there are multiple nominees, then a small window pops 
+up allowing you to choose which account you wish to use.
 
 .. index::
     single: RecognizeTitle
@@ -68,7 +68,7 @@ seen, use:
 
 The title is a glob string, meaning that '*' matches any combination
 of characters. The script describes what *Avendesora* should output
-when their is a match. In this case it outputs the username field,
+when there is a match. In this case it outputs the username field,
 then a tab, then the passcode field, then a return (see :ref:`scripts`).
 
 Matching window titles can be fragile, especially for websites
@@ -90,7 +90,7 @@ patterns:
 If you use Firefox, you can install the `Add URL to Window Title 
 <https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title>`_
 extension.  It is a plugin that makes discovery easier and more
-robust by adding the URL to the title.  For Chrome the appropriate
+robust by adding the URL to the title.  For *Chrome* the appropriate
 plugin is  is `URL in Title 
 <https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb>`_.  
 It is recommended that you install
@@ -171,8 +171,7 @@ The following recognizers are available::
     single: RecognizeAny
 
 :class:`avendesora.RecognizeAll` and :class:`avendesora.RecognizeAny` can be 
-used to combine several
-recognizers. For example:
+used to combine several recognizers. For example:
 
 .. code-block:: python
 
@@ -298,14 +297,15 @@ level of protection. They are especially useful when you are concerned about
 keyloggers.
 
 *Avendesora* supports time-based one-time passwords (TOTP) that are fully 
-compatible with, and can act as an alternative to or a replacement for, Google 
-Authenticator  or Authy.
+compatible with, and can act as an alternative to or a replacement for, the 
+*Google Authenticator* or *Authy* apps.
 
-When first enabling one-time passwords you are generally presented with a QR 
-code and a string of characters that are often referred to as the backup code.  
-You would provide this string of characters to the OTP class to configure an 
-account for a one-time password. For example, here is an account that requests 
-your username and password on one page, and your one time password on another:
+When first enabling one-time passwords with *Google Authenticator* you are 
+generally presented with a QR code. Also included is a string of characters that 
+are often referred to as the backup code.  You would provide this string of 
+characters to the OTP class to configure an account for a one-time password. For 
+example, here is an account that requests your username and password on one 
+page, and your one time password on another:
 
 .. code-block:: python
 
@@ -334,14 +334,15 @@ that adds the one-time password to the output of the :ref:`credentials command
 entry of the one-time password to the browser. And finally it adds the *urls* to 
 specify which URL the :ref:`browse command <browse command>` should use.
 
-It is easy to mimic Google Authenticator. Mimicking Authy is more difficult. To 
-do so, follow `these instructions 
+It is easy to mimic *Google Authenticator*. Mimicking *Authy* is more difficult.  
+To do so, follow `these instructions 
 <https://randomoracle.wordpress.com/2017/02/15/extracting-otp-seeds-from-authy>`_.  
-Basically, the idea is to install the Authy Chrome app, start it, open the 
-desired account, then back in Chrome open chrome://extensions, select Developer 
-Mode, then click on  'Inspect views: main.html', search for totp function, set 
-break point, then copy the value of the e argument once break point is reached, 
-and copy that 32 digit hexadecimal number to hex_seed in the code below:
+Basically, the idea is to install the *Authy* *Chrome* app, start it, open the 
+desired account, then back in *Chrome* open chrome://extensions, select 
+*Developer Mode*, then click on  'Inspect views: main.html', search for *totp* 
+function, set a break point in that function and wait until it trips, then copy 
+the value of the *e* argument (a 32 digit hexadecimal number) to *hex_seed* in 
+the code below:
 
 .. code-block:: python
 
@@ -371,15 +372,20 @@ and copy that 32 digit hexadecimal number to hex_seed in the code below:
 
 Substitute your number for *NNN...NN*. Then run the script to display the seed 
 or shared secret.  It will also show five codes, one every 10 seconds. Every 
-other code should match the value produced by the Chrome app. Once you are 
-convinced that your seed is correct, add something like the following to your 
-account to generate the one-time password:
+other code should match the value produced by the *Chrome* app. Be aware that 
+every *Authy* app has its own seed, so the sequence that *Chrome* generates will 
+be different from the sequence generated by your phone app or even a different 
+*Chrome* app, and that is true even if they are generating tokens for the same 
+account.
+
+Once you are convinced that your seed is correct, add something like the 
+following to your account to generate the one-time password:
 
 .. code-block:: python
 
         otp = OTP('UM0HJVLT4HVWJQJC47Q8YXX4TU======', interval=10, digits=7)
 
-The *interval* and *digits* are specific to Authy.
+The *interval* and *digits* are specific to *Authy*.
 
 
 .. index::
@@ -407,11 +413,11 @@ following to your account:
 .. code-block:: python
 
     questions = [
-        Question('oldest aunt'),
-        Question('title of first job'),
-        Question('oldest uncle'),
-        Question('savings goal'),
-        Question('childhood vacation spot'),
+        Question('oldest aunt?'),
+        Question('title of first job?'),
+        Question('oldest uncle?'),
+        Question('savings goal?'),
+        Question('childhood vacation spot?'),
     ]
 
 The string identifying the question does not need to contain the
@@ -419,9 +425,9 @@ question verbatim, a abbreviated version is sufficient as long as it
 allows you to distinguish the question. However, once set, you should not change 
 the question in the slightest; doing so changes the generated answer.
 
-The questions are given as
-an array, and so are accessed with an index that starts at 0. Thus,
-to get the answer to who is your 'oldest aunt', you would use::
+The questions are given as an array, and so are accessed with an index that 
+starts at 0. Thus, to get the answer to who is your 'oldest aunt', you would 
+use::
 
     > avendesora value <accountname> 0
     questions.0 (oldest aunt): ampere reimburse duster
@@ -432,12 +438,23 @@ to use with::
     > avendesora values <accountname>
     ...
     questions:
-        0: oldest aunt <reveal with 'avendesora value <accountname> questions.0'>
-        1: title of first job <reveal with 'avendesora value <accountname> questions.1'>
-        2: oldest uncle <reveal with 'avendesora value <accountname> questions.2'>
-        3: savings goal <reveal with 'avendesora value <accountname> questions.3'>
-        4: childhood vacation spot <reveal with 'avendesora value <accountname> questions.4'>
+        0: oldest aunt? <reveal with 'avendesora value <accountname> questions.0'>
+        1: title of first job? <reveal with 'avendesora value <accountname> questions.1'>
+        2: oldest uncle? <reveal with 'avendesora value <accountname> questions.2'>
+        3: savings goal? <reveal with 'avendesora value <accountname> questions.3'>
+        4: childhood vacation spot? <reveal with 'avendesora value <accountname> questions.4'>
     ...
+
+Or you can use::
+
+    > avendesora values <accountname> questions
+    avendesora error: questions:
+        composite value found: questions:
+            0: oldest aunt?
+            1: title of first job?
+            2: oldest uncle?
+            3: savings goal?
+            4: childhood vacation spot?
 
 By default, *Avendesora* generates a response that consists of 3
 random words. This makes it easy to read to a person over the phone
@@ -449,17 +466,13 @@ question:
 .. code-block:: python
 
     questions = [
-        Question('favorite fruit', answer='grapes'),
-        Question('first major city visited', answer='paris'),
-        Question('favorite subject', answer='history'),
+        Question('favorite fruit?', answer='grapes'),
+        Question('first major city visited?', answer='paris'),
+        Question('favorite subject?', answer='history'),
     ]
 
 When giving the answers you may want to conceal them to protect them
 from casual observation.
-
-Be aware that the question is used as a seed when generating the
-answer, so if you change the question in any way it changes the
-answer.
 
 
 .. index::
@@ -481,7 +494,7 @@ When processed by *Avendesora* the attributes are replaced by their
 value from the chosen account.  For example, this script might
 be rendered as::
 
-    username: jman, password: R7ibHyPjWtG2
+    username: rand_alThor, password: R7ibHyPjWtG2
 
 You can specify a script directly to the :ref:`value command <value command>`.  
 You can specify them as account attributes (in this case then need to be 
@@ -506,6 +519,7 @@ or more for the network passwords.  Such an account might look like:
         network_passwords = [Passphrase(), Passphrase()]
         privileged = Script('SSID: {networks.0}, password: {network_passwords.0}')
         guest = Script('SSID: {networks.1}, password: {network_passwords.1}')
+        credentials = 'privileged guest username passcode'
 
 Notice that *privileged* and *guest* were specified as scripts. Now the 
 credentials for the privileged network are accessed with::
@@ -517,7 +531,7 @@ You can also give a script rather than a field on the command line
 when running the :ref:`value command <value command>`::
 
     > avendesora value scc '{username}: {passcode}'
-    jman: R7ibHyPjWtG2
+    rand_alThor: R7ibHyPjWtG2
 
 For example, a place where this is useful is when specifying a username and 
 password to curl::
@@ -536,14 +550,14 @@ interpreted as a field name, and so would result in a 'not found' error.
 
     class SCC(Account):
         aliases = 'scc'
-        username = 'jman'
+        username = 'rand_alThor'
         password = PasswordRecipe('12 2u 2d 2s')
         default = 'username: {username}, password: {password}'
 
 You can access the script by simply not providing a field::
 
     > avendesora value scc
-    username: jman, password: *m7Aqj=XBAs7
+    username: rand_alThor, password: *m7Aqj=XBAs7
 
 Finally, you pass a script to the account discovery recognizers.  They specify 
 the action that should be taken when a particular recognizer triggers. These 
@@ -568,7 +582,7 @@ Besides the account attributes, you can use several other special attributes
 including: *{tab}*, *{return}*, and *{sleep N}*.  *{tab}* is replaced by a tab 
 character, *{return}* is replaced by a carriage return character, and *{sleep 
 N}* causes a pause of N seconds. The sleep function is only active when 
-autotyping after account discovery.
+auto-typing in account discovery.
 
 
 .. index::
@@ -678,7 +692,7 @@ contained in the accounts file that is shared in a secure manner
 once at the beginning.  For example, imagine one partner creates an
 account at the US Postal Service website and then informs the
 partner that the name of the new account is *USPS* and the username is
-*justus*.  That is enough information for the second partner to
+*taveren*.  That is enough information for the second partner to
 generate the password and login. And notice that the necessary
 information can be shared over an insecure channel. For example, it
 could be sent in a text message or from a phone where trustworthy
@@ -690,36 +704,37 @@ that is dedicated to the shared accounts.  This file contains the
 master seed, and it is critical to keep this value secure. Thus, it
 is recommended that the shared file be encrypted.
 
-Consider an example where you, Alice, are sharing accounts with your
-business partner, Bob.  You have hired a contractor to run your
-email server, Eve, who unbeknownst to you is reading your email in
-order to steal valuable secrets.  Together, you and Bob jointly run
-Teneya Enterprises. Since you expect more people will need access to
+Consider an example where you, Siuan, are sharing accounts with your
+business partner, Moiraine.  You have hired a contractor to run your
+email server, Elaida, who unbeknownst to you is reading your email in
+order to steal valuable secrets.  Together, you and Moiraine jointly run
+Aes Sedai Enterprises. Since you expect more people will need access to
 the accounts in the future, you choose to the name the file after
-the company rather than your partner.  To share accounts with Bob,
-you start by getting Bob's public GPG key.  Then, create the new
+the company rather than your partner.  To share accounts with Moiraine,
+you start by getting Moiraine's public GPG key.  Then, create the new
 accounts file with something like::
 
-    avendesora new -g alice@teneya.com,bob@teneya.com teneya.gpg
+    avendesora new -g siuan@AesSedai.com,moiraine@AesSedai.com aesSedai.gpg
 
-This generates a new accounts file, ~/.config/avendesora/teneya.gpg,
-and encrypts it so only you and Bob can open it.  Mail this file to
-Bob. Since it is encrypted, it is to safe to send the file through
-email.  Even though Eve can read this message, the accounts file is
-encrypted so Eve cannot access the master seed it contains.  Bob
+This generates a new accounts file, ~/.config/avendesora/AesSedai.gpg,
+and encrypts it so only you and Moiraine can open it.  Mail this file to
+Moiraine. Since it is encrypted, it is to safe to send the file through
+email.  Even though Elaida can read this message, the accounts file is
+encrypted so she cannot access the master seed it contains.  Moiraine
 should put the file in ~/.config/avendesora and then add it to
 accounts_files in ~/.config/avendesora/accounts_files.  You are now
 ready to share accounts.
 
 Then, one partner creates a new account and mails the account entry
 to the other partner.  This entry does not contain enough
-information to allow an eavesdropper such as Eve to be able to
+information to allow an eavesdropper such as Elaida to be able to
 generate the secrets, but now both partners can. At a minimum you
 would need to share only the account name and the user name if one
 is needed. With that, the other partner can generate the passcode.
 
 Once you have shared an accounts file, you can also use the :ref:`identity
-command <identity command>` to prove your identity to your partner.
+command <identity command>` to prove your identity to your partner (described 
+next).
 
 You cannot share secrets encrypted with Scrypt. Also, you cannot
 share stealth accounts unless the file that contains the account
@@ -734,8 +749,8 @@ account templates and add a master seed to that file manually.
 
 .. _confirming identity:
 
-Confirming Identity of a Partner
---------------------------------
+Confirming the Identity of a Partner
+------------------------------------
 
 The :ref:`identity command <identity command>` allows you to generate a response 
 to any challenge.  The response identifies you to a remote partner with whom you 
@@ -746,7 +761,7 @@ valid names. If you run it with no challenge, one is created for you
 based on the current time and date.
 
 If you have a remote partner to whom you wish to prove your
-identity, have that partner use avendesora to generate a challenge
+identity, have that partner use *Avendesora* to generate a challenge
 and a response based on your shared secret. Then the remote partner
 provides you with the challenge and you run avendesora with that
 challenge to generate the same response, which you provide to your
@@ -759,37 +774,37 @@ provide the challenge. In this situation, one is generated for you
 based on the time and date.
 
 Consider an example that illustrates the process. In this example,
-Ahmed is confirming the identity of Reza, where both Ahmed and Reza
-are assumed to have shared *Avendesora* accounts.  Ahmed runs
+Siuan is confirming the identity of Moiraine, where both Siuan and Moiraine
+are assumed to have shared *Avendesora* accounts.  Siuan runs
 *Avendesora* as follows and remembers the response::
 
-    > avendesora identity reza
+    > avendesora identity moiraine
     challenge: slouch emirate bedeck brooding
     response: spear disable local marigold
 
-This assumes that reza is the name, with any extension removed, of the file that 
-Ahmed uses to contain their shared accounts.
+This assumes that moiraine is the name, with any extension removed, of the file 
+that Siuan uses to contain their shared accounts.
 
-Ahmed communicates the challenge to Reza but not the response.  Reza then runs 
-*Avendesora* with the given challenge::
+Siuan communicates the challenge to Moiraine but not the response.  Moiraine 
+then runs *Avendesora* with the given challenge::
 
-    > avendesora identity ahmed slouch emirate bedeck brooding
+    > avendesora identity siuan slouch emirate bedeck brooding
     challenge: slouch emirate bedeck brooding
     response: spear disable local marigold
 
-In this example, ahmed is the name of the file that Reza uses to contain their 
-shared accounts.
+In this example, siuan is the name of the file that Moiraine uses to contain 
+their shared accounts.
 
-To complete the process, Reza returns the response to Ahmed, who compares it to 
-the response he received to confirm Reza's identity.  If Ahmed has forgotten the 
-desired response, he can also specify the challenge to the :ref:`identity 
-command <identity command>` to regenerate the expected response.
+To complete the process, Moiraine returns the response to Siuan, who compares it 
+to the response she received to confirm Moiraine's identity.  If Siuan has 
+forgotten the desired response, she can also specify the challenge to the 
+:ref:`identity command <identity command>` to regenerate the expected response.
 
-Alternately, when Ahmed sends a message to Reza, he can proactively prove his 
-identity by providing both the challenge and the response. Reza could then run 
-the *identity* command with the challenge and confirm that he gets the same 
-response. Other than himself, only Ahmed could predict the correct response to 
-any challenge.
+Alternately, when Siuan sends a message to Moiraine, she can proactively prove 
+his identity by providing both the challenge and the response. Moiraine could 
+then run the *identity* command with the challenge and confirm that she gets the 
+same response. Other than herself, only Siuan could predict the correct response 
+to any challenge.
 
 
 .. index::

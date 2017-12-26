@@ -11,15 +11,16 @@ Accounts
 
 Account information is stored in account files. The list of account files is 
 given in ~/.config/avendesora/accounts_files.  New account files are created 
-using ``avendesora new``, but to delete an accounts file, you must manually 
-remove it from accounts_files. Once an accounts file exists, you may add 
-accounts to it using ``account add``. Use the -f option to specify which file is 
-to contain the new account.  Modifying or deleting an account is done with 
-``account edit <account_name>``.  To delete the account, simply remove all lines 
-associated with the account.
+using ':ref:`avendesora new <new command>`', but to delete an accounts file, you 
+must manually remove it from accounts_files. Once an accounts file exists, you 
+may add accounts to it using ':ref:`account add <add command>`'. Use the ``-f`` 
+option to specify which file is to contain the new account.  Modifying or 
+deleting an account is done with ':ref:`account edit account_name <edit 
+command>`'.  To delete the account, simply remove all lines associated with the 
+account.
 
 An account is basically a collection of attributes organized as a subclass of 
-the Python Account class. For example:
+the Python :class:`avendesora.Account` class. For example:
 
 .. code-block:: python
 
@@ -46,8 +47,8 @@ the :ref:`edit command <edit command>` to do so::
 
     > avendesora edit nyt
 
-Most of the field values can be retrieved simply by asking for them.  For 
-example::
+Once created, most of the field values can be retrieved simply by asking for 
+them.  For example::
 
     > avendesora value newyorktimes username
     username: derrickAsh
@@ -131,8 +132,8 @@ You can find the specifics of how to specify or generate your secrets in
 Any value that is an instance of the :class:`avendesora.GeneratedSecret` class 
 (:class:`avendesora.Password`, :class:`avendesora.Passphrase`, ...) or the 
 :class:`avendesora.ObscuredSecret` class (:class:`avendesora.Hidden`, 
-:class:`avendesora.GPG`, ...) are considered sensitive.  They are given out only 
-in a controlled manner. For example, running the :ref:`values command <values 
+:class:`avendesora.GPG`, ...) is considered sensitive.  It is only given out in 
+a controlled manner. For example, running the :ref:`values command <values 
 command>` displays all fields, but the values that are sensitive are replaced by 
 instructions on how to view them. They can only be viewed individually::
 
@@ -143,8 +144,8 @@ instructions on how to view them. They can only be viewed individually::
     username: derrickAsh
 
 The *aliases* and *discovery* fields are not shown because they are considered 
-tool fields. Other tool fields include *NAME*, *default*, *master*, *browser*, 
-and *default_url*. See :ref:`discovery` for more information on discovery.  
+tool fields (see :ref:`discovery` for more information on discovery).  Other 
+tool fields include *NAME*, *default*, *master*, *browser*, and *default_url*.  
 *default* is the name of the default field, which is the field you get if you do 
 not request a particular field. Its value defaults to *password*, *pasphrase*, 
 or *passcode* (as set by *default_field* setting), but it can be set to any 
@@ -153,14 +154,14 @@ default browser to use when opening the account, run the :ref:`browse command
 <browse command>` to see a list of available browsers.
 
 The value of *passcode* is considered sensitive because it is an instance of 
-*PasswordRecipe*, which is a subclass of *GeneratedSecret*.  If you wish to see 
-the *passcode*, use::
+:class:`PasswordRecipe`, which is a subclass of :class:`GeneratedSecret`.  If 
+you wish to see the *passcode*, use::
 
     > avendesora value nyt
     passcode: TZuk8:u7qY8%
 
-This value will be displayed for a minute and then hidden. If you would like to 
-hide it early, simply type Ctrl-C.
+This value will be displayed for a minute and is then hidden. If you would like 
+to hide it early, simply type Ctrl-C.
 
 An attribute value can incorporate other attribute values through use of the 
 :class:`avendesora.Script` class as described in :ref:`scripts`. For example, 
@@ -178,34 +179,33 @@ consider an account for your wireless router that contains the following:
         privileged = Script('SSID: huron_drugs, password: {ssid.huron_drugs}')
 
 The *ssid* field is a dictionary that contains the SSID and passphrases for each 
-of the wireless networks provided by the router.  This is a natural an compact 
+of the wireless networks provided by the router.  This is a natural and compact 
 representation for this information, but accessing it as a user in this form 
-would require two steps to access the information, one to get the SSID and 
-another to get the passphrase. This issue is addressed by adding the guest and 
-privileged attributes. The guest and privileged attributes are a script that 
-gives the SSID and interpolate the passphrase. Now both can easily accessed at 
-once with::
+requires two steps to access the information, one to get the SSID and another to 
+get the passphrase. This issue is addressed by adding the guest and privileged 
+attributes. The guest and privileged attributes are scripts that gives the SSID 
+and interpolate the passphrase. Now both can easily accessed at once with::
 
     > avendesora value wifi guest
     SSID: huron_guests, password: delimit ballcock fibber levitate
 
-Use of *Avendesora* classes (:class:`avendesora.GeneratedSecret` or 
+Use of *Avendesora* secrets classes (:class:`avendesora.GeneratedSecret` or 
 :class:`avendesora.ObscuredSecret`) is confined to the top two levels of account 
 attributes, meaning that they can be the value of the top-level attributes, or 
 the top-level attributes may be arrays or dictionaries that contain objects of 
 these classes, but it can go no further.
 
-It is important to remember that any generated secrets use the account name and 
-the field name when generating their value, so if you change the account name or 
+It is important to remember that generated secrets use the account name and the 
+field name when generating their value, so if you change the account name or 
 field name you will change the value of the secret.  For this reason is it 
 important to choose a good account and field names up front and not change them.  
 It should be very specific to avoid conflicts with similar accounts created 
 later.  For example, rather than choosing Gmail as your account name, you might 
-want to include your username, ex.  GmailPaulBunyan.  This would allow you to 
+want to include your username, ex.  GmailThomMerrilin.  This would allow you to 
 create additional gmail accounts later without ambiguity.  Then just add *gmail* 
 as an alias to the account you use most often.
 
 Account and field names are case insensitive. So you can use Gmail or gmail.  
 Also, if the account or field names contains an underscore, you can substitute 
-a dash. So if the account name is Gmail_Paul_Bunyon, you can use 
-gmail-paul-bunyon instead.
+a dash. So if the account name is Gmail_Thom_Merrilin, you can use 
+gmail-thom-merrilin instead.
