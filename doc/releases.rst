@@ -43,8 +43,8 @@ Releases
     - Added browser version of :ref:`help command <help command>`.
 
 **Latest development release**:
-    | Version: 1.8.8
-    | Released: 2017-12-20
+    | Version: 1.9.0
+    | Released: 2017-12-25
 
     - Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
     - Added 'vc' command as an alias for 'value --clipboard'.
