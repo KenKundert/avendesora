@@ -42,9 +42,16 @@ Releases
     - Added :ref:`phonetic command <phonetic command>`.
     - Added browser version of :ref:`help command <help command>`.
 
-**Latest development release**:
+    It is recommended that in this release you trim your 
+    ~/.config/avendesora/config file to only include those settings that you 
+    explicitly wish to override.
+
+**1.9 (2017-12-25)**:
+    - Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
+    - Added 'vc' command as an alias for 'value --clipboard'.
+
+**Latest Development Version**:
     | Version: 1.9.0
     | Released: 2017-12-25
 
-    - Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
-    - Added 'vc' command as an alias for 'value --clipboard'.
+    - Added more currency symbols.
