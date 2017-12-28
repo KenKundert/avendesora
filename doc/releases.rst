@@ -51,7 +51,7 @@ Releases
     - Added 'vc' command as an alias for 'value --clipboard'.
 
 **Latest Development Version**:
-    | Version: 1.9.0
-    | Released: 2017-12-25
+    | Version: 1.9.1
+    | Released: 2017-12-28
 
     - Added more currency symbols.
