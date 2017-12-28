@@ -222,20 +222,32 @@ class Account(object):
 
             # do not want to give multiple options all of which are aliases for
             # the same accounts, so look for up to three unique accounts
-            accounts = []
+            close_matches = []
             for candidate in candidates:
                 account = Account._accounts[candidate]
-                if account not in accounts:
-                    accounts.append(account)
-                if len(accounts) >= 3:
+                if account not in close_matches:
+                    close_matches.append(account)
+                if len(close_matches) >= 3:
                     break
 
+            # add the aliases to be base account names if available
+            offer = []
+            for account in close_matches:
+                aliases = getattr(account, 'aliases', None)
+                if aliases:
+                    offer.append('{} ({})'.format(
+                        account.get_name(), ', '.join(aliases)
+                    ))
+                else:
+                    offer.append(account.get_name())
+
             # generate the message handling 0, 1, 2 or 3 candidates gracefully
-            msg = ['account not found']
-            candidates = conjoin((a.get_name() for a in accounts), conj=' or ')
-            if candidates:
-                msg.append('did you mean {}?'.format(candidates))
-            raise PasswordError(full_stop(', '.join(msg)), culprit=name)
+            msg = 'account not found'
+            if offer:
+                msg = '{}, did you mean:\n    {}?'.format(
+                    msg, conjoin(offer, sep=',\n    ', conj=', or\n    ')
+                )
+            raise PasswordError(msg, culprit=name)
 
     # get_name() {{{2
     @classmethod
