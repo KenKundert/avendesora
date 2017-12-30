@@ -154,13 +154,16 @@ class Script:
     """
     def __init__(self, script='username: {username}, password: {passcode}'):
         self.script = script
-        self.is_secret = False
         self.account = None
+        self.rendered = None
+        self.is_secret = None
 
     def initialize(self, account, field_name=None, field_key=None):
         self.account = account
 
     def __str__(self):
+        if self.rendered is not None:
+            return self.rendered
         regex = re.compile(r'({[\w. ]+})')
         out = []
         self.is_secret = False
@@ -182,7 +185,8 @@ class Script:
                         self.is_secret = True
             else:
                 out.append(term)
-        return ''.join(out)
+        self.rendered = ''.join(out)
+        return self.rendered
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.script)
@@ -552,6 +556,9 @@ class Account(object):
     @classmethod
     def is_secret(cls, name, key=None):
         value = cls.__dict__.get(name)
+        if isinstance(value, Script):
+            str(value)  # side effect of convert to string is computing is_secret
+            return value.is_secret
         if key is None:
             return isinstance(value, (GeneratedSecret, ObscuredSecret))
         else:
