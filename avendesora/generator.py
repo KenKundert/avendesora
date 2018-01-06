@@ -292,7 +292,6 @@ class PasswordGenerator(object):
 
         if not matches:
             msg = 'cannot find appropriate account.'
-            notify(msg)
             raise PasswordError(msg)
         if len(matches) > 1:
             choice = show_list_dialog('Choose Secret', sorted(matches.keys()))
