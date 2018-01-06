@@ -213,38 +213,50 @@ This is a program that generates messages for a person's children and business
 partners. It is assumed that these messages would be placed into a safe place to 
 be found and read upon the person's death.
 
-It examines all accounts looking for a special field, *postmortem_recipient*. If 
-the field exists, then that account is included in the file of accounts sent to 
-that recipient.  The generated files are encrypted so that only the intended 
+It examines all accounts looking for a special field, *postmortem_recipients*.  
+If the field exists, then that account is included in the file of accounts sent 
+to that recipient.  The generated files are encrypted so that only the intended 
 recipients can read them.
 
 .. code-block:: python
 
-    #!/bin/env python3
+    #!/usr/bin/env python3
 
-    from avendesora import PasswordGenerator
-    from inform import done, Error, indent, os_error, terminate
+    from avendesora import PasswordGenerator, PasswordError
+    from inform import Error, display, indent, os_error, terminate, warn
     import gnupg
 
     recipients = dict(
-        kids='dominique@chappell.name lonny@chappell.name tabatha@chappell.name',
-        partners='dominique@chappell.name  lynna.titus625@gmail.com',
+        kids='galad@trakand.name gawyn@trakand.name elayne@trakand.name',
+        partners='taringail.damodred@andor.gov',
     )
 
     try:
         pw = PasswordGenerator()
+        accounts = {}
 
-        for recipient, idents in recipients.items():
-            # extract account information
-            accounts = []
-            for account in pw.all_accounts():
-                if recipient == account.get_scalar('postmortem_recipient', default=None):
+        # scan accounts and gather information for recipients
+        for account in pw.all_accounts():
+
+            # summarize account values
+            value = account.get_scalar('estimated_value', default=None)
+            postmortem_recipients = account.get_scalar('postmortem_recipients', default=None)
+            if value and postmortem_recipients:
+                display(f'{account.get_name()}: {value}')
+            elif value:
+                warn(f'{account.get_name()}: no recipients.')
+            elif not postmortem_recipients:
+                continue
+
+            # gather information for recipients
+            for recipient in recipients:
+                if recipient in postmortem_recipients:
                     account_name = account.get_name()
                     description = account.get_scalar('desc', None, account_name)
                     lines = [description, len(description)*'=']
 
                     for name, keys in account.get_fields():
-                        if name == 'postmortem_recipient':
+                        if name == 'postmortem_recipients':
                             continue
                         if keys:
                             lines.append(name + ':')
@@ -255,24 +267,34 @@ recipients can read them.
                         else:
                             value = account.get_value(name)
                             lines += value.render('{n}: {v}').split('\n')
-                    accounts.append('\n'.join(lines))
+                    if recipient not in accounts:
+                        recipient_accounts = []
+                        accounts[recipient] = recipient_accounts
+                    recipient_accounts.append('\n'.join(lines))
 
-            # write GPG file containing accounts
-            gpg = gnupg.GPG(gpgbinary='gpg2')
-            encrypted = gpg.encrypt('\n\n\n'.join(accounts), idents.split())
-            if not encrypted.ok:
-                raise Error(
-                    'unable to encrypt:', encrypted.stderr, culprit=recipient
-                )
-            try:
-                filename = recipient + '.gpg'
-                with open(filename, 'w') as file:
-                    file.write(str(encrypted))
-                narrate("created.", culprit=filename)
-            except OSError as e:
-                raise Error(os_error(e))
+
+        # generate encrypted files than contain about accounts for each recipient
+        gpg = gnupg.GPG(gpgbinary='gpg2')
+        for recipient, idents in recipients.items():
+            if recipient in accounts:
+                content = accounts[recipient]
+                num_accounts = len(content)
+                encrypted = gpg.encrypt('\n\n\n'.join(content), idents.split())
+                if not encrypted.ok:
+                    raise Error(
+                        'unable to encrypt:', encrypted.stderr, culprit=recipient
+                    )
+                try:
+                    filename = recipient + '.gpg'
+                    with open(filename, 'w') as file:
+                        file.write(str(encrypted))
+                    display(f'contains {num_accounts} accounts.', culprit=filename)
+                except OSError as e:
+                    raise Error(os_error(e))
+            else:
+                warn('no accounts found.', culprit=recipient)
 
     except KeyboardInterrupt:
-        terminate('Killed by user')
-    except Error as e:
+        terminate('Killed by user.')
+    except (PasswordError, Error) as e:
         e.terminate()
