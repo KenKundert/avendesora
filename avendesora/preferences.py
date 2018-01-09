@@ -61,10 +61,11 @@ CONFIG_DEFAULTS = {
     'label_color': 'blue',
     'color_scheme': 'dark',
     'browsers': {
-        'f':  'firefox -new-tab {url}',
-        'fp':  'firefox -private-window {url}',
         'c':  'google-chrome {url}',
         'ci': 'google-chrome --incognito {url}',
+        'f':  'firefox -new-tab {url}',
+        'fp':  'firefox -private-window {url}',
+        'q':  'qutebrowser {url}',
         't':  'torbrowser {url}',
         'x':  'xdg-open {url}', # system default browser
     },

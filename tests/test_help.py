@@ -145,6 +145,7 @@ def test_browse():
             ci     google-chrome --incognito {url}
             f      firefox -new-tab {url}
             fp     firefox -private-window {url}
+            q      qutebrowser {url}
             t      torbrowser {url}
             x      xdg-open {url}
 

@@ -87,7 +87,11 @@ patterns:
 .. index::
     single: RecognizeURL
 
-If you use Firefox, you can install the `Add URL to Window Title 
+However, in general, it is better to match the URL. This can be done in Firefox 
+and Chrome by adding extensions that place the URL in the window title and then 
+using :class:`avendesora.RecognizeURL` to do the recognition.
+
+If you use Firefox, you should install the `Add URL to Window Title 
 <https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title>`_
 extension.  It is a plugin that makes discovery easier and more
 robust by adding the URL to the title.  For *Chrome* the appropriate
@@ -106,6 +110,13 @@ the following options:
 For *URL in Title*, set::
 
     tab title format = '{title} - {protocol}://{hostname}{port}/{path}'
+
+If you use `qutebrowser <https://qutebrowser.org>`_ as your browser, you should 
+add the following to your ~/.config/qutebrowser/config.py file:
+
+.. code-block:: python
+
+    c.window.title_format = '{title} - {current_url} - qutebrowser'
 
 :class:`avendesora.RecognizeURL` is designed to recognize such titles. Once you 
 have
