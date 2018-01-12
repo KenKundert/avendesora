@@ -14,7 +14,7 @@
 
 from avendesora import (
     # Basics
-    Account, Hidden, GPG,
+    Account, Hidden, GPG, Script,
 
     # Character sets
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
@@ -44,7 +44,7 @@ class AlertSCC(Account):
     email = 'pizzaman@pizza.com'
     comments = '''
         Account where I signed up for local alert messages from the county 
-        covernment.
+        government.
     '''
     master = ken
     default  = 'email is {email}, password is {password}'
@@ -112,8 +112,19 @@ class MyBank(Account):
         'savings':    Hidden('MjM0NTY3ODk='),
         'creditcard': Hidden('MzQ1Njc4OTA='),
     }
+    checking=Script('{accounts.checking}')
     customer_service = '1-866-229-6633'
     otp = OTP('JBSWY3DPEHPK3PXP')
+    discovery = RecognizeTitle(
+        'easy peasy',
+        script='lemon squeezy'
+    )
+
+# Margaritaville {{{1
+class Margaritaville(Account):
+    email = 'pizzaman@pizza.com'
+    urls = 'https://www.margaritaville.com'
+    passcode = Password()
 
 # Include a few unicode characters, but to make sure they work: ±αβγδε
 # vim: filetype=python sw=4 sts=4 et ai ff=unix :

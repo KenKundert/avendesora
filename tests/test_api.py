@@ -1,5 +1,7 @@
+from textwrap import dedent
 import pytest
 import os
+from inform import Inform
 
 # set various environment variables so avendesora uses local gpg key and config
 # directory rather than the users.
@@ -37,6 +39,15 @@ def test_mybank_accounts_checking2():
         pw = PasswordGenerator()
         account = pw.get_account('mybank')
         checking = account.get_scalar('accounts', 'checking')
+    except PasswordError as err:
+        checking = str(err)
+    assert str(checking) == '12345678'
+
+def test_mybank_accounts_checking3():
+    try:
+        pw = PasswordGenerator()
+        account = pw.get_account('mybank')
+        checking = account.get_scalar('checking')
     except PasswordError as err:
         checking = str(err)
     assert str(checking) == '12345678'
@@ -132,3 +143,81 @@ def test_alertscc_questions():
     except PasswordError as err:
         assert str(err) == None
 
+def test_unknown_account():
+    try:
+        pw = PasswordGenerator()
+        account = pw.get_account('alertsdd')
+    except PasswordError as err:
+        assert str(err) == 'alertsdd: account not found, did you mean:\n    alertscc (scc)?'
+
+def test_search_accounts():
+    try:
+        pw = PasswordGenerator()
+        matches = set()
+        for acct in pw.search_accounts('my'):
+            matches.add(acct.get_name())
+        assert ' '.join(matches) == 'mybank'
+    except PasswordError as err:
+        assert str(err) == None
+
+def test_find_accounts():
+    try:
+        pw = PasswordGenerator()
+        matches = set()
+        for acct in pw.find_accounts('my'):
+            matches.add(acct.get_name())
+        assert ' '.join(matches) == 'mybank'
+    except PasswordError as err:
+        assert str(err) == None
+
+def test_recognize1():
+    try:
+        pw = PasswordGenerator()
+        name, script = pw.discover_account(title='easy peasy')
+        assert name == 'mybank'
+        assert script == 'lemon squeezy'
+    except PasswordError as err:
+        assert str(err) == None
+
+def test_recognize2():
+    try:
+        pw = PasswordGenerator()
+        name, script = pw.discover_account(title='Margaritaville - https://www.margaritaville.com/home - Firefox')
+        assert name == 'margaritaville'
+        assert script == True
+    except PasswordError as err:
+        assert str(err) == None
+
+def test_summary(capsys):
+    try:
+        with Inform(prog_name=False):
+            pw = PasswordGenerator()
+            account = pw.get_account('mybank')
+            stdout, stderr = capsys.readouterr()
+            assert stdout == ''
+            assert stderr == ''
+            account.write_summary()
+            stdout, stderr = capsys.readouterr()
+            assert stderr == ''
+            assert stdout == dedent('''
+                names: mybank, mb
+                accounts:
+                    checking: <reveal with 'avendesora value mybank accounts.checking'>
+                    creditcard: <reveal with 'avendesora value mybank accounts.creditcard'>
+                    savings: <reveal with 'avendesora value mybank accounts.savings'>
+                checking: <{accounts.checking}>
+                customer service: 1-866-229-6633
+                email: pizzaman@pizza.com
+                otp: <reveal with 'avendesora value mybank otp'>
+                passcode: <reveal with 'avendesora value mybank passcode'>
+                pin: <reveal with 'avendesora value mybank pin'>
+                questions:
+                    0: What city were you born in? <reveal with 'avendesora value mybank questions.0'>
+                    1: What street did you grow up on? <reveal with 'avendesora value mybank questions.1'>
+                    2: What was your childhood nickname? <reveal with 'avendesora value mybank questions.2'>
+                urls: https://mb.com
+                username: pizzaman
+                verbal: <reveal with 'avendesora value mybank verbal'>
+            ''').lstrip()
+    except PasswordError as err:
+        assert str(err) == None

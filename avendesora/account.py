@@ -36,7 +36,7 @@ from inform import (
 from textwrap import dedent
 try:
     from urllib.parse import urlparse
-except ImportError:
+except ImportError:  # pragma: no cover
     from urlparse import urlparse
 import re
 

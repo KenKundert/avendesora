@@ -131,11 +131,12 @@ You can find the specifics of how to specify or generate your secrets in
 
 Any value that is an instance of the :class:`avendesora.GeneratedSecret` class 
 (:class:`avendesora.Password`, :class:`avendesora.Passphrase`, ...) or the 
-:class:`avendesora.ObscuredSecret` class (:class:`avendesora.Hidden`, 
-:class:`avendesora.GPG`, ...) is considered sensitive.  It is only given out in 
-a controlled manner. For example, running the :ref:`values command <values 
-command>` displays all fields, but the values that are sensitive are replaced by 
-instructions on how to view them. They can only be viewed individually::
+:class:`avendesora.ObscuredSecret` class (:class:`avendesora.Hide`, 
+:class:`avendesora.Hidden`, :class:`avendesora.GPG`, ...) is considered 
+sensitive.  It is only given out in a controlled manner. For example, running 
+the :ref:`values command <values command>` displays all fields, but the values 
+that are sensitive are replaced by instructions on how to view them. They can 
+only be viewed individually::
 
     > avendesora values newyorktimes
     names: newyorktimes, nyt
@@ -200,12 +201,12 @@ field name when generating their value, so if you change the account name or
 field name you will change the value of the secret.  For this reason is it 
 important to choose a good account and field names up front and not change them.  
 It should be very specific to avoid conflicts with similar accounts created 
-later.  For example, rather than choosing Gmail as your account name, you might 
-want to include your username, ex.  GmailThomMerrilin.  This would allow you to 
-create additional gmail accounts later without ambiguity.  Then just add *gmail* 
-as an alias to the account you use most often.
+later.  For example, rather than choosing *Gmail* as your account name, you 
+might want to include your username, ex.  *GmailThomMerrilin*.  This would allow 
+you to create additional gmail accounts later without ambiguity.  Then just add 
+*gmail* as an alias to the account you use most often.
 
-Account and field names are case insensitive. So you can use Gmail or gmail.  
+Account and field names are case insensitive. So you can use *Gmail* or *gmail*.  
 Also, if the account or field names contains an underscore, you can substitute 
-a dash. So if the account name is Gmail_Thom_Merrilin, you can use 
-gmail-thom-merrilin instead.
+a dash. So if the account name is *Gmail_Thom_Merrilin*, you can use 
+*gmail-thom-merrilin* instead.

@@ -8,11 +8,11 @@ from .generator import PasswordGenerator
 from .obscure import Hide, Hidden, GPG
 try:
     from .obscure import Scrypt
-except ImportError:  # no cover
+except ImportError:  # pragma: no cover
     pass
 try:
     from .otp import OTP
-except ImportError:  # no cover
+except ImportError:  # pragma: no cover
     pass
 from .recognize import (
     RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,

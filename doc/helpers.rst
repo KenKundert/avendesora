@@ -3,6 +3,11 @@
 Account Helpers
 ===============
 
+Account helpers are are classes and character sets that are used in your account 
+attributes. They provide advanced capabilities such as holding secrets, 
+generating secrets, and recognizing accounts.
+
+
 Generated Secret Classes
 ------------------------
 
@@ -40,7 +45,21 @@ requested, :exc:`avendesora.SecretExhausted` is raised.
 Character Sets
 --------------
 
-These are useful when constructing generated secrets.
+These are useful when constructing generated secrets. They are used to build the 
+alphabet used by the generator. For example, you can specify that passwords 
+should be constructed from 12 lower case letters and digits with:
+
+.. code-block:: python
+
+    Password(length=12, alphabet=LOWERCASE+DIGITS)
+
+Or here is an example that starts with the alphanumeric and punctuation 
+characters, and removes those that require the shift key to type:
+
+.. code-block:: python
+
+    Password(length=12, alphabet=exclude(ALPHANUMERIC+PUNCTUATION, SHIFTED))
+
 
 .. autofunction:: avendesora.exclude
 

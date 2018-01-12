@@ -155,6 +155,7 @@ def test_summary():
             checking: <reveal with 'avendesora value mybank accounts.checking'>
             creditcard: <reveal with 'avendesora value mybank accounts.creditcard'>
             savings: <reveal with 'avendesora value mybank accounts.savings'>
+        checking: <{accounts.checking}>
         customer service: 1-866-229-6633
         email: pizzaman@pizza.com
         otp: <reveal with 'avendesora value mybank otp'>
@@ -191,6 +192,7 @@ def test_search():
     expected = dedent("""\
         pizza:
             alertscc (scc)
+            margaritaville
             mybank (mb)
     """)
     assert result.decode('utf-8') == expected
