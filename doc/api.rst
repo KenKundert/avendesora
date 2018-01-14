@@ -215,8 +215,11 @@ be found and read upon the person's death.
 
 It examines all accounts looking for a special field, *postmortem_recipients*.  
 If the field exists, then that account is included in the file of accounts sent 
-to that recipient.  The generated files are encrypted so that only the intended 
-recipients can read them.
+to that recipient.  The script also looks for another special field, 
+*estimated_value*. It includes this value in the message and prints the values 
+to the standard output when generating the messages. This gives you a chance to 
+review the values and update them if they are stale. The generated files are 
+encrypted so that only the intended recipients can read them.
 
 .. code-block:: python
 
@@ -298,3 +301,91 @@ recipients can read them.
         terminate('Killed by user.')
     except (PasswordError, Error) as e:
         e.terminate()
+
+
+.. index::
+    single: networth example
+
+.. _networth letter:
+
+Example: Net Worth
+------------------
+
+If you have added *estimated_value* to all of your accounts that hold 
+significant value as proposed in the previous example, then the following script 
+will summarize the values and estimate your net worth:
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    """Networth
+
+    Usage:
+        networth [options]
+
+    Options:
+        -v, --verbose  output actual estimated value text rather than just the value
+    """
+
+    from avendesora import PasswordGenerator, PasswordError
+    from inform import display, terminate
+    from quantiphy import Quantity
+    from docopt import docopt
+    Quantity.set_prefs(prec=2)
+
+
+    cmdline = docopt(__doc__)
+    verbose = cmdline['--verbose']
+
+    try:
+        pw = PasswordGenerator()
+
+        # scan accounts and gather values for appropriate accounts
+        amounts = {}
+        width = 0
+        total = 0
+        for account in pw.all_accounts():
+            text = account.get_scalar('estimated_value', default=None)
+            if text:
+                components = text.split()
+                value = Quantity(components[0])
+                if verbose:
+                    to_output = text
+                else:
+                    to_output = value
+                if value.units in ['$', 'USD']:
+                    total += value
+                else:
+                    to_output = f'{to_output} (not in total)'
+                account_name = account.get_name()
+                width = max(width, len(account_name))
+                amounts[account_name] = to_output
+        total = Quantity(total, "$")
+
+        # display the account values
+        for key, val in amounts.items():
+            display(f'{key:>{width+2}s}: {val}')
+        display(f'{"TOTAL":>{width+2}s}: {total}')
+
+    except KeyboardInterrupt:
+        terminate('Killed by user.')
+    except PasswordError as e:
+        e.terminate()
+
+This script assumes that the account value with units are the first thing in the 
+*estimated_value* string. It is common to combine the estimated value with the 
+date it was last updated. Something like this:
+
+.. code-block:: python
+
+    estimated_value = '$11k in January 2018'
+
+The text before the first whitespace is considered the value, and if it has 
+units of dollars it will be added to the reported total.  Here is a typical 
+output::
+
+         mint: $19k
+   betterment: $22k
+        chase: $12k
+    southwest: 78kmiles (not in total)
+        TOTAL: $53k
