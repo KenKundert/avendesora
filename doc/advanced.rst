@@ -87,6 +87,10 @@ patterns:
 .. index::
     single: RecognizeURL
 
+.. index::
+    single: Firefox
+    single: Chrome
+
 However, in general, it is better to match the URL. This can be done in Firefox 
 and Chrome by adding extensions that place the URL in the window title and then 
 using :class:`avendesora.RecognizeURL` to do the recognition.
@@ -110,6 +114,9 @@ the following options:
 For *URL in Title*, set::
 
     tab title format = '{title} - {protocol}://{hostname}{port}/{path}'
+
+.. index::
+    single: qutebrowser
 
 If you use `qutebrowser <https://qutebrowser.org>`_ as your browser, you should 
 add the following to your ~/.config/qutebrowser/config.py file:
