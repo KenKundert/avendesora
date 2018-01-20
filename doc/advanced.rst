@@ -88,8 +88,9 @@ patterns:
     single: RecognizeURL
 
 .. index::
-    single: Firefox
-    single: Chrome
+    single: Firefox browser
+    single: Chrome browser
+    single: browsers
 
 However, in general, it is better to match the URL. This can be done in Firefox 
 and Chrome by adding extensions that place the URL in the window title and then 
