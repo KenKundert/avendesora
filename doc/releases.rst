@@ -54,4 +54,4 @@ Releases
     | Version: 1.9.7
     | Released: 2018-01-13
 
-    - Added more currency symbols.
+    - Added support for *qutebrowser*.
