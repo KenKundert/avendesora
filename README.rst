@@ -737,5 +737,11 @@ Contributing
 
 Please ask questions or report bugs on `Github Issues 
 <https://github.com/KenKundert/avendesora/issues>`_. I will entertain pull 
-requests if you make improvements. I am particularly interested in help adapting 
-*Avendesora* for other editors, window managers and distributions.
+requests if you make improvements. Currently *Avendesora* is very *Fedora* and 
+*VIM* centric. I am particularly interested in help adapting *Avendesora* in the 
+following ways:
+
+- Support for other editors, window managers and distributions.
+- Support for Windows and OSX.
+- Support for Android and iOS (perhaps through exports to a password manager 
+  that already support smartphones).
