@@ -376,3 +376,49 @@ Now, running the :ref:`credentials command <credentials command>` gives::
 This example shows that the capabilities of the Python language can be used in 
 the accounts files to increase the capabilities of *Avendesora* in unexpected 
 ways.
+
+
+.. index::
+    single: shell command recognition
+
+Recognizing Shell Commands
+--------------------------
+
+Modern shells inform their terminal emulator of the currently running command.  
+Modern terminal emulators then use that information to display the command in 
+the window title. Generally this happens automatically, but if it is not working 
+for you, you may have to manually configure your shell. Generally, you configure 
+the shell by changing the value of the variable that sets the command prompt.
+
+If your window manager is configured to not show window titles, you can still 
+determine the title using *xwininfo*.
+
+If the command does not provide enough information to do the recognition 
+properly for a command you use routinely, you can embed the command in a shell 
+script and use *xdotool* to explicitly set the window title::
+
+    #!/bin/bash
+
+    xdotool getactivewindow set_window --name "Mutt $account"
+    mutt -F ~/.config/mutt/$account
+
+Once you have desired information in the window title, you can use the use 
+:class:`avendesora.RecognizeTitle` to trigger *Avendesora*. For example, you 
+might use the following as the entry for you Linux password:
+
+.. code-block:: python
+
+    class Login(Account):
+        desc = 'Linux login'
+        aliases = 'linux sudo'
+        passcode = Passphrase()
+        discovery = RecognizeTitle(
+            'sudo *',
+            script='{passcode}{return}'
+        )
+
+You cannot use *Avendesora* to login to Linux, however once you have logged in 
+you can use *Avendesora* to deliver your linux password to the sudo command.
+
+An alternative to using *xdotool* to force the window title is to use 
+:class:`avendesora.RecognizeFile` as shown in :ref:`discovery`.
