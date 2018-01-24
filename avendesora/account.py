@@ -563,7 +563,7 @@ class Account(object):
             return isinstance(value, (GeneratedSecret, ObscuredSecret))
         else:
             try:
-                return isinstance(value, (GeneratedSecret, ObscuredSecret))
+                return isinstance(value[key], (GeneratedSecret, ObscuredSecret))
             except (IndexError, KeyError, TypeError):
                 raise PasswordError(
                     'not found.', culprit=cls.combine_field(name, key)

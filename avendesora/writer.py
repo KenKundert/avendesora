@@ -155,15 +155,15 @@ class TTY_Writer(Writer):
         # get string to display
         value, is_secret, name, desc = tuple(account.get_value(field))
         label = '%s (%s)' % (name, desc) if desc else name
+        value = dedent(str(value)).strip()
 
         # indent multiline outputs
         sep = ' '
         if '\n' in value:
             if is_secret:
                 warn('secret contains newlines, will not be fully concealed.')
-            else:
-                value = indent(dedent(value), get_setting('indent')).strip('\n')
-                sep = '\n'
+            value = indent(value, get_setting('indent')).strip('\n')
+            sep = '\n'
 
         if label:
             text = LabelColor(label.replace('_', '-') + ':') + sep + value
@@ -207,6 +207,7 @@ class ClipboardWriter(Writer):
 
         # get string to display
         value, is_secret, name, desc, = tuple(account.get_value(field))
+        value = dedent(str(value)).strip()
 
         # Use 'xsel' to put the information on the clipboard.
         # This represents a vulnerability, if someone were to replace xsel they
@@ -258,9 +259,10 @@ class StdoutWriter(Writer):
     def display_field(self, account, field):
         # get string to display
         value = account.get_value(field)
+        value = dedent(str(value)).strip()
 
         # don't use inform otherwise password shows up in logfile
-        print(str(value))
+        print(value)
         log('writing secret to standard output.')
 
 
@@ -294,9 +296,10 @@ class KeyboardWriter(Writer):
     def display_field(self, account, field):
         # get string to display
         value = account.get_value(field)
+        value = dedent(str(value)).strip()
 
         log('writing secret to keyboard writer.')
-        self._autotype(str(value))
+        self._autotype(value)
 
     def run_script(self, account, script, dryrun):
 
