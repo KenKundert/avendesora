@@ -390,7 +390,7 @@ determine the title using *xwininfo*.
 
 If your shell does not set the window title you can still use the window title 
 to trigger *Avendesora* secrets recognition by explicitly setting the window 
-title using *xdotool*. For example,
+title using *xdotool*. For example::
 
     #!/bin/bash
 
