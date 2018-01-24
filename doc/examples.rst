@@ -119,11 +119,6 @@ your Gmail/Google account entry:
                 script='{passcode}{return}',
                 name='passcode',
             ),
-            RecognizeURL(
-                'https://accounts.google.com/signin/challenge',
-                script='{questions}{return}',
-                name='challenge',
-            ),
         ]
 
 See :ref:`otp` to see how to configure two-factor authentication for Google 
@@ -164,8 +159,8 @@ guest credentials are offered as choices.
         default = 'admin_password'
         networks = ["Occam's Router", "Occam's Router (guest)"]
         network_passwords = [Passphrase(), Passphrase()]
-        privileged = Script('SSID: {networks.0}, password: {network_passwords.0}')
-        guest = Script('SSID: {networks.1}, password: {network_passwords.1}')
+        privileged = Script('SSID: {networks.0}{return}password: {network_passwords.0}')
+        guest = Script('SSID: {networks.1}{return}password: {network_passwords.1}')
         discovery = [
             RecognizeURL(
                 'http://192.168.1.1',
@@ -310,16 +305,16 @@ outputs the credit card information. For example:
 
         ccn = Script('{account}{tab}{cvv}{tab}')
 
-In this case the amount of information is limited to increase the chance that 
-the result will be compatible with a large number of websites.  Then run 
-*Avendesora* from the window manager::
+In this case the amount of information requested is limited to increase the 
+chance that the result will be compatible with a large number of websites.  Then 
+run *Avendesora* from the window manager::
 
     Alt-F2 avendesora citi ccn
 
 Here, Alt-F2 is the hot key Gnome uses to execute a command. This causes 
 *Avendesora* to run the *ccn* script. Since *Avendesora* running from the window 
-manager does not have access to a TTY, it will instead mimic the keyboard to 
-autotype the credit card information, will go to the active window.
+manager does not have access to a TTY it will instead mimic the keyboard and 
+autotype the credit card information into the active window.
 
 
 .. index::
@@ -393,14 +388,16 @@ the shell by changing the value of the variable that sets the command prompt.
 If your window manager is configured to not show window titles, you can still 
 determine the title using *xwininfo*.
 
-If the command does not provide enough information to do the recognition 
-properly for a command you use routinely, you can embed the command in a shell 
-script and use *xdotool* to explicitly set the window title::
+If your shell does not set the window title you can still use the window title 
+to trigger *Avendesora* secrets recognition by explicitly setting the window 
+title using *xdotool*. For example,
 
     #!/bin/bash
 
-    xdotool getactivewindow set_window --name "Mutt $account"
-    mutt -F ~/.config/mutt/$account
+    original_title=`xdotool getactivewindow getwindowname`
+    xdotool getactivewindow set_window --name 'Home email'
+    mutt -F ~/.config/mutt/home
+    xdotool getactivewindow set_window --name "$original_title"
 
 Once you have desired information in the window title, you can use the use 
 :class:`avendesora.RecognizeTitle` to trigger *Avendesora*. For example, you 
@@ -420,5 +417,6 @@ might use the following as the entry for you Linux password:
 You cannot use *Avendesora* to login to Linux, however once you have logged in 
 you can use *Avendesora* to deliver your linux password to the sudo command.
 
-An alternative to using *xdotool* to force the window title is to use 
-:class:`avendesora.RecognizeFile` as shown in :ref:`discovery`.
+An alternative to using window titles is to trigger *Avendesora* secrets 
+recognition is to use :class:`avendesora.RecognizeFile` as shown in 
+:ref:`discovery`.

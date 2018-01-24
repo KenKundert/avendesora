@@ -420,7 +420,7 @@ If you use the :ref:`browse command <browse command>` on an account without
 a *urls* field, *Avendesora* will try to find one in the *discovery* field (it 
 looks for URLs given to an instance of *RecognizeURL*, however it can get 
 complicated if there is more than one instance of *RecognizeURL*. In such cases 
-it is generallybetter to explicitly specify *urls*.
+it is generally better to explicitly specify *urls*.
 
 The *discovery* field is used to recognize that this is the account to use when 
 *Avendesora* is asked to login into the *virginamerica.com* site. Notice that 
