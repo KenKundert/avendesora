@@ -910,10 +910,13 @@ class Account(object):
                     msg = 'key required, choose from {}.'
                 raise PasswordError(msg.format(conjoin(keys)), culprit=key)
             else:
-                raise PasswordError(
-                    'keys are not supported with urls on this account.',
-                    culprit=key
-                )
+                if key:
+                    raise PasswordError(
+                        'keys are not supported with urls on this account.',
+                        culprit=key
+                    )
+                else:
+                    raise PasswordError('no url available.')
 
         # open the url
         if list_urls:

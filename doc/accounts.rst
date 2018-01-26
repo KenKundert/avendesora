@@ -24,13 +24,13 @@ the Python :class:`avendesora.Account` class. For example:
 
 .. code-block:: python
 
-    class NewYorkTimes(Account):
-        aliases = 'nyt'
-        username = 'derrickAsh'
-        email = 'derrickAsh@gmail.com'
+    class ManetherenTimes(Account):
+        aliases = 'times mt'
+        username = 'nynaeve'
+        email = 'nynaeve@gmail.com'
         passcode = PasswordRecipe('12 2u 2d 2s')
         discovery = RecognizeURL(
-            'https://myaccount.nytimes.com',
+            'https://myaccount.manetherentimes.com',
             script='{email}{tab}{passcode}{return}'
         )
 
@@ -45,13 +45,14 @@ seems most appropriate (see :ref:`overview <overview>` and :ref:`add command
 If after configuring your account you feel the need to change it, you can use 
 the :ref:`edit command <edit command>` to do so::
 
-    > avendesora edit nyt
+    > avendesora edit manetherentimes
 
+The account name is case insenstive and can be replaced by one of the aliases.
 Once created, most of the field values can be retrieved simply by asking for 
 them.  For example::
 
-    > avendesora value newyorktimes username
-    username: derrickAsh
+    > avendesora value times username
+    username: nynaeve
 
 In general, values can be strings, arrays, dictionaries, and special Avendesora 
 classes. For example, you could have an array of security questions:
@@ -67,7 +68,7 @@ classes. For example, you could have an array of security questions:
 Then you can request the answer to a particular question using its
 index::
 
-    > avendesora value newyorktimes questions.0
+    > avendesora value times questions.0
     questions.0 (What is your mother's maiden name?): portrayal tentacle fanlight
 
 *questions* is the default array field, so you could have shortened your request 
@@ -80,7 +81,7 @@ A dictionary is often used to hold account numbers:
 
 .. code-block:: python
 
-    class MyBank(Account):
+    class TwoRiversCU(Account):
         accounts = {
             'checking': '1234-56-7890',
             'savings': '0123-45-6789',
@@ -88,7 +89,7 @@ A dictionary is often used to hold account numbers:
 
 You then access its values using::
 
-    > avendesora value mybank accounts.checking
+    > avendesora value tworiverscu accounts.checking
     accounts.checking: 1234-56-7890
 
 You might consider your account numbers as sensitive information. In this case 
@@ -96,7 +97,7 @@ you can hide them with:
 
 .. code-block:: python
 
-    class MyBank(Account):
+    class TwoRiversCU(Account):
         accounts = {
             'checking': Hide('1234-56-7890'),
             'savings': Hide('0123-45-6789'),
@@ -110,7 +111,7 @@ reduce the chance, you can encode the secrets:
 
 .. code-block:: python
 
-    class MyBank(Account):
+    class TwoRiversCU(Account):
         accounts = {
             'checking': Hidden('MTIzNC01Ni03ODkw'),
             'savings': Hidden('MDEyMy00NS02Nzg5'),
@@ -138,11 +139,11 @@ the :ref:`values command <values command>` displays all fields, but the values
 that are sensitive are replaced by instructions on how to view them. They can 
 only be viewed individually::
 
-    > avendesora values newyorktimes
-    names: newyorktimes, nyt
-    email: derrickAsh@gmail.com
-    passcode: <reveal with 'avendesora value newyorktimes passcode'>
-    username: derrickAsh
+    > avendesora values times
+    names: manetherentimes, times, mt
+    email: nynaeve@gmail.com
+    passcode: <reveal with 'avendesora value manetherentimes passcode'>
+    username: nynaeve
 
 The *aliases* and *discovery* fields are not shown because they are considered 
 tool fields (see :ref:`discovery` for more information on discovery).  Other 
@@ -158,7 +159,7 @@ The value of *passcode* is considered sensitive because it is an instance of
 :class:`PasswordRecipe`, which is a subclass of :class:`GeneratedSecret`.  If 
 you wish to see the *passcode*, use::
 
-    > avendesora value nyt
+    > avendesora value mt
     passcode: TZuk8:u7qY8%
 
 This value will be displayed for a minute and is then hidden. If you would like 
@@ -170,25 +171,26 @@ consider an account for your wireless router that contains the following:
 
 .. code-block:: python
 
-    class Router(Account):
+    class TwoRiversInnWifi(Account):
         aliases = 'wifi'
         ssid = {
-            'huron_guests': Passphrase(),
-            'huron_drugs': Passphrase(),
+            'two_rivers_inn_guests': Passphrase(),
+            'two_rivers_inn_private': Passphrase(),
         }
-        guest = Script('SSID: huron_guests, password: {ssid.huron_guests}')
-        privileged = Script('SSID: huron_drugs, password: {ssid.huron_drugs}')
+        guest = Script('SSID: two_rivers_inn_guests{return}password: {ssid.two_rivers_inn_guests}')
+        private = Script('SSID: two_rivers_inn_private{return}password: {ssid.two_rivers_inn_private}')
 
 The *ssid* field is a dictionary that contains the SSID and passphrases for each 
 of the wireless networks provided by the router.  This is a natural and compact 
 representation for this information, but accessing it as a user in this form 
 requires two steps to access the information, one to get the SSID and another to 
-get the passphrase. This issue is addressed by adding the guest and privileged 
-attributes. The guest and privileged attributes are scripts that gives the SSID 
-and interpolate the passphrase. Now both can easily accessed at once with::
+get the passphrase. This issue is addressed by adding the guest and private 
+attributes. The guest and private attributes are scripts that gives the SSID and 
+interpolate the passphrase. Now both can easily accessed at once with::
 
     > avendesora value wifi guest
-    SSID: huron_guests, password: delimit ballcock fibber levitate
+    SSID: two_rivers_inn_guests
+    password: delimit ballcock fibber levitate
 
 Use of *Avendesora* secrets classes (:class:`avendesora.GeneratedSecret` or 
 :class:`avendesora.ObscuredSecret`) is confined to the top two levels of account 
