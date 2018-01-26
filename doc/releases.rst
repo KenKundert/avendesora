@@ -51,7 +51,7 @@ Releases
     - Added 'vc' command as an alias for 'value --clipboard'.
 
 **Latest Development Version**:
-    | Version: 1.9.10
-    | Released: 2018-01-24
+    | Version: 1.9.11
+    | Released: 2018-01-25
 
     - Added support for *qutebrowser*.
