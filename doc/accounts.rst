@@ -171,14 +171,14 @@ consider an account for your wireless router that contains the following:
 
 .. code-block:: python
 
-    class TwoRiversInnWifi(Account):
+    class EmondsFieldInnWifi(Account):
         aliases = 'wifi'
         ssid = {
-            'two_rivers_inn_guests': Passphrase(),
-            'two_rivers_inn_private': Passphrase(),
+            'emonds_field_inn_guests': Passphrase(),
+            'emonds_field_inn_private': Passphrase(),
         }
-        guest = Script('SSID: two_rivers_inn_guests{return}password: {ssid.two_rivers_inn_guests}')
-        private = Script('SSID: two_rivers_inn_private{return}password: {ssid.two_rivers_inn_private}')
+        guest = Script('SSID: emonds_field_inn_guests{return}password: {ssid.emonds_field_inn_guests}')
+        private = Script('SSID: emonds_field_inn_private{return}password: {ssid.emonds_field_inn_private}')
 
 The *ssid* field is a dictionary that contains the SSID and passphrases for each 
 of the wireless networks provided by the router.  This is a natural and compact 
@@ -189,7 +189,7 @@ attributes. The guest and private attributes are scripts that gives the SSID and
 interpolate the passphrase. Now both can easily accessed at once with::
 
     > avendesora value wifi guest
-    SSID: two_rivers_inn_guests
+    SSID: emonds_field_inn_guests
     password: delimit ballcock fibber levitate
 
 Use of *Avendesora* secrets classes (:class:`avendesora.GeneratedSecret` or 
