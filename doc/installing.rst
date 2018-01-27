@@ -80,7 +80,7 @@ initial versions of these files, run::
 
 For example::
 
-    avendesora init -g bob@nurdletech.com
+    avendesora init -g rand@dragon.com
 
 or::
 
@@ -89,7 +89,7 @@ or::
 If you would like to have more than one person access your passwords, you should 
 give GPG IDs for everyone::
 
-    avendesora init -g bob@nurdletech.com,rob@nurdletech.com
+    avendesora init -g rand@dragon.com,lews.therin@dragon.com
 
 After initialization, there should be several files in ~/.config/avendesora. In 
 particular, you should see at least an initial accounts files and a config file.

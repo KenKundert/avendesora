@@ -237,15 +237,14 @@ specifying the desired values in the *config* file (found in
 
 **config_dir_mask** = 0o077:
 
-    An integer that determines if a warning should be printed about the
-    file permissions on the Avendesora configuration directory
-    (~/.config/avendesora) being too loose. A bitwise and operation is
-    performed between this value and the actual file permissions, and if
-    the result is nonzero, a warning is printed.  Set to 0o000 to disable
-    the warning. Set to 0o077 to generate a warning if the configuration
-    directory is readable or writable by the group or others. Set to 0o007
-    to generated a warning if the directory is readable or writable by
-    others.
+    An integer that determines if the permissions of *Avendeosora* configuration 
+    directory (~/.config/avendesora) are too loose. If they are, a warning is 
+    printed.  A bitwise *and* operation is performed between this value and the 
+    actual file permissions, and if the result is nonzero, a warning is printed.  
+    Set to 0o000 to disable the warning. Set to 0o077 to generate a warning if 
+    the configuration directory is readable or writable by the group or others.  
+    Set to 0o007 to generated a warning if the directory is readable or writable 
+    by others.
 
 .. index::
     single: label_color setting
