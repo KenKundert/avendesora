@@ -29,8 +29,8 @@ from .recognize import Recognizer
 from .secrets import GeneratedSecret
 from difflib import get_close_matches
 from inform import (
-    Color, codicil, conjoin, cull, debug, full_stop, is_collection, is_str, log,
-    notify, output, warn, indent,
+    Color, codicil, conjoin, cull, debug, full_stop, is_collection, is_str,
+    join, log, notify, output, warn, indent,
     ddd, ppp, vvv
 )
 from textwrap import dedent
@@ -45,6 +45,11 @@ import re
 VECTOR_PATTERN = re.compile(r'\A(\w+)\[(\w+)\]\Z')
 LabelColor = Color(
     color=get_setting('label_color'),
+    scheme=get_setting('color_scheme'),
+    enable=Color.isTTY()
+)
+HighlightColor = Color(
+    color=get_setting('highlight_color'),
     scheme=get_setting('color_scheme'),
     enable=Color.isTTY()
 )
@@ -814,7 +819,7 @@ class Account(object):
     def write_summary(cls):
         # present all account values that are not explicitly secret to the user
 
-        def fmt_field(key, value='', level=0):
+        def fmt_field(key, value='', level=0, hl=False):
             if '\n' in value:
                 value = indent(dedent(value), get_setting('indent')).strip('\n')
                 sep = '\n'
@@ -822,14 +827,19 @@ class Account(object):
                 sep = ' '
             else:
                 sep = ''
+            if hl:
+                value = HighlightColor(value)
             key = str(key).replace('_', ' ')
             leader = level*get_setting('indent')
             return indent(LabelColor(key + ':') + sep + value, leader)
 
         def reveal(name, key=None):
-            return "<reveal with 'avendesora value %s %s'>" % (
-                cls.get_name(), cls.combine_field(name, key)
-            )
+            return "reveal with {}".format(HighlightColor(join(
+                'avendesora',
+                'value',
+                cls.get_name(),
+                cls.combine_field(name, key)
+            )))
 
         def extract_collection(name, collection):
             lines = [fmt_field(key)]
@@ -848,7 +858,7 @@ class Account(object):
             if is_collection(value):
                 lines += extract_collection(key, value)
             elif hasattr(value, 'script'):
-                lines.append(fmt_field(key, '<%s>' % value.script))
+                lines.append(fmt_field(key, value.script, hl=True))
             elif cls.is_secret(key):
                 lines.append(fmt_field(key, reveal(key)))
             else:

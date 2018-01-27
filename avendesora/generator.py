@@ -295,9 +295,10 @@ class PasswordGenerator(object):
             raise PasswordError(msg)
         if len(matches) > 1:
             choice = show_list_dialog('Choose Secret', sorted(matches.keys()))
-            if choice:
-                log('user selects %s' % choice)
-                return matches[choice]
+            if choice is None:
+                raise PasswordError('user abort.')
+            log('user selects %s' % choice)
+            return matches[choice]
         return matches.popitem()[1]
             # this odd little piece of code returns the value of the one item in
             # the dictionary

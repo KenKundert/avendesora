@@ -256,6 +256,14 @@ specifying the desired values in the *config* file (found in
     Choose from black, red, green, yellow, blue, magenta, cyan, white.
 
 .. index::
+    single: highlight_color setting
+
+**highlight_color** = 'magenta':
+
+    The color of the highlight use by the value and values commands.
+    Choose from black, red, green, yellow, blue, magenta, cyan, white.
+
+.. index::
     single: color_scheme setting
 
 **color_scheme** = 'dark':

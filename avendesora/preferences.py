@@ -59,6 +59,7 @@ CONFIG_DEFAULTS = {
     'credential_ids': 'username email',
     'credential_secrets': 'passcode password passphrase',
     'label_color': 'blue',
+    'highlight_color': 'magenta',
     'color_scheme': 'dark',
     'browsers': {
         'c':  'google-chrome {url}',
@@ -322,6 +323,10 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
 
     label_color = {label_color}
         # The color of the label use by the value and values commands.
+        # Choose from black, red, green, yellow, blue, magenta, cyan, white.
+
+    highlight_color = {highlight_color}
+        # The color of the highlight use by the value and values commands.
         # Choose from black, red, green, yellow, blue, magenta, cyan, white.
 
     color_scheme = {color_scheme}

@@ -356,6 +356,8 @@ class KeyboardWriter(Writer):
                                     'Choose from %s' % name,
                                     sorted(choices.keys())
                                 )
+                                if choice is None:
+                                    raise PasswordError('user abort.')
                             key = choices[choice]
                             value = account.get_scalar(name, key)
                         else:
