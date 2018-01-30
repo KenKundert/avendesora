@@ -237,7 +237,7 @@ specifying the desired values in the *config* file (found in
 
 **config_dir_mask** = 0o077:
 
-    An integer that determines if the permissions of *Avendeosora* configuration 
+    An integer that determines if the permissions of *Avendesora* configuration 
     directory (~/.config/avendesora) are too loose. If they are, a warning is 
     printed.  A bitwise *and* operation is performed between this value and the 
     actual file permissions, and if the result is nonzero, a warning is printed.  

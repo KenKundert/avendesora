@@ -7,6 +7,8 @@ tests/home/gnupg/random_seed
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+.*.swp
+.*.swo
 
 # C extensions
 *.so

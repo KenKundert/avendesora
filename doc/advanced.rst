@@ -386,6 +386,88 @@ from casual observation.
 
 
 .. index::
+    single: browse
+
+.. _browse:
+
+Opening Accounts in your Browser
+--------------------------------
+
+*Avendesora* provides the :ref:`browse command <browse command>` to allow you to 
+easily. To do so, it needs two things: a URL and a browser.
+
+Selecting the URL
+"""""""""""""""""
+
+*Avendesora* looks for URLs in the *urls* and *discovery* account attributes, 
+with *urls* being preferred if both exist.  *urls* may either be a string, 
+a list, or a dictionary. If it is a string, it is split at white spaces to make 
+it a list.  If *urls* is a list, the URLs are considered unnamed and the first 
+one given is used. If it a dictionary, the URLs are named.  When named, you may 
+specify the URL you wish to use by specifying the name to the *browse* command.  
+For example, consider a *urls* attribute that looks like this:
+
+.. code-block:: python
+
+    class Dragon(Account):
+        username = 'rand'
+        passcode = Passphrase()
+        urls = dict(
+            email = 'https://webmail.dragon.com',
+            vpn = 'https://vpn.dragon.com',
+        )
+        default_url = 'email'
+
+You would access *vpn* with::
+
+    avendesora browse dragon vpn
+
+By specifying *default_url* you indicate which URL is desired when you do not 
+explicitly specify which you want on the *browse* command. In this way, you can 
+access your email with either of the following::
+
+    avendesora browse dragon email
+    avendesora browse dragon
+
+If *urls* is not given, *Avendesora* looks for URLs in 
+:class:`avendesora.RecognizeURL` members in the *discovery* attribute.  If the 
+*name* argument is provided to :class:`avendesora.RecognizeURL`, it is treated 
+as a named URL, otherwise it is treated as an unnamed URL.
+
+If named URLs are found in both *urls* and *discovery* they are all available to 
+*browse* command, with those given in *urls* being preferred when the same name 
+is found in both attributes.
+
+Selecting the Browser
+"""""""""""""""""""""
+
+You can configure browsers for use by *Avendesora* using the *browsers* setting.  
+By default, *browsers* contains the following:
+
+.. code-block:: python
+
+    browsers = dict(
+        f = 'firefox -new-tab {url}',
+        fp = 'firefox -private-window {url}',
+        c = 'google-chrome {url}',
+        ci = 'google-chrome --incognito {url}',
+        q =  'qutebrowser {url}',
+        t = 'torbrowser {url}',
+        x = 'xdg-open {url}',
+    )
+
+Each entry pairs a key with a command. The command will be run with *{url}* 
+replaced by the selected URL when the browser is selected. You can choose which 
+browser is used by specifying the *--browser* command line option on the 
+*browse* command, by adding the *browser* attribute to the account, or by 
+specifying the *default_browser* setting in the :ref:`config file 
+<configuring>`.  If more than one is specified, the command line option 
+dominates over the account attribute, which dominates over the setting.  By 
+default, the default browser is *x*, which uses the default browser for your 
+account.
+
+
+.. index::
     single: OTP
     single: Google Authenticator
     single: Authy
