@@ -394,7 +394,8 @@ Opening Accounts in your Browser
 --------------------------------
 
 *Avendesora* provides the :ref:`browse command <browse command>` to allow you to 
-easily. To do so, it needs two things: a URL and a browser.
+easily open the website for your account in your browser. To do so, it needs two 
+things: a URL and a browser.
 
 Selecting the URL
 """""""""""""""""
