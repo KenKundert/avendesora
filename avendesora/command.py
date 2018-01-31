@@ -916,7 +916,7 @@ class Initialize(Command):
 # Log {{{1
 class Log(Command):
     NAMES = 'log',
-    DESCRIPTION = 'show the logfile'
+    DESCRIPTION = 'open the logfile'
     USAGE = dedent("""
         Usage:
             avendesora log

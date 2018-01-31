@@ -487,7 +487,7 @@ def test_log():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Show the logfile.
+        Open the logfile.
 
         Usage:
             avendesora log
@@ -2213,4 +2213,43 @@ def test_stealth():
         master seeds that you can share with your associates.
     """).strip()
     assert result.decode('utf-8') == expected
+
+# test_urls() {{{1
+def test_urls():
+    # these tests are important because the documentation and the program may
+    # have different ideas on what the URL for this help topics is.
+    import requests
+    from avendesora.command import Command
+    from avendesora.help import HelpMessage
+    base_url = 'https://avendesora.readthedocs.io/en/latest'
+
+    def url_exists(url):
+        anchor = url.split('#')[-1] if '#' in url else None
+
+        # I have no idea why sphinx decides to use the target rather than the title 
+        # for the anchor for the identity command, but here is a workaround.
+        exceptions = {
+            'identity-generate-an-identifying-response-to-a-challenge':
+                'identity-command',
+        }
+        anchor = exceptions.get(anchor, anchor)
+
+        try:
+            r = requests.get(url)
+            if r.status_code != 200:
+                return False
+            if anchor and 'href="#{anchor}"'.format(anchor=anchor) in r.text:
+                return True
+            return not anchor
+        except:
+            return False
+
+    for cmd in Command.commands():
+        path = cmd.get_help_url()
+        url = base_url + path
+        assert url_exists(url), url
+    for topic in HelpMessage.topics():
+        path = topic.URL
+        url = base_url + path
+        assert url_exists(url), url
 
