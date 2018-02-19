@@ -50,8 +50,10 @@ Releases
     - Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
     - Added 'vc' command as an alias for 'value --clipboard'.
 
+**1.10 (2018-02-18)**:
+    - Added support for *qutebrowser*.
+
 **Latest Development Version**:
     | Version: 1.9.13
     | Released: 2018-01-30
 
-    - Added support for *qutebrowser*.
