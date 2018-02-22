@@ -28,5 +28,5 @@ from .secrets import (
 # otherwise
 from . import command
 
-__version__ = '1.10.0'
-__released__ = '2018-02-18'
+__version__ = '1.10.1'
+__released__ = '2018-02-21'
