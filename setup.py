@@ -12,7 +12,7 @@ setup(
     author_email = 'avendesora@nurdletech.com',
     description = 'A password generator and account manager.',
     long_description = readme,
-    url = 'http://nurdletech.com/linux-utilities/avendesora',
+    url = 'https://avendesora.readthedocs.io',
     download_url = 'https://github.com/kenkundert/avendesora/tarball/master',
     license = 'GPLv3+',
     packages = 'avendesora'.split(),

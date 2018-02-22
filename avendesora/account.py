@@ -834,7 +834,7 @@ class Account(object):
             return indent(LabelColor(key + ':') + sep + value, leader)
 
         def reveal(name, key=None):
-            return "reveal with {}".format(HighlightColor(join(
+            return "reveal with: {}".format(HighlightColor(join(
                 'avendesora',
                 'value',
                 cls.get_name(),
@@ -907,12 +907,14 @@ class Account(object):
         urls.update(primary_urls)
 
         # select the urls
+        keys = cull(list(urls.keys()))
+        if not key and keys and len(keys) == 1:
+            key = keys[0]
         if not key:
             key = getattr(cls, 'default_url', None)
         try:
             urls = urls[key]
         except KeyError:
-            keys = cull(list(urls.keys()))
             if keys:
                 if key:
                     msg = 'unknown key, choose from {}.'
