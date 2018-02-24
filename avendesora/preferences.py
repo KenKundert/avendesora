@@ -450,13 +450,14 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         BirthDate, OTP,
 
         # Account Discovery
-        RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
-        RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
+        RecognizeAll, RecognizeAny, RecognizeCWD, RecognizeEnvVar,
+        RecognizeFile, RecognizeHost, RecognizeNetwork, RecognizeTitle,
+        RecognizeURL, RecognizeUser,
     )
     try:
-        # You need to install scrypt using 'pip install scrypt' to use Scrypt
         import Scrypt
     except ImportError:
+        # You need to install scrypt using 'pip install scrypt' to use Scrypt
         pass
 
     # Shared Values {section}

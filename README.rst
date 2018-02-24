@@ -19,6 +19,10 @@ Avendesora Collaborative Password Manager
     .. image:: https://img.shields.io/pypi/dm/avendesora.svg
         :target: https://pypi.python.org/pypi/avendesora/
 
+.. image:: https://requires.io/github/KenKundert/avendesora/requirements.svg?branch=master
+     :target: https://requires.io/github/KenKundert/avendesora/requirements/?branch=master
+     :alt: Requirements Status
+
 | Version: 1.10.1
 | Released: 2018-02-21
 |
