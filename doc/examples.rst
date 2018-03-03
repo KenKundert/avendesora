@@ -87,24 +87,36 @@ case you would save the answer with the question as follows:
 .. index::
     single: google
     single: gmail
+    single: amazon
+    single: two page authentication
 
-Google and Gmail
-----------------
+Two Page Authentication
+-----------------------
 
-Google always seems to keep futzing with there security protocols in order to 
-make them more secure, but at the same time also seem to make them more 
-annoying. As such, I have gone through several approaches to making the Google 
-login work with *Avendesora*. The latest, as of 2017, is shown below. Google 
-uses a different page when requesting your username or email, your passcode, and 
-the answer to your challenge questions. So the current approach is to simply 
-recognize each of those pages individually.  You can use something like this for 
-your Gmail/Google account entry:
+A new trend in recent years is websites that use two-page authentication.  This 
+is where you enter your user name or email on one page, you then submit it and 
+get another page that you use to enter your password, which requires a second 
+submission.  Google moved to two-page authentication some time ago, and now 
+Amazon seems to be switching as well.  Originally this was intended as an 
+anti-phishing strategy.  After entering your user name you are shown a site 
+image and phrase that you can use to confirm that you are logging in to the 
+correct site.  This is unnecessary when using *RecognizeURL* because it will 
+only enter your user name and password if the URL is correct. Recently however, 
+sites have dispensed with the site image and phrase, but still spread the login 
+in process over two pages. It is not clear why they do this. There does not seem 
+to be any security benefit. In fact it acts to reduce security by making it more 
+difficult to use a password manager.  Unfortunately this is all to common.  
+Companies talk a good game when it comes to security, but all to often employ 
+practices that are antithetical to good security.
+
+There are two approaches to handling two-page authentication in *Avendesora*.  
+The first would be to split the account discovery into two steps. For example:
 
 .. code-block:: python
 
     class Gmail(Account):
-        aliases = 'gmail google'
-        username = 'matrim'
+        aliases = 'email'
+        username = 'matrim.cauthon'
         passcode = Passphrase()
         urls = 'https://accounts.google.com/signin/v2/identifier'
         discovery = [
@@ -116,14 +128,66 @@ your Gmail/Google account entry:
             ),
             RecognizeURL(
                 'https://accounts.google.com/signin/v2/sl/pwd',
-                script='{passcode}{return}',
+                script='{passphrase}{return}',
                 name='passcode',
             ),
         ]
 
-See :ref:`otp` to see how to configure two-factor authentication for Google 
-accounts.
+Notice that there are two instances of *RecognizeURL*, both looking for 
+different URLs. You would trigger *Avendesora* to enter the user name, then 
+trigger it again to enter the passcode. This is the best case situation in that 
+the URLs for each page are distinct.  However, some sites make it difficult to 
+distinguish what is being asked for just by looking at the URL.  Amazon is one 
+of those:
 
+.. code-block:: python
+
+    class Amazon(Account):
+        email = 'matrim@tworivers.com'
+        passcode = Passphrase()
+        discovery = [
+            RecognizeURL(
+                'https://www.amazon.com/ap/signin',
+                script = '{email}{return}',
+                name = 'email',
+            ),
+            RecognizeURL(
+                'https://www.amazon.com/ap/signin',
+                script = '{passcode}{return}',
+                name = 'passcode',
+            ),
+        ]
+
+Notice that the URL is the same for both recognizers, which causes *Avendesora* 
+to ask you which you want each time you request either.  A variation on this is 
+to have different URLs for each page, but one URL is a subset of the other. For 
+example, 'andorsavings.com/signin' and 'andorsavings.com/signin/pwd'.  By 
+default *Avendesora* will offer both when it comes time to enter the password, 
+but adding 'exact_path=True' to the username recognizer causes *Avendesora* to 
+be more selective.
+
+The second approach is use just one recognizer that outputs both the user name 
+and password, but to add a delay between them. For example:
+
+.. code-block:: python
+
+    class Amazon(Account):
+        email = 'amazon@shalmirane.com'
+        passcode = Passphrase()
+        discovery = [
+            RecognizeURL(
+                'https://www.amazon.com/ap/signin',
+                script = '{email}{return}{sleep 2}{passcode}{return}',
+                name = 'both',
+            ),
+        ]
+
+In this way you would only need to trigger *Avendesora* once.
+You might have to adjust the sleep time to be able to log in reliably.
+
+
+.. index::
+    single: wireless router
 
 Wireless Router
 ---------------
