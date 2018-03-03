@@ -54,6 +54,6 @@ Releases
     - Added support for *qutebrowser*.
 
 **Latest Development Version**:
-    | Version: 1.10.1
-    | Released: 2018-02-21
+    | Version: 1.10.2
+    | Released: 2018-03-02
 

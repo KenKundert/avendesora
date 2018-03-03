@@ -23,8 +23,8 @@ Avendesora Collaborative Password Manager
      :target: https://requires.io/github/KenKundert/avendesora/requirements/?branch=master
      :alt: Requirements Status
 
-| Version: 1.10.1
-| Released: 2018-02-21
+| Version: 1.10.2
+| Released: 2018-03-02
 |
 
 Avendesora replaces the Abraxas, which are both alternatives to the traditional 
