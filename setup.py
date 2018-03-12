@@ -53,6 +53,7 @@ setup(
     ],
     setup_requires = 'pytest-runner>=2.0'.split(),
     tests_require = 'pytest pexpect'.split(),
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*',
     keywords = 'avendesora password XKCD'.split(),
     classifiers = [
         'Development Status :: 5 - Production/Stable',

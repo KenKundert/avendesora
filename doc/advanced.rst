@@ -825,9 +825,9 @@ the company rather than your partner.  To share accounts with Moiraine,
 you start by getting Moiraine's public GPG key.  Then, create the new
 accounts file with something like::
 
-    avendesora new -g siuan@AesSedai.com,moiraine@AesSedai.com aesSedai.gpg
+    avendesora new -g siuan@aessedai.com,moiraine@aessedai.com aessedai.gpg
 
-This generates a new accounts file, ~/.config/avendesora/AesSedai.gpg,
+This generates a new accounts file, ~/.config/avendesora/aessedai.gpg,
 and encrypts it so only you and Moiraine can open it.  Mail this file to
 Moiraine. Since it is encrypted, it is to safe to send the file through
 email.  Even though Elaida can read this message, the accounts file is
@@ -874,7 +874,7 @@ based on the current time and date.
 If you have a remote partner to whom you wish to prove your
 identity, have that partner use *Avendesora* to generate a challenge
 and a response based on your shared secret. Then the remote partner
-provides you with the challenge and you run avendesora with that
+provides you with the challenge and you run *Avendesora* with that
 challenge to generate the same response, which you provide to your
 remote partner to prove your identity.
 

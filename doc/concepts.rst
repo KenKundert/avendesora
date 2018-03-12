@@ -10,12 +10,16 @@ Generated Secrets
 -----------------
 
 Account secrets can be saved in encrypted form, as with password vaults, or 
-generated from a root secret.  Generated secrets have two important benefits.  
-First, they are produced from a random seed, and so are quite unpredictable.  
-This is important, because the predictability of a passwords can be exploited 
-when cracking passwords.  Second, if the root secret is shared with another 
-trusted party, then you both can generate new shared secrets without passing any 
-further secrets.
+generated from a root secret.  Generated secrets have several important 
+benefits.  First, they are produced from a random seed, and so are quite 
+unpredictable.  This is important, because the predictability of a passwords can 
+be exploited when cracking passwords.  Second, if the root secret is shared with 
+another trusted party, then you both can generate new shared secrets without 
+passing any further secrets.  Furthermore, if you keep a copy of the root 
+secret, say in a safe deposit box, then there is a good chance you can resurrect 
+your secrets if you happen to lose your accounts files.  Finally, with generated 
+secrets, it is possible to have :ref:`stealth secrets <stealth accounts>`, which 
+are secrets for which there is absolutely no evidence.
 
 Secrets are generated from a collection of seeds, one of which must be random 
 with a very high degree of entropy. The random seed is referred to as the 
