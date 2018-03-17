@@ -472,7 +472,7 @@ account.
     single: OTP
     single: Google Authenticator
     single: Authy
-    single: One-Time passwords
+    single: One-time passwords
     single: second factor
     single: 2FA
 
@@ -513,9 +513,28 @@ page, and your one time password on another:
             RecognizeURL(
                 'https://www.andorsavings.com/googleVerify.html',
                 script='{otp}{return}',
-                name='one-time password',
+                name='authentication token',
             ),
         ]
+
+Or, if you are lucky enough that they allow you to enter the OTP on the same 
+page as your username and password, you might have:
+
+.. code-block:: python
+
+    class AndorSavings(Account):
+        email = 'lini.eltring@yahoo.com'
+        passcode = PasswordRecipe('16 2u 2d 2s')
+        otp = OTP('JBSWY3DPEHPK3PXP')
+        credentials = 'email passcode otp'
+        discovery = RecognizeURL(
+            'https://www.andorsavings.com/login.html',
+            script='{email}{tab}{passcode}{tab}{otp}{return}',
+            name='email, passcode and authentication token',
+        )
+
+In this case, you only need one recognizer and specifying *urls* is no longer 
+necessary because you only have one URL in the account.
 
 This account adds a one time password as *otp*. It adds a *credentials* field 
 that adds the one-time password to the output of the :ref:`credentials command 
