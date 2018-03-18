@@ -298,9 +298,6 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         # contains the command that invokes the browser. The value may contain
         # {{url}}, which is replaced by the URL to open.
 
-    help_url = {help_url}
-        # The base URL for Avendesora's online documentation.
-
     default_browser = {default_browser}
         # The name of the default browser. This name should be one of the keys
         # in the browsers dictionary.
@@ -348,6 +345,9 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         # This is most useful when debugging account discovery, and in that case
         # this setting has largely been superseded by the use of the --title and
         # --verbose command line options.
+
+    help_url = {help_url}
+        # The base URL for Avendesora's online documentation.
 
     # Account templates
     # Use these settings to specify the available account templates that are
