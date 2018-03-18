@@ -34,7 +34,7 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': '0120b695fb247d4993b1595ab087cc15',
     'dict_hash': '11fe5bc734f4a956c37d7cb3da16ab3f',
-    'secrets_hash': 'e038c2a9022b23ac9ceda8645d94816b',
+    'secrets_hash': 'c9355a4e5ee714bc7f5fa51ec1ca0f0c',
     'discard_logfile': False,
     'commonly_mistaken_attributes': {
         'url': 'urls',
@@ -390,22 +390,29 @@ HASH_FILE_INITIAL_CONTENTS = dedent('''\
     # Avendesora Hashes
     # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding={encoding} :
     #
-    # Changing the contents of the dictionary, secrets, or charsets will change
-    # the secrets you generate, thus you do not want to change these files once
-    # you have started using the program. These are hashes for the contents of
-    # these files at the time that this file was created. The program will
-    # complain if the current contents of these files generate a different
-    # hash. Only update these hashes if you know what you are doing.
+    # Changing the contents of the dictionary, secrets, or charsets files can change
+    # the secrets you generate, thus you should be very careful in changing
+    # these files.  These files may change when upgrading the program. Care is
+    # taken to assure than your generated passwords do not change as a result of
+    # an upgrade, but mistakes can be made.  Hashes for the contents of these
+    # files are stored here, and the hashes are checked each time Avendesora is
+    # run.  If you get a message indicating that the hashes have changed, it
+    # does not mean that there is a problem. Rather it indicates that a change
+    # has been made that could conceivably have created a problem and you
+    # should do some checking before continuing to use the program. Once you are
+    # convinced everything is working as expected, you should update these
+    # hashes as needed.
     #
-    # Here is the procedure you should use.
-    # 1. Using the original version of Advendesora, run 'avendesora archive'
-    #    This version should not emit a hash warning.
-    # 2. Update Avendesora
+    # When upgrading the program, here is the procedure you should use.
+    # 1. Before upgrading you should run 'avendesora changed' and examine all
+    #    the differences and make sure they are all expected.
+    # 2. Run 'avendesora archive' to create a clean archive.
+    # 3. Update Avendesora
     #    This version may emit hash warnings.
-    # 3. Run 'avendesora changed'. If no changes are noted, it is okay to update
-    #    the appropriate hashes.
-    # 4. If there are changes, either do not upgrade or manually override the
-    #    changed secrets to return them to their original values.
+    # 4. Run 'avendesora changed'. If no changes are noted, it is okay to update
+    #    the appropriate hashes below.
+    # 5. If there are changes, do not upgrade and report the situation to
+    #    Avendesora's authors.
 
     charsets_hash = {charsets_hash}  # DO NOT CHANGE THIS LINE
     dict_hash     = {dict_hash}  # DO NOT CHANGE THIS LINE

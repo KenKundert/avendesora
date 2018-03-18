@@ -383,6 +383,8 @@ class Password(GeneratedSecret):
             A string added to the front of the generated password.
         suffix (str):
             A string added to the end of the generated password.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.SecretExhausted`:
@@ -409,14 +411,15 @@ class Password(GeneratedSecret):
     # make *sep* a space::
 
     def __init__(self,
-        length=12,
-        alphabet=DISTINGUISHABLE,
-        master=None,
-        version=None,
-        shift_sort=False,
-        sep='',
-        prefix='',
-        suffix='',
+        length = 12,
+        alphabet = DISTINGUISHABLE,
+        master = None,
+        version = None,
+        shift_sort = False,
+        sep = '',
+        prefix = '',
+        suffix = '',
+        is_secret = True,
     ):
         try:
             self.length = int(length)
@@ -432,6 +435,7 @@ class Password(GeneratedSecret):
         self.sep = sep
         self.prefix = prefix
         self.suffix = suffix
+        self.is_secret = is_secret
 
     def render(self):
         if self.secret:
@@ -478,6 +482,8 @@ class Passphrase(Password):
             A string added to the front of the generated password.
         suffix (str):
             A string added to the end of the generated password.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.SecretExhausted`:
@@ -493,13 +499,14 @@ class Passphrase(Password):
 
     """
     def __init__(self,
-        length=4,
-        alphabet=None,
-        master=None,
-        version=None,
-        sep=' ',
-        prefix='',
-        suffix='',
+        length = 4,
+        alphabet = None,
+        master = None,
+        version = None,
+        sep = ' ',
+        prefix = '',
+        suffix = '',
+        is_secret = True,
     ):
         try:
             self.length = int(length)
@@ -514,6 +521,7 @@ class Passphrase(Password):
         self.sep = sep
         self.prefix = prefix
         self.suffix = suffix
+        self.is_secret = is_secret
 
 
 # PIN {{{1
@@ -546,6 +554,8 @@ class PIN(Password):
             A string added to the front of the generated password.
         suffix (str):
             A string added to the end of the generated password.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.SecretExhausted`:
@@ -561,10 +571,11 @@ class PIN(Password):
 
     """
     def __init__(self,
-        length=4,
-        alphabet=DIGITS,
-        master=None,
-        version=None,
+        length = 4,
+        alphabet = DIGITS,
+        master = None,
+        version = None,
+        is_secret = True,
     ):
         try:
             self.length = int(length)
@@ -579,6 +590,7 @@ class PIN(Password):
         self.sep = ''
         self.prefix = ''
         self.suffix = ''
+        self.is_secret = is_secret
 
 
 # Question {{{1
@@ -616,6 +628,8 @@ class Question(Passphrase):
         answer (str):
             The answer. If provided, this would override the generated answer.
             May be a string, or it may be an Obscured object.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.SecretExhausted`:
@@ -643,14 +657,15 @@ class Question(Passphrase):
     # constructor {{{2
     def __init__(self,
         question,
-        length=3,
-        alphabet=None,
-        master=None,
-        version=None,
-        sep=' ',
-        prefix='',
-        suffix='',
-        answer=None,
+        length = 3,
+        alphabet = None,
+        master = None,
+        version = None,
+        sep = ' ',
+        prefix = '',
+        suffix = '',
+        answer = None,
+        is_secret = True,
     ):
         self.question = question
         try:
@@ -666,6 +681,7 @@ class Question(Passphrase):
         self.sep = sep
         self.prefix = prefix
         self.suffix = suffix
+        self.is_secret = is_secret
         if answer:
             # answer allows the user to override the generator and simply
             # specify the answer. This is also used when producing the archive.
@@ -717,6 +733,8 @@ class MixedPassword(GeneratedSecret):
             If true, the characters in the password will be sorted so that the
             characters that require the shift key when typing are placed last.
             This make the password easier to type.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.SecretExhausted`:
@@ -738,9 +756,10 @@ class MixedPassword(GeneratedSecret):
         length,
         def_alphabet,
         requirements,
-        master=None,
-        version=None,
-        shift_sort=False,
+        master = None,
+        version = None,
+        shift_sort = False,
+        is_secret = True,
     ):
         try:
             self.length = int(length)
@@ -753,6 +772,7 @@ class MixedPassword(GeneratedSecret):
         self.master = master
         self.version = version
         self.shift_sort = shift_sort
+        self.is_secret = is_secret
 
     def render(self):
         if self.secret:
@@ -818,6 +838,8 @@ class PasswordRecipe(MixedPassword):
             If true, the characters in the password will be sorted so that the
             characters that require the shift key when typing are placed last.
             This make the password easier to type.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.SecretExhausted`:
@@ -854,10 +876,11 @@ class PasswordRecipe(MixedPassword):
     def __init__(
         self,
         recipe,
-        def_alphabet=ALPHANUMERIC,
-        master=None,
-        version=None,
-        shift_sort=False,
+        def_alphabet = ALPHANUMERIC,
+        master = None,
+        version = None,
+        shift_sort = False,
+        is_secret = True,
     ):
         requirements = []
         try:
@@ -888,6 +911,7 @@ class PasswordRecipe(MixedPassword):
         self.master = master
         self.version = version
         self.shift_sort = shift_sort
+        self.is_secret = is_secret
 
 
 # BirthDate {{{1
@@ -935,6 +959,8 @@ class BirthDate(GeneratedSecret):
         version (str):
             An optional seed. Changing this value will change the generated
             answer.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.SecretExhausted`:
@@ -944,17 +970,19 @@ class BirthDate(GeneratedSecret):
     def __init__(
         self,
         year,
-        min_age=18,
-        max_age=65,
-        fmt='YYYY-MM-DD',
-        master=None,
-        version=None,
+        min_age = 18,
+        max_age = 65,
+        fmt = 'YYYY-MM-DD',
+        master = None,
+        version = None,
+        is_secret = True,
     ):
         self.fmt = fmt
         self.last_year = year-min_age
         self.first_year = year-max_age
         self.master = master
         self.version = version
+        self.is_secret = is_secret
 
     def render(self):
         if self.secret:

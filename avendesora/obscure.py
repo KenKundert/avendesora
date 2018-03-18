@@ -23,7 +23,6 @@
 # Imports {{{1
 from .charsets import DIGITS, DISTINGUISHABLE
 from .config import get_setting, override_setting
-from .dictionary import DICTIONARY
 from .error import PasswordError
 from .gpg import GnuPG
 from .utilities import error_source
@@ -170,6 +169,8 @@ class Hide(ObscuredSecret):
         secure (bool):
             Indicates that this secret is of high value and so should not be
             found in an unencrypted accounts file.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
     """
 
     NAME = 'base64'
@@ -177,8 +178,9 @@ class Hide(ObscuredSecret):
         Marks a value as being secret but the secret is not encoded in any way.
         Generally used in encrypted accounts files or on very low-value secrets.
     '''
-    def __init__(self, plaintext, secure=True):
+    def __init__(self, plaintext, secure=True, is_secret=True):
         self.plaintext = plaintext
+        self.is_secret = is_secret
 
     def initialize(self, account, field_name, field_key=None):
         # we don't need to do anything, but having this method marks this value
@@ -206,6 +208,8 @@ class Hidden(ObscuredSecret):
             found in an unencrypted accounts file.
         encoding (str):
             The encoding to use for the decoded text.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
 
     Raises:
         :exc:`avendesora.PasswordError`: invalid value.
@@ -218,7 +222,7 @@ class Hidden(ObscuredSecret):
         encoded text, but if they are able to capture it they can easily
         decode it.
     '''
-    def __init__(self, encoded_text, secure=True, encoding=None):
+    def __init__(self, encoded_text, secure=True, encoding=None, is_secret=True):
         self.encoded_text = encoded_text
         encoding = encoding if encoding else get_setting('encoding')
         try:
@@ -229,6 +233,7 @@ class Hidden(ObscuredSecret):
                 'invalid value specified to Hidden(): %s.' % str(e),
                 culprit=error_source()
             )
+        self.is_secret = is_secret
 
     def initialize(self, account, field_name, field_key=None):
         # we don't need to do anything, but having this method marks this value

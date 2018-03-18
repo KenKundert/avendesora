@@ -565,10 +565,16 @@ class Account(object):
             str(value)  # side effect of convert to string is computing is_secret
             return value.is_secret
         if key is None:
-            return isinstance(value, (GeneratedSecret, ObscuredSecret))
+            try:
+                return value.is_secret
+            except AttributeError:
+                return isinstance(value, (GeneratedSecret, ObscuredSecret))
         else:
             try:
-                return isinstance(value[key], (GeneratedSecret, ObscuredSecret))
+                try:
+                    return value[key].is_secret
+                except AttributeError:
+                    return isinstance(value[key], (GeneratedSecret, ObscuredSecret))
             except (IndexError, KeyError, TypeError):
                 raise PasswordError(
                     'not found.', culprit=cls.combine_field(name, key)
@@ -819,7 +825,28 @@ class Account(object):
     def write_summary(cls):
         # present all account values that are not explicitly secret to the user
 
-        def fmt_field(key, value='', level=0, hl=False):
+        def fmt_field(name, value='', key=None, level=0):
+            hl = False
+
+            # resolve values
+            if isinstance(value, Script):
+                hl = True
+                value = value.script
+            elif cls.is_secret(name, key):
+                reveal = "reveal with: {}".format(HighlightColor(join(
+                    'avendesora',
+                    'value',
+                    cls.get_name(),
+                    cls.combine_field(name, key)
+                )))
+                value = ' '.join(cull([value.get_description(), reveal]))
+            elif isinstance(value, (GeneratedSecret, ObscuredSecret)):
+                v = cls.get_scalar(name, key)
+                value = ' '.join(cull([value.get_description(), str(v)]))
+            else:
+                value = str(value)
+
+            # format values
             if '\n' in value:
                 value = indent(dedent(value), get_setting('indent')).strip('\n')
                 sep = '\n'
@@ -829,26 +856,12 @@ class Account(object):
                 sep = ''
             if hl:
                 value = HighlightColor(value)
-            key = str(key).replace('_', ' ')
+            name = str(name).replace('_', ' ')
             leader = level*get_setting('indent')
-            return indent(LabelColor(key + ':') + sep + value, leader)
-
-        def reveal(name, key=None):
-            return "reveal with: {}".format(HighlightColor(join(
-                'avendesora',
-                'value',
-                cls.get_name(),
-                cls.combine_field(name, key)
-            )))
-
-        def extract_collection(name, collection):
-            lines = [fmt_field(key)]
-            for k, v in Collection(collection).items():
-                if isinstance(v, (GeneratedSecret, ObscuredSecret)):
-                    # is a secret, get description if available
-                    v = ' '.join(cull([v.get_description(), reveal(name, k)]))
-                lines.append(fmt_field(k, v, level=1))
-            return lines
+            return indent(
+                LabelColor((name if key is None else str(key)) + ':') + sep + value,
+                leader
+            )
 
         # preload list with the names associated with this account
         names = [cls.get_name()] + getattr(cls, 'aliases', [])
@@ -856,13 +869,12 @@ class Account(object):
 
         for key, value in cls.items():
             if is_collection(value):
-                lines += extract_collection(key, value)
-            elif hasattr(value, 'script'):
-                lines.append(fmt_field(key, value.script, hl=True))
-            elif cls.is_secret(key):
-                lines.append(fmt_field(key, reveal(key)))
+                lines.append(fmt_field(key))
+                for k, v in Collection(value).items():
+                    lines.append(fmt_field(key, v, k, level=1))
             else:
                 lines.append(fmt_field(key, value))
+
         output(*lines, sep='\n')
 
     # archive() {{{2

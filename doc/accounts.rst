@@ -145,6 +145,9 @@ only be viewed individually::
     passcode: <reveal with 'avendesora value manetherentimes passcode'>
     username: nynaeve
 
+Notice the passcode is not shown. You can circumvent this protection by adding 
+*is_secret=False* to the argument list of the secret.
+
 The *aliases* and *discovery* fields are not shown because they are considered 
 tool fields (see :ref:`discovery` for more information on discovery).  Other 
 tool fields include *NAME*, *default*, *master*, *browser*, and *default_url*.  
