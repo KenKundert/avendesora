@@ -698,11 +698,19 @@ recognize Gmail:
     discovery = [
         RecognizeURL(
             'https://accounts.google.com/ServiceLogin',
-            script='{username}{return}{sleep 1.5}{passcode}{return}'
+            'https://accounts.google.com/signin/v2/identifier',
+            script='{username}{return}{sleep 2}{passcode}{return}'
+            name='username and passcode',
+        ),
+        RecognizeURL(
+            'https://accounts.google.com/signin/v2/sl/pwd',
+            script='{passcode}{return}',
+            name='passcode',
         ),
         RecognizeURL(
             'https://accounts.google.com/signin/challenge',
             script='{questions.0}{return}'
+            name='challenge',
         ),
     ]
 

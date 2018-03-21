@@ -187,6 +187,23 @@ You might have to adjust the sleep time to be able to log in reliably.
 
 
 .. index::
+    single: Chrome
+
+Chrome
+~~~~~~
+
+The Chrome browser seems to have a bug that can interfere with its use with 
+account discovery. In the two step process used when logging in, the site might 
+pre-fillin your user name so you do not have to enter it explicitly, you just 
+have to click *next*. Chrome then takes you to the page where you are expected 
+to enter your password, however when it does so it does not update the window 
+title to match the new page.  Then Avendesora sees the wrong URL and either 
+enters the wrong thing or does not recognize the page. To work around this bug, 
+you must refresh the page when you land on the password page before activating 
+Avendesora.
+
+
+.. index::
     single: wireless router
 
 Wireless Router

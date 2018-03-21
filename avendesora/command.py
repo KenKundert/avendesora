@@ -340,7 +340,7 @@ class Archive(Command):
             raise PasswordError(os_error(e))
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(warnings=False)
 
         # get dictionary that fully describes the contents of each account
         entries = []
@@ -495,7 +495,7 @@ class Changed(Command):
             )
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(warnings=False)
 
         # determine the account and open the URL
         current_accounts = {}

@@ -64,7 +64,7 @@ class PasswordGenerator(object):
     """
 
     # Constructor {{{2
-    def __init__(self, init=False, gpg_ids=None):
+    def __init__(self, init=False, gpg_ids=None, warnings=True):
         # initialize avendesora (these should already be done if called from 
         # main, but it is safe to call them again)
         read_config()
@@ -100,7 +100,7 @@ class PasswordGenerator(object):
 
         # check for missing or stale archive file
         archive_file = get_setting('archive_file')
-        if archive_file:
+        if archive_file and warnings:
             if archive_file.exists():
                 stale = int(get_setting('archive_stale'))
                 archive_updated = os.path.getmtime(str(archive_file))
