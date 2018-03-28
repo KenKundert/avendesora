@@ -57,3 +57,6 @@ Releases
     | Version: 1.10.3
     | Released: 2018-03-21
 
+    - Added *is_secret* argument to Secret classes
+    - Added support for *dmenu* as alternative to built-in selection utility.
+

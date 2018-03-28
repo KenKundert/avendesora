@@ -28,8 +28,8 @@ from .obscure import ObscuredSecret
 from .utilities import query_user, two_columns
 from .writer import get_writer
 from inform import (
-    codicil, columns, cull, debug, error, full_stop, join, output, warn,
-    conjoin, os_error, is_collection, indent, render, ddd, ppp, vvv
+    codicil, columns, cull, debug, display, error, full_stop, output, warn,
+    conjoin, join, os_error, is_collection, indent, render, ddd, ppp, vvv
 )
 from shlib import chmod, cp, rm, to_path
 from docopt import docopt
@@ -401,10 +401,10 @@ class Browse(Command):
 
             {usage}
 
-            The account is examined for URLS, a URL is chosen, and then that URL
-            is opened in the chosen browser.  First URLS are gathered from the
+            The account is examined for URLs, a URL is chosen, and then that URL
+            is opened in the chosen browser.  First URLs are gathered from the
             'urls' account attribute, which can be a string containing one or
-            more URLS, a list, or a dictionary.  If 'urls' is a dictionary, the
+            more URLs, a list, or a dictionary.  If 'urls' is a dictionary, the
             desired URL can be chosen by entering the key as an argument to the
             browse command. If a key is not given, then the 'default_url'
             account attribute is used to specify the key to use by default. If
@@ -946,7 +946,10 @@ class Log(Command):
 
         # open the logfile
         logfile = get_setting('log_file')
-        GenericEditor.open(logfile)
+        if not logfile.exists():
+            display('Logfile was not found.')
+        else:
+            GenericEditor.open(logfile)
 
 
 # Login Credentials {{{1
@@ -1364,12 +1367,11 @@ class Value(Command):
             writer.display_field(account, cmdline['<field>'])
         else:
             # use discovery to determine account
-            account_name, script = generator.discover_account(
+            script = generator.discover_account(
                 title=cmdline['--title'], verbose=cmdline['--verbose']
             )
-            account = generator.get_account(account_name)
             writer = get_writer(tty=False)
-            writer.run_script(account, script, cmdline['--title'])
+            writer.run_script(script, dryrun=bool(cmdline['--title']))
 
 
 # Values {{{1

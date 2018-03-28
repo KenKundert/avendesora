@@ -18,8 +18,8 @@ entry to your Citibank account as follows::
 
     class CostcoCitiVisa(Account):
         aliases = 'citi costcovisa'
-        username = 'giddy2050'
-        email = 'herbie@telegen.com'
+        username = 'rhuarc'
+        email = 'rhuarc@threefoldland.com'
         account = '1234 5678 8901 2345'
         expiration = '03/2019'
         cvv = '233'

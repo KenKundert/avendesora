@@ -1,4 +1,4 @@
-from .account import Account, StealthAccount, Script, AccountValue
+from .account import Account, StealthAccount
 from .charsets import (
     exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
     HEXDIGITS, PUNCTUATION, SYMBOLS, WHITESPACE, PRINTABLE, DISTINGUISHABLE
@@ -19,6 +19,7 @@ from .recognize import (
     RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
     RecognizeFile
 )
+from .script import Script
 from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
     BirthDate, SecretExhausted

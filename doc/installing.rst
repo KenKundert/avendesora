@@ -24,10 +24,17 @@ more information.  On Redhat systms use::
 
    yum install python3-gobject
 
+Gobject is only used to provide a user-interactive selection utility. However, 
+if you prefer, you can use *dmenu* for your selection utility, in which case you 
+will need to install it by hand using::
+
+   yum install dmenu
+
 If you would like to use scrypt as a way of encrypting fields, you will need to 
 install scrypt by hand using::
 
    pip3 install --user scrypt
+
 
 
 GPG Key

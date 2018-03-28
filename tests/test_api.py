@@ -173,18 +173,18 @@ def test_find_accounts():
 def test_recognize1():
     try:
         pw = PasswordGenerator()
-        name, script = pw.discover_account(title='easy peasy')
-        assert name == 'mybank'
-        assert script == 'lemon squeezy'
+        script = pw.discover_account(title='easy peasy')
+        assert script.account.get_name() == 'mybank'
+        assert repr(script) == "Script('lemon squeezy')"
     except PasswordError as err:
         assert str(err) == None
 
 def test_recognize2():
     try:
         pw = PasswordGenerator()
-        name, script = pw.discover_account(title='Margaritaville - https://www.margaritaville.com/home - Firefox')
-        assert name == 'margaritaville'
-        assert script == True
+        script = pw.discover_account(title='Margaritaville - https://www.margaritaville.com/home - Firefox')
+        assert script.account.get_name() == 'margaritaville'
+        assert repr(script) == "Script('{passcode}{return}')"
     except PasswordError as err:
         assert str(err) == None
 

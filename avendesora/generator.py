@@ -30,11 +30,12 @@ from .preferences import (
     USER_KEY_FILE_INITIAL_CONTENTS, HASH_FILE_INITIAL_CONTENTS,
     STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS, ACCOUNT_LIST_FILE_CONTENTS,
 )
+from .script import Script
 from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_components
 from inform import (
-    codicil, conjoin, debug, error, notify, log, os_error, render, warn,
+    codicil, conjoin, debug, error, notify, log, os_error, render, warn, is_str,
     ddd, ppp, vvv
 )
 from shlib import to_path, mv, rm
@@ -248,14 +249,18 @@ class PasswordGenerator(object):
         return account
 
     # discover_account() {{{2
-    def discover_account(self, title=None, verbose=False):
+    def discover_account(self, url=None, title=None, verbose=False):
         """Discover the account from the environment.
 
-        Examine the environment and return the account that matches. If more
+        Examine the environment and return the script that matches (the script
+        is initialized, and so contains a pointer to the right account). If more
         than one account/secret matches, user is queried to resolve the
         ambiguity.
 
         Args:
+            url (str):
+                Specifying the URL short-circuits the processing of the
+                title that is used to find the URL.
             title (str): Override the window title. This is used for debugging.
             verbose (bool):
                 Run the discovery process in verbose mode (adds more information
@@ -271,7 +276,7 @@ class PasswordGenerator(object):
             verbose = get_setting('verbose')
 
         # get and parse the title
-        data = Title(override=title).get_data()
+        data = Title(url=url, override=title).get_data()
 
         # sweep through accounts to see if any recognize this title data
         matches = {}
@@ -287,7 +292,7 @@ class PasswordGenerator(object):
                 seen.add((name, script))
                 ident = '%s (%s)' % (name, key) if key else name
                 ident = '%s: %s' % (len(matches), ident)  # assure uniqueness
-                matches[ident] = name, script
+                matches[ident] = account, script
                 log('%s matches' % ident)
 
         if not matches:
@@ -298,10 +303,19 @@ class PasswordGenerator(object):
             if choice is None:
                 raise PasswordError('user abort.')
             log('user selects %s' % choice)
-            return matches[choice]
-        return matches.popitem()[1]
-            # this odd little piece of code returns the value of the one item in
-            # the dictionary
+            account, script = matches[choice]
+        else:
+            account, script =  matches.popitem()[1]
+                # this odd little piece of code gives the value of the one item in
+                # the dictionary
+        if script is True:
+            # this bit of trickery gets the name of the default field
+            n, k = account.split_field(None)
+            script = "{%s}{return}" % account.combine_field(n, k)
+        if is_str(script):
+            script = Script(script)
+        script.initialize(account)
+        return script
 
     # all_accounts() {{{2
     def all_accounts(self):

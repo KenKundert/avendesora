@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""
+Avendesora for Qutebrowser
+
+Usage:
+    qute-avendesora
+
+WARNING: passwords end up in qutebrowser log when using this command.
+"""
+# To activate plugin, place this script in 
+# ~/.local/share/qutebrowser/userscripts, make it executable, and then add the 
+# following you your ~/.config/qutebrowser/config.py file:
+
+#  config.bind('<ctrl-a>', 'spawn --userscript qute-avendesora', mode='normal')
+#  config.bind('<ctrl-a>', 'spawn --userscript qute-avendesora', mode='insert')
+#
+# You are free to choose any keybinding you like. <ctrl-a> was chosen to as 
+# a mnemonic for *authenticate* or *Avendesora*.
+
+
+# This script communicates the username and password back to qutebrowser using 
+# a sequence of fake-key coommands. It takes either a double-quoted string or 
+# a single key code, but only a few key codes appear to be supported. From our 
+# perspective, only two keystrokes are needed <Tab> and <Enter> (or <Return>, 
+# not sure which is preferred).  In the double-quoted string, backslash and 
+# double quotes must be escaped with a backslash.
+
+from inform import Inform, log, os_error, warn
+from avendesora import (
+    PasswordGenerator, PasswordError, __version__ as avendesora_version
+)
+import os
+from time import sleep
+from textwrap import dedent
+from appdirs import user_data_dir
+Inform(logfile=user_data_dir('qutebrowser') + '/userscripts/log')
+
+if [int(n) for n in avendesora_version.split('.')] < [1, 10, 4]:
+    warn(
+        "Expecting Avendesora version 1.10.4 or better,",
+        f"found {avendesora_version}."
+    )
+
+try:
+    avendesora = PasswordGenerator()
+    url = os.environ['QUTE_URL']
+    log('URL:', url)
+    script = avendesora.discover_account(url=url)
+
+    with open(os.environ['QUTE_FIFO'], 'w') as fifo:
+
+        queue = []
+        scrubbed = []
+        def send_queue():
+            global queue
+            if queue:
+                script = ' ;; '.join(queue)
+                fifo.write(script + '\n')
+                fifo.flush()
+                queue = []
+
+        for cmd, val in script.components():
+            if cmd.startswith('sleep'):
+                send_queue()
+                scrubbed.append('<'+cmd+'>')
+                seconds = ''.join(cmd.split()[1:])
+                sleep(int(seconds))
+            elif cmd in 'tab':
+                queue.append('fake-key <Tab>')
+                scrubbed.append('→')
+            elif cmd in 'return':
+                queue.append('fake-key <Enter>')
+                scrubbed.append('↲')
+            else:
+                escaped = val.replace('\\', r'\\').replace('"', r'\"')
+                queue.append('fake-key "{}"'.format(escaped))
+                if cmd in ['text', 'value']:
+                    scrubbed.append(val)
+                else:  # this is a secret
+                    scrubbed.append('<'+cmd+'>')
+        send_queue()
+        log('sent to qutebrowser:', ''.join(scrubbed))
+
+except OSError as e:
+    fatal(os_error(e))
+except PasswordError as e:
+    e.terminate()
+log(flush=True)

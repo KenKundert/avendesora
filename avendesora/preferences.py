@@ -97,6 +97,8 @@ CONFIG_DEFAULTS = {
     'log_file': 'log.gpg',
     'default_protocol': 'https',
     'user_key_file': 'key.gpg',
+    'use_pager': True,
+    'selection_utility': 'gtk',
     'verbose': False,
     'default_account_template': 'bank',
     'account_templates': {
@@ -199,7 +201,7 @@ CONFIG_DEFAULTS = {
     'gpg_ids': None,
     'xdotool_executable': '/usr/bin/xdotool',
     'xsel_executable': '/usr/bin/xsel',
-    'use_pager': True,
+    'dmenu_executable': '/usr/bin/dmenu',
     'arp_executable': '/sbin/arp',
 }
 
@@ -338,6 +340,20 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         # set, or 'less' is used if not set. If False, a paging program is not
         # used.
 
+    selection_utility = {use_pager}
+        Which utility should be used when it becomes necessary for you to
+        interactively make a choice. Two utilities are available: 'gtk', the
+        default, and 'dmenu'.
+
+        'gtk' is the built-in selection. When needed it pops a small dialog box in
+        the middle of the screen. You can use the 'j' and 'k' to navigate to your
+        selection and 'l' to make the selection or 'h' to cancel.  Alternately you
+        can use the arrow keys and Enter and Esc to navigate, select, and cancel.
+
+        'dmenu' is an external utility, and must be installed. With *demenu* you
+        type the first few letters of your selection to highlight it, then type
+        'Enter' to select or 'Esc' to cancel.
+
     verbose = {verbose}
         # Set this to True to generate additional information in the log file
         # that can help debug account discovery issues.  Normally it should be
@@ -380,6 +396,7 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     xsel_executable = {xsel_executable}
         # recommend '/usr/bin/xsel -p' if you wish to use mouse middle click
         # recommend '/usr/bin/xsel -b' if you wish to use mouse right click then paste
+    dmenu_executable = {dmenu_executable}
 
     # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
 ''')

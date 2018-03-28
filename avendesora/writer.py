@@ -24,12 +24,12 @@
 from . import cursor
 from .config import get_setting
 from .error import PasswordError
-from .dialog import show_list_dialog
 from .preferences import INITIAL_AUTOTYPE_DELAY
+from .script import Script
 from shlib import Run
 from inform import (
     Color,
-    codicil, cull, error, log, output, warn, indent, os_error,
+    codicil, cull, error, is_str, log, output, warn, indent, os_error,
     ddd, ppp, vvv
 )
 from time import sleep
@@ -271,6 +271,8 @@ class KeyboardWriter(Writer):
     """Writes output via pseudo-keyboard."""
 
     def _autotype(self, text):
+        if not text:
+            return
         # Split the text into individual key strokes and convert the special
         # characters to their xkeysym names
 
@@ -301,80 +303,37 @@ class KeyboardWriter(Writer):
         log('writing secret to keyboard writer.')
         self._autotype(value)
 
-    def run_script(self, account, script, dryrun):
-
-        # Create the default script if a script was not given
-        if script is True:
-            # this bit of trickery gets the name of the default field
-            name, key = account.split_field(None)
-            name = account.combine_field(name, key)
-            script = "{%s}{return}" % name
-
-        # Run the script
+    def run_script(self, script, dryrun=False):
         out = []
         scrubbed = []
         sleep(INITIAL_AUTOTYPE_DELAY)
-        regex = re.compile(r'({[\w. ]+})')
-        for term in regex.split(script):
-            if term and term[0] == '{' and term[-1] == '}':
-                # we have found a command
-                cmd = term[1:-1].lower()
-                if cmd == 'tab':
-                    out.append('\t')
-                    scrubbed.append('\t')
-                elif cmd == 'return':
-                    out.append('\n')
-                    scrubbed.append('\n')
-                elif cmd.startswith('sleep '):
-                    cmd = cmd.split()
-                    try:
-                        assert cmd[0] == 'sleep'
-                        assert len(cmd) == 2
-                        if out:
-                            # drain the buffer before sleeping
-                            if not dryrun:
-                                self._autotype(''.join(out))
-                            out = []
-                        sleep(float(cmd[1]))
-                        scrubbed.append('<sleep %s>' % cmd[1])
-                    except TypeError:
-                        raise PasswordError(
-                            'syntax error in keyboard script.', culprit=term
-                        )
-                else:
-                    name, key = account.split_field(cmd)
-                    try:
-                        value = account.get_scalar(name, key)
-                    except PasswordError as e:
-                        if e.is_collection and len(e.collection):
-                            # is composite value, ask user which one is desired
-                            choices = e.collection
-                            if len(choices) == 1:
-                                choice = choices.keys()[0]
-                            else:
-                                choice = show_list_dialog(
-                                    'Choose from %s' % name,
-                                    sorted(choices.keys())
-                                )
-                                if choice is None:
-                                    raise PasswordError('user abort.')
-                            key = choices[choice]
-                            value = account.get_scalar(name, key)
-                        else:
-                            raise
-                    value = dedent(str(value)).strip()
-                    out.append(value)
-                    if account.is_secret(name, key):
-                        scrubbed.append('<%s>' % cmd)
-                    else:
-                        scrubbed.append(value)
-            elif term:
-                out.append(term)
-                scrubbed.append(term)
+        for cmd, val in script.components(True):
+            if cmd in ['tab', 'return', 'text', 'value']:
+                out.append(val)
+                scrubbed.append(val)
+            elif cmd.startswith('sleep '):
+                cmd = cmd.split()
+                try:
+                    assert cmd[0] == 'sleep'
+                    assert len(cmd) == 2
+                    if out:
+                        # drain the buffer before sleeping
+                        if not dryrun:
+                            self._autotype(''.join(out))
+                        out = []
+                    sleep(float(cmd[1]))
+                    scrubbed.append('<sleep %s>' % cmd[1])
+                except TypeError:
+                    raise PasswordError(
+                        'syntax error in keyboard script.', culprit=term
+                    )
+            else:
+                out.append(val)
+                scrubbed.append('<%s>' % cmd)
 
         scrubbed = ''.join(scrubbed).replace('\t', '→').replace('\n', '↲')
         log('Autotyping "%s"%s.' % (scrubbed, ' -- dry run' if dryrun else ''))
         if dryrun:
-            output(account.get_name(), scrubbed, sep=': ')
+            output(script.account.get_name(), scrubbed, sep=': ')
         else:
             self._autotype(''.join(out))

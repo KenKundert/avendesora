@@ -52,7 +52,10 @@ REGEX_COMPONENTS = {
 
 # Title base class {{{1
 class Title(object):
-    def __init__(self, override=None):
+    def __init__(self, url=None, override=None):
+        if url:
+            self.data = self._process_url(url)
+            return
         if override:
             title = override
         else:
@@ -94,14 +97,21 @@ class Title(object):
         if match:
             found = match.groupdict()
             if 'url' in found:
-                components = urlparse(found.get('url'))
-                if components.netloc:
-                    log('title matched.', culprit=cls.__name__)
+                components = cls._process_url(found['url'])
+                if components:
                     data.update(found)
-                    data['protocol'] = components.scheme
-                    data['host'] = components.netloc
-                    data['path'] = components.path
+                    data.update(components)
                     return True
+
+    @staticmethod
+    def _process_url(url):
+        components = urlparse(url)
+        if components.netloc:
+            return dict(
+                protocol = components.scheme,
+                host = components.netloc,
+                path = components.path
+            )
 
 
 # AddURLToWindowTitle (Firefox) {{{1

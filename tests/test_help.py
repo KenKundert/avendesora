@@ -116,10 +116,10 @@ def test_browse():
                                     Open account in specified browser.
             -l, --list              List available URLs rather than open first.
 
-        The account is examined for URLS, a URL is chosen, and then that URL
-        is opened in the chosen browser.  First URLS are gathered from the
+        The account is examined for URLs, a URL is chosen, and then that URL
+        is opened in the chosen browser.  First URLs are gathered from the
         'urls' account attribute, which can be a string containing one or
-        more URLS, a list, or a dictionary.  If 'urls' is a dictionary, the
+        more URLs, a list, or a dictionary.  If 'urls' is a dictionary, the
         desired URL can be chosen by entering the key as an argument to the
         browse command. If a key is not given, then the 'default_url'
         account attribute is used to specify the key to use by default. If

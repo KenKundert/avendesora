@@ -100,6 +100,7 @@ The settings are documented in *config.doc*, and can be overwritten by
 specifying the desired values in the *config* file (found in 
 ~/.config/avendesora).  The available settings are:
 
+
 .. index::
     single: log_file setting
 
@@ -109,6 +110,7 @@ specifying the desired values in the *config* file (found in
     Adding a suffix of .gpg or .asc causes the file to be encrypted
     (otherwise it can leak account names). Use None to disable logging.
 
+
 .. index::
     single: archive_file setting
 
@@ -116,6 +118,7 @@ specifying the desired values in the *config* file (found in
 
     The desired location of the archive file (relative to config director).
     End the path in .gpg or .asc. Use None to disable archiving.
+
 
 .. index::
     single: previous_archive_file setting
@@ -125,6 +128,7 @@ specifying the desired values in the *config* file (found in
     The existing archive file is renamed to this name when updating the archive 
     file. This could be helpful if the archive file is somehow corrupted.
 
+
 .. index::
     single: archive_stale setting
 
@@ -132,6 +136,7 @@ specifying the desired values in the *config* file (found in
 
     The archive file is consider stale if it is this many days older than
     the most recently updated account file.
+
 
 .. index::
     single: default_field setting
@@ -141,6 +146,7 @@ specifying the desired values in the *config* file (found in
     The name of the field to use for the :ref:`value command <value command>` 
     when one is not given. May be a space separated list of names, in which case 
     the first that is found is used.
+
 
 .. index::
     single: default_vector_field setting
@@ -154,6 +160,7 @@ specifying the desired values in the *config* file (found in
     with the :ref:`value command <value command>` is 1, then question[1] is 
     produced.
 
+
 .. index::
     single: credential_ids setting
 
@@ -162,6 +169,7 @@ specifying the desired values in the *config* file (found in
     A string that contains the field names (space separated) that should be
     considered by the :ref:`credentials command <credentials command>` for the 
     account identity.
+
 
 .. index::
     single: credential_secrets setting
@@ -172,6 +180,7 @@ specifying the desired values in the *config* file (found in
     considered by the :ref:`credentials command <credentials command>` for the 
     primary account secret.
 
+
 .. index::
     single: display_time setting
 
@@ -180,11 +189,13 @@ specifying the desired values in the *config* file (found in
     The number of seconds that the secret will be displayed before it is
     erase when writing to the TTY or clibboard.
 
+
 .. index::
     single: encoding setting
 
 **encoding** = 'utf-8':
     The unicode encoding to use when reading or writing files.
+
 
 .. index::
     single: edit_account setting
@@ -196,6 +207,7 @@ specifying the desired values in the *config* file (found in
     which are replaced by the path to the file and the name of the
     account.
 
+
 .. index::
     single: edit_template setting
 
@@ -204,6 +216,7 @@ specifying the desired values in the *config* file (found in
     The command used when creating a new account that has been initialized
     with a template. The command is given as list of strings. The strings
     may contain {filepath}, which is replaced by the path to the file.
+
 
 .. index::
     single: browsers setting
@@ -215,6 +228,7 @@ specifying the desired values in the *config* file (found in
     contains the command that invokes the browser. The value may contain
     {url}, which is replaced by the URL to open.
 
+
 .. index::
     single: default_browser setting
 
@@ -222,6 +236,7 @@ specifying the desired values in the *config* file (found in
 
     The name of the default browser. This name should be one of the keys
     in the browsers dictionary.
+
 
 .. index::
     single: default_protocol setting
@@ -231,6 +246,7 @@ specifying the desired values in the *config* file (found in
     The default protocol to use for a URL if the protocol is not specified
     in the requested URL. Generally this should be 'https' or 'http',
     though 'https' is recommended.
+
 
 .. index::
     single: config_dir_mask setting
@@ -246,6 +262,7 @@ specifying the desired values in the *config* file (found in
     Set to 0o007 to generated a warning if the directory is readable or writable 
     by others.
 
+
 .. index::
     single: label_color setting
 
@@ -253,6 +270,7 @@ specifying the desired values in the *config* file (found in
 
     The color of the label use by the value and values commands.
     Choose from black, red, green, yellow, blue, magenta, cyan, white.
+
 
 .. index::
     single: highlight_color setting
@@ -262,6 +280,7 @@ specifying the desired values in the *config* file (found in
     The color of the highlight use by the value and values commands.
     Choose from black, red, green, yellow, blue, magenta, cyan, white.
 
+
 .. index::
     single: color_scheme setting
 
@@ -269,6 +288,7 @@ specifying the desired values in the *config* file (found in
 
     The color scheme used for the label color.  Choose from dark, light.
     If the shell background color is light, use dark.
+
 
 .. index::
     single: use_pager setting
@@ -280,6 +300,25 @@ specifying the desired values in the *config* file (found in
     True, the program name is taken from the PAGER environment variable if
     set, or 'less' is used if not set. If False, a paging program is not
     used.
+
+
+.. index::
+    single: selection_utility setting
+
+**selection_utility** = 'gtk':
+    Which utility should be used when it becomes necessary for you to 
+    interactively make a choice. Two utilities are available: *gtk*, the 
+    default,  and *dmenu*.  
+
+    *gtk* is the built-in selection. When needed it pops a small dialog box in 
+    the middle of the screen. You can use the 'j' and 'k' to navigate to your 
+    selection and 'l' to make the selection or 'h' to cancel.  Alternately you 
+    can use the arrow keys and Enter and Esc to navigate, select, and cancel.
+
+    *dmenu* is an external utility, and must be installed. With *demenu* you 
+    type the first few letters of your selection to highlight it, then type 
+    'Enter' to select or 'Esc' to cancel.
+
 
 .. index::
     single: verbose setting
@@ -293,6 +332,7 @@ specifying the desired values in the *config* file (found in
     this setting has largely been superseded by the use of the --title and
     --verbose command line options.
 
+
 .. index::
     single: account_templates setting
 
@@ -305,6 +345,7 @@ specifying the desired values in the *config* file (found in
     begin with '# Avendesora: ' represent comments that can contain instructions 
     to the user. They will are removed when the account is created.
 
+
 .. index::
     single: default_account_template setting
 
@@ -312,6 +353,7 @@ specifying the desired values in the *config* file (found in
 
     The default account template that is used when creating a new account and 
     the user does not specify a template name.
+
 
 .. index::
     single: gpg_ids setting
@@ -321,6 +363,7 @@ specifying the desired values in the *config* file (found in
     The GPG ID or IDs to use by default when creating encrypted files (the
     archive and account files).
 
+
 .. index::
     single: gpg_armor setting
 
@@ -329,6 +372,7 @@ specifying the desired values in the *config* file (found in
     Choose between 'always', 'never' and 'extension' (.asc: armor, .gpg:
     no).
 
+
 .. index::
     single: gpg_home setting
 
@@ -336,19 +380,22 @@ specifying the desired values in the *config* file (found in
 
     This is your GPG home directory. By default it will be ~/.gnupg.
 
+
 .. index::
     single: gpg_executable setting
 
 **gpg_executable** = /usr/bin/gpg2:
 
-    Path to the gpg2 executable.
+    Path to the *gpg2* executable.
+
 
 .. index::
     single: xdotool_executable setting
 
 **xdotool_executable** = /usr/bin/xdotool:
 
-    Path to the xdotool executable.
+    Path to the *xdotool* executable.
+
 
 .. index::
     single: xsel_executable setting
@@ -358,3 +405,13 @@ specifying the desired values in the *config* file (found in
     Recommend '/usr/bin/xsel -p' if you wish to use mouse middle click.
     Recommend '/usr/bin/xsel -b' if you wish to use mouse right click then 
     paste.
+
+
+.. index::
+    single: dmenu_executable setting
+
+**dmenu_executable** = /usr/bin/dmenu:
+
+    Path to the *dmenu* executable.  *Avendesora* can be configured to use 
+    *dmenu* as selection utility rather than built-in *gtk* version.
+

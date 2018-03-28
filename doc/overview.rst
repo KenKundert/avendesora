@@ -275,7 +275,8 @@ discovery script is run, in which case is '{passcode}{return}'. This script
 simulates the keyboard and types the passcode and then types the enter key, 
 which should authenticate you with sudo and allow the command to run.  If the 
 window title matches several accounts, then each is offered up in a selection 
-box and you choose the one you want.
+box and you choose the one you want (use 'j' and 'k' to navigate to desired 
+section and 'Enter' to select or 'Esc' to cancel).
 
 
 .. index::

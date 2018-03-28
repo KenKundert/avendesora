@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""Networth
+
+Usage:
+    networth [options]
+
+Options:
+    -v, --verbose  output actual estimated value text rather than just the value
+"""
+
+from avendesora import PasswordGenerator, PasswordError
+from inform import display, terminate
+from quantiphy import Quantity
+from docopt import docopt
+Quantity.set_prefs(prec=2)
+
+
+cmdline = docopt(__doc__)
+verbose = cmdline['--verbose']
+
+try:
+    pw = PasswordGenerator()
+
+    # scan accounts and gather values for appropriate accounts
+    amounts = {}
+    width = 0
+    total = 0
+    for account in pw.all_accounts():
+        text = account.get_scalar('estimated_value', default=None)
+        if text:
+            components = text.split()
+            value = Quantity(components[0])
+            if verbose:
+                to_output = text
+            else:
+                to_output = value
+            if value.units in ['$', 'USD']:
+                total += value
+            else:
+                to_output = f'{to_output} (not in total)'
+            account_name = account.get_name()
+            width = max(width, len(account_name))
+            amounts[account_name] = to_output
+    total = Quantity(total, "$")
+
+    # display the account values
+    for key, val in amounts.items():
+        display(f'{key:>{width+2}s}: {val}')
+    display(f'{"TOTAL":>{width+2}s}: {total}')
+
+except KeyboardInterrupt:
+    terminate('Killed by user.')
+except (PasswordError) as e:
+    e.terminate()

@@ -2,7 +2,23 @@
 
 # Requires the python bindings for the GTK3 library.
 
-from inform import fatal, notify
+from .config import get_setting
+from inform import Error, os_error
+from shlib import Run
+
+
+# dmenu selection utility interface
+def dmenu_dialog(title, choices):
+    executable = get_setting('dmenu_executable')
+    #cmd = [executable, '-l', len(choices), '-i', '-p', title]
+    cmd = [executable, '-l', len(choices), '-i']
+    try:
+        dmenu = Run(cmd, 'sOeW1', stdin='\n'.join(choices))
+    except OSError as e:
+        raise Error(os_error(e))
+    return dmenu.stdout.rstrip('\n')
+
+# gtk selection utility interface
 try:
     import gi
     gi.require_version('Gtk', '3.0')
@@ -63,9 +79,9 @@ try:
                 self.view.set_cursor(scroll(path, 1))
             elif key in ['k', 'Up']:
                 self.view.set_cursor(scroll(path, -1))
-            elif key == 'Return':
+            elif key in ['l', 'Right', 'Return']:
                 self.accept()
-            elif key == 'Escape':
+            elif key in ['h', 'Left', 'Escape']:
                 self.close()
 
             return True
@@ -82,13 +98,18 @@ try:
                 buttons=gtk.ButtonsType.OK,
                 message_format=message
             )
-
             if description:
                 self.format_secondary_text(description)
 
     def show_list_dialog(title, choices):
-        dialog = ListDialog(title, choices)
-        return dialog.run()
+        selector = get_setting('selection_utility')
+        if selector == 'gtk':
+            return ListDialog(title, choices).run()
+        elif selector == 'dmenu':
+            return dmenu_dialog(title, choices)
+        else:
+            msg = 'selection utility not found.'
+        raise Error(msg, culprit=selector)
 
     def show_error_dialog(message):
         dialog = ErrorDialog(message)
@@ -96,15 +117,19 @@ try:
 
 except ImportError:
     def show_list_dialog(title, choices):
-        msg = 'selection dialog not available, you must install python-gobject.'
-        notify(msg)
-        fatal(msg)
+        selector = get_setting('selection_utility')
+        if selector == 'gtk':
+            msg = 'selection utility not available, you must install python-gobject.'
+        elif selector == 'dmenu':
+            return dmenu_dialog(title, choices)
+        else:
+            msg = 'selection utility not found.'
+        raise Error(msg, culprit=selector)
 
     def show_error_dialog(message):
         msg = 'error dialog not available, you must install python-gobject.'
-        notify(msg)
-        fatal(msg)
+        raise Error(msg)
 
 if __name__ == '__main__':
-    print(show_list_dialog(['primary', 'secondary']))
+    print(show_list_dialog('Choose from', ['primary', 'secondary']))
     print(show_error_dialog('This is a test of the emergency broadcast system.'))

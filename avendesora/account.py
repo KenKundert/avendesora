@@ -26,6 +26,7 @@ from .error import PasswordError
 from .obscure import ObscuredSecret
 from .preferences import TOOL_FIELDS
 from .recognize import Recognizer
+from .script import Script
 from .secrets import GeneratedSecret
 from difflib import get_close_matches
 from inform import (
@@ -135,66 +136,6 @@ class AccountValue:
         "Cast AccountValue to a tuple to get value, is_secret, name, and desc."
         for each in [str(self), self.is_secret, self.name, self.desc]:
             yield each
-
-
-# Script class {{{1
-class Script:
-    """Script
-
-    Takes a string that contains attributes. Those attributes are expanded
-    before being output. For example::
-
-        Script('username: {username}, password: {passcode}')
-
-    In this case, *{username}* and *{passcode}* are replaced by with the value
-    of the corresponding account attribute. In addition to the account
-    attributes, *{tab}* and *{return}* are replaced by a tab or carriage return
-    character.
-
-    Args:
-        script (str):  The script.
-
-    Raises:
-        :exc:`avendesora.PasswordError`: attribute not found.
-    """
-    def __init__(self, script='username: {username}, password: {passcode}'):
-        self.script = script
-        self.account = None
-        self.rendered = None
-        self.is_secret = None
-
-    def initialize(self, account, field_name=None, field_key=None):
-        self.account = account
-
-    def __str__(self):
-        if self.rendered is not None:
-            return self.rendered
-        regex = re.compile(r'({[\w. ]+})')
-        out = []
-        self.is_secret = False
-        for term in regex.split(self.script):
-            if term and term[0] == '{' and term[-1] == '}':
-                # we have found a command
-                cmd = term[1:-1].lower()
-                if cmd == 'tab':
-                    out.append('\t')
-                elif cmd == 'return':
-                    out.append('\n')
-                elif cmd.startswith('sleep '):
-                    pass
-                else:
-                    name, key = self.account.split_field(cmd)
-                    value = self.account.get_scalar(name, key)
-                    out.append(dedent(str(value)).strip())
-                    if self.account.is_secret(name, key):
-                        self.is_secret = True
-            else:
-                out.append(term)
-        self.rendered = ''.join(out)
-        return self.rendered
-
-    def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, self.script)
 
 
 # Account class {{{1
@@ -533,7 +474,7 @@ class Account(object):
                     'composite value found, need key. Choose from:',
                     *sorted(choices.keys()),
                     sep = '\n',
-                    culprit = name,
+                    culprit=(cls.get_name(), cls.combine_field(name, key)),
                     is_collection = True,
                     collection = choices
                 )
@@ -546,7 +487,8 @@ class Account(object):
                     key = None
             except (IndexError, KeyError, TypeError):
                 raise PasswordError(
-                    'key not found.', culprit=cls.combine_field(name, key)
+                    'key not found.',
+                    culprit=(cls.get_name(), cls.combine_field(name, key))
                 )
 
         # initialize the value if needed
