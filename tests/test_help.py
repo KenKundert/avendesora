@@ -490,7 +490,10 @@ def test_log():
         Open the logfile.
 
         Usage:
-            avendesora log
+            avendesora [options] log
+
+        Options:
+            -d, --delete   Delete the logfile rather than opening it.
 
         Opens the logfile in your editor.
 
