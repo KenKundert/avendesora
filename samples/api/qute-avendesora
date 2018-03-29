@@ -62,7 +62,7 @@ try:
                 fifo.flush()
                 queue = []
 
-        for cmd, val in script.components(True):
+        for cmd, val in script.components(ask=True):
             if cmd.startswith('sleep'):
                 send_queue()
                 scrubbed.append('<'+cmd+'>')
