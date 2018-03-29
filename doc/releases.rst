@@ -57,6 +57,7 @@ Releases
     | Version: 1.10.4
     | Released: 2018-03-28
 
-    - Added *is_secret* argument to Secret classes
+    - Added *is_secret* argument to Secret classes.
     - Added support for *dmenu* as alternative to built-in selection utility.
+    - Add --delete option to log command.
 

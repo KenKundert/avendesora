@@ -919,7 +919,10 @@ class Log(Command):
     DESCRIPTION = 'open the logfile'
     USAGE = dedent("""
         Usage:
-            avendesora log
+            avendesora [options] log
+
+        Options:
+            -d, --delete   Delete the logfile rather than opening it.
     """).strip()
 
     @classmethod
@@ -946,6 +949,13 @@ class Log(Command):
 
         # open the logfile
         logfile = get_setting('log_file')
+
+        if cmdline['--delete']:
+            try:
+                rm(logfile)
+                return
+            except OSError as e:
+                raise PasswordError(os_error(e))
         if not logfile.exists():
             display('Logfile was not found.')
         else:

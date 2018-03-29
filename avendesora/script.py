@@ -18,7 +18,7 @@
 
 
 # Imports {{{1
-from inform import log
+from .dialog import show_list_dialog
 from .error import PasswordError
 from textwrap import dedent
 import re

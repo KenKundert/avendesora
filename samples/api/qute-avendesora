@@ -7,23 +7,25 @@ Usage:
 
 WARNING: passwords end up in qutebrowser log when using this command.
 """
+# This script is a authentication plugin for qutebrowser.
+#
 # To activate plugin, place this script in 
 # ~/.local/share/qutebrowser/userscripts, make it executable, and then add the 
 # following you your ~/.config/qutebrowser/config.py file:
 
 #  config.bind('<ctrl-a>', 'spawn --userscript qute-avendesora', mode='normal')
 #  config.bind('<ctrl-a>', 'spawn --userscript qute-avendesora', mode='insert')
+#  config.bind('<ctrl-a>', 'spawn --userscript qute-avendesora', mode='prompt')
 #
 # You are free to choose any keybinding you like. <ctrl-a> was chosen to as 
 # a mnemonic for *authenticate* or *Avendesora*.
 
-
 # This script communicates the username and password back to qutebrowser using 
-# a sequence of fake-key coommands. It takes either a double-quoted string or 
-# a single key code, but only a few key codes appear to be supported. From our 
-# perspective, only two keystrokes are needed <Tab> and <Enter> (or <Return>, 
-# not sure which is preferred).  In the double-quoted string, backslash and 
-# double quotes must be escaped with a backslash.
+# a sequence of fake-key commands. fake-key takes either a double-quoted string 
+# or a single key code, but only a few key codes appear to be supported. From 
+# our perspective, only two keystrokes are needed, <Tab> and <Enter> (or 
+# <Return>, not sure which is preferred).  In the double-quoted string, 
+# backslash and double quotes must be escaped with a backslash.
 
 from inform import Inform, log, os_error, warn
 from avendesora import (
@@ -31,7 +33,6 @@ from avendesora import (
 )
 import os
 from time import sleep
-from textwrap import dedent
 from appdirs import user_data_dir
 Inform(logfile=user_data_dir('qutebrowser') + '/userscripts/log')
 
@@ -46,6 +47,8 @@ try:
     url = os.environ['QUTE_URL']
     log('URL:', url)
     script = avendesora.discover_account(url=url)
+    account = script.account.get_name()
+    log('Avendesora Account:', account)
 
     with open(os.environ['QUTE_FIFO'], 'w') as fifo:
 
@@ -59,7 +62,7 @@ try:
                 fifo.flush()
                 queue = []
 
-        for cmd, val in script.components():
+        for cmd, val in script.components(True):
             if cmd.startswith('sleep'):
                 send_queue()
                 scrubbed.append('<'+cmd+'>')
@@ -79,7 +82,7 @@ try:
                 else:  # this is a secret
                     scrubbed.append('<'+cmd+'>')
         send_queue()
-        log('sent to qutebrowser:', ''.join(scrubbed))
+        log('Sent to qutebrowser:', ''.join(scrubbed))
 
 except OSError as e:
     fatal(os_error(e))

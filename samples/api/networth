@@ -7,6 +7,14 @@ Usage:
 Options:
     -v, --verbose  output actual estimated value text rather than just the value
 """
+# Outputs a summary of your networth. It assumes that accounts that carry 
+# significant value have the field 'estimated_value' that contains the value of 
+# the account as the first item in the string. For example:
+#    estimated_value = '$544k @ March 2018'
+# The value is expected to have units (generally $) and may be written with SI 
+# scale factors. Anything after the first item in the string is ignored.
+# You will need to manually update the estimated values.
+
 
 from avendesora import PasswordGenerator, PasswordError
 from inform import display, terminate

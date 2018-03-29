@@ -11,10 +11,12 @@ Usage:
 Options:
     -v, --verbose    list the keys as they are being added
 """
-# This assumes that the Avendesora account that contains the ssh key's 
-# passphrase has a name or alias of the form <name>-ssh-key. It also assumes 
-# that the account contains a field named 'keyfile' or 'keyfiles' that contains 
-# an absolute path or paths to the ssh key files in a string.
+# Adds ssh keys to SSH agent.
+#
+# Assumes that the Avendesora account that contains the ssh key's passphrase has 
+# a name or alias of the form <name>-ssh-key. It also assumes that the account 
+# contains a field named 'keyfile' or 'keyfiles' that contains an absolute path 
+# or paths to the ssh key files in a string.
 
 from avendesora import PasswordGenerator, PasswordError
 from inform import Inform, codicil, error, fatal, narrate
@@ -22,7 +24,7 @@ from docopt import docopt
 from pathlib import Path
 import pexpect
 
-SSHkeys = ['primary', 'github', 'backups']
+SSHkeys = 'primary github backups'.split()
 SSHadd = 'ssh-add'
 
 cmdline = docopt(__doc__.format(keys = ', '.join(SSHkeys)))
@@ -37,7 +39,7 @@ for key in SSHkeys:
     name = key + '-ssh-key'
     try:
         account = pw.get_account(name)
-        passphrase = account.get_passcode().value
+        passphrase = str(account.get_passcode().value)
         if account.has_field('keyfiles'):
             keyfiles = account.get_value('keyfiles').value
         else:

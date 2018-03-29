@@ -229,6 +229,7 @@ encrypted so that only the intended recipients can read them.
     from inform import Error, display, indent, os_error, terminate, warn
     import gnupg
 
+    me = 'morgase@andor.gov'
     recipients = dict(
         kids='galad@trakand.name gawyn@trakand.name elayne@trakand.name',
         partners='taringail.damodred@andor.gov',
@@ -282,7 +283,10 @@ encrypted so that only the intended recipients can read them.
             if recipient in accounts:
                 content = accounts[recipient]
                 num_accounts = len(content)
-                encrypted = gpg.encrypt('\n\n\n'.join(content), idents.split())
+                encrypted = gpg.encrypt(
+                    '\n\n\n'.join(content),
+                    idents.split() + me.split()
+                )
                 if not encrypted.ok:
                     raise Error(
                         'unable to encrypt:', encrypted.stderr, culprit=recipient
