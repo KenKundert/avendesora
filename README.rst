@@ -23,7 +23,7 @@ Avendesora Collaborative Password Manager
      :target: https://requires.io/github/KenKundert/avendesora/requirements/?branch=master
      :alt: Requirements Status
 
-| Version: 1.10.4
+| Version: 1.10.5
 | Released: 2018-03-28
 |
 

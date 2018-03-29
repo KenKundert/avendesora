@@ -54,7 +54,7 @@ Releases
     - Added support for *qutebrowser*.
 
 **Latest Development Version**:
-    | Version: 1.10.4
+    | Version: 1.10.5
     | Released: 2018-03-28
 
     - Added *is_secret* argument to Secret classes.
