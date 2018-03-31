@@ -49,11 +49,11 @@ For example, consider the following rather abbreviated accounts file::
         passcode = Passphrase()
 
 This file contains one secret, the login passphrase for Herbie.  In this case, 
-the master seed is combined with the words 'login' (the account name, downcased) 
-and 'passcode' (the attribute name); the combination is hashed, and the hash is 
-used to generate the passphrase. The words in the passphrase are chosen at 
-random from a dictionary of roughly 10,000 words.  The first word is chosen by 
-taking the first 14 bits from the hash and using that to number to select 
+the master seed is combined with the words 'login' (the account name, down 
+cased) and 'passcode' (the attribute name); the combination is hashed, and the 
+hash is used to generate the passphrase. The words in the passphrase are chosen 
+at random from a dictionary of roughly 10,000 words.  The first word is chosen 
+by taking the first 14 bits from the hash and using that to number to select 
 a word. The second word is chosen using the next 14 bits, and so on.  The hash 
 is constructed such that even the smallest changes in any seed results in 
 a completely different hash. As such, the resulting passphrase is quite 

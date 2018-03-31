@@ -350,7 +350,7 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         selection and 'l' to make the selection or 'h' to cancel.  Alternately you
         can use the arrow keys and Enter and Esc to navigate, select, and cancel.
 
-        'dmenu' is an external utility, and must be installed. With *demenu* you
+        'dmenu' is an external utility, and must be installed. With *dmenu* you
         type the first few letters of your selection to highlight it, then type
         'Enter' to select or 'Esc' to cancel.
 

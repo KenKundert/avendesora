@@ -194,7 +194,7 @@ Chrome
 
 The Chrome browser seems to have a bug that can interfere with its use with 
 account discovery. In the two step process used when logging in, the site might 
-pre-fillin your user name so you do not have to enter it explicitly, you just 
+pre-fill-in your user name so you do not have to enter it explicitly, you just 
 have to click *next*. Chrome then takes you to the page where you are expected 
 to enter your password, however when it does so it does not update the window 
 title to match the new page.  Then Avendesora sees the wrong URL and either 

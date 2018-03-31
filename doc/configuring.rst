@@ -315,9 +315,9 @@ specifying the desired values in the *config* file (found in
     selection and 'l' to make the selection or 'h' to cancel.  Alternately you 
     can use the arrow keys and Enter and Esc to navigate, select, and cancel.
 
-    *dmenu* is an external utility, and must be installed. With *demenu* you 
-    type the first few letters of your selection to highlight it, then type 
-    'Enter' to select or 'Esc' to cancel.
+    *dmenu* is an external utility, and must be installed. With *dmenu* you type 
+    the first few letters of your selection to highlight it, then type 'Enter' 
+    to select or 'Esc' to cancel.
 
 
 .. index::
