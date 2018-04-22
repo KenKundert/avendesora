@@ -32,7 +32,6 @@ from difflib import get_close_matches
 from inform import (
     Color, codicil, conjoin, cull, debug, full_stop, is_collection, is_str,
     join, log, notify, output, warn, indent,
-    ddd, ppp, vvv
 )
 from textwrap import dedent
 try:

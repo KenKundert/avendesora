@@ -28,9 +28,7 @@ from .preferences import INITIAL_AUTOTYPE_DELAY
 from .script import Script
 from shlib import Run
 from inform import (
-    Color,
-    codicil, cull, error, is_str, log, output, warn, indent, os_error,
-    ddd, ppp, vvv
+    Color, codicil, cull, error, is_str, log, output, warn, indent, os_error,
 )
 from time import sleep
 from textwrap import dedent

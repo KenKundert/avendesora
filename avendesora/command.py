@@ -29,7 +29,7 @@ from .utilities import query_user, two_columns
 from .writer import get_writer
 from inform import (
     codicil, columns, cull, debug, display, error, full_stop, output, warn,
-    conjoin, join, os_error, is_collection, indent, render, ddd, ppp, vvv
+    conjoin, join, os_error, is_collection, indent, render,
 )
 from shlib import chmod, cp, rm, to_path
 from docopt import docopt
