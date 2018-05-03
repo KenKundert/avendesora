@@ -54,8 +54,8 @@ Releases
     - Added support for *qutebrowser*.
 
 **Latest Development Version**:
-    | Version: 1.10.5
-    | Released: 2018-03-28
+    | Version: 1.10.6
+    | Released: 2018-05-02
 
     - Added *is_secret* argument to Secret classes.
     - Added support for *dmenu* as alternative to built-in selection utility.
