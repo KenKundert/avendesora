@@ -162,6 +162,16 @@ specifying the desired values in the *config* file (found in
 
 
 .. index::
+    single: dynamic_fields setting
+
+**dynamic_fields = '':
+
+    Fields whose values can change in real time. These fields will not be 
+    mentioned by the :ref:`changed command <changed command>`, even if their 
+    value differs from when the most recent archive was created.
+
+
+.. index::
     single: credential_ids setting
 
 **credential_ids** = 'username email':

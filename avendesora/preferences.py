@@ -73,6 +73,7 @@ CONFIG_DEFAULTS = {
     'help_url': 'https://avendesora.readthedocs.io/en/latest',
     'default_field': 'passcode password passphrase',
     'default_vector_field': 'questions',
+    'dynamic_fields': '',
     'default_browser': 'x',
     'display_time': 60,
     'dictionary_file': 'words',
@@ -267,6 +268,11 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         # and the argument is taken to be the index of the desired value.
         # For example, if default_vector_field is 'question' and the argument
         # given with the value command is 1, then question[1] is produced.
+
+    dynamic_fields = {dynamic_fields}
+        # Fields whose values can change in real time. These fields will not be
+        # mentioned by the *changed* command, even if their value differs from
+        # when the last archive was created.
 
     credential_ids = {credential_ids}
         # A string that contains the field names (space separated) that should be

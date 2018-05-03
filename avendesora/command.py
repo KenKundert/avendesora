@@ -497,12 +497,15 @@ class Changed(Command):
         # run the generator
         generator = PasswordGenerator(warnings=False)
 
-        # determine the account and open the URL
+        # collect the accounts
         current_accounts = {}
         for account in generator.all_accounts():
             entry = account.archive()
             if entry:
                 current_accounts[account.get_name()] = entry
+
+        # determine which fields to ignore
+        dynamic_fields = Collection(get_setting('dynamic_fields'))
 
         # report any new or missing accounts
         new = set(current_accounts.keys()) - set(archive_accounts.keys())
@@ -529,6 +532,8 @@ class Changed(Command):
             # for the common fields, report any differences in the values
             shared = set(archive_account.keys()) & set(current_account.keys())
             for field_name in sorted(shared):
+                if field_name in dynamic_fields:
+                    continue
                 try:
                     archive_value = archive_account[field_name]
                     current_value = current_account[field_name]
