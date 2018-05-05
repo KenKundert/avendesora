@@ -209,9 +209,9 @@ interaction between this script and *ssh-add*.
 Example: Postmortem Letter
 ---------------------------
 
-This is a program that generates messages for a person's children and business 
-partners. It is assumed that these messages would be placed into a safe place to 
-be found and read upon the person's death.
+This is a program that generates messages for a person's children and partners. 
+It is assumed that these messages would be placed into a safe place to be found 
+and read upon the person's death.
 
 It examines all accounts looking for a special field, *postmortem_recipients*.  
 If the field exists, then that account is included in the file of accounts sent 
@@ -226,7 +226,7 @@ encrypted so that only the intended recipients can read them.
     #!/usr/bin/env python3
 
     from avendesora import PasswordGenerator, PasswordError
-    from inform import Error, display, indent, os_error, terminate, warn
+    from inform import Error, cull, display, indent, os_error, terminate, warn
     import gnupg
 
     me = 'morgase@andor.gov'
@@ -241,26 +241,35 @@ encrypted so that only the intended recipients can read them.
 
         # scan accounts and gather information for recipients
         for account in pw.all_accounts():
+            account_name = account.get_name()
+            class_name = account.__name__
+            description = account.get_scalar('desc', None, None)
 
             # summarize account values
             value = account.get_scalar('estimated_value', default=None)
             postmortem_recipients = account.get_scalar('postmortem_recipients', default=None)
-            if value and postmortem_recipients:
-                display(f'{account.get_name()}: {value}')
-            elif value:
+            if value and not postmortem_recipients:
                 warn(f'{account.get_name()}: no recipients.')
-            elif not postmortem_recipients:
                 continue
+            if not postmortem_recipients:
+                continue
+            postmortem_recipients = postmortem_recipients.split()
 
             # gather information for recipients
             for recipient in recipients:
                 if recipient in postmortem_recipients:
-                    account_name = account.get_name()
-                    description = account.get_scalar('desc', None, account_name)
-                    lines = [description, len(description)*'=']
+                    # output title
+                    title = ' - '.join(cull([class_name, description]))
+                    lines = [title, len(title)*'=']
 
+                    # output avendesora names
+                    aliases = account.get_composite('aliases')
+                    names = [account_name] + (aliases if aliases else [])
+                    lines.append('avendesora names: ' + ', '.join(names))
+
+                    # output user fields
                     for name, keys in account.get_fields():
-                        if name == 'postmortem_recipients':
+                        if name in ['postmortem_recipients', 'desc', 'NAME']:
                             continue
                         if keys:
                             lines.append(name + ':')
@@ -272,9 +281,8 @@ encrypted so that only the intended recipients can read them.
                             value = account.get_value(name)
                             lines += value.render('{n}: {v}').split('\n')
                     if recipient not in accounts:
-                        recipient_accounts = []
-                        accounts[recipient] = recipient_accounts
-                    recipient_accounts.append('\n'.join(lines))
+                        accounts[recipient] = []
+                    accounts[recipient].append('\n'.join(lines))
 
 
         # generate encrypted files than contain about accounts for each recipient
