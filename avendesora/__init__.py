@@ -28,6 +28,7 @@ from .secrets import (
 # the following are used when generating the documentation and are not needed
 # otherwise
 from . import command
+from .account import AccountValue
 
 __version__ = '1.10.7'
 __released__ = '2018-05-08'
