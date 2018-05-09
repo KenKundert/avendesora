@@ -220,7 +220,7 @@ class Account(object):
     @classmethod
     def get_seed(cls):
         try:
-            return cls.seed
+            return cls.account_seed
         except AttributeError:
             return cls.get_name()
 
@@ -242,8 +242,8 @@ class Account(object):
 
         # add master seed
         if master and not hasattr(cls, '_%s__NO_MASTER' % cls.__name__):
-            if not hasattr(cls, 'master'):
-                cls.master = master
+            if not hasattr(cls, 'master_seed'):
+                cls.master_seed = master
                 cls._master_source = 'file'
             else:
                 cls._master_source = 'account'
@@ -349,7 +349,7 @@ class Account(object):
         cls._interactive_seed = interactive_seed
         log('initializing account:', cls.get_name())
         try:
-            if cls.master.is_secure():
+            if cls.master_seed.is_secure():
                 if not cls._file_info.encrypted:
                     warn(
                         'high value master seed not contained in encrypted',
@@ -366,7 +366,7 @@ class Account(object):
                 )
 
         # do some more error checking
-        if isinstance(getattr(cls, 'master', None), GeneratedSecret):
+        if isinstance(getattr(cls, 'master_seed', None), GeneratedSecret):
             raise PasswordError(
                 'master must not be a subclass of GeneratedSecret.',
                 culprit=cls.get_name()
@@ -833,7 +833,11 @@ class Account(object):
             except AttributeError:
                 return [extract(v, name, i) for i, v in enumerate(value)]
 
-        return {k: extract(v, k) for k, v in cls.items(True) if k != 'master'}
+        return {
+            k: extract(v, k)
+            for k, v in cls.items(True)
+            if k not in ['master_seed', 'account_seed']
+        }
 
     # open_browser() {{{2
     @classmethod
@@ -953,7 +957,7 @@ class StealthAccount(Account):
     @classmethod
     def initialize(cls, interactive_seed=False, stealth_name=None):
         cls._interactive_seed = interactive_seed
-        cls.stealth_name = stealth_name
+        cls._stealth_name = stealth_name
         log('initializing stealth account:', cls.get_name())
         for key, value in cls.items():
             # reset the secrets so they honor stealth_name
@@ -964,10 +968,10 @@ class StealthAccount(Account):
 
     @classmethod
     def get_seed(cls):
-        if cls.stealth_name:
+        if cls._stealth_name:
             # In this case we are running using API rather than running from
             # command line and the account names was specified to get_account().
-            return cls.stealth_name
+            return cls._stealth_name
         # need to handle case where stdin/stdout is not available.
         # perhaps write generic password getter that supports both gui and tui.
         # Then have global option that indicates which should be used.

@@ -125,24 +125,24 @@ class GeneratedSecret(object):
         account_name = account.get_name()
         account_seed = account.get_seed()
         if self.master is None:
-            master = account.get_scalar('master', default=None)
+            master_seed = account.get_scalar('master_seed', default=None)
             master_source = account.get_scalar('_master_source', default=None)
         else:
-            master = self.master
+            master_seed = self.master
             master_source = 'secret'
-        if not master:
-            master = get_setting('user_key')
+        if not master_seed:
+            master_seed = get_setting('user_key')
             master_source = 'user_key'
-        if not master:
+        if not master_seed:
             try:
                 try:
-                    master = getpass.getpass(
+                    master_seed = getpass.getpass(
                         'master seed for %s: ' % account_name
                     )
                     master_source = 'user'
                 except EOFError:
                     output()
-                if not master:
+                if not master_seed:
                     warn("master seed is empty.")
             except (EOFError, KeyboardInterrupt):
                 terminate()
@@ -179,7 +179,7 @@ class GeneratedSecret(object):
             warn("seed is empty.")
 
         seeds = [
-            master,
+            master_seed,
             account_seed,
             field_name,
             field_key,

@@ -150,13 +150,14 @@ Notice the passcode is not shown. You can circumvent this protection by adding
 
 The *aliases* and *discovery* fields are not shown because they are considered 
 tool fields (see :ref:`discovery` for more information on discovery).  Other 
-tool fields include *NAME*, *default*, *master*, *browser*, and *default_url*.  
-*default* is the name of the default field, which is the field you get if you do 
-not request a particular field. Its value defaults to *password*, *pasphrase*, 
-or *passcode* (as set by *default_field* setting), but it can be set to any 
-account attribute name or it can be a :ref:`script <scripts>`.  *browser* is the 
-default browser to use when opening the account, run the :ref:`browse command 
-<browse command>` to see a list of available browsers.
+tool fields include *NAME*, *default*, *master_seed*, *account_seed*, *browser*, 
+and *default_url*.  *default* is the name of the default field, which is the 
+field you get if you do not request a particular field. Its value defaults to 
+*password*, *pasphrase*, or *passcode* (as set by *default_field* setting), but 
+it can be set to any account attribute name or it can be a :ref:`script 
+<scripts>`.  *browser* is the default browser to use when opening the account, 
+run the :ref:`browse command <browse command>` to see a list of available 
+browsers.
 
 The value of *passcode* is considered sensitive because it is an instance of 
 :class:`PasswordRecipe`, which is a subclass of :class:`GeneratedSecret`.  If 
@@ -215,3 +216,9 @@ Account and field names are case insensitive. So you can use *Gmail* or *gmail*.
 Also, if the account or field names contains an underscore, you can substitute 
 a dash. So if the account name is *Gmail_Thom_Merrilin*, you can use 
 *gmail-thom-merrilin* instead.
+
+Normally the user need not specify any of the seeds used when generating 
+passwords. However, it is possible to override the master seed and the account 
+seed.  To do so, specify these seeds using the *master_seed* and *account_seed* 
+attributes on the account. This would allow you to change the account file or 
+account name without disturbing the generated secrets.
