@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+# Description {{{1
+"""Postmortem
+
+Generate an account summary that includes complete account information, 
+including secrets, for selected accounts. This summary should allow the 
+recipients to access your accounts. The summaries are intended to be given to 
+the recipients after you die.
+
+Usage:
+    postmortem [options] [<recipients>...]
+
+Choose from: {available}.  If no recipients are specified, then summaries will 
+be generated for all recipients.
+"""
+
+# Imports {{{1
+from avendesora import PasswordGenerator, PasswordError
+from avendesora.gpg import PythonFile
+from inform import (
+    Error, conjoin, cull, display, indent, os_error, terminate, warn
+)
+from docopt import docopt
+from appdirs import user_config_dir
+from pathlib import Path
+import gnupg
+
+# Settings {{{1
+prog_name = 'postmortem'
+config_filename = 'config'
+
+# these can be overridden in the settings file: ~/.config/postmortem
+my_gpg_ids = ''
+recipients = dict()
+avendesora_value_fieldname = 'estimated_value'
+avendesora_recipients_fieldname = 'postmortem_recipients'
+
+try:
+    # Read settings {{{1
+    config_filepath = Path(user_config_dir(prog_name), config_filename)
+    if config_filepath.exists():
+        settings = PythonFile(config_filepath)
+        settings.initialize()
+        locals().update(settings.run())
+    else:
+        warn('no configuration file found.')
+
+    # Read command line and process options {{{1
+    cmdline = docopt(__doc__.format(available=conjoin(recipients)))
+    who = cmdline['<recipients>']
+    if not who:
+        who = recipients
+
+    # Scan accounts and gather information for recipients {{{1
+    pw = PasswordGenerator()
+    accounts = {}
+    for account in pw.all_accounts():
+        account_name = account.get_name()
+        class_name = account.__name__
+        description = account.get_scalar('desc', None, None)
+
+        # summarize account values {{{2
+        data = account.get_composite(avendesora_value_fieldname)
+        postmortem_recipients = account.get_scalar(avendesora_recipients_fieldname, default=None)
+        if data and not postmortem_recipients:
+            warn('no recipients.', culprit= account.get_name())
+            continue
+        if not postmortem_recipients:
+            continue
+        postmortem_recipients = postmortem_recipients.split()
+
+        # gather information for recipients {{{2
+        for recipient in recipients:
+            if recipient in postmortem_recipients:
+                # output title
+                title = ' - '.join(cull([class_name, description]))
+                lines = [title, len(title)*'=']
+
+                # output avendesora names
+                aliases = account.get_composite('aliases')
+                names = [account_name] + (aliases if aliases else [])
+                lines.append('avendesora names: ' + ', '.join(names))
+
+                # output user fields
+                for name, keys in account.get_fields():
+                    if name in [avendesora_recipients_fieldname, 'desc', 'NAME']:
+                        continue
+                    if keys:
+                        lines.append(name + ':')
+                        for key, value in account.get_values(name):
+                            lines += indent(
+                                value.render(('{k}) {d}: {v}', '{k}: {v}'))
+                            ).split('\n')
+                    else:
+                        value = account.get_value(name)
+                        lines += value.render('{n}: {v}').split('\n')
+                if recipient not in accounts:
+                    accounts[recipient] = []
+                accounts[recipient].append('\n'.join(lines))
+
+
+    # generate encrypted files than contain about accounts for each recipient {{{1
+    gpg = gnupg.GPG(gpgbinary='gpg2')
+    for recipient, idents in recipients.items():
+        if recipient in accounts:
+            content = accounts[recipient]
+            num_accounts = len(content)
+            encrypted = gpg.encrypt(
+                '\n\n\n'.join(content),
+                idents.split() + my_gpg_ids.split()
+            )
+            if not encrypted.ok:
+                raise Error(
+                    'unable to encrypt:', encrypted.stderr, culprit=recipient
+                )
+            try:
+                filename = recipient + '.gpg'
+                with open(filename, 'w') as file:
+                    file.write(str(encrypted))
+                display(f'contains {num_accounts} accounts.', culprit=filename)
+            except OSError as e:
+                raise Error(os_error(e))
+        else:
+            warn('no accounts found.', culprit=recipient)
+
+# process exceptions {{{1
+except KeyboardInterrupt:
+    terminate('Killed by user.')
+except (PasswordError, Error) as e:
+    e.terminate()
+
+# vim: set sw=4 sts=4 et:

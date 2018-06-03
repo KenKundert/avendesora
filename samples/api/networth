@@ -1,62 +1,242 @@
 #!/usr/bin/env python3
+# Description {{{1
 """Networth
 
+Show a summary of the networth of the specified person.
+
 Usage:
-    networth [options]
+    networth [options] [<who>]
+
+Choose from: {available}. The default is {default_who}.
 
 Options:
-    -v, --verbose  output actual estimated value text rather than just the value
+    -u, --updated           show the account update date rather than breakdown
 """
-# Outputs a summary of your networth. It assumes that accounts that carry 
-# significant value have the field 'estimated_value' that contains the value of 
-# the account as the first item in the string. For example:
-#    estimated_value = '$544k @ March 2018'
-# The value is expected to have units (generally $) and may be written with SI 
-# scale factors. Anything after the first item in the string is ignored.
-# You will need to manually update the estimated values.
 
-
+# Imports {{{1
 from avendesora import PasswordGenerator, PasswordError
-from inform import display, terminate
+from avendesora.gpg import PythonFile
+from inform import (
+    conjoin, display, error, join, os_error, terminate,
+    Color, Error, Inform,
+)
 from quantiphy import Quantity
 from docopt import docopt
+from appdirs import user_config_dir, user_cache_dir
+from pathlib import Path
 Quantity.set_prefs(prec=2)
+Inform(logfile=False)  # suppress warnings
 
+# Settings {{{1
+# These can be overridden in ~/.config/networth/config
+prog_name = 'networth'
+config_filename = 'config'
+asset_color = Color(None)
+debt_color = Color('red')
 
-cmdline = docopt(__doc__)
-verbose = cmdline['--verbose']
+# Avendesora settings {{{2
+default_who='me'
+avendesora_fieldnames = dict(
+    me='estimated_value',
+)
+aliases = dict(me= {})
+
+# cryptocurrency settings (empty coins to disable cryptocurrency support) {{{2
+proxy = None
+prices_filename = 'prices'
+coins = None
+max_age = 86400  # refresh cache if older than this (seconds)
+
+# bar settings {{{2
+screen_width = 79
+bar_chars = '-=#'
+bar_chars = '·╴─━═=#'
+num_bar_chars = len(bar_chars)
+
+# Utility functions {{{1
+# Render bar {{{2
+def render_bar(value, width):
+    """Render graphic representation of a value
+
+    value (real): should be normalized (fall between 0 and 1)
+    width (int): the width of the bar in characters when value is 1.
+    """
+    if value < 0:
+        color = debt_color
+        value = -value
+    else:
+        color = asset_color
+    scaled = width*value
+    buckets = int(scaled)
+    frac = int((num_bar_chars*scaled) % num_bar_chars)
+    extra = bar_chars[frac-1:frac]
+    bar = buckets*bar_chars[-1] + extra
+    return color(bar)
 
 try:
+    # Read settings {{{1
+    config_filepath = Path(user_config_dir(prog_name), config_filename)
+    if config_filepath.exists():
+        settings = PythonFile(config_filepath)
+        settings.initialize()
+        locals().update(settings.run())
+
+    # Read command line and process options {{{1
+    cmdline = docopt(__doc__.format(
+        available=conjoin(avendesora_fieldnames),
+        default_who=default_who,
+    ))
+    show_updated = cmdline['--updated']
+    who = cmdline['<who>'] if cmdline['<who>'] else default_who
+    fieldname = avendesora_fieldnames[who]
+    active_aliases = aliases[who]
+
+    # Get cryptocurrency prices {{{1
+    if coins:
+        import requests
+        import arrow
+
+        cache_valid = False
+        cache_dir = Path(user_cache_dir(prog_name))
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        prices_cache = Path(cache_dir, prices_filename)
+        if prices_cache:
+            if prices_cache.exists():
+                now = arrow.now()
+                age = now.timestamp - prices_cache.stat().st_mtime
+                cache_valid = age < max_age
+        if cache_valid:
+            contents = prices_cache.read_text()
+            prices = Quantity.extract(contents)
+        else:
+            # download latest asset prices from cryptocompare.com
+            currencies = dict(
+                fsyms=','.join(coins),     # from symbols
+                tsyms='USD',               # to symbols
+            )
+            url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
+            base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
+            url = '?'.join([base_url, url_args])
+            try:
+                r = requests.get(url, proxies=proxy)
+            except Exception as e:
+                # must catch all exceptions as requests.get() can generate 
+                # a variety based on how it fails, and if the exception is not 
+                # caught the thread dies.
+                raise Error('cannot access cryptocurrency prices:', str(e))
+            except KeyboardInterrupt:
+                done()
+
+            try:
+                data = r.json()
+            except:
+                raise Error('cryptocurrency price download was garbled.')
+            prices = {k: Quantity(v['USD'], '$') for k, v in data.items()}
+
+            if prices_cache:
+                contents = '\n'.join('{} = {}'.format(k,v) for k,v in 
+                prices.items())
+                prices_cache.write_text(contents)
+        prices['USD'] = Quantity(1, '$')
+    else:
+        prices = {}
+
+
+    # Build account summaries {{{1
     pw = PasswordGenerator()
-
-    # scan accounts and gather values for appropriate accounts
-    amounts = {}
+    totals = {}
+    accounts = {}
+    total_assets = Quantity(0, '$')
+    total_debt = Quantity(0, '$')
+    grand_total = Quantity(0, '$')
     width = 0
-    total = 0
     for account in pw.all_accounts():
-        text = account.get_scalar('estimated_value', default=None)
-        if text:
-            components = text.split()
-            value = Quantity(components[0])
-            if verbose:
-                to_output = text
-            else:
-                to_output = value
-            if value.units in ['$', 'USD']:
-                total += value
-            else:
-                to_output = f'{to_output} (not in total)'
-            account_name = account.get_name()
-            width = max(width, len(account_name))
-            amounts[account_name] = to_output
-    total = Quantity(total, "$")
+        # get data {{{2
+        data = account.get_composite(fieldname)
+        if not data:
+            continue
+        if type(data) != dict:
+            error(
+                'expected a dictionary.',
+                culprit=(account_name, fieldname)
+            )
+            continue
 
-    # display the account values
-    for key, val in amounts.items():
-        display(f'{key:>{width+2}s}: {val}')
-    display(f'{"TOTAL":>{width+2}s}: {total}')
+        # get account name {{{2
+        account_name = account.get_name()
+        account_name = active_aliases.get(account_name, account_name)
+        account_name = account_name.replace('_', ' ')
+        width = max(width, len(account_name))
 
+        # sum the data {{{2
+        updated = None
+        contents = {}
+        total = Quantity(0, '$')
+        odd_units = False
+        for k, v in data.items():
+            if k == 'updated':
+                updated = v
+                continue
+            if k in prices:
+                value = Quantity(v*prices[k], prices[k])
+                k = 'cryptocurrency'
+            else:
+                value = Quantity(v, '$')
+            if value.units == '$':
+                total = total.add(value)
+            else:
+                odd_units = True
+            contents[k] = value.add(contents.get(k, 0))
+            width = max(width, len(k))
+        for k, v in contents.items():
+            totals[k] = v.add(totals.get(k, 0))
+
+        # generate the account summary {{{2
+        if show_updated:
+            desc = updated
+        else:
+            desc = ', '.join('{}={}'.format(k, v) for k, v in contents.items() if v)
+            if len(contents) == 1 and not odd_units:
+                desc = k
+        accounts[account_name] = join(
+            total, desc.replace('_', ' '),
+            template=('{:7q} {}', '{:7q}'), remove=(None,'')
+        )
+
+        # sum assets and debts {{{2
+        if total > 0:
+            total_assets = total_assets.add(total)
+        else:
+            total_debt = total_debt.add(-total)
+        grand_total = grand_total.add(total)
+
+    # Summarize by account {{{1
+    display('By Account:')
+    for name in sorted(accounts):
+        summary = accounts[name]
+        display(f'{name:>{width+2}s}: {summary}')
+
+    # Summarize by investment type {{{1
+    display('\nBy Type:')
+    largest_share = max(totals.values())
+    barwidth = screen_width - width - 18
+    for asset_type in sorted(totals, key=lambda k: totals[k], reverse=True):
+        value = totals[asset_type]
+        if value.units != '$':
+            continue
+        share = value/grand_total
+        bar = render_bar(value/largest_share, barwidth)
+        asset_type = asset_type.replace('_', ' ')
+        display(f'{asset_type:>{width+2}s}: {value:>7s} ({share:>5.1%}) {bar}')
+    display(
+        f'\n{"TOTAL":>{width+2}s}:',
+        f'{grand_total:>7s} (assets = {total_assets}, debt = {total_debt})'
+    )
+
+# Handle exceptions {{{1
+except OSError as e:
+    error(os_error(e))
 except KeyboardInterrupt:
     terminate('Killed by user.')
-except (PasswordError) as e:
+except (PasswordError, Error) as e:
     e.terminate()

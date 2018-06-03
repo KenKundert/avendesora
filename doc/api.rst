@@ -133,6 +133,9 @@ Example: Add SSH Keys
 This example adds SSH keys to your SSH agent. It uses *pexpect* to manage the 
 interaction between this script and *ssh-add*.
 
+The updated source code for `addsshkeys
+<https://github.com/KenKundert/avendesora/tree/master/samples/api/addsshkeys>`_
+can be found on Github.
 
 .. code-block:: python
 
@@ -202,16 +205,16 @@ interaction between this script and *ssh-add*.
 
 
 .. index::
-    single: postmortem letter example
+    single: postmortem summary example
 
-.. _postmortem letter:
+.. _postmortem api example:
 
-Example: Postmortem Letter
----------------------------
+Example: Postmortem Summaries
+-----------------------------
 
-This is a program that generates messages for a person's children and partners. 
-It is assumed that these messages would be placed into a safe place to be found 
-and read upon the person's death.
+This is a program that generates a summary of selected accounts for a person's 
+children and partners.  It is assumed that these messages would be placed into 
+a safe place to be found and read upon the person's death.
 
 It examines all accounts looking for a special field, *postmortem_recipients*.  
 If the field exists, then that account is included in the file of accounts sent 
@@ -223,33 +226,105 @@ encrypted so that only the intended recipients can read them.
 
 .. code-block:: python
 
-    #!/usr/bin/env python3
+    estimated_value = dict(
+        updated = 'January 2018',
+        equities = '$23k',
+        cash = '$1.7k',
+        retirement = '$41k'
+    )
 
-    from avendesora import PasswordGenerator, PasswordError
-    from inform import Error, cull, display, indent, os_error, terminate, warn
-    import gnupg
+The values may be specified as strings (units and SI scale factors allowed) or 
+as a real number or expression.
 
-    me = 'morgase@andor.gov'
+The *estimated_value* field should be a dictionary where one item is 'updated' 
+that contains the date of when the value of values were last updated, and the 
+remaining items should give an investment class and value. For example:
+
+You configure *postmortem* by creating ~/.config/postmortem/config. This file 
+contains Python code that specifies the various settings. At a minimum it should 
+include the GPG IDs for yourself and your recipients. For example:
+
+.. code-block:: python
+
+    my_gpg_ids = 'morgase@andor.gov'
     recipients = dict(
         kids='galad@trakand.name gawyn@trakand.name elayne@trakand.name',
         partners='taringail.damodred@andor.gov',
     )
 
+The updated source code for `postmortem
+<https://github.com/KenKundert/avendesora/tree/master/samples/api/postmortem>`_
+can be found on Github.
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+
+    # Description
+    """Postmortem
+
+    Generate an account summary that includes complete account information, 
+    including secrets, for selected accounts. This summary should allow the 
+    recipients to access your accounts. The summaries are intended to be given to 
+    the recipients after you die.
+
+    Usage:
+        postmortem [options] [<recipients>...]
+
+    Choose from: {available}.  If no recipients are specified, then summaries will 
+    be generated for all recipients.
+    """
+
+    # Imports
+    from avendesora import PasswordGenerator, PasswordError
+    from avendesora.gpg import PythonFile
+    from inform import (
+        Error, conjoin, cull, display, indent, os_error, terminate, warn
+    )
+    from docopt import docopt
+    from appdirs import user_config_dir
+    from pathlib import Path
+    import gnupg
+
+    # Settings
+    prog_name = 'postmortem'
+    config_filename = 'config'
+
+    # these can be overridden in the settings file: ~/.config/postmortem
+    my_gpg_ids = ''
+    recipients = dict()
+    avendesora_value_fieldname = 'estimated_value'
+    avendesora_recipients_fieldname = 'postmortem_recipients'
+
     try:
+        # Read settings
+        config_filepath = Path(user_config_dir(prog_name), config_filename)
+        if config_filepath.exists():
+            settings = PythonFile(config_filepath)
+            settings.initialize()
+            locals().update(settings.run())
+        else:
+            warn('no configuration file found.')
+
+        # Read command line and process options
+        cmdline = docopt(__doc__.format(available=conjoin(recipients)))
+        who = cmdline['<recipients>']
+        if not who:
+            who = recipients
+
+        # Scan accounts and gather information for recipients
         pw = PasswordGenerator()
         accounts = {}
-
-        # scan accounts and gather information for recipients
         for account in pw.all_accounts():
             account_name = account.get_name()
             class_name = account.__name__
             description = account.get_scalar('desc', None, None)
 
             # summarize account values
-            value = account.get_scalar('estimated_value', default=None)
-            postmortem_recipients = account.get_scalar('postmortem_recipients', default=None)
-            if value and not postmortem_recipients:
-                warn(f'{account.get_name()}: no recipients.')
+            data = account.get_composite(avendesora_value_fieldname)
+            postmortem_recipients = account.get_scalar(avendesora_recipients_fieldname, default=None)
+            if data and not postmortem_recipients:
+                warn('no recipients.', culprit= account.get_name())
                 continue
             if not postmortem_recipients:
                 continue
@@ -269,7 +344,7 @@ encrypted so that only the intended recipients can read them.
 
                     # output user fields
                     for name, keys in account.get_fields():
-                        if name in ['postmortem_recipients', 'desc', 'NAME']:
+                        if name in [avendesora_recipients_fieldname, 'desc', 'NAME']:
                             continue
                         if keys:
                             lines.append(name + ':')
@@ -293,7 +368,7 @@ encrypted so that only the intended recipients can read them.
                 num_accounts = len(content)
                 encrypted = gpg.encrypt(
                     '\n\n\n'.join(content),
-                    idents.split() + me.split()
+                    idents.split() + my_gpg_ids.split()
                 )
                 if not encrypted.ok:
                     raise Error(
@@ -309,6 +384,7 @@ encrypted so that only the intended recipients can read them.
             else:
                 warn('no accounts found.', culprit=recipient)
 
+    # process exceptions
     except KeyboardInterrupt:
         terminate('Killed by user.')
     except (PasswordError, Error) as e:
@@ -318,86 +394,314 @@ encrypted so that only the intended recipients can read them.
 .. index::
     single: networth example
 
-.. _networth letter:
+.. _networth api example:
 
 Example: Net Worth
 ------------------
 
 If you have added *estimated_value* to all of your accounts that hold 
 significant value as proposed in the previous example, then the following script 
-will summarize the values and estimate your net worth:
+summarizes the values and estimates your net worth:
+
+You configure *networth* by creating ~/.config/networth/config. This file 
+contains Python code that specifies the various settings. You do not need this 
+file, but there is a few things you might wish to configure with this file.  
+First, you can arrange to report the networth of multiple people.  Generally you 
+would be interested in your own networth, but you might also be interested in 
+the networth of someone such as a child or a parent, if you are their financial 
+custodian. Second, you can rename accounts if you have obscure or excessively 
+long account names. Finally, you can add a list of cryptocurrency, in which case 
+*networth* will download the latest prices to give you an up-to-date view of 
+your networth.
+
+Here is an example of what your configuration file might look like.
+
+.. code-block:: python
+
+    default_who='me'
+
+    avendesora_fieldnames = dict(
+        me='estimated_value',
+        parents='parents_estimated_value',
+    )
+
+    aliases = dict(
+        me = {
+            'princeton-capital': 'home mortgage',
+        },
+        parents = {
+            'parents-bankamerica': 'bank america',
+            'parents-schwab': 'schwab',
+            'premierlending': 'home mortgage',
+        }
+    )
+
+    coins = 'BTC ETH'.split()
+
+    # bar settings
+    screen_width = 110
+
+The updated source code for `networth
+<https://github.com/KenKundert/avendesora/tree/master/samples/api/networth>`_ 
+can be found on Github.
 
 .. code-block:: python
 
     #!/usr/bin/env python3
+    # Description
     """Networth
 
+    Show a summary of the networth of the specified person.
+
     Usage:
-        networth [options]
+        networth [options] [<who>]
+
+    Choose from: {available}. The default is {default_who}.
 
     Options:
-        -v, --verbose  output actual estimated value text rather than just the value
+        -u, --updated           show the account update date rather than breakdown
     """
 
+    # Imports
     from avendesora import PasswordGenerator, PasswordError
-    from inform import display, terminate
+    from avendesora.gpg import PythonFile
+    from inform import (
+        conjoin, display, error, join, os_error, terminate,
+        Color, Error, Inform,
+    )
     from quantiphy import Quantity
     from docopt import docopt
+    from appdirs import user_config_dir, user_cache_dir
+    from pathlib import Path
     Quantity.set_prefs(prec=2)
+    Inform(logfile=False)  # suppress warnings
 
+    # Settings
+    # These can be overridden in ~/.config/networth/config
+    prog_name = 'networth'
+    config_filename = 'config'
+    asset_color = Color(None)
+    debt_color = Color('red')
 
-    cmdline = docopt(__doc__)
-    verbose = cmdline['--verbose']
+    # Avendesora settings
+    default_who='me'
+    avendesora_fieldnames = dict(
+        me='estimated_value',
+    )
+    aliases = dict(me= {})
+
+    # cryptocurrency settings (empty coins to disable cryptocurrency support)
+    proxy = None
+    prices_filename = 'prices'
+    coins = None
+    max_age = 86400  # refresh cache if older than this (seconds)
+
+    # bar settings
+    screen_width = 79
+    bar_chars = '-=#'
+    bar_chars = '·╴─━═=#'
+    num_bar_chars = len(bar_chars)
+
+    # Utility functions
+    # Render bar
+    def render_bar(value, width):
+        """Render graphic representation of a value
+
+        value (real): should be normalized (fall between 0 and 1)
+        width (int): the width of the bar in characters when value is 1.
+        """
+        if value < 0:
+            color = debt_color
+            value = -value
+        else:
+            color = asset_color
+        scaled = width*value
+        buckets = int(scaled)
+        frac = int((num_bar_chars*scaled) % num_bar_chars)
+        extra = bar_chars[frac-1:frac]
+        bar = buckets*bar_chars[-1] + extra
+        return color(bar)
 
     try:
+        # Read settings
+        config_filepath = Path(user_config_dir(prog_name), config_filename)
+        if config_filepath.exists():
+            settings = PythonFile(config_filepath)
+            settings.initialize()
+            locals().update(settings.run())
+
+        # Read command line and process options
+        cmdline = docopt(__doc__.format(
+            available=conjoin(avendesora_fieldnames),
+            default_who=default_who,
+        ))
+        show_updated = cmdline['--updated']
+        who = cmdline['<who>'] if cmdline['<who>'] else default_who
+        fieldname = avendesora_fieldnames[who]
+        active_aliases = aliases[who]
+
+        # Get cryptocurrency prices
+        if coins:
+            import requests
+            import arrow
+
+            cache_valid = False
+            cache_dir = Path(user_cache_dir(prog_name))
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            prices_cache = Path(cache_dir, prices_filename)
+            if prices_cache:
+                if prices_cache.exists():
+                    now = arrow.now()
+                    age = now.timestamp - prices_cache.stat().st_mtime
+                    cache_valid = age < max_age
+            if cache_valid:
+                contents = prices_cache.read_text()
+                prices = Quantity.extract(contents)
+            else:
+                # download latest asset prices from cryptocompare.com
+                currencies = dict(
+                    fsyms=','.join(coins),     # from symbols
+                    tsyms='USD',               # to symbols
+                )
+                url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
+                base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
+                url = '?'.join([base_url, url_args])
+                try:
+                    r = requests.get(url, proxies=proxy)
+                except Exception as e:
+                    # must catch all exceptions as requests.get() can generate 
+                    # a variety based on how it fails, and if the exception is not 
+                    # caught the thread dies.
+                    raise Error('cannot access cryptocurrency prices:', str(e))
+                except KeyboardInterrupt:
+                    done()
+
+                try:
+                    data = r.json()
+                except:
+                    raise Error('cryptocurrency price download was garbled.')
+                prices = {k: Quantity(v['USD'], '$') for k, v in data.items()}
+
+                if prices_cache:
+                    contents = '\n'.join('{} = {}'.format(k,v) for k,v in 
+                    prices.items())
+                    prices_cache.write_text(contents)
+            prices['USD'] = Quantity(1, '$')
+        else:
+            prices = {}
+
+
+        # Build account summaries
         pw = PasswordGenerator()
-
-        # scan accounts and gather values for appropriate accounts
-        amounts = {}
+        totals = {}
+        accounts = {}
+        total_assets = Quantity(0, '$')
+        total_debt = Quantity(0, '$')
+        grand_total = Quantity(0, '$')
         width = 0
-        total = 0
         for account in pw.all_accounts():
-            text = account.get_scalar('estimated_value', default=None)
-            if text:
-                components = text.split()
-                value = Quantity(components[0])
-                if verbose:
-                    to_output = text
-                else:
-                    to_output = value
-                if value.units in ['$', 'USD']:
-                    total += value
-                else:
-                    to_output = f'{to_output} (not in total)'
-                account_name = account.get_name()
-                width = max(width, len(account_name))
-                amounts[account_name] = to_output
-        total = Quantity(total, "$")
+            # get data
+            data = account.get_composite(fieldname)
+            if not data:
+                continue
+            if type(data) != dict:
+                error(
+                    'expected a dictionary.',
+                    culprit=(account_name, fieldname)
+                )
+                continue
 
-        # display the account values
-        for key, val in amounts.items():
-            display(f'{key:>{width+2}s}: {val}')
-        display(f'{"TOTAL":>{width+2}s}: {total}')
+            # get account name
+            account_name = account.get_name()
+            account_name = active_aliases.get(account_name, account_name)
+            account_name = account_name.replace('_', ' ')
+            width = max(width, len(account_name))
 
+            # sum the data
+            updated = None
+            contents = {}
+            total = Quantity(0, '$')
+            odd_units = False
+            for k, v in data.items():
+                if k == 'updated':
+                    updated = v
+                    continue
+                if k in prices:
+                    value = Quantity(v*prices[k], prices[k])
+                    k = 'cryptocurrency'
+                else:
+                    value = Quantity(v, '$')
+                if value.units == '$':
+                    total = total.add(value)
+                else:
+                    odd_units = True
+                contents[k] = value.add(contents.get(k, 0))
+                width = max(width, len(k))
+            for k, v in contents.items():
+                totals[k] = v.add(totals.get(k, 0))
+
+            # generate the account summary
+            if show_updated:
+                desc = updated
+            else:
+                desc = ', '.join('{}={}'.format(k, v) for k, v in contents.items() if v)
+                if len(contents) == 1 and not odd_units:
+                    desc = k
+            accounts[account_name] = join(
+                total, desc.replace('_', ' '),
+                template=('{:7q} {}', '{:7q}'), remove=(None,'')
+            )
+
+            # sum assets and debts
+            if total > 0:
+                total_assets = total_assets.add(total)
+            else:
+                total_debt = total_debt.add(-total)
+            grand_total = grand_total.add(total)
+
+        # Summarize by account
+        display('By Account:')
+        for name in sorted(accounts):
+            summary = accounts[name]
+            display(f'{name:>{width+2}s}: {summary}')
+
+        # Summarize by investment type
+        display('\nBy Type:')
+        largest_share = max(totals.values())
+        barwidth = screen_width - width - 18
+        for asset_type in sorted(totals, key=lambda k: totals[k], reverse=True):
+            value = totals[asset_type]
+            if value.units != '$':
+                continue
+            share = value/grand_total
+            bar = render_bar(value/largest_share, barwidth)
+            asset_type = asset_type.replace('_', ' ')
+            display(f'{asset_type:>{width+2}s}: {value:>7s} ({share:>5.1%}) {bar}')
+        display(
+            f'\n{"TOTAL":>{width+2}s}:',
+            f'{grand_total:>7s} (assets = {total_assets}, debt = {total_debt})'
+        )
+
+    # Handle exceptions
+    except OSError as e:
+        error(os_error(e))
     except KeyboardInterrupt:
         terminate('Killed by user.')
-    except PasswordError as e:
+    except (PasswordError, Error) as e:
         e.terminate()
 
-This script assumes that the account value with units are the first thing in the 
-*estimated_value* string. It is common to combine the estimated value with the 
-date it was last updated. Something like this:
+Here is a typical output of this script::
 
-.. code-block:: python
+    By Account:
+            betterment:    $22k equities=$9k, cash=$3k, retirement=$9k
+                 chase:     $7k cash
+             southwest:      $0 miles=78kmiles
+              coindesk:  $15.3k cryptocurrency
 
-    estimated_value = '$11k in January 2018'
+    By Type:
+        cryptocurrency:  $15.3k (35.3%) ##########################################
+                  cash:    $10k (23.1%) ###############################
+              equities:     $9k (20.8%) ###########################
+            retirement:     $9k (20.8%) ###########################
 
-The text before the first whitespace is considered the value, and if it has 
-units of dollars it will be added to the reported total.  Here is a typical 
-output::
-
-         mint: $19k
-   betterment: $22k
-        chase: $12k
-    southwest: 78kmiles (not in total)
-        TOTAL: $53k
+                 TOTAL:  $43.3k (assets = $43.3k, debt = $0)

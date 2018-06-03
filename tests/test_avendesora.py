@@ -153,8 +153,8 @@ def test_summary():
         names: mybank, mb
         accounts:
             checking: reveal with: avendesora value mybank accounts.checking
-            creditcard: reveal with: avendesora value mybank accounts.creditcard
             savings: reveal with: avendesora value mybank accounts.savings
+            creditcard: reveal with: avendesora value mybank accounts.creditcard
         checking: {accounts.checking}
         customer service: 1-866-229-6633
         email: pizzaman@pizza.com
@@ -162,9 +162,9 @@ def test_summary():
         passcode: reveal with: avendesora value mybank passcode
         pin: reveal with: avendesora value mybank pin
         questions:
-            0: What city were you born in? reveal with: avendesora value mybank questions.0
-            1: What street did you grow up on? reveal with: avendesora value mybank questions.1
-            2: What was your childhood nickname? reveal with: avendesora value mybank questions.2
+            0: What city were you born in?, reveal with: avendesora value mybank questions.0
+            1: What street did you grow up on?, reveal with: avendesora value mybank questions.1
+            2: What was your childhood nickname?, reveal with: avendesora value mybank questions.2
         urls: https://mb.com
         username: pizzaman
         verbal: reveal with: avendesora value mybank verbal

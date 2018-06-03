@@ -780,10 +780,10 @@ class Account(object):
                     cls.get_name(),
                     cls.combine_field(name, key)
                 )))
-                value = ' '.join(cull([value.get_description(), reveal]))
+                value = ', '.join(cull([value.get_description(), reveal]))
             elif isinstance(value, (GeneratedSecret, ObscuredSecret)):
                 v = cls.get_scalar(name, key)
-                value = ' '.join(cull([value.get_description(), str(v)]))
+                value = ', '.join(cull([value.get_description(), str(v)]))
             else:
                 value = str(value)
 

@@ -59,5 +59,8 @@ Releases
 
     - Added *is_secret* argument to Secret classes.
     - Added support for *dmenu* as alternative to built-in selection utility.
-    - Add --delete option to log command.
-
+    - Added --delete option to log command.
+    - Rename *master* and *seed* *Account* attributes to *master_seed* and 
+      *account_seed*.
+    - updated *portmortem* and *networth* api examples.
+    - improve the account value formatting.

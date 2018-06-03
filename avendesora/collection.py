@@ -6,7 +6,7 @@
 # in the ordering of the dictionary-based collections.
 
 # License {{{1
-# Copyright (C) 2016-17 Kenneth S. Kundert
+# Copyright (C) 2016-18 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@
 # Imports {{{1
 from inform import is_str, is_collection
 
+# Globals {{{1
+__version__ = '0.1.0'
+__released__ = '2018-05-13'
 
 # Collection {{{1
 class Collection(object):
@@ -47,13 +50,13 @@ class Collection(object):
 
     def values(self):
         try:
-            return [self.collection[k] for k in sorted(self.collection.keys())]
+            return [self.collection[k] for k in self.collection.keys()]
         except AttributeError:
             return self.collection
 
     def items(self):
         try:
-            return [(k, self.collection[k]) for k in sorted(self.collection.keys())]
+            return [(k, self.collection[k]) for k in self.collection.keys()]
         except AttributeError:
             return enumerate(self.collection)
 
@@ -68,36 +71,45 @@ class Collection(object):
             The string used to join the formatted items.
         the value.  The second component is the separator. Thus:
 
+            >>> from collection import Collection
+
             >>> dogs = Collection({'collie': 3, 'beagle':1, 'sheppard': 2})
-            >>> print('dogs: {}.'.format(c.render('{k} ({v})', ', ')))
+            >>> print('dogs: {}.'.format(dogs.render('{k} ({v})', ', ')))
             dogs: collie (3), beagle (1), sheppard (2).
+
+            >>> print('dogs: {}.'.format(dogs.render(sep=', ')))
+            dogs: 3, 1, 2.
+
         """
-        return sep.join([tmpl.format(k=k, v=v) for k, v in self.items()])
+        if not fmt:
+            fmt = '{}'
+
+        return sep.join(fmt.format(v, k=k, v=v) for k, v in self.items())
 
     def __format__(self, template):
         """Convert the collection into a string
 
         The template consists of two components separated by a vertical bar. The
         first component specifies the formatting from each item. The key and
-        value are interpolated using \k to represent the key and \v to represent
-        the value.  The second component is the separator. Thus:
+        value are interpolated using {{k}} to represent the key and {{v}} to
+        represent the value.  The second component is the separator. Thus:
 
             >>> dogs = Collection({'collie': 3, 'beagle':1, 'sheppard': 2})
-            >>> print('dogs: {dogs:\k (\v)|, }.'.format(names=c))
+            >>> print('dogs: {:{{k}} ({{v}})|, }.'.format(dogs))
             dogs: collie (3), beagle (1), sheppard (2).
+
         """
         components = template.split('|')
         if len(components) == 2:
-            tmpl, sep = components
+            fmt, sep = components
         elif len(components) == 1:
-            tmpl, sep = components[0], ', '
+            fmt, sep = components[0], ', '
         else:
             raise ValueError('invalid format string for {!r}', self)
+        if not fmt:
+            fmt = '{}'
 
-        return sep.join([
-            tmpl.replace('\k', str(k)).replace('\v', str(v))
-            for k, v in self.items()
-        ])
+        return sep.join(fmt.format(v, k=k, v=v) for k, v in self.items())
 
     def __contains__(self, item):
         return item in self.values()

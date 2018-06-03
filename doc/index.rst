@@ -257,6 +257,7 @@ Contents
    configuring
    api
    examples
+   kpns
    upgrading
    releases
 
