@@ -1,17 +1,8 @@
 # Help
 # Output a help topic.
-#
-# To Do:  Output the obscured text within a class instantiation. So rather than
-# just outputting obscured text, output 'Hidden('obscured-text'). Also, accept
-# obscured text within its class and try to decode it using the class name, so
-# if GPG("ciphertext") then it will use GPG to decode it even if user does not
-# provide the encoding.
-#
-# Also implement scrypt class that uses a personal password. Call this Encrypt
-# or PersonalEncrypt.
 
 # License {{{1
-# Copyright (C) 2016-17 Kenneth S. Kundert
+# Copyright (C) 2016-18 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software

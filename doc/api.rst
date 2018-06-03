@@ -224,8 +224,12 @@ to the standard output when generating the messages. This gives you a chance to
 review the values and update them if they are stale. The generated files are 
 encrypted so that only the intended recipients can read them.
 
+Here is an example of the fields you would add to an account to support 
+*postmortem*:
+
 .. code-block:: python
 
+    postmortem_recipients = 'kids'
     estimated_value = dict(
         updated = 'January 2018',
         equities = '$23k',
@@ -233,12 +237,10 @@ encrypted so that only the intended recipients can read them.
         retirement = '$41k'
     )
 
-The values may be specified as strings (units and SI scale factors allowed) or 
-as a real number or expression.
-
-The *estimated_value* field should be a dictionary where one item is 'updated' 
-that contains the date of when the value of values were last updated, and the 
-remaining items should give an investment class and value. For example:
+The *estimated_value* field should be a dictionary where one item is 'updated',
+which contains the date of when the values were last updated, and the remaining 
+items should give an investment class and value.  The values may be specified as 
+strings (units and SI scale factors allowed) or as a real number or expression.
 
 You configure *postmortem* by creating ~/.config/postmortem/config. This file 
 contains Python code that specifies the various settings. At a minimum it should 
@@ -400,8 +402,8 @@ Example: Net Worth
 ------------------
 
 If you have added *estimated_value* to all of your accounts that hold 
-significant value as proposed in the previous example, then the following script 
-summarizes the values and estimates your net worth:
+significant value as proposed in the previous example, then *networth* 
+summarizes the values and estimates your net worth.
 
 You configure *networth* by creating ~/.config/networth/config. This file 
 contains Python code that specifies the various settings. You do not need this 
@@ -410,9 +412,9 @@ First, you can arrange to report the networth of multiple people.  Generally you
 would be interested in your own networth, but you might also be interested in 
 the networth of someone such as a child or a parent, if you are their financial 
 custodian. Second, you can rename accounts if you have obscure or excessively 
-long account names. Finally, you can add a list of cryptocurrency, in which case 
-*networth* will download the latest prices to give you an up-to-date view of 
-your networth.
+long account names. Finally, you can add a list of cryptocurrencies, in which 
+case *networth* will download the latest prices to give you an up-to-date view 
+of your networth.
 
 Here is an example of what your configuration file might look like.
 

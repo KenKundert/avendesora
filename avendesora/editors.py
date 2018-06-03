@@ -3,7 +3,7 @@
 # Open and editor on a file.
 
 # License {{{1
-# Copyright (C) 2016-17 Kenneth S. Kundert
+# Copyright (C) 2016-18 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
