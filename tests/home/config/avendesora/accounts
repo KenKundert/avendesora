@@ -114,11 +114,11 @@ class MyBank(Account):
         Question('What street did you grow up on?'),
         Question('What was your childhood nickname?'),
     ]
-    accounts = dict(
-        checking =   Hidden('MTIzNDU2Nzg='),
-        savings =    Hidden('MjM0NTY3ODk='),
-        creditcard = Hidden('MzQ1Njc4OTA='),
-    )
+    accounts = dict([
+        ('checking',   Hidden('MTIzNDU2Nzg=')),
+        ('savings',    Hidden('MjM0NTY3ODk=')),
+        ('creditcard', Hidden('MzQ1Njc4OTA=')),
+    ])
     checking=Script('{accounts.checking}')
     customer_service = '1-866-229-6633'
     otp = OTP('JBSWY3DPEHPK3PXP')
