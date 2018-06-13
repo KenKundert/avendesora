@@ -62,5 +62,5 @@ Releases
     - Added --delete option to log command.
     - Rename *master* and *seed* *Account* attributes to *master_seed* and 
       *account_seed*.
-    - updated *portmortem* and *networth* api examples.
-    - improve the account value formatting.
+    - Improve  *portmortem* and *networth* api examples.
+    - Improve the account value formatting.

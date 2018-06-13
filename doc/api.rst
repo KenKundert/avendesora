@@ -163,7 +163,7 @@ can be found on Github.
     from pathlib import Path
     import pexpect
 
-    SSHkeys = ['primary', 'github', 'backups']
+    SSHkeys = 'primary github backups'.split()
     SSHadd = 'ssh-add'
 
     cmdline = docopt(__doc__.format(keys = ', '.join(SSHkeys)))

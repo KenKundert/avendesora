@@ -962,7 +962,7 @@ class Log(Command):
             except OSError as e:
                 raise PasswordError(os_error(e))
         if not logfile.exists():
-            display('Logfile was not found.')
+            raise PasswordError('log file was not found.')
         else:
             GenericEditor.open(logfile)
 
