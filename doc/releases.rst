@@ -53,14 +53,10 @@ Releases
 **1.10 (2018-02-18)**:
     - Added support for *qutebrowser*.
 
-**Latest Development Version**:
-    | Version: 1.10.9
-    | Released: 2018-06-12
-
+**1.11 (2018-06-14)**:
     - Added *is_secret* argument to Secret classes.
     - Added support for *dmenu* as alternative to built-in selection utility.
     - Added --delete option to log command.
-    - Rename *master* and *seed* *Account* attributes to *master_seed* and 
-      *account_seed*.
+    - Rename *master* and *seed* *Account* attributes to *master_seed* and *account_seed*.
     - Improve  *portmortem* and *networth* api examples.
     - Improve the account value formatting.
