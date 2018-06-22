@@ -456,110 +456,199 @@ can be found on Github.
     Show a summary of the networth of the specified person.
 
     Usage:
-        networth [options] [<who>]
-
-    Choose from: {available}. The default is {default_who}.
+        networth [options] [<profile>]
 
     Options:
         -u, --updated           show the account update date rather than breakdown
+
+    {available_profiles}
+    Settings can be found in: {settings_dir}.
+    Typically there is one file for generic settings named 'config' and then one 
+    file for each profile whose name is the same as the profile name with a '.prof' 
+    suffix.  Each of the files may contain any setting, but those values in 'config' 
+    override those built in to the program, and those in the individual profiles 
+    override those in 'config'. The following settings are understood. The values 
+    are those before an individual profile is applied.
+
+    Profile values:
+        default_profile = {default_profile}
+
+    Account values:
+        avendesora_fieldname = {avendesora_fieldname}
+        value_updated_subfieldname = {value_updated_subfieldname}
+        date_formats = {date_formats}
+        max_account_value_age = {max_account_value_age}  (in days)
+        aliases = {aliases}
+            (aliases is used to fix account names to make them more readable)
+
+    Cryptocurrency values:
+        coins = {coins}
+        prices_filename = {prices_filename}
+        max_coin_price_age = {max_coin_price_age}  (in seconds)
+
+    Bar graph values:
+        screen_width = {screen_width}
+        bar_chars = {bar_chars}
+        asset_color = {asset_color}
+        debt_color = {debt_color}
+
+    The prices and log files can be found in {cache_dir}.
     """
 
     # Imports
     from avendesora import PasswordGenerator, PasswordError
     from avendesora.gpg import PythonFile
     from inform import (
-        conjoin, display, error, join, os_error, terminate,
-        Color, Error, Inform,
+        conjoin, display, done, error, is_str, join, narrate, os_error, terminate, 
+        warn, Color, Error, Inform,
     )
     from quantiphy import Quantity
     from docopt import docopt
     from appdirs import user_config_dir, user_cache_dir
     from pathlib import Path
-    Quantity.set_prefs(prec=2)
-    Inform(logfile=False)  # suppress warnings
+    import arrow
 
     # Settings
     # These can be overridden in ~/.config/networth/config
     prog_name = 'networth'
     config_filename = 'config'
-    asset_color = Color(None)
-    debt_color = Color('red')
 
     # Avendesora settings
-    default_who='me'
-    avendesora_fieldnames = dict(
-        me='estimated_value',
-    )
-    aliases = dict(me= {})
+    default_profile = 'me'
+    avendesora_fieldname = 'estimated_value'
+    value_updated_subfieldname = 'updated'
+    aliases = {}
 
     # cryptocurrency settings (empty coins to disable cryptocurrency support)
     proxy = None
     prices_filename = 'prices'
     coins = None
-    max_age = 86400  # refresh cache if older than this (seconds)
+    max_coin_price_age = 86400  # refresh cache if older than this (seconds)
 
     # bar settings
     screen_width = 79
     bar_chars = '-=#'
     bar_chars = '·╴─━═=#'
-    num_bar_chars = len(bar_chars)
+    asset_color = None
+    debt_color = 'red'
+        # currently we only colorize the bar because ...
+        # - it is the only way of telling whether value is positive or negative
+        # - trying to colorize the value really messes with the column widths and is 
+        #     not attractive
+
+    # date settings
+    date_formats = [
+        'MMMM YYYY',
+        'YYMMDD',
+    ]
+    max_account_value_age = 120  # days
 
     # Utility functions
-    # Render bar
+    # get the age of an account value
+    def get_age(date, profile):
+        if date:
+            for fmt in date_formats:
+                try:
+                    then = arrow.get(date, fmt)
+                    age = arrow.now() - then
+                    return age.days
+                except:
+                    pass
+        warn(
+            'could not compute age of account value',
+            '(updated missing or misformatted).',
+            culprit=profile
+        )
+
+    # colorize text
+    def colorize(value, text = None):
+        if text is None:
+            text = str(value)
+        return debt_color(text) if value < 0 else asset_color(text)
+
+    # render bar
     def render_bar(value, width):
         """Render graphic representation of a value
 
         value (real): should be normalized (fall between 0 and 1)
         width (int): the width of the bar in characters when value is 1.
         """
-        if value < 0:
-            color = debt_color
-            value = -value
-        else:
-            color = asset_color
-        scaled = width*value
+        scaled = width*abs(value)
         buckets = int(scaled)
         frac = int((num_bar_chars*scaled) % num_bar_chars)
         extra = bar_chars[frac-1:frac]
         bar = buckets*bar_chars[-1] + extra
-        return color(bar)
+        return colorize(value, bar)
 
     try:
-        # Read settings
-        config_filepath = Path(user_config_dir(prog_name), config_filename)
+        # Initialization
+        settings_dir = Path(user_config_dir(prog_name))
+        cache_dir = user_cache_dir(prog_name)
+        Quantity.set_prefs(prec=2)
+        Inform(logfile=Path(cache_dir, 'log'))
+        display.log = False   # do not log normal output
+
+        # Read generic settings
+        config_filepath = Path(settings_dir, config_filename)
         if config_filepath.exists():
+            narrate('reading:', config_filepath)
             settings = PythonFile(config_filepath)
             settings.initialize()
             locals().update(settings.run())
+        else:
+            narrate('not found:', config_filepath)
 
         # Read command line and process options
+        available=set(p.stem for p in settings_dir.glob('*.prof'))
+        available.add(default_profile)
+        if len(available) > 1:
+            choose_from = f'Choose <profile> from {conjoin(sorted(available))}.'
+            default = f'The default is {default_profile}.'
+            available_profiles = f'{choose_from} {default}\n'
+        else:
+            available_profiles = ''
+
         cmdline = docopt(__doc__.format(
-            available=conjoin(avendesora_fieldnames),
-            default_who=default_who,
+            **locals()
         ))
         show_updated = cmdline['--updated']
-        who = cmdline['<who>'] if cmdline['<who>'] else default_who
-        fieldname = avendesora_fieldnames[who]
-        active_aliases = aliases[who]
+        profile = cmdline['<profile>'] if cmdline['<profile>'] else default_profile
+
+        # Read profile settings
+        config_filepath = Path(user_config_dir(prog_name), profile + '.prof')
+        if config_filepath.exists():
+            narrate('reading:', config_filepath)
+            settings = PythonFile(config_filepath)
+            settings.initialize()
+            locals().update(settings.run())
+        else:
+            narrate('not found:', config_filepath)
+
+        # Process the settings
+        if is_str(date_formats):
+            date_formats = [date_formats]
+        asset_color = Color(asset_color)
+        debt_color = Color(debt_color)
+        num_bar_chars = len(bar_chars)
 
         # Get cryptocurrency prices
         if coins:
             import requests
-            import arrow
 
             cache_valid = False
-            cache_dir = Path(user_cache_dir(prog_name))
+            cache_dir = Path(cache_dir)
             cache_dir.mkdir(parents=True, exist_ok=True)
             prices_cache = Path(cache_dir, prices_filename)
-            if prices_cache:
-                if prices_cache.exists():
-                    now = arrow.now()
-                    age = now.timestamp - prices_cache.stat().st_mtime
-                    cache_valid = age < max_age
+            if prices_cache and prices_cache.exists():
+                now = arrow.now()
+                age = now.timestamp - prices_cache.stat().st_mtime
+                cache_valid = age < max_coin_price_age
             if cache_valid:
                 contents = prices_cache.read_text()
                 prices = Quantity.extract(contents)
+                narrate('coin prices are current:', prices_cache)
             else:
+                narrate('updating coin prices')
                 # download latest asset prices from cryptocompare.com
                 currencies = dict(
                     fsyms=','.join(coins),     # from symbols
@@ -588,12 +677,13 @@ can be found on Github.
                     contents = '\n'.join('{} = {}'.format(k,v) for k,v in 
                     prices.items())
                     prices_cache.write_text(contents)
+                    narrate('updating coin prices:', prices_cache)
             prices['USD'] = Quantity(1, '$')
         else:
             prices = {}
 
-
         # Build account summaries
+        narrate('running avendesora')
         pw = PasswordGenerator()
         totals = {}
         accounts = {}
@@ -602,20 +692,21 @@ can be found on Github.
         grand_total = Quantity(0, '$')
         width = 0
         for account in pw.all_accounts():
+
             # get data
-            data = account.get_composite(fieldname)
+            data = account.get_composite(avendesora_fieldname)
             if not data:
                 continue
             if type(data) != dict:
                 error(
                     'expected a dictionary.',
-                    culprit=(account_name, fieldname)
+                    culprit=(account_name, avendesora_fieldname)
                 )
                 continue
 
             # get account name
             account_name = account.get_name()
-            account_name = active_aliases.get(account_name, account_name)
+            account_name = aliases.get(account_name, account_name)
             account_name = account_name.replace('_', ' ')
             width = max(width, len(account_name))
 
@@ -625,7 +716,7 @@ can be found on Github.
             total = Quantity(0, '$')
             odd_units = False
             for k, v in data.items():
-                if k == 'updated':
+                if k == value_updated_subfieldname:
                     updated = v
                     continue
                 if k in prices:
@@ -643,12 +734,15 @@ can be found on Github.
                 totals[k] = v.add(totals.get(k, 0))
 
             # generate the account summary
+            age = get_age(data.get(value_updated_subfieldname), account_name)
             if show_updated:
                 desc = updated
             else:
                 desc = ', '.join('{}={}'.format(k, v) for k, v in contents.items() if v)
                 if len(contents) == 1 and not odd_units:
                     desc = k
+                if age and age > max_account_value_age:
+                    desc += f' ({age//30} months old)'
             accounts[account_name] = join(
                 total, desc.replace('_', ' '),
                 template=('{:7q} {}', '{:7q}'), remove=(None,'')
@@ -691,6 +785,7 @@ can be found on Github.
         terminate('Killed by user.')
     except (PasswordError, Error) as e:
         e.terminate()
+    done()
 
 Here is a typical output of this script::
 
@@ -706,4 +801,4 @@ Here is a typical output of this script::
               equities:     $9k (20.8%) ###########################
             retirement:     $9k (20.8%) ###########################
 
-                 TOTAL:  $43.3k (assets = $43.3k, debt = $0)
+                TOTAL:  $43.3k (assets = $43.3k, debt = $0)

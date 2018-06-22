@@ -60,3 +60,9 @@ Releases
     - Rename *master* and *seed* *Account* attributes to *master_seed* and *account_seed*.
     - Improve  *portmortem* and *networth* api examples.
     - Improve the account value formatting.
+
+**Latest Development Version**:
+    | Version: 1.11.0
+    | Released: 2018-06-14
+
+    - Updated the networth API example.
