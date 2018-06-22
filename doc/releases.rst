@@ -62,7 +62,7 @@ Releases
     - Improve the account value formatting.
 
 **Latest Development Version**:
-    | Version: 1.11.0
-    | Released: 2018-06-14
+    | Version: 1.11.1
+    | Released: 2018-06-22
 
     - Updated the networth API example.
