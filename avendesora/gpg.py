@@ -52,7 +52,6 @@ class GnuPG(object):
     def initialize(cls,
         gpg_path=None, gpg_home=None, armor=None
     ):
-        from .config import get_setting, override_setting
 
         cls.gpg_path = to_path(
             gpg_path if gpg_path else get_setting('gpg_executable')
@@ -155,15 +154,15 @@ class GnuPG(object):
         The name of the new file has the specified extension prepended to the
         existing suffixes.
         """
+        if extension:
+            # prepend extension to list of suffixes
+            suffixes = self.path.suffixes
+            stem = self.path.stem.partition('.')[0]  # remove all suffixes
+            new = to_path(self.path.parent, ''.join([stem, extension] + suffixes))
+            self.backup_path = new
 
-        # prepend extension to list of suffixes
-        suffixes = self.path.suffixes
-        stem = self.path.stem.partition('.')[0]  # remove all suffixes
-        new = to_path(self.path.parent, ''.join([stem, extension] + suffixes))
-        self.backup_path = new
-
-        cp(self.path, new)
-        return new
+            cp(self.path, new)
+            return new
 
     def restore(self):
         "Restores the backup copy of the file."
@@ -216,7 +215,7 @@ class PythonFile(GnuPG):
         ActivePythonFile = self.path
         path = self.path
         self.encrypted = path.suffix in ['.gpg', '.asc']
-        log('reading.', culprit=path)
+        narrate('reading.', culprit=path)
         try:
             self.code = self.read()
                 # need to save the code for the new command
@@ -247,7 +246,7 @@ class PythonFile(GnuPG):
         ActivePythonFile = None
         return contents
 
-    def create(self, contents, gpg_ids):
+    def create(self, contents, gpg_ids=None):
         path = self.path
         try:
             # check to see if file already exists
@@ -263,6 +262,8 @@ class PythonFile(GnuPG):
             if path.suffix in ['.gpg', '.asc']:
                 narrate('encrypting.', culprit=path)
                 # encrypt it
+                if not gpg_ids:
+                    raise PasswordError('gpg_ids missing.')
                 self.save(contents, gpg_ids)
             else:
                 narrate('not encrypting.', culprit=path)

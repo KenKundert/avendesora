@@ -30,7 +30,7 @@ from .script import Script
 from .secrets import GeneratedSecret
 from difflib import get_close_matches
 from inform import (
-    Color, codicil, conjoin, cull, debug, full_stop, is_collection, is_str,
+    Color, codicil, conjoin, cull, full_stop, is_collection, is_str,
     join, log, notify, output, warn, indent,
 )
 from textwrap import dedent

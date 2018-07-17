@@ -35,7 +35,7 @@ from .secrets import Passphrase
 from .title import Title
 from .utilities import generate_random_string, validate_components
 from inform import (
-    codicil, conjoin, debug, error, notify, log, os_error, render, warn, is_str,
+    codicil, conjoin, error, notify, log, os_error, render, warn, is_str,
 )
 from shlib import to_path, mv, rm
 from textwrap import dedent, fill

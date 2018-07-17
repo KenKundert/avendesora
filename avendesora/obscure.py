@@ -27,7 +27,7 @@ from .error import PasswordError
 from .gpg import GnuPG
 from .utilities import error_source
 from inform import (
-    debug, log, indent, is_str, output, terminate, warn, full_stop, cull
+    log, indent, is_str, output, terminate, warn, full_stop, cull
 )
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent

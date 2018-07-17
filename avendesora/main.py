@@ -39,7 +39,7 @@ from .command import Command
 from .config import read_config, get_setting
 from .error import PasswordError
 from .gpg import GnuPG, BufferedFile
-from inform import Inform, Error, done, fatal, output, terminate, debug, os_error
+from inform import Inform, Error, done, fatal, output, terminate, os_error
 from shlib import to_path
 from docopt import docopt
 import sys

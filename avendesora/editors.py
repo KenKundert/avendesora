@@ -33,7 +33,7 @@ class GenericEditor(Editor):
     NAME = 'generic'
 
     @classmethod
-    def open(cls, filepath, account = None):
+    def run(cls, filepath, account = None):
         args = dict(
             filepath = filepath,
             account = account,

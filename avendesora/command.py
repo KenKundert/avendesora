@@ -28,7 +28,7 @@ from .obscure import ObscuredSecret
 from .utilities import query_user, two_columns
 from .writer import get_writer
 from inform import (
-    codicil, columns, cull, debug, display, error, full_stop, output, warn,
+    codicil, columns, cull, display, error, full_stop, output, warn,
     conjoin, join, os_error, is_collection, indent, render,
 )
 from shlib import chmod, cp, rm, to_path
@@ -225,7 +225,7 @@ class Add(Command):
         # open template in the editor
         try:
             while (True):
-                GenericEditor.open(tmpfile.path)
+                GenericEditor.run(tmpfile.path)
 
                 # read the tmp file and determine if it has changed
                 new = tmpfile.read()
@@ -683,7 +683,7 @@ class Edit(Command):
         # allow the user to edit, and then check and make sure it is valid
         try:
             while True:
-                GenericEditor.open(accounts_file.path, account_name)
+                GenericEditor.run(accounts_file.path, account_name)
 
                 # check the changes to see if there are any issues
                 try:
@@ -964,7 +964,7 @@ class Log(Command):
         if not logfile.exists():
             raise PasswordError('log file was not found.')
         else:
-            GenericEditor.open(logfile)
+            GenericEditor.run(logfile)
 
 
 # Login Credentials {{{1
