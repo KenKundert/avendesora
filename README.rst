@@ -76,7 +76,7 @@ careful when you first create your account to name it appropriately so you don't
 feel the need to change it in the future. For example, 'gmail' might not be 
 a good account name if you expect to have multiple Gmail accounts. In this case 
 you might want to include your username in the account name. You can always make 
-the shorter 'gmail' as an account alias to you can still access the account 
+the shorter 'gmail' as an account alias so you can still access the account 
 quickly.
 
 
@@ -238,8 +238,8 @@ can simply delete the existing file and then regenerate it using::
     avendesora init -g <gpg_id>
 
 Any files that already exist will not be touched, but any missing files will be 
-recreated, and this time they will be encrypted or not based on the extensions 
-you gave.
+recreated, and this time they will be encrypted or not based on the extension 
+you give.
 
 
 Using Avendesora
@@ -304,7 +304,7 @@ for that account. For example:
         accounts = {
             'checking':   Hidden('MTIzNDU2Nzg='),
             'savings':    Hidden('MjM0NTY3ODk='),
-            'creditcard': Hidden('MzQ1Njc4OTA='),
+            'creditcard': Hidden('ODczMi0yODk0LTI4NjEtMjgxMA=='),
         }
         questions = [
             Question('What city were you born in?'),
@@ -372,12 +372,15 @@ You can also use simple scripts as the requested value::
     > avendesora value 'username: {username}, password: {passcode}'
     username: gman33, password: Nj3gpqHNfiie
 
-Finally, you can use a script for the value of the *default* attribute on the 
-account, then the script is used to generate the output when no attribute is 
-requested::
+Finally, the attributes themselves may be scripts. For example, if you added the 
+following to you account::
 
-    > avendesora value
-    username: gman33, password: Nj3gpqHNfiie
+    cc = Script('{accounts.creditcard} 02/23 363')
+
+Then you could access a summary of your credit card information with::
+
+    > avendesora value cc
+    8732-2894-2861-2810 02/23 363
 
 
 Adding And Editing Accounts
