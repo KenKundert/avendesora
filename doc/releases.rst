@@ -65,4 +65,5 @@ Releases
     | Version: 1.11.1
     | Released: 2018-06-22
 
-    - Updated the networth API example.
+    - Updated the *networth* API example.
+    - Incorporated *shlib* package into *Avendesora* for better security.
