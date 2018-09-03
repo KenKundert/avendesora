@@ -19,11 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '0.8.2'
+__version__ = '0.8.3'
 __released__ = '2018-09-03'
 
 # Imports {{{1
-from extended_pathlib import Path
+try:
+    from .extended_pathlib import Path
+except ImportError:
+    from pathlib import Path
 import itertools
 import shlex
 import shutil
@@ -107,8 +110,8 @@ def quote_arg(arg):
                 return "'" + arg.replace("'", "'\"'\"'") + "'"
     return quote(str(arg))
 
-# use_log {{{2
-def use_log(log):
+# _use_log {{{2
+def _use_log(log):
     if log is None:
         return preferences.get('log_cmd')
     return log
@@ -516,7 +519,7 @@ class Cmd(object):
             # cannot use to_str() because it can change some arguments when not intended.
             # this is particularly problematic the duplicity arguments in embalm
             cmd = [str(c) for c in self.cmd]
-        if use_log(self.log):
+        if _use_log(self.log):
             from inform import log
             log('Running:', render_command(cmd, option_args=self.option_args))
 
@@ -557,7 +560,7 @@ class Cmd(object):
             cmd = self.cmd if self.use_shell else split_cmd(self.cmd)
         else:
             cmd = self.cmd
-        if use_log(self.log):
+        if _use_log(self.log):
             from inform import log
             log('Running:', render_command(cmd, option_args=self.option_args))
 
@@ -607,7 +610,7 @@ class Cmd(object):
         self.stderr = None if stderr is None else stderr.decode(self.encoding)
         self.status = process.returncode
 
-        if use_log(self.log):
+        if _use_log(self.log):
             from inform import log
             log('Exit status:', self.status)
 
