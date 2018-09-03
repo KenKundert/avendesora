@@ -15,6 +15,8 @@ Commands:
 
 Use 'avendesora help <command>' for information on a specific command.
 Use 'avendesora help' for list of available help topics.
+
+Documentation can be found at avendesora.readthedocs.io.
 """
 
 # License {{{1
@@ -39,8 +41,8 @@ from .command import Command
 from .config import read_config, get_setting
 from .error import PasswordError
 from .gpg import GnuPG, BufferedFile
+from . import shlib
 from inform import Inform, Error, done, fatal, output, terminate, os_error
-from shlib import to_path
 from docopt import docopt
 import sys
 
@@ -63,6 +65,7 @@ def main():
             logfile=logfile, hanging_indent=False,
             stream_policy='header', notify_if_no_tty=True
         )
+        shlib.set_prefs(use_inform=True, log_cmd=True)
 
         # run the requested command
         Command.execute(cmdline['<command>'], cmdline['<args>'])

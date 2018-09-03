@@ -196,7 +196,7 @@ class Account(object):
                 msg = '{}, did you mean:\n    {}?'.format(
                     msg, conjoin(offer, sep=',\n    ', conj=', or\n    ')
                 )
-            raise PasswordError(msg, culprit=name)
+            raise PasswordError(full_stop(msg), culprit=name)
 
     # get_name() {{{2
     @classmethod

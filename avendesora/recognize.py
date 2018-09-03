@@ -23,9 +23,9 @@
 # Imports {{{1
 from .config import get_setting
 from .error import PasswordError
+from .shlib import cwd, to_path, Run
 from .utilities import gethostname, getusername, error_source
-from shlib import cwd, to_path, Run
-from inform import is_collection, is_str, log, notify, warn, os_error
+from inform import Error, is_collection, is_str, log, notify, warn, os_error
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
@@ -622,8 +622,8 @@ class RecognizeNetwork(Recognizer):
                 if verbose:
                     log('    %s: matches.' % self.get_name())
                 return self.script
-        except OSError as e:
-            warn(os_error(e))
+        except Error as e:
+            warn(e)
             return
         if verbose:
             log('    %s: no match.' % self.get_name())

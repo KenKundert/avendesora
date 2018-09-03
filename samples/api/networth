@@ -48,8 +48,8 @@ The prices and log files can be found in {cache_dir}.
 from avendesora import PasswordGenerator, PasswordError
 from avendesora.gpg import PythonFile
 from inform import (
-    conjoin, display, done, error, is_str, join, narrate, os_error, terminate, 
-    warn, Color, Error, Inform,
+    conjoin, display, done, error, fatal, is_str, join, narrate, os_error, 
+    terminate, warn, Color, Error, Inform,
 )
 from quantiphy import Quantity
 from docopt import docopt
@@ -78,11 +78,13 @@ max_coin_price_age = 86400  # refresh cache if older than this (seconds)
 screen_width = 79
 bar_chars = '-=#'
 bar_chars = '·╴─━═=#'
-asset_color = None
+bar_chars = '▏▎▍▌▋▊▉█'
+asset_color = 'green'
 debt_color = 'red'
     # currently we only colorize the bar because ...
-    #     it is the only way of telling whether value is positive or negative
-    #     trying to colorize the value really messes with the column widths
+    # - it is the only way of telling whether value is positive or negative
+    # - trying to colorize the value really messes with the column widths and is 
+    #     not attractive
 
 # date settings {{{2
 date_formats = [
@@ -92,7 +94,7 @@ date_formats = [
 max_account_value_age = 120  # days
 
 # Utility functions {{{1
-# Get the age of an account value {{{2
+# get the age of an account value {{{2
 def get_age(date, profile):
     if date:
         for fmt in date_formats:
@@ -108,13 +110,13 @@ def get_age(date, profile):
         culprit=profile
     )
 
-# colorize text {{[2
+# colorize text {{{2
 def colorize(value, text = None):
     if text is None:
         text = str(value)
     return debt_color(text) if value < 0 else asset_color(text)
 
-# Render bar {{{2
+# render bar {{{2
 def render_bar(value, width):
     """Render graphic representation of a value
 
@@ -129,7 +131,7 @@ def render_bar(value, width):
     return colorize(value, bar)
 
 try:
-    # initialization
+    # Initialization {{{1
     settings_dir = Path(user_config_dir(prog_name))
     cache_dir = user_cache_dir(prog_name)
     Quantity.set_prefs(prec=2)
@@ -161,6 +163,11 @@ try:
     ))
     show_updated = cmdline['--updated']
     profile = cmdline['<profile>'] if cmdline['<profile>'] else default_profile
+    if profile not in available:
+        fatal(
+            'unknown profile.', choose_from, template=('{} {}', '{}'), 
+            culprit=profile
+        )
 
     # Read profile settings {{{1
     config_filepath = Path(user_config_dir(prog_name), profile + '.prof')

@@ -26,7 +26,7 @@ from .config import get_setting
 from .error import PasswordError
 from .preferences import INITIAL_AUTOTYPE_DELAY
 from .script import Script
-from shlib import Run
+from .shlib import Run, split_cmd
 from inform import (
     Color, codicil, cull, error, is_str, log, output, warn, indent, os_error,
 )
@@ -212,13 +212,10 @@ class ClipboardWriter(Writer):
         # could steal my passwords. This is why I use an absolute path. I tried
         # to access the clipboard directly using GTK but I cannot get the code
         # to work.
-        base_cmd = Run.split(get_setting('xsel_executable'))
+        base_cmd = split_cmd(get_setting('xsel_executable'))
 
         log('Writing to clipboard.')
-        try:
-            Run(base_cmd + ['-i'], 'soeW', stdin=value+'\n')
-        except OSError as e:
-            raise PasswordError(os_error(e))
+        Run(base_cmd + ['-i'], 'soeW', stdin=value+'\n')
 
         if is_secret:
             # produce count down
@@ -231,10 +228,7 @@ class ClipboardWriter(Writer):
                 cursor.clear()
 
             # clear the clipboard
-            try:
-                Run(base_cmd + ['-c'], 'soew')
-            except OSError as e:
-                raise PasswordError(os_error(e))
+            Run(base_cmd + ['-c'], 'soew')
 
         # Use Gobject Introspection (GTK) to put the information on the
         # clipboard (for some reason I cannot get this to work).
@@ -274,13 +268,6 @@ class KeyboardWriter(Writer):
         # Split the text into individual key strokes and convert the special
         # characters to their xkeysym names
 
-        def run_xdotool(args):
-            try:
-                #[get_setting('xdotool_executable'), 'getactivewindow'] +
-                Run(get_setting('xdotool_executable').split() + args, 'soeW')
-            except OSError as e:
-                raise PasswordError(os_error(e))
-
         keysyms = []
         for char in text:
             if char in string.ascii_letters + string.digits:
@@ -291,7 +278,10 @@ class KeyboardWriter(Writer):
                 error('cannot map to keysym, unknown.', culprit=char)
             else:
                 keysyms.append(keysym)
-        run_xdotool('key --clearmodifiers'.split() + keysyms)
+        xdotool = get_setting('xdotool_executable')
+        Run([xdotool, 'key', '--clearmodifiers'] + keysyms, 'soeW', log=False)
+            # it is important that log be False, it prevents the password from
+            # ending up in the logfile.
 
     def display_field(self, account, field):
         # get string to display
@@ -310,20 +300,19 @@ class KeyboardWriter(Writer):
                 out.append(val)
                 scrubbed.append(val)
             elif cmd.startswith('sleep '):
-                cmd = cmd.split()
+                scrubbed.append(cmd)
                 try:
-                    assert cmd[0] == 'sleep'
-                    assert len(cmd) == 2
+                    kw, seconds = cmd.split()
+                    assert kw == 'sleep'
                     if out:
                         # drain the buffer before sleeping
                         if not dryrun:
                             self._autotype(''.join(out))
                         out = []
-                    sleep(float(cmd[1]))
-                    scrubbed.append('<sleep %s>' % cmd[1])
-                except TypeError:
+                    sleep(float(seconds))
+                except (TypeError, ValueError):
                     raise PasswordError(
-                        'syntax error in keyboard script.', culprit=term
+                        'syntax error in keyboard script.', culprit=cmd
                     )
             else:
                 out.append(val)

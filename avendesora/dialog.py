@@ -3,8 +3,8 @@
 # Requires the python bindings for the GTK3 library.
 
 from .config import get_setting
+from .shlib import Run
 from inform import Error, os_error
-from shlib import Run
 
 
 # dmenu selection utility interface
@@ -12,10 +12,7 @@ def dmenu_dialog(title, choices):
     executable = get_setting('dmenu_executable')
     #cmd = [executable, '-l', len(choices), '-i', '-p', title]
     cmd = [executable, '-l', len(choices), '-i']
-    try:
-        dmenu = Run(cmd, 'sOeW1', stdin='\n'.join(choices))
-    except OSError as e:
-        raise Error(os_error(e))
+    dmenu = Run(cmd, 'sOeW1', stdin='\n'.join(choices))
     return dmenu.stdout.rstrip('\n')
 
 # gtk selection utility interface

@@ -21,7 +21,7 @@
 # Imports {{{1
 from .config import get_setting, add_setting, setting_path
 from .error import PasswordError
-from shlib import Run
+from .shlib import Run
 from inform import log, os_error
 
 # Editor base class {{{1
@@ -43,10 +43,7 @@ class GenericEditor(Editor):
             cmd = get_setting(editor_setting)
             cmd = [e.format(**args) for e in cmd]
 
-            log("running '%s'." % ' '.join(cmd))
             Run(cmd, 'soeW')
-        except OSError as e:
-            raise PasswordError(os_error(e))
         except KeyError as e:
             raise PasswordError(
                 *e.args,

@@ -21,7 +21,7 @@
 
 # Imports {{{1
 from .config import get_setting
-from shlib import to_path
+from .shlib import to_path
 from inform import error, os_error
 import hashlib
 

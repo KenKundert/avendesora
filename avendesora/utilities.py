@@ -19,8 +19,8 @@
 # Imports {{{1
 from .config import get_setting
 from .error import PasswordError
-from shlib import Run, to_path
-from inform import codicil, os_error, output, warn, is_str, indent
+from .shlib import Run, to_path
+from inform import Error, codicil, os_error, output, warn, is_str, indent
 from textwrap import dedent, wrap
 from pkg_resources import resource_filename
 from stat import ST_MODE
@@ -209,3 +209,4 @@ def query_user(msg):
         return raw_input(msg + ' ')
     else:
         return input(msg + ' ')
+

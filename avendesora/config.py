@@ -21,7 +21,7 @@
 # Imports {{{1
 from .error import PasswordError
 from .preferences import CONFIG_DEFAULTS, NONCONFIG_SETTINGS
-from shlib import to_path
+from .shlib import to_path
 from inform import comment, warn, is_str
 
 # Globals {{{1

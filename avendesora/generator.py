@@ -32,12 +32,10 @@ from .preferences import (
 )
 from .script import Script
 from .secrets import Passphrase
+from .shlib import to_path, mv, rm
 from .title import Title
 from .utilities import generate_random_string, validate_components
-from inform import (
-    codicil, conjoin, error, notify, log, os_error, render, warn, is_str,
-)
-from shlib import to_path, mv, rm
+from inform import codicil, conjoin, log, os_error, render, warn, is_str
 from textwrap import dedent, fill
 from pathlib import Path
 import os
@@ -301,7 +299,7 @@ class PasswordGenerator(object):
             choice = show_list_dialog('Choose Secret', sorted(matches.keys()))
             if choice is None:
                 raise PasswordError('user abort.')
-            log('user selects %s' % choice)
+            log('User selects %s' % choice)
             account, script = matches[choice]
         else:
             account, script =  matches.popitem()[1]

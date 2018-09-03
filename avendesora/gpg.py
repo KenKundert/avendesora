@@ -23,7 +23,7 @@
 # Imports {{{1
 from .config import get_setting, override_setting, setting_path
 from .error import PasswordError
-from shlib import to_path, cp
+from .shlib import to_path, cp
 from inform import (
     conjoin, cull, display, log, narrate, os_error, warn, is_str,
     full_stop
