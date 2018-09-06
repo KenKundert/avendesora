@@ -10,13 +10,14 @@ Usage:
 
 Options:
     -v, --verbose    list the keys as they are being added
+
+A description of how to configure and use this program can be found at 
+`<https://avendesora.readthedocs.io/en/latest/api.html#example-add-ssh-keys>_.
 """
-# Adds ssh keys to SSH agent.
-#
-# Assumes that the Avendesora account that contains the ssh key's passphrase has 
-# a name or alias of the form <name>-ssh-key. It also assumes that the account 
-# contains a field named 'keyfile' or 'keyfiles' that contains an absolute path 
-# or paths to the ssh key files in a string.
+# Assumes that the Avendesora account that contains the ssh key's passphrase 
+# has a name or alias of the form <name>-ssh-key. It also assumes that the 
+# account contains a field named 'keyfile' or 'keyfiles' that contains an 
+# absolute path or paths to the ssh key files in a string.
 
 from avendesora import PasswordGenerator, PasswordError
 from inform import Inform, codicil, error, fatal, narrate

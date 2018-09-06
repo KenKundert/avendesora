@@ -151,11 +151,14 @@ can be found on Github.
 
     Options:
         -v, --verbose    list the keys as they are being added
+
+    A description of how to configure and use this program can be found at 
+    `<https://avendesora.readthedocs.io/en/latest/api.html#example-add-ssh-keys>_.
     """
-    # This assumes that the Avendesora account that contains the ssh key's 
-    # passphrase has a name or alias of the form <name>-ssh-key. It also assumes 
-    # that the account contains a field named 'keyfile' or 'keyfiles' that contains 
-    # an absolute path or paths to the ssh key files in a string.
+    # Assumes that the Avendesora account that contains the ssh key's passphrase 
+    # has a name or alias of the form <name>-ssh-key. It also assumes that the 
+    # account contains a field named 'keyfile' or 'keyfiles' that contains an 
+    # absolute path or paths to the ssh key files in a string.
 
     from avendesora import PasswordGenerator, PasswordError
     from inform import Inform, codicil, error, fatal, narrate
@@ -178,7 +181,7 @@ can be found on Github.
         name = key + '-ssh-key'
         try:
             account = pw.get_account(name)
-            passphrase = account.get_passcode().value
+            passphrase = str(account.get_passcode().value)
             if account.has_field('keyfiles'):
                 keyfiles = account.get_value('keyfiles').value
             else:
@@ -234,13 +237,14 @@ Here is an example of the fields you would add to an account to support
         updated = 'January 2018',
         equities = '$23k',
         cash = '$1.7k',
-        retirement = '$41k'
+        retirement = '$41,326'
     )
 
 The *estimated_value* field should be a dictionary where one item is 'updated',
 which contains the date of when the values were last updated, and the remaining 
 items should give an investment class and value.  The values may be specified as 
-strings (units and SI scale factors allowed) or as a real number or expression.
+strings (commas, units and SI scale factors allowed) or as a real number or 
+expression.
 
 You configure *postmortem* by creating ~/.config/postmortem/config. This file 
 contains Python code that specifies the various settings. At a minimum it should 
@@ -275,6 +279,9 @@ can be found on Github.
 
     Choose from: {available}.  If no recipients are specified, then summaries will 
     be generated for all recipients.
+
+    A description of how to configure and use this program can be found at 
+    `<https://avendesora.readthedocs.io/en/latest/api.html#example-postmortem-summaries>_.
     """
 
     # Imports
@@ -410,7 +417,7 @@ contains Python code that specifies the various settings. You do not need this
 file, but there is a few things you might wish to configure with this file.  
 First, you can arrange to report the networth of multiple people.  Generally you 
 would be interested in your own networth, but you might also be interested in 
-the networth of someone such as a child or a parent, if you are their financial 
+the networth of someone such as a child or a parent if you are their financial 
 custodian. Second, you can rename accounts if you have obscure or excessively 
 long account names. Finally, you can add a list of cryptocurrencies, in which 
 case *networth* will download the latest prices to give you an up-to-date view 
@@ -493,14 +500,17 @@ can be found on Github.
         debt_color = {debt_color}
 
     The prices and log files can be found in {cache_dir}.
+
+    A description of how to configure and use this program can be found at 
+    `<https://avendesora.readthedocs.io/en/latest/api.html#example-net-worth>`_.
     """
 
     # Imports
     from avendesora import PasswordGenerator, PasswordError
     from avendesora.gpg import PythonFile
     from inform import (
-        conjoin, display, done, error, is_str, join, narrate, os_error, terminate, 
-        warn, Color, Error, Inform,
+        conjoin, display, done, error, fatal, is_str, join, narrate, os_error, 
+        terminate, warn, Color, Error, Inform,
     )
     from quantiphy import Quantity
     from docopt import docopt
@@ -529,7 +539,8 @@ can be found on Github.
     screen_width = 79
     bar_chars = '-=#'
     bar_chars = '·╴─━═=#'
-    asset_color = None
+    bar_chars = '▏▎▍▌▋▊▉█'
+    asset_color = 'green'
     debt_color = 'red'
         # currently we only colorize the bar because ...
         # - it is the only way of telling whether value is positive or negative
@@ -613,6 +624,11 @@ can be found on Github.
         ))
         show_updated = cmdline['--updated']
         profile = cmdline['<profile>'] if cmdline['<profile>'] else default_profile
+        if profile not in available:
+            fatal(
+                'unknown profile.', choose_from, template=('{} {}', '{}'), 
+                culprit=profile
+            )
 
         # Read profile settings
         config_filepath = Path(user_config_dir(prog_name), profile + '.prof')
@@ -763,7 +779,7 @@ can be found on Github.
 
         # Summarize by investment type
         display('\nBy Type:')
-        largest_share = max(totals.values())
+        largest_share = max(v for v in totals.values() if v.units == '$')
         barwidth = screen_width - width - 18
         for asset_type in sorted(totals, key=lambda k: totals[k], reverse=True):
             value = totals[asset_type]

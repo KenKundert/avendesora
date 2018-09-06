@@ -42,6 +42,9 @@ Bar graph values:
     debt_color = {debt_color}
 
 The prices and log files can be found in {cache_dir}.
+
+A description of how to configure and use this program can be found at 
+<https://avendesora.readthedocs.io/en/latest/api.html#example-net-worth>`_
 """
 
 # Imports {{{1
