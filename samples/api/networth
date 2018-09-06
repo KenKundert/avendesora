@@ -318,7 +318,7 @@ try:
 
     # Summarize by investment type {{{1
     display('\nBy Type:')
-    largest_share = max(totals.values())
+    largest_share = max(v for v in totals.values() if v.units == '$')
     barwidth = screen_width - width - 18
     for asset_type in sorted(totals, key=lambda k: totals[k], reverse=True):
         value = totals[asset_type]
