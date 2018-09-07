@@ -658,7 +658,7 @@ API Example
 
 The following example creates encrypted files that contain account information 
 that would be needed by close family members and by a business partner in case 
-anything happened to you.  This is an abreviated version of an example given in 
+anything happened to you.  This is an abbreviated version of an example given in 
 the users' guide.
 
 .. code-block:: python
