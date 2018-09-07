@@ -297,7 +297,7 @@ for that account. For example:
         aliases = 'bb'
         username = 'gman33'
         email = 'gman33@pizza.com'
-        url = 'https://bigbank.com/login'
+        urls = 'https://bigbank.com/login'
         passcode = Password(length=12)
         verbal = Passphrase(length=2)
         pin = PIN()
@@ -330,7 +330,7 @@ example, a summary of all information can be requested with::
         0: What city were you born in? <reveal with 'avendesora show bigbank questions.0'>
         1: What street did you grow up on? <reveal with 'avendesora show bigbank questions.1'>
         2: What was your childhood nickname? <reveal with 'avendesora show bigbank questions.2'>
-    url: https://bigbank.com/login
+    urls: https://bigbank.com/login
     username: gman33
     verbal: <reveal with 'avendesora show bigbank verbal'>
 
@@ -444,9 +444,11 @@ choose between them. To see how to configure secrets for discovery, run
 
 To make secret discovery easier and more robust it is helpful to add a plugin to 
 your web browser to make its title more informative. For Firefox, the best 
-plugin to use is AddURLToWindowTitle. For Chrome it is URLinTitle. It is 
-recommended that you install the appropriate one into your browser. For 
-AddURLToWindowTitle, set the following options:
+plugin to use is *AddURLToWindowTitle*. For Chrome it is *URLinTitle*. (The 
+latest versions of Firefox are incompatible with *AddURLToWindowTitle*, however 
+you can use the Firefox version of *URLinTitle* instead.) It is recommended that 
+you install the appropriate one into your browser.  For AddURLToWindowTitle, set 
+the following options:
 
   | show full URL = yes
   | separator string = '-'
@@ -656,7 +658,8 @@ API Example
 
 The following example creates encrypted files that contain account information 
 that would be needed by close family members and by a business partner in case 
-anything happened to you:
+anything happened to you.  This is an abreviated version of an example given in 
+the users' guide.
 
 .. code-block:: python
 
