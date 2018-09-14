@@ -166,7 +166,6 @@ class GnuPG(object):
 
     def restore(self):
         "Restores the backup copy of the file."
-
         cp(self.backup_path, self.path)
 
     def will_encrypt(self):
