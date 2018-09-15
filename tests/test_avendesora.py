@@ -16,11 +16,13 @@ if not cwd.endswith('/tests'):
     os.chdir('tests')
 
 # Run avendesora
-# Cannot determine whether coverage analysis is needed, so simply always do it
-# Whoops, not so fast. The python coverage analysis is broken when it comes to
-# the exit status, it always returns 1. So instead, never do it.
+# Explicitly calling the coverage analysis does not seem to be needed. Adding it
+# does not change the coverage numbers.
 def run(args):
-    #return subprocess.check_output(['coverage', 'run', '-m'] + args.split())
+    #args = args.split()
+    #args[0] = './pw'
+    #print(*(['coverage', 'run'] + args))
+    #return subprocess.check_output(['coverage', 'run'] + args)
     return subprocess.check_output(args.split())
 
 # test_mybank() {{{1
@@ -155,7 +157,11 @@ def test_summary():
             checking: reveal with: avendesora value mybank accounts.checking
             savings: reveal with: avendesora value mybank accounts.savings
             creditcard: reveal with: avendesora value mybank accounts.creditcard
+        birthdate: 1981-10-01
         checking: {accounts.checking}
+        comment:
+            This is a multiline comment.
+            It spans more than one line.
         customer service: 1-866-229-6633
         email: pizzaman@pizza.com
         otp: reveal with: avendesora value mybank otp

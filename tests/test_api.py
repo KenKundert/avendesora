@@ -143,6 +143,20 @@ def test_alertscc_questions():
     except PasswordError as err:
         assert str(err) == None
 
+def test_mybank_accounts():
+    try:
+        pw = PasswordGenerator()
+        account = pw.get_account('mybank')
+        expected = dict(
+            checking='12345678',
+            savings='23456789',
+            creditcard='34567890'
+        )
+        for k, v in account.get_values('accounts'):
+            assert str(v) == expected[k]
+    except PasswordError as err:
+        assert str(err) == None
+
 def test_unknown_account():
     try:
         pw = PasswordGenerator()
@@ -205,7 +219,11 @@ def test_summary(capsys):
                     checking: reveal with: avendesora value mybank accounts.checking
                     savings: reveal with: avendesora value mybank accounts.savings
                     creditcard: reveal with: avendesora value mybank accounts.creditcard
+                birthdate: 1981-10-01
                 checking: {accounts.checking}
+                comment:
+                    This is a multiline comment.
+                    It spans more than one line.
                 customer service: 1-866-229-6633
                 email: pizzaman@pizza.com
                 otp: reveal with: avendesora value mybank otp
@@ -221,3 +239,74 @@ def test_summary(capsys):
             ''').lstrip()
     except PasswordError as err:
         assert str(err) == None
+
+def test_composite(capsys):
+    with Inform(prog_name=False):
+        pw = PasswordGenerator()
+        account = pw.get_account('mybank')
+        accounts = account.get_composite('accounts')
+        assert accounts == dict(
+            checking='12345678',
+            savings='23456789',
+            creditcard='34567890'
+        )
+        questions = account.get_composite('questions')
+        assert questions == [
+            'scallywag bedbug groupie',
+            'assay centrist fanatic',
+            'shunt remnant burrow'
+        ]
+        pin = account.get_composite('pin')
+        assert pin == '9982'
+        name = account.get_composite('NAME')
+        assert name == 'mybank'
+        nada = account.get_composite('nada')
+        assert nada == None
+
+def test_archive(capsys):
+    from avendesora import Hidden, OTP, Question, RecognizeTitle, Script
+    from inform import render
+    with Inform(prog_name=False):
+        pw = PasswordGenerator()
+        account = pw.get_account('mybank')
+        archive = account.archive()
+        assert render(archive, sort=True) == render(dict(
+            accounts = dict(
+                checking = Hidden('MTIzNDU2Nzg='),
+                creditcard = Hidden('MzQ1Njc4OTA='),
+                savings = Hidden('MjM0NTY3ODk=')
+            ),
+            aliases = 'mb'.split(),
+            birthdate = Hidden('MTk4MS0xMC0wMQ=='),
+            checking = Script('{accounts.checking}'),
+            comment =
+                '\n'
+                '        This is a multiline comment.\n'
+                '        It spans more than one line.\n'
+                '    ',
+            customer_service = '1-866-229-6633',
+            discovery = RecognizeTitle('easy peasy', script='lemon squeezy'),
+            email = 'pizzaman@pizza.com',
+            otp = OTP('JBSWY3DPEHPK3PXP'),
+            passcode = Hidden('b1UkJHcwVU1YZTc0'),
+            pin = Hidden('OTk4Mg=='),
+            questions = [
+                Question(
+                    'What city were you born in?',
+                    answer=Hidden('c2NhbGx5d2FnIGJlZGJ1ZyBncm91cGll')
+                ),
+                Question(
+                    'What street did you grow up on?',
+                    answer=Hidden('YXNzYXkgY2VudHJpc3QgZmFuYXRpYw==')
+                ),
+                Question(
+                    'What was your childhood nickname?',
+                    answer=Hidden('c2h1bnQgcmVtbmFudCBidXJyb3c=')
+                )
+            ],
+            urls = 'https://mb.com',
+            username = 'pizzaman',
+            verbal = Hidden('Zml6emxlIGxlb3BhcmQ=')
+        ), sort=True)
+
+

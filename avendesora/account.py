@@ -739,14 +739,14 @@ class Account(object):
             return None
 
         if is_collection(value):
-            if type(value) is dict:
+            if hasattr(value, 'items'): # a dictionary or dictionary-like object
                 result = {}
                 for key in value.keys():
                     v = cls.get_scalar(name, key)
                     if isinstance(v, GeneratedSecret) or isinstance(v, ObscuredSecret):
                         v = str(v)
                     result[key] = v
-            elif type(value) is list:
+            elif hasattr(value, 'append'):  # a list or list-like object
                 result = []
                 for index in range(len(value)):
                     v = cls.get_scalar(name, index)

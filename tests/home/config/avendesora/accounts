@@ -109,6 +109,7 @@ class MyBank(Account):
     )
     verbal = Passphrase(length=2)
     pin = PIN()
+    birthdate = BirthDate(2018, is_secret=False)
     questions = [
         Question('What city were you born in?'),
         Question('What street did you grow up on?'),
@@ -126,6 +127,10 @@ class MyBank(Account):
         'easy peasy',
         script='lemon squeezy'
     )
+    comment = '''
+        This is a multiline comment.
+        It spans more than one line.
+    '''
 
 # Margaritaville {{{1
 class Margaritaville(Account):
