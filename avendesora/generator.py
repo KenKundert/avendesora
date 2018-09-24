@@ -100,9 +100,14 @@ class PasswordGenerator(object):
         archive_file = get_setting('archive_file')
         if archive_file and warnings:
             if archive_file.exists():
-                stale = int(get_setting('archive_stale'))
+                stale = float(get_setting('archive_stale'))
                 archive_updated = os.path.getmtime(str(archive_file))
-                if most_recently_updated - archive_updated > 86400 * stale:
+                seconds_ood = most_recently_updated - archive_updated
+                if seconds_ood > 0:
+                    log('Archive is {:.0f} seconds out of date.'.format(seconds_ood))
+                else:
+                    log('Archive is up-to-date.')
+                if seconds_ood > 86400 * stale:
                     warn('stale archive.')
                     codicil(fill(dedent("""
                         Recommend running 'avendesora changed' to determine
@@ -181,7 +186,7 @@ class PasswordGenerator(object):
                 (get_setting('account_list_file'), ACCOUNT_LIST_FILE_CONTENTS),
             ]:
                 if path:
-                    log('creating initial version.', culprit=path)
+                    log('Creating initial version.', culprit=path)
                     f = PythonFile(path)
                     f.create(contents.format(**fields), gpg_ids)
                         # create will not overwrite an existing file, instead it
@@ -197,7 +202,7 @@ class PasswordGenerator(object):
                 raise PasswordError('exists.', culprit=path)
             if path.suffix in GPG_EXTENSIONS and not gpg_ids:
                 raise PasswordError('Must specify GPG IDs.')
-            log('creating accounts file.', culprit=path)
+            log('Creating accounts file.', culprit=path)
             f = PythonFile(path)
             f.create(ACCOUNTS_FILE_INITIAL_CONTENTS.format(**fields), gpg_ids)
 
@@ -205,7 +210,7 @@ class PasswordGenerator(object):
             path = to_path(
                 get_setting('settings_dir'), get_setting('account_list_file')
             )
-            log('update accounts list.', culprit=path)
+            log('Update accounts list.', culprit=path)
             f = PythonFile(path)
             try:
                 mv(path, str(path) + '~')

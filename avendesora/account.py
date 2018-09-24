@@ -82,7 +82,7 @@ class AccountValue:
         "Returns value as string."
         if hasattr(self.value, 'entropy'):
             entropy = round(self.value.entropy)
-            log('entropy of {} = {} bits'.format(self.name, entropy))
+            log('Entropy of {} = {} bits.'.format(self.name, entropy))
         return str(self.value)
 
     def render(self, fmts=('{f} ({d}): {v}', '{f}: {v}')):
@@ -339,7 +339,7 @@ class Account(object):
                     yield None, True
                     return
                 else:
-                    msg = 'url matches, but uses wrong protocol.'
+                    msg = 'URL matches, but uses wrong protocol.'
                     notify(msg)
                     raise PasswordError(msg, culprit=cls.get_name())
 
@@ -347,7 +347,7 @@ class Account(object):
     @classmethod
     def initialize(cls, interactive_seed=False, stealth_name=None):
         cls._interactive_seed = interactive_seed
-        log('initializing account:', cls.get_name())
+        log('Initializing account:', cls.get_name())
         try:
             if cls.master_seed.is_secure():
                 if not cls._file_info.encrypted:
@@ -958,7 +958,7 @@ class StealthAccount(Account):
     def initialize(cls, interactive_seed=False, stealth_name=None):
         cls._interactive_seed = interactive_seed
         cls._stealth_name = stealth_name
-        log('initializing stealth account:', cls.get_name())
+        log('Initializing stealth account:', cls.get_name())
         for key, value in cls.items():
             # reset the secrets so they honor stealth_name
             try:

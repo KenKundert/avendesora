@@ -117,7 +117,8 @@ CONFIG_DEFAULTS = {
                     Question("_QUESTION3_?"),
                 ]
                 urls = '_URL_'
-            # Avendesora: specify urls to indicate the url to be used by the browse command.
+            # Avendesora: specify URL or URLs to be used by the browse command.
+            # Avendesora: generally this is the URL of the sign-in page.
                 discovery = RecognizeURL(
                     'https://_URL_',
                     script='{email}{tab}{passcode}{return}'
@@ -128,9 +129,9 @@ CONFIG_DEFAULTS = {
             # Avendesora: Tailor the account entry to suit you needs.
             # Avendesora: You can add or delete class attributes as you see fit.
             # Avendesora: The 'n' key should take you to the next field name.
-            # Avendesora: Use 'cw' to specify a field name, or delete it if unneeded.
+            # Avendesora: Use 'cw' to specify a field value, or 'dw' to delete it if unneeded.
             # Avendesora: Fields surrounded by << and >> will be hidden.
-            # Avendesora: All lines that begin with '# Avendesora:' are deleted.
+            # Avendesora: All lines that begin with '# Avendesora:' are removed.
         """ % (3*'{')),
         'shell': dedent("""
             class _NAME_(Account): # %s1
