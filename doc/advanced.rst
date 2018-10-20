@@ -949,7 +949,12 @@ Alternately, when Siuan sends a message to Moiraine, she can proactively prove
 her identity by providing both the challenge and the response. Moiraine could 
 then run the *identity* command with the challenge and confirm that she gets the 
 same response. Other than herself, only Siuan could predict the correct response 
-to any challenge.
+to any challenge.  However, this is not recommended as it would allow someone 
+with brief access to Suian's Avendesora, perhaps Leane her Keeper, to generate 
+and store multiple challenge/response pairs. Leane could then send messages to 
+Moiraine while pretending to be Siuan using the saved challenge/response pairs.  
+The subterfuge would not work if Moiraine generated the challenge unless Leane 
+currently has access to Siuan's Avendesora.
 
 
 .. index::

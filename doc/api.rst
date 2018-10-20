@@ -161,7 +161,7 @@ can be found on Github.
     # absolute path or paths to the ssh key files in a string.
 
     from avendesora import PasswordGenerator, PasswordError
-    from inform import Inform, codicil, error, fatal, narrate
+    from inform import Inform, codicil, error, narrate
     from docopt import docopt
     from pathlib import Path
     import pexpect
@@ -200,11 +200,11 @@ can be found on Github.
                         continue
                 except (pexpect.EOF, pexpect.TIMEOUT):
                     pass
-                error('failed.', culprit=path)
+                error('failed.', culprit=key)
                 codicil('response:', sshadd.before.decode('utf8'), culprit=SSHadd)
                 codicil('exit status:', sshadd.exitstatus , culprit=SSHadd)
         except PasswordError as e:
-            fatal(e, culprit=path)
+            e.report(culprit=key)
 
 
 .. index::

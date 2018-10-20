@@ -811,32 +811,45 @@ class Identity(Command):
             based on the time and date.
 
             Consider an example that illustrates the process. In this example,
-            Ahmed is confirming the identity of Reza, where both Ahmed and Reza
-            are assumed to have shared Avendesora accounts.  Ahmed runs
-            Avendesora as follows and remembers the response:
+            Siuan is confirming the identity of Moiraine, where both Siuan and
+            Moiraine are assumed to have shared *Avendesora* accounts.  Siuan
+            runs *Avendesora* as follows and remembers the response::
 
-                > avendesora identity reza
+                > avendesora identity moiraine
                 challenge: slouch emirate bedeck brooding
                 response: spear disable local marigold
 
-            This assumes that reza is the name, with any extension removed, of
-            the file that Ahmed uses to contain their shared accounts.
+            This assumes that moiraine is the name, with any extension removed,
+            of the file that Siuan uses to contain their shared accounts.
 
-            Ahmed communicates the challenge to Reza but not the response.  Reza
-            then runs Avendesora with the given challenge:
+            Siuan communicates the challenge to Moiraine but not the response.
+            Moiraine then runs *Avendesora* with the given challenge::
 
-                > avendesora identity ahmed slouch emirate bedeck brooding
+                > avendesora identity siuan slouch emirate bedeck brooding
                 challenge: slouch emirate bedeck brooding
                 response: spear disable local marigold
 
-            In this example, ahmed is the name of the file that Reza uses to
+            In this example, siuan is the name of the file that Moiraine uses to
             contain their shared accounts.
 
-            To complete the process, Reza returns the response to Ahmed, who
-            compares it to the response he received to confirm Reza's identity.
-            If Ahmed has forgotten the desired response, he can also specify the
-            challenge to the *identity* command to regenerate the expected
-            response.
+            To complete the process, Moiraine returns the response to Siuan, who
+            compares it to the response she received to confirm Moiraine's
+            identity.  If Siuan has forgotten the desired response, she can also
+            specify the challenge to the :ref:`identity command <identity
+            command>` to regenerate the expected response.
+
+            Alternately, when Siuan sends a message to Moiraine, she can
+            proactively prove her identity by providing both the challenge and
+            the response. Moiraine could then run the *identity* command with
+            the challenge and confirm that she gets the same response. Other
+            than herself, only Siuan could predict the correct response to any
+            challenge.  However, this is not recommended as it would allow
+            someone with brief access to Suian's Avendesora, perhaps Leane her
+            Keeper, to generate and store multiple challenge/response pairs.
+            Leane could then send messages to Moiraine while pretending to be
+            Siuan using the saved challenge/response pairs.  The subterfuge
+            would not work if Moiraine generated the challenge unless Leane
+            currently has access to Siuan's Avendesora.
         """).strip()
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
