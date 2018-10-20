@@ -691,10 +691,7 @@ class Edit(Command):
                     break
                 except PasswordError as e:
                     error(e)
-                    if sys.version_info.major < 3:
-                        response = raw_input('Try again? ')
-                    else:
-                        response = input('Try again? ')
+                    response = query_input('Try again?')
                     if response.lower() not in ['y', 'yes']:
                         raise PasswordError(
                             'Giving up, restoring original version.'
@@ -1171,6 +1168,79 @@ class PhoneticAlphabet(Command):
             output(columns(words))
 
 
+# Questions {{{1
+class Questions(Command):
+    NAMES = 'questions', 'quest', 'q', 'qc'
+    DESCRIPTION = 'answer a security question'
+    USAGE = dedent("""
+        Displays the security questions and then allows you to select one
+        to be answered.
+
+        Usage:
+            avendesora questions [options] <account> [<field>]
+            avendesora quest     [options] <account> [<field>]
+            avendesora q         [options] <account> [<field>]
+            avendesora qc        [options] <account> [<field>]
+
+        Options:
+            -c, --clipboard         Write output to clipboard rather than stdout.
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
+
+        The 'qc' command is a shortcut for 'questions --clipboard'.
+
+        Request the answer to a security question by giving the account name to
+        this command.  For example:
+
+            avendesora questions bank
+
+        It will print out the security questions for *bank* account along with
+        an index. Specify the index of the question you want answered.
+
+        By default *Avendesora* looks for the security questions in the
+        *questions* field.  If your questions are in a different field, just
+        specify the name of the field on the command line:
+
+            avendesora questions bank verbal
+    """).strip()
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        use_clipboard = cmdline['--clipboard'] or cmdline['qc']
+
+        # run the generator
+        generator = PasswordGenerator()
+
+        # get the questions
+        account_name = cmdline['<account>']
+        account = generator.get_account(account_name, cmdline['--seed'])
+        field = cmdline.get('<field>')
+        if not field:
+            field = get_setting('default_vector_field')
+        try:
+            questions = getattr(account, field)
+        except AttributeError:
+            raise PasswordError('unknown field.', culprit=field)
+        if not is_collection(questions):
+            raise PasswordError('unknown field.', culprit=field)
+
+        contains_secret = False
+        for k, v in Collection(questions).items():
+            try:
+                value = v.get_description()
+                contains_secret = True
+            except AttributeError:
+                value = v
+            display(k, value, template='{}: {}')
+
+        if contains_secret:
+            response = query_user('Which question?')
+            writer = get_writer(clipboard=use_clipboard, stdout=False)
+            writer.display_field(account, field + '.' + response)
+
+
 # Reveal {{{1
 class Reveal(Command):
     NAMES = 'reveal', 'r'
@@ -1372,15 +1442,9 @@ class Value(Command):
         use_clipboard = cmdline['--clipboard'] or cmdline['vc']
 
         # mute any warnings if using --stdout
-        try:
+        if cmdline['--stdout']:
             from inform import get_informer
-            if cmdline['--stdout']:
-                get_informer().suppress_output()
-        except ImportError:
-            # remove this once the version 1.11 of inform is formally released
-            # --KSK
-            pass
-
+            get_informer().suppress_output()
 
         # run the generator
         generator = PasswordGenerator()

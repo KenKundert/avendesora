@@ -67,3 +67,4 @@ Releases
 
     - Updated the *networth* API example.
     - Incorporated *shlib* package into *Avendesora* for better security.
+    - Added :ref:`questions command <questions command>`.

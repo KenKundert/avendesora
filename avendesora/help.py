@@ -920,7 +920,7 @@ class Overview(HelpMessage):
 
 
 # Questions class {{{1
-class Questions(HelpMessage):
+class Sec_Quest(HelpMessage):
     DESCRIPTION = "security questions"
     URL = '/advanced.html#security-questions'
 

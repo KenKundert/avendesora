@@ -405,6 +405,19 @@ answer along with the question:
         Question('favorite composer?' answer=<<chuck berry>>)),
     ]
 
+The :ref:`questions command <questions command>` can be used to quickly display 
+the answer to a security question::
+
+    > avendesora questions LinuxLogin
+    0: favorite subject in school?
+    1: favorite composer?
+    Which question? 0
+    questions (favorite subject in school?): recess
+
+The *questions* command, which can be abbreviated as *quest* or *q*, displays 
+all of the questions and then you are expected to choose one. Once you do, that 
+question is answered.
+
 Lastly this account sets up the web interface by specifying *urls* and 
 *discovery*. The *urls* field is used by the :ref:`browse command <browse 
 command>`, which opens your browser and navigates to the login page.  For 

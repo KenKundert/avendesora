@@ -463,6 +463,48 @@ Example::
 
 
 .. index::
+    single: questions command
+    single: command; questions
+
+.. _questions command:
+
+**questions** -- Answer a Security Question
+-------------------------------------------
+
+Displays the security questions and then allows you to select one to be 
+answered.
+
+Usage::
+
+    avendesora questions [options] <account> [<field>]
+    avendesora quest     [options] <account> [<field>]
+    avendesora q         [options] <account> [<field>]
+    avendesora qc        [options] <account> [<field>]
+
+Options:
+    =============== =============================================
+    -c, --clipboard Write output to clipboard rather than stdout.
+    -S, --seed      Interactively request additional seed for generated secrets.
+    =============== =============================================
+
+The 'qc' command is a shortcut for 'questions --clipboard'.
+
+Request the answer to a security question by giving the account name to this 
+command.  For example::
+
+     avendesora questions bank
+
+It will print out the security questions for *bank* account along with an index.  
+Specify the index of the question you want answered.
+
+By default *Avendesora* looks for the security questions in the *questions* 
+field.  If your questions are in a different field, just specify the name of the 
+field on the command line::
+
+    avendesora questions bank verbal
+
+
+.. index::
     single: reveal command
     single: command; reveal
 

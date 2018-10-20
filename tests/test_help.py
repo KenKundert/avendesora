@@ -422,32 +422,45 @@ def test_identity():
         based on the time and date.
 
         Consider an example that illustrates the process. In this example,
-        Ahmed is confirming the identity of Reza, where both Ahmed and Reza
-        are assumed to have shared Avendesora accounts.  Ahmed runs
-        Avendesora as follows and remembers the response:
+        Siuan is confirming the identity of Moiraine, where both Siuan and
+        Moiraine are assumed to have shared *Avendesora* accounts.  Siuan
+        runs *Avendesora* as follows and remembers the response::
 
-            > avendesora identity reza
+            > avendesora identity moiraine
             challenge: slouch emirate bedeck brooding
             response: spear disable local marigold
 
-        This assumes that reza is the name, with any extension removed, of
-        the file that Ahmed uses to contain their shared accounts.
+        This assumes that moiraine is the name, with any extension removed,
+        of the file that Siuan uses to contain their shared accounts.
 
-        Ahmed communicates the challenge to Reza but not the response.  Reza
-        then runs Avendesora with the given challenge:
+        Siuan communicates the challenge to Moiraine but not the response.
+        Moiraine then runs *Avendesora* with the given challenge::
 
-            > avendesora identity ahmed slouch emirate bedeck brooding
+            > avendesora identity siuan slouch emirate bedeck brooding
             challenge: slouch emirate bedeck brooding
             response: spear disable local marigold
 
-        In this example, ahmed is the name of the file that Reza uses to
+        In this example, siuan is the name of the file that Moiraine uses to
         contain their shared accounts.
 
-        To complete the process, Reza returns the response to Ahmed, who
-        compares it to the response he received to confirm Reza's identity.
-        If Ahmed has forgotten the desired response, he can also specify the
-        challenge to the *identity* command to regenerate the expected
-        response.
+        To complete the process, Moiraine returns the response to Siuan, who
+        compares it to the response she received to confirm Moiraine's
+        identity.  If Siuan has forgotten the desired response, she can also
+        specify the challenge to the :ref:`identity command <identity
+        command>` to regenerate the expected response.
+
+        Alternately, when Siuan sends a message to Moiraine, she can
+        proactively prove her identity by providing both the challenge and
+        the response. Moiraine could then run the *identity* command with
+        the challenge and confirm that she gets the same response. Other
+        than herself, only Siuan could predict the correct response to any
+        challenge.  However, this is not recommended as it would allow
+        someone with brief access to Suian's Avendesora, perhaps Leane her
+        Keeper, to generate and store multiple challenge/response pairs.
+        Leane could then send messages to Moiraine while pretending to be
+        Siuan using the saved challenge/response pairs.  The subterfuge
+        would not work if Moiraine generated the challenge unless Leane
+        currently has access to Siuan's Avendesora.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -552,6 +565,47 @@ def test_phonetic():
         If <text> is given, it is converted character by character to the
         phonetic alphabet. If not given, the entire phonetic alphabet is
         displayed.
+    """).strip()
+    assert result.decode('utf-8') == expected
+
+# test_questions() {{{1
+def test_questions():
+    try:
+        result = run('avendesora help questions')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Answer a security question.
+
+        Displays the security questions and then allows you to select one
+        to be answered.
+
+        Usage:
+            avendesora questions [options] <account> [<field>]
+            avendesora quest     [options] <account> [<field>]
+            avendesora q         [options] <account> [<field>]
+            avendesora qc        [options] <account> [<field>]
+
+        Options:
+            -c, --clipboard         Write output to clipboard rather than stdout.
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
+
+        The 'qc' command is a shortcut for 'questions --clipboard'.
+
+        Request the answer to a security question by giving the account name to
+        this command.  For example:
+
+            avendesora questions bank
+
+        It will print out the security questions for *bank* account along with
+        an index. Specify the index of the question you want answered.
+
+        By default *Avendesora* looks for the security questions in the
+        *questions* field.  If your questions are in a different field, just
+        specify the name of the field on the command line:
+
+            avendesora questions bank verbal
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -1563,9 +1617,9 @@ def test_phishing():
     assert result.decode('utf-8') == expected
 
 # test_questions() {{{1
-def test_questions():
+def test_security_questions():
     try:
-        result = run('avendesora help questions')
+        result = run('avendesora help sec_quest')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
