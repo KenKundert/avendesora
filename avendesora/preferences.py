@@ -54,6 +54,7 @@ CONFIG_DEFAULTS = {
     'archive_stale': 1,
     'previous_archive_file': 'archive.prev.gpg',
     'config_dir_mask': 0o077,
+    'account_file_mask': 0o077,
     'credential_ids': 'username email',
     'credential_secrets': 'passcode password passphrase',
     'label_color': 'blue',
@@ -324,6 +325,16 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         # directory is readable or writable by the group or others. Set to 0o007
         # to generated a warning if the directory is readable or writable by
         # others.
+
+    account_file_mask = {account_file_mask}
+        # An integer that determines if a warning should be printed about the
+        # file permissions of the accounts and archive files being too loose.  A
+        # bitwise and operation is performed between this value and the actual
+        # file permissions, and if the result is nonzero, a warning is printed.
+        # Set to 0o000 to disable the warning. Set to 0o077 to generate a
+        # warning if the configuration directory is readable or writable by the
+        # group or others. Set to 0o007 to generated a warning if the directory
+        # is readable or writable by others.
 
     label_color = {label_color}
         # The color of the label use by the value and values commands.

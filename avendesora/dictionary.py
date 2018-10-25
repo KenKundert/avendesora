@@ -26,6 +26,7 @@ from inform import error, os_error
 import hashlib
 
 
+# Dictionary class {{{1
 class Dictionary(object):
     """Read Dictionary"""
     def __init__(self, path):

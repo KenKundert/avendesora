@@ -14,6 +14,9 @@ gpg_executable = '/usr/bin/gpg2'
 # Don't complain about Avendesora settings directory being accessible to others
 config_dir_mask = 0o000
 
+# Don't complain about account or archive files being accessible to others
+account_file_mask = 0o000
+
 # I just cannot get gpg to cooperate.
 user_key_file = 'key'
 

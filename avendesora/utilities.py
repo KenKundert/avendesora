@@ -19,12 +19,9 @@
 # Imports {{{1
 from .config import get_setting
 from .error import PasswordError
-from .shlib import Run, to_path
+from .shlib import Run, to_path, getmod
 from inform import Error, codicil, os_error, output, warn, is_str, indent
 from textwrap import dedent, wrap
-from pkg_resources import resource_filename
-from stat import ST_MODE
-import hashlib
 import os
 import sys
 
@@ -59,56 +56,6 @@ def generate_random_string(length=64):
     for i in range(length):
         password += rand.choice(alphabet)
     return password
-
-
-# validate_components {{{1
-def validate_components():
-    # check permissions on the settings directory
-    path = get_setting('settings_dir')
-    mask = get_setting('config_dir_mask')
-    try:
-        permissions = os.stat(path)[ST_MODE]
-    except FileNotFoundError:
-        raise Error('missing, must run initialize.', culprit=path)
-    violation = permissions & mask
-    recommended = permissions & ~mask & 0o777
-    if violation:
-        warn(
-            "directory permissions are too loose.",
-            "Recommend running 'chmod {:o} {}'.".format(recommended, path),
-            culprit=path
-        )
-
-    # find dictionary file
-    dict_path = get_setting('dictionary_file')
-    if not dict_path.is_file():
-        # user did not provide a dictionary, so use the internal one
-        dict_path = to_path(resource_filename(__name__, 'words'))
-
-    # Check that files that are critical to the integrity of the generated
-    # secrets have not changed
-    for path, kind in [
-        (to_path(resource_filename(__name__, 'secrets.py')), 'secrets_hash'),
-        (to_path(resource_filename(__name__, 'charsets.py')), 'charsets_hash'),
-        (dict_path, 'dict_hash'),
-    ]:
-        try:
-            contents = path.read_text()
-        except OSError as e:
-            raise PasswordError(os_error(e))
-        md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
-        # Check that file has not changed.
-        if md5 != get_setting(kind):
-            warn("file contents have changed.", culprit=path)
-            lines = wrap(dedent("""\
-                    This could result in passwords that are inconsistent with
-                    those created in the past.  Use 'avendesora changed' to
-                    assure that nothing has changed. Then, to suppress this
-                    message, change {hashes} to contain:
-                """.format(hashes=get_setting('hashes_file'))
-            ))
-            lines.append("     {kind} = '{md5}'".format(kind=kind, md5=md5))
-            codicil(*lines, sep='\n')
 
 
 # pager {{{1
@@ -184,7 +131,6 @@ def error_source():
     try:
         # return filename and lineno
         # context and content are also available
-        import sys
         exc_cls, exc, tb = sys.exc_info()
         trace = traceback.extract_tb(tb)
         filename, line, context, text = trace[-1]
@@ -210,3 +156,18 @@ def query_user(msg):
     else:
         return input(msg + ' ')
 
+
+# invert dictionary {{{1
+def invert_dict(d, initial_keys=None):
+    """Invert a dictionary
+
+    Given a dictionary, return another where the values of the first are the
+    keys of the second, and the values of the second are the set of keys from
+    the first that contain that value.
+    You can specify an minimum set of keys by providing *initial_keys*.
+    """
+    new = dict((k,set()) for k in initial_keys) if initial_keys else {}
+    for k, v in d.items():
+        new.setdefault(v, set())
+        new[v].add(k)
+    return new

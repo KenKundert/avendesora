@@ -32,12 +32,15 @@ from .preferences import (
 )
 from .script import Script
 from .secrets import Passphrase
-from .shlib import to_path, mv, rm
+from .shlib import to_path, getmod, mv, rm
 from .title import Title
-from .utilities import generate_random_string, validate_components
+from .utilities import generate_random_string
 from inform import codicil, conjoin, log, os_error, render, warn, is_str
 from textwrap import dedent, fill
 from pathlib import Path
+from pkg_resources import resource_filename
+from time import time
+import hashlib
 import os
 
 # PasswordGenerator class{{{1
@@ -74,17 +77,31 @@ class PasswordGenerator(object):
             return
 
         # check the integrity of avendesora
-        validate_components()
+        self._validate_components()
 
         # read the accounts files
         self.shared_secrets = {}
         seen = {}
         most_recently_updated = 0
+        mask = get_setting('account_file_mask')
         for filename in get_setting('accounts_files', []):
             path = to_path(get_setting('settings_dir'), filename)
-            updated = os.path.getmtime(str(path.resolve()))
+            resolved_path = path.resolve()
+
+            # check file permissions
+            permissions = getmod(resolved_path)
+            violation = permissions & mask
+            if violation:
+                recommended = permissions & ~mask & 0o777
+                warn("file permissions are too loose.", culprit=path)
+                codicil("Recommend running 'chmod {:o} {}'.".format(recommended, resolved_path))
+
+            # determine time of most recently updated account file
+            updated = os.path.getmtime(str(resolved_path))
             if updated > most_recently_updated:
                 most_recently_updated = updated
+
+            # read the file
             account_file = PythonFile(path)
             contents = account_file.run()
             master_seed = contents.get('master_seed')
@@ -100,21 +117,32 @@ class PasswordGenerator(object):
         archive_file = get_setting('archive_file')
         if archive_file and warnings:
             if archive_file.exists():
+                resolved_path = archive_file.resolve()
+
+                # check file permissions
+                permissions = getmod(resolved_path)
+                violation = permissions & mask
+                if violation:
+                    recommended = permissions & ~mask & 0o777
+                    warn("file permissions are too loose.", culprit=path)
+                    codicil("Recommend running 'chmod {:o} {}'.".format(recommended, resolved_path))
+
+                # warn user if archive file is out of date
                 stale = float(get_setting('archive_stale'))
-                archive_updated = os.path.getmtime(str(archive_file))
-                seconds_ood = most_recently_updated - archive_updated
-                if seconds_ood > 0:
-                    log('Archive is {:.0f} seconds out of date.'.format(seconds_ood))
-                else:
+                archive_updated = os.path.getmtime(str(resolved_path))
+                if most_recently_updated > archive_updated:
                     log('Archive is up-to-date.')
-                if seconds_ood > 86400 * stale:
-                    warn('stale archive.')
-                    codicil(fill(dedent("""
-                        Recommend running 'avendesora changed' to determine
-                        which account entries have changed, and if all the
-                        changes are expected, running 'avendesora archive' to
-                        update the archive.
-                    """).strip()))
+                    age_in_seconds = time() - most_recently_updated
+                    if age_in_seconds > 86400 * stale:
+                        warn('stale archive.')
+                        codicil(fill(dedent("""
+                            Recommend running 'avendesora changed' to determine
+                            which account entries have changed, and if all the
+                            changes are expected, running 'avendesora archive' to
+                            update the archive.
+                        """).strip()))
+                else:
+                    log('Archive is out of date.')
             else:
                 warn('archive missing.')
                 codicil(
@@ -122,7 +150,7 @@ class PasswordGenerator(object):
                     "to create the archive."
                 )
 
-    # _initialize() {{{2
+    # _initialize() (private){{{2
     def _initialize(self, gpg_ids, filename):
         # If filename is True, this is being called as part of the Avendesora
         # 'initialize' command, in which case all missing files should be created.
@@ -217,6 +245,52 @@ class PasswordGenerator(object):
                 f.create(ACCOUNT_LIST_FILE_CONTENTS.format(**fields), gpg_ids)
             except OSError as e:
                 raise PasswordError(os_error(e))
+
+    # _validate_components() (private) {{{1
+    def _validate_components(self):
+        # check permissions on the settings directory
+        path = get_setting('settings_dir')
+        mask = get_setting('config_dir_mask')
+        try:
+            permissions = getmod(path)
+        except FileNotFoundError:
+            raise Error('missing, must run initialize.', culprit=path)
+        violation = permissions & mask
+        if violation:
+            recommended = permissions & ~mask & 0o777
+            warn("directory permissions are too loose.", culprit=path)
+            codicil("Recommend running 'chmod {:o} {}'.".format(recommended, path))
+
+        # find dictionary file
+        dict_path = get_setting('dictionary_file')
+        if not dict_path.is_file():
+            # user did not provide a dictionary, so use the internal one
+            dict_path = to_path(resource_filename(__name__, 'words'))
+
+        # Check that files that are critical to the integrity of the generated
+        # secrets have not changed
+        for path, kind in [
+            (to_path(resource_filename(__name__, 'secrets.py')), 'secrets_hash'),
+            (to_path(resource_filename(__name__, 'charsets.py')), 'charsets_hash'),
+            (dict_path, 'dict_hash'),
+        ]:
+            try:
+                contents = path.read_text()
+            except OSError as e:
+                raise PasswordError(os_error(e))
+            md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
+            # Check that file has not changed.
+            if md5 != get_setting(kind):
+                warn("file contents have changed.", culprit=path)
+                lines = wrap(dedent("""\
+                        This could result in passwords that are inconsistent with
+                        those created in the past.  Use 'avendesora changed' to
+                        assure that nothing has changed. Then, to suppress this
+                        message, change {hashes} to contain:
+                    """.format(hashes=get_setting('hashes_file'))
+                ))
+                lines.append("     {kind} = '{md5}'".format(kind=kind, md5=md5))
+                codicil(*lines, sep='\n')
 
     # get_account() {{{2
     def get_account(self, name, request_seed=False, stealth_name=None):
