@@ -696,6 +696,7 @@ class Edit(Command):
                         raise PasswordError(
                             'Giving up, restoring original version.'
                         )
+            accounts_file.chmod()
 
         except PasswordError:
             accounts_file.restore()

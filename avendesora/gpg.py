@@ -111,7 +111,7 @@ class GnuPG(object):
                 raise PasswordError(full_stop(e), culprit=path)
         else:
             path.write_text(contents, encoding=get_setting('encoding'))
-        path.chmod(0o600)
+        self.chmod()
 
     def read(self):
         path = self.path
@@ -173,6 +173,9 @@ class GnuPG(object):
 
     def exists(self):
         return self.path.exists()
+
+    def chmod(self, mode=0o600):
+        self.path.chmod(mode)
 
     def __str__(self):
         return str(self.path)
