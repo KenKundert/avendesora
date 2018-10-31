@@ -105,7 +105,7 @@ only enter your user name and password if the URL is correct. Recently however,
 sites have dispensed with the site image and phrase, but still spread the login 
 in process over two pages. It is not clear why they do this. There does not seem 
 to be any security benefit. In fact it acts to reduce security by making it more 
-difficult to use a password manager.  Unfortunately this is all to common.  
+difficult to use a password manager.  Unfortunately this is all too common.  
 Companies talk a good game when it comes to security, but all to often employ 
 practices that are antithetical to good security.
 
