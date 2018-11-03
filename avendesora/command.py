@@ -691,7 +691,7 @@ class Edit(Command):
                     break
                 except PasswordError as e:
                     error(e)
-                    response = query_input('Try again?')
+                    response = query_user('Try again?')
                     if response.lower() not in ['y', 'yes']:
                         raise PasswordError(
                             'Giving up, restoring original version.'
