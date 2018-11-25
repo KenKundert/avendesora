@@ -221,7 +221,7 @@ try:
                 # must catch all exceptions as requests.get() can generate 
                 # a variety based on how it fails, and if the exception is not 
                 # caught the thread dies.
-                raise Error('cannot access cryptocurrency prices:', str(e))
+                raise Error('cannot access cryptocurrency prices.', codicil=str(e))
             except KeyboardInterrupt:
                 done()
 

@@ -164,7 +164,7 @@ specifying the desired values in the *config* file (found in
 .. index::
     single: dynamic_fields setting
 
-**dynamic_fields = '':
+**dynamic_fields** = '':
 
     Fields whose values can change in real time. These fields will not be 
     mentioned by the :ref:`changed command <changed command>`, even if their 

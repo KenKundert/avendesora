@@ -208,6 +208,129 @@ can be found on Github.
 
 
 .. index::
+    single: bitwarden export
+
+.. _bitwarden:
+
+Example: Export to BitWarden
+----------------------------
+
+This program exports selected accounts from *Avendesora* to *BitWarden*.  
+*BitWarden* is a multi-platform open-source password manager.  Using *BitWarden* 
+you can extend the reach of *Avendesora* to your phone or other non-Unix 
+platform.
+
+To use *bw-export* you would add a special field named *bitwarden* to those 
+accounts that you wish to export. It must contain a dictionary that gives the 
+values of each of the fields exported for each account. For example:
+
+.. code-block:: python
+
+    bitwarden = dict(
+        type='login',
+        name='Andor Airlines',
+        login_uri='{urls}',
+        login_username='{email}',
+        login_password='{passcode}',
+        fields='account: {account}\ncustomer service: {customer_service}',
+    )
+
+The exported fields are described on the `BitWarden website 
+<https://help.bitwarden.com/article/import-data>`_.  The values for the fields 
+are either simple strings, as in *type* and *name*.  The values may also be 
+*Avendesora* scripts, as in *login_username* and *fields*.  Scripts allow you to 
+interpolate *Advendesora* account field value into *BitWarden* fields.  Any 
+field that is supported but not given will be blank.
+
+This script produces a file named *bw.csv* that contains the exported accounts, 
+It can be imported into *BitWarden* from their website. You should delete any 
+previously imported accounts before importing this file to avoid duplicates.
+
+The updated source code for `bw-export
+<https://github.com/KenKundert/avendesora/tree/master/samples/api/bw-export>`_
+can be found on Github.
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # Description
+    """Export Accounts to BitWarden
+
+    Generates a CSV file (bw.csv) suitable for uploading to BitWarden.
+
+    Usage:
+        bw-export
+
+    Only those accounts with 'bitwarden' field are exported. The "bitwarden' field 
+    is expected to be a dictionary that may contain the following fields: folder, 
+    favorite, type, name, notes, fields, login_uri, login_username, login_password, 
+    login_totp. If not given, they are left blank. Each value may be a simple string 
+    or it may be a script.
+
+    Once created, it can be imported from the BitWarden website 
+    (vault.bitwarden.com).  You should delete existing accounts before re-importing 
+    to avoid duplicate accounts. When importing, use 'Bitwarden (csv)' as the file 
+    format.
+    """
+
+    # Imports
+    from avendesora import PasswordGenerator, PasswordError, Script
+    from inform import conjoin, os_error, terminate
+    from docopt import docopt
+    import csv
+
+    # Globals
+    fieldnames='''
+        folder
+        favorite
+        type
+        name
+        notes
+        fields
+        login_uri
+        login_username
+        login_password
+        login_totp
+    '''.split()
+
+    # Program
+    try:
+        # Read command line and process options
+        cmdline = docopt(__doc__)
+
+        # Scan accounts and gather accounts to export
+        pw = PasswordGenerator()
+        accounts = {}
+        with open('bw.csv', 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+
+            # visit each account
+            for account in pw.all_accounts():
+                account_name = account.get_name()
+                class_name = account.__name__
+                description = account.get_scalar('desc', None, None)
+
+                # process bitwarden field if it exists
+                fields = account.get_composite('bitwarden')
+                if fields:
+                    # expand fields
+                    for k, v in fields.items():
+                        value = Script(v)
+                        value.initialize(account)
+                        fields[k] = str(value)
+                    writer.writerow(fields)
+
+    # Process exceptions
+    except KeyboardInterrupt:
+        terminate('Killed by user.')
+    except PasswordError as e:
+        e.terminate()
+    except OSError as e:
+        terminate(os_error(e))
+
+
+.. index::
     single: postmortem summary example
 
 .. _postmortem api example:

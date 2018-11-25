@@ -877,7 +877,9 @@ class Account(object):
                     msg = 'unknown key, choose from {}.'
                 else:
                     msg = 'key required, choose from {}.'
-                raise PasswordError(msg.format(conjoin(keys)), culprit=key)
+                raise PasswordError(
+                    msg.format(conjoin(repr(k) for k in keys)), culprit=key
+                )
             else:
                 if key:
                     raise PasswordError(

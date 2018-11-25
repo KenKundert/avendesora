@@ -627,7 +627,7 @@ class Discovery(HelpMessage):
             script. The name allows the user to distinguish the available
             choices.
 
-            If there is a need to distinguish URLs where is one is a substring
+            If there is a need to distinguish URLs where one is a substring
             of another, you can use *exact_path*::
 
                 discovery = [
@@ -642,6 +642,28 @@ class Discovery(HelpMessage):
                         exact_path=True,
                     ),
                 ]
+
+            Some similar URLs can be distinguished by their fragment. If the
+            URL contains '#', then anything that follows is considered its
+            fragment.  For example::
+
+                discovery = [
+                    RecognizeURL(
+                        'https://mybank.com/auth',
+                        script='{username}{tab}{passcode}{return}',
+                        fragment='/',
+                    ),
+                    RecognizeURL(
+                        'https://mybank.com/auth',
+                        script='{passcode}{return}',
+                        fragment='/password',
+                    ),
+                ]
+
+            In this example, the URL 'https://mybank.com/auth/#/' would match
+            the first entry, which outputs both the username and password, and a
+            URL of 'https://mybank.com/auth/#/password' would match the second,
+            which only outputs the password.
 
             RecognizeFile checks to determine whether a particular file has been
             created recently.  This can be use in scripts to force secret

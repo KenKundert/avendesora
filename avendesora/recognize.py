@@ -260,6 +260,9 @@ class RecognizeURL(Recognizer):
         exact_path (bool):
             If True, path given in the URL must be matched completely, partial
             matches are ignored.
+        fragment (str):
+            If given, it must match the URL fragment exactly. The URL fragment
+            is the part of the url after #.
         script (str or True):
             A script that indicates the text that should be typed to active
             application. The names of fields can be included in the script
@@ -285,6 +288,7 @@ class RecognizeURL(Recognizer):
         self.script = kwargs.pop('script', True)
         self.name = kwargs.pop('name', None)
         self.exact_path = kwargs.pop('exact_path', False)
+        self.fragment = kwargs.pop('fragment', None)
         if kwargs:
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
@@ -325,6 +329,8 @@ class RecognizeURL(Recognizer):
                             return actual.startswith(expected)
 
                     if path_matches(path, data.get('path')):
+                        if self.fragment and data.get('fragment') != self.fragment:
+                            continue
                         if (protocol == data.get('protocol')):
                             if verbose:
                                 log('    %s: matches.' % self.get_name())

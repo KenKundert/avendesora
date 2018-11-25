@@ -79,7 +79,7 @@ class Title(object):
                 break
 
         # log the components of the title
-        log('Recognized title components ...')
+        log('Recognized title components;')
         for k, v in data.items():
             log('    %s: %s' % (k, v))
 
@@ -107,7 +107,8 @@ class Title(object):
             return dict(
                 protocol = components.scheme,
                 host = components.netloc,
-                path = components.path
+                path = components.path,
+                fragment = components.fragment,
             )
 
 

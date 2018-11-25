@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+# Description {{{1
+"""Export Accounts to BitWarden
+
+Generates a CSV file (bw.csv) suitable for uploading to BitWarden.
+
+Usage:
+    bw-export
+
+Only those accounts with 'bitwarden' field are exported. The "bitwarden' field 
+is expected to be a dictionary that may contain the following fields: folder, 
+favorite, type, name, notes, fields, login_uri, login_username, login_password, 
+login_totp. If not given, they are left blank. Each value may be a simple string 
+or it may be a script.
+
+Once created, it can be imported from the BitWarden website 
+(vault.bitwarden.com).  You should delete existing accounts before re-importing 
+to avoid duplicate accounts. When importing, use 'Bitwarden (csv)' as the file 
+format.
+"""
+
+# Imports {{{1
+from avendesora import PasswordGenerator, PasswordError, Script
+from inform import conjoin, os_error, terminate
+from docopt import docopt
+import csv
+
+# Globals {{{1
+fieldnames='''
+    folder
+    favorite
+    type
+    name
+    notes
+    fields
+    login_uri
+    login_username
+    login_password
+    login_totp
+'''.split()
+
+# Program {{{1
+try:
+    # Read command line and process options {{{2
+    cmdline = docopt(__doc__)
+
+    # Scan accounts and gather accounts to export {{{2
+    pw = PasswordGenerator()
+    accounts = {}
+    with open('bw.csv', 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        # visit each account
+        for account in pw.all_accounts():
+            account_name = account.get_name()
+            class_name = account.__name__
+            description = account.get_scalar('desc', None, None)
+
+            # process bitwarden field if it exists
+            fields = account.get_composite('bitwarden')
+            if fields:
+                # expand fields
+                for k, v in fields.items():
+                    value = Script(v)
+                    value.initialize(account)
+                    fields[k] = str(value)
+                writer.writerow(fields)
+
+# Process exceptions {{{1
+except KeyboardInterrupt:
+    terminate('Killed by user.')
+except PasswordError as e:
+    e.terminate()
+except OSError as e:
+    terminate(os_error(e))
