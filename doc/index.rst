@@ -3,8 +3,8 @@
 Avendesora Collaborative Password Manager
 =========================================
 
-| Version: 1.11.4
-| Released: 2018-10-24
+| Version: 1.11.5
+| Released: 2018-11-25
 | Please report all bugs and suggestions at
   `Github <https://github.com/KenKundert/avendesora/issues>`_
   (or contact me directly at `avendesora@nurdletech.com
