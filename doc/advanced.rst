@@ -143,8 +143,7 @@ not supported. If you give a partial path, by default *Avendesora*
 matches up to what you have given, but you can require an exact
 match of the entire path by specifying exact_path=True to
 :class:`avendesora.RecognizeURL`.  If you do not give the protocol, the 
-default_protocol
-(https) is assumed.
+default_protocol (https) is assumed.
 
 In general you should use :class:`avendesora.RecognizeURL` rather than 
 :class:`avendesora.RecognizeTitle` for websites if you can. Doing so helps 
@@ -240,6 +239,31 @@ you can use *exact_path*:
         ),
     ]
 
+The URL may contain the # character. This character separates the 'fragment' 
+from the rest of the URL. You can distinguish two otherwise indistinguishable 
+URLs by their fragment. For example, *BitWarden* requests the username and 
+password on a page with a URL of https://vault.bitwarden.com/#/ and it request 
+only the password on a page with a URL of https://vault.bitwarden.com/#/lock.  
+Normally the fragment (the part of the URL that follows the #) is ignored when 
+determining whether a URL matches, however you can explicitly specify that it 
+should be included as follows:
+
+.. code-block:: python
+
+    discovery = [
+        RecognizeURL(
+            'https://vault.bitwarden.com',
+            script='{email}{tab}{passcode}{return}',
+            fragment='/',
+        ),
+        RecognizeURL(
+            'https://vault.bitwarden.com',
+            script='{passcode}{return}',
+            fragment='/lock',
+        ),
+    ]
+
+
 .. index::
     single: RecognizeFile
 
@@ -258,14 +282,16 @@ Thunderbird::
     /usr/bin/thunderbird > /dev/null
 
 Here I have adding my user id (uid=1024) to make the filename unique
-so I am less likely to clash with other users. Alternately, you
-could choose a path that fell within your home directory. Then,
-adding:
+so I am less likely to clash with other users. Alternately, I could have simply 
+placed the file in my home directory.
+
+Then, *Avendesora* will recognize *Thunderbird* if you add the following 
+*discovery* field to your *Thunderbird* account:
 
 .. code-block:: python
 
-    class Firefox(Account):
-        desc = 'Master password for Firefox and Thunderbird'
+    class Thunderbird(Account):
+        desc = 'Master password for Thunderbird'
         passcode = Password()
         discovery = RecognizeFile(
             '/tmp/thunderbird-1024', wait=60, script='{passcode}{return}'
@@ -284,12 +310,13 @@ rewritten as::
     echo thunderbird > ~/.avendesora-password-request
     /usr/bin/thunderbird > /dev/null
 
-Then you would add something like the following to your accounts file:
+Then you would add something like the following to your *Thunderbird* account 
+entry:
 
 .. code-block:: python
 
-    class Firefox(Account):
-        desc = 'Master password for Firefox and Thunderbird'
+    class Thunderbird(Account):
+        desc = 'Master password for Thunderbird'
         passcode = Password()
         discovery = RecognizeFile(
             '~/.avendesora-password-request',
