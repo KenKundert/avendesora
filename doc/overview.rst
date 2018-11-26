@@ -254,7 +254,7 @@ particular:
 Auto Entry
 """"""""""
 
-You *LinuxLogin* account was provisioned with account discovery by way of the 
+Your *LinuxLogin* account was provisioned with account discovery by way of the 
 window title. This assumes that your shell adds the currently running command to 
 the window title. Most shells are configured to do this by default, or can be 
 configured to do so, though it may take some digging on the web to find the 
@@ -401,8 +401,8 @@ answer along with the question:
 .. code-block:: python
 
     questions = [
-        Question('favorite subject in school?', answer=<<recess>>)),
-        Question('favorite composer?' answer=<<chuck berry>>)),
+        Question('favorite subject in school?', answer=<<recess>>),
+        Question('favorite composer?' answer=<<chuck berry>>),
     ]
 
 The :ref:`questions command <questions command>` can be used to quickly display 
@@ -415,7 +415,7 @@ the answer to a security question::
     questions (favorite subject in school?): recess
 
 The *questions* command, which can be abbreviated as *quest* or *q*, displays 
-all of the questions and then you are expected to choose one. Once you do, that 
+all of the questions and you are expected to then choose one. Once you do, that 
 question is answered.
 
 Lastly this account sets up the web interface by specifying *urls* and 

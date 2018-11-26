@@ -342,29 +342,18 @@ use::
     > avendesora value <accountname> 0
     questions.0 (oldest aunt): ampere reimburse duster
 
-You can get a list of your questions so you can identify which index
-to use with::
+You can get a list of your questions and then select which one you want answered 
+using the *questions* command. Specifically, if Citibank asks for the name of 
+your oldest uncle you can use the following to find the answer::
 
-    > avendesora values <accountname>
-    ...
-    questions:
-        0: oldest aunt? <reveal with 'avendesora value <accountname> questions.0'>
-        1: title of first job? <reveal with 'avendesora value <accountname> questions.1'>
-        2: oldest uncle? <reveal with 'avendesora value <accountname> questions.2'>
-        3: savings goal? <reveal with 'avendesora value <accountname> questions.3'>
-        4: childhood vacation spot? <reveal with 'avendesora value <accountname> questions.4'>
-    ...
-
-Or you can use::
-
-    > avendesora values <accountname> questions
-    avendesora error: questions:
-        composite value found: questions:
-            0: oldest aunt?
-            1: title of first job?
-            2: oldest uncle?
-            3: savings goal?
-            4: childhood vacation spot?
+    > avendesora questions citi
+    0: oldest aunt?
+    1: title of first job?
+    2: oldest uncle?
+    3: savings goal?
+    4: childhood vacation spot?
+    Which question? 2
+    questions (oldest uncle?): discomfit correct contact
 
 By default, *Avendesora* generates a response that consists of 3
 random words. This makes it easy to read to a person over the phone
