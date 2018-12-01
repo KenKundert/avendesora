@@ -24,6 +24,7 @@
 from .config import get_setting, override_setting, setting_path
 from .error import PasswordError
 from .shlib import to_path, cp
+from .utilities import OSErrors
 from inform import (
     conjoin, cull, display, log, narrate, os_error, warn, is_str,
     full_stop
@@ -128,7 +129,7 @@ class GnuPG(object):
                         raise PasswordError(msg, culprit=path, sep='\n')
             except ValueError as e:
                 raise PasswordError(full_stop(e), culprit=path)
-            except (IOError, OSError) as e:
+            except OSErrors as e:
                 raise PasswordError(os_error(e))
             return decrypted.data.decode(get_setting('encoding'))
         else:
@@ -221,7 +222,7 @@ class PythonFile(GnuPG):
         try:
             self.code = self.read()
                 # need to save the code for the new command
-        except OSError as e:
+        except OSErrors as e:
             raise PasswordError(os_error(e))
 
         try:
@@ -272,5 +273,5 @@ class PythonFile(GnuPG):
                 # file is not encrypted
                 with path.open('wb') as f:
                     f.write(contents.encode(get_setting('encoding')))
-        except OSError as e:
+        except OSErrors as e:
             raise PasswordError(os_error(e))

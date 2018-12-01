@@ -642,7 +642,7 @@ be rendered as::
 
 You can specify a script directly to the :ref:`value command <value command>`.  
 You can specify them as account attributes (in this case then need to be 
-embedded in :class:`avendesora.Script`), or you can specify them to 
+embedded in :class:`avendesora.Script`).  Or you can specify them to 
 :ref:`account discovery recognizers <discovery>`.
 
 Scripts are useful if you need to combine an account value with
@@ -863,7 +863,8 @@ The first step in using *Avendesora* to collaborate with a partner is
 for one of the partners to generate and then share an accounts file
 that is dedicated to the shared accounts.  This file contains the
 master seed, and it is critical to keep this value secure. Thus, it
-is recommended that the shared file be encrypted.
+is recommended that the file be shared in person or that it be encrypted in 
+transit.
 
 Consider an example where you, Siuan, are sharing accounts with your
 business partner, Moiraine.  You have hired a contractor to run your

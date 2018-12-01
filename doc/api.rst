@@ -94,8 +94,8 @@ found in a list.
 
 .. code-block:: python
 
-    from avendesora import PasswordGenerator
-    from inform import display, indent, Error
+    from avendesora import PasswordGenerator, PasswordError
+    from inform import display, indent
 
     accounts = ['bank', 'credit-union', 'brokerage']
 
@@ -118,7 +118,7 @@ found in a list.
                     value = account.get_value(name)
                     display(value.render('{n}: {v}'))
             display()
-    except Error as e:
+    except PasswordError as e:
         e.terminate()
 
 
@@ -237,14 +237,16 @@ values of each of the fields exported for each account. For example:
 
 The exported fields are described on the `BitWarden website 
 <https://help.bitwarden.com/article/import-data>`_.  The values for the fields 
-are either simple strings, as in *type* and *name*.  The values may also be 
-*Avendesora* scripts, as in *login_username* and *fields*.  Scripts allow you to 
-interpolate *Advendesora* account field value into *BitWarden* fields.  Any 
-field that is supported but not given will be blank.
+are either simple strings, as in *type* and *name*, or *Avendesora* scripts, as 
+in *login_username* and *fields*.  Scripts allow you to interpolate 
+*Advendesora* account field value into *BitWarden* fields.  Any field that is 
+supported but not given will be blank.
 
 This script produces a file named *bw.csv* that contains the exported accounts, 
 It can be imported into *BitWarden* from their website. You should delete any 
 previously imported accounts before importing this file to avoid duplicates.
+You should all take care to delete this file after you have completed the import 
+as it contains the passcodes in plain text.
 
 The updated source code for `bw-export
 <https://github.com/KenKundert/avendesora/tree/master/samples/api/bw-export>`_

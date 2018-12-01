@@ -26,6 +26,14 @@ import os
 import sys
 
 
+# OSErrors {{{1
+# Define OSError to include IOError with Python2 for backward compatibility
+if sys.version_info.major < 3:
+    OSErrors = (OSError, IOError)
+else:
+    OSErrors = OSError
+
+
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
 def gethostname():
@@ -171,3 +179,23 @@ def invert_dict(d, initial_keys=None):
         new.setdefault(v, set())
         new[v].add(k)
     return new
+
+# timer {{{1
+start_time = 0
+last_time = 0
+def timer(label=None):
+    from quantiphy import Quantity
+    from time import time
+    global start_time, last_time
+    t = time()
+    if label:
+        elapsed = Quantity(t - start_time, 's')
+        delta = Quantity(t - last_time, 's')
+        print('{label}: delta = {delta}, cumulative = {elapsed}'.format(
+            label,
+            elapsed = Quantity(t - start_time, 's'),
+            delta = Quantity(t - last_time, 's'),
+        ))
+    else:
+        start_time = t
+    last_time = t

@@ -16,7 +16,6 @@ setup(
     download_url = 'https://github.com/kenkundert/avendesora/tarball/master',
     license = 'GPLv3+',
     packages = 'avendesora'.split(),
-    package_data = {'avendesora': ['words']},
     entry_points = {
         'console_scripts': ['avendesora = avendesora.main:main'],
     },
@@ -48,8 +47,9 @@ setup(
             # pyotp is optional, it provides one-time-password (OTP) secrets.
         #'scrypt',
             # scrypt is optional. If you install it then Avendesora will offer
-            # it. It is not required because it involves compiling C code and so
-            # significant additional dependencies such as gcc.
+            # it. It is not required because it is little used and installing it
+            # involves compiling C code and so significant additional
+            # dependencies such as gcc.
     ],
     setup_requires = 'pytest-runner>=2.0'.split(),
     tests_require = 'pytest pexpect'.split(),

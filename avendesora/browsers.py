@@ -23,6 +23,7 @@
 from .config import get_setting, setting_path
 from .error import PasswordError
 from .shlib import Cmd
+from .utilities import OSErrors
 from inform import log, os_error
 
 
@@ -63,7 +64,7 @@ class StandardBrowser(Browser):
             log("running '%s'" % str(browser))
             try:
                 browser.start()
-            except OSError as e:
+            except OSErrors as e:
                 raise PasswordError(
                     os_error(e), culprit=setting_path('browsers')
                 )

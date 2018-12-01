@@ -24,7 +24,7 @@
 from .config import get_setting
 from .error import PasswordError
 from .shlib import cwd, to_path, Run
-from .utilities import gethostname, getusername, error_source
+from .utilities import gethostname, getusername, error_source, OSErrors
 from inform import Error, is_collection, is_str, log, notify, warn, os_error
 from fnmatch import fnmatch
 try:
@@ -702,7 +702,7 @@ class RecognizeFile(Recognizer):
                 return
         except FileNotFoundError:
             pass
-        except OSError as e:
+        except OSErrors as e:
             warn(os_error(e))
         if verbose:
             log('    %s: no match.' % self.get_name())

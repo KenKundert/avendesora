@@ -265,6 +265,11 @@ class GeneratedSecret(object):
 
         """
         assert self.pool, 'initialize() must be called first'
+        if callable(alphabet):
+            # Dictionary is passed as a function. That allows us to defer
+            # reading the dictionary until we know it is really going to be
+            # used as it is a slow operation.
+            alphabet = alphabet()
         radix = len(alphabet)
         max_index = radix-1
         bits_per_chunk = (max_index).bit_length()
@@ -498,6 +503,7 @@ class Passphrase(Password):
         'graveyard cockle intone provider'
 
     """
+
     def __init__(self,
         length = 4,
         alphabet = None,
@@ -514,7 +520,7 @@ class Passphrase(Password):
             raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
-        self.alphabet = alphabet if alphabet else DICTIONARY.words
+        self.alphabet = alphabet if alphabet else DICTIONARY.get_words
         self.master = master
         self.version = version
         self.shift_sort = False
@@ -674,7 +680,7 @@ class Question(Passphrase):
             raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
-        self.alphabet = alphabet if alphabet else DICTIONARY.words
+        self.alphabet = alphabet if alphabet else DICTIONARY.get_words
         self.master = master
         self.version = version
         self.shift_sort = False

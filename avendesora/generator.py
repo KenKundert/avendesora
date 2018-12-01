@@ -21,7 +21,9 @@
 from .account import Account
 from .config import read_config, get_setting
 from .dialog import show_list_dialog
+from .dictionary import DICTIONARY
 from .error import PasswordError
+from .files import AccountFiles
 from .gpg import GnuPG, PythonFile, GPG_EXTENSIONS
 from .obscure import Hidden
 from .preferences import (
@@ -34,11 +36,10 @@ from .script import Script
 from .secrets import Passphrase
 from .shlib import to_path, getmod, mv, rm
 from .title import Title
-from .utilities import generate_random_string
+from .utilities import generate_random_string, OSErrors
 from inform import codicil, conjoin, log, os_error, render, warn, is_str
-from textwrap import dedent, fill
+from textwrap import dedent, fill, wrap
 from pathlib import Path
-from pkg_resources import resource_filename
 from time import time
 import hashlib
 import os
@@ -58,6 +59,11 @@ class PasswordGenerator(object):
         init (bool): Create user's directory.
         gpg_ids (list of strings):
             List of GPG identities to use when creating user's directory.
+        check_integrity (bool):
+            If true will validate that certain critical components in Avendesora
+            have not be tampered with.  Checking the integrity can take up to a
+            second, so recommend you pass False on interactive commands that
+            benefit from low startup overhead.
 
     Raises:
         :exc:`avendesora.PasswordError`:
@@ -65,7 +71,9 @@ class PasswordGenerator(object):
     """
 
     # Constructor {{{2
-    def __init__(self, init=False, gpg_ids=None, warnings=True):
+    def __init__(
+            self, init=False, gpg_ids=None, check_integrity=True, warnings=True
+    ):
         # initialize avendesora (these should already be done if called from 
         # main, but it is safe to call them again)
         read_config()
@@ -77,78 +85,11 @@ class PasswordGenerator(object):
             return
 
         # check the integrity of avendesora
-        self._validate_components()
+        if check_integrity:
+            self._validate_components()
 
-        # read the accounts files
-        self.shared_secrets = {}
-        seen = {}
-        most_recently_updated = 0
-        mask = get_setting('account_file_mask')
-        for filename in get_setting('accounts_files', []):
-            path = to_path(get_setting('settings_dir'), filename)
-            resolved_path = path.resolve()
-
-            # check file permissions
-            permissions = getmod(resolved_path)
-            violation = permissions & mask
-            if violation:
-                recommended = permissions & ~mask & 0o777
-                warn("file permissions are too loose.", culprit=path)
-                codicil("Recommend running 'chmod {:o} {}'.".format(recommended, resolved_path))
-
-            # determine time of most recently updated account file
-            updated = os.path.getmtime(str(resolved_path))
-            if updated > most_recently_updated:
-                most_recently_updated = updated
-
-            # read the file
-            account_file = PythonFile(path)
-            contents = account_file.run()
-            master_seed = contents.get('master_seed')
-            if master_seed:
-                self.shared_secrets[path.stem] = master_seed
-
-            # traverse through all accounts and pass in fileinfo and master
-            # will be ignored if already set
-            for account in self.all_accounts():
-                account.preprocess(master_seed, account_file, seen)
-
-        # check for missing or stale archive file
-        archive_file = get_setting('archive_file')
-        if archive_file and warnings:
-            if archive_file.exists():
-                resolved_path = archive_file.resolve()
-
-                # check file permissions
-                permissions = getmod(resolved_path)
-                violation = permissions & mask
-                if violation:
-                    recommended = permissions & ~mask & 0o777
-                    warn("file permissions are too loose.", culprit=path)
-                    codicil("Recommend running 'chmod {:o} {}'.".format(recommended, resolved_path))
-
-                # warn user if archive file is out of date
-                stale = float(get_setting('archive_stale'))
-                archive_updated = os.path.getmtime(str(resolved_path))
-                if most_recently_updated > archive_updated:
-                    log('Archive is up-to-date.')
-                    age_in_seconds = time() - most_recently_updated
-                    if age_in_seconds > 86400 * stale:
-                        warn('stale archive.')
-                        codicil(fill(dedent("""
-                            Recommend running 'avendesora changed' to determine
-                            which account entries have changed, and if all the
-                            changes are expected, running 'avendesora archive' to
-                            update the archive.
-                        """).strip()))
-                else:
-                    log('Archive is out of date.')
-            else:
-                warn('archive missing.')
-                codicil(
-                    "Recommend running 'avendesora archive'",
-                    "to create the archive."
-                )
+        # prepare to read accounts files
+        self.account_files = AccountFiles()
 
     # _initialize() (private){{{2
     def _initialize(self, gpg_ids, filename):
@@ -194,7 +135,7 @@ class PasswordGenerator(object):
         if (get_setting('config_doc_file')):
             try:
                 rm(get_setting('config_doc_file'))
-            except OSError as e:
+            except OSErrors as e:
                 warn(os_error(e))
 
         # create the initial versions of the files in the settings directory
@@ -243,41 +184,40 @@ class PasswordGenerator(object):
             try:
                 mv(path, str(path) + '~')
                 f.create(ACCOUNT_LIST_FILE_CONTENTS.format(**fields), gpg_ids)
-            except OSError as e:
+            except OSErrors as e:
                 raise PasswordError(os_error(e))
 
-    # _validate_components() (private) {{{1
+    # _validate_components() (private) {{{2
     def _validate_components(self):
+        from pkg_resources import resource_filename
+
         # check permissions on the settings directory
         path = get_setting('settings_dir')
         mask = get_setting('config_dir_mask')
         try:
             permissions = getmod(path)
         except FileNotFoundError:
-            raise Error('missing, must run initialize.', culprit=path)
+            raise PasswordError('missing, must run initialize.', culprit=path)
         violation = permissions & mask
         if violation:
             recommended = permissions & ~mask & 0o777
             warn("directory permissions are too loose.", culprit=path)
             codicil("Recommend running 'chmod {:o} {}'.".format(recommended, path))
 
-        # find dictionary file
-        dict_path = get_setting('dictionary_file')
-        if not dict_path.is_file():
-            # user did not provide a dictionary, so use the internal one
-            dict_path = to_path(resource_filename(__name__, 'words'))
-
         # Check that files that are critical to the integrity of the generated
         # secrets have not changed
         for path, kind in [
             (to_path(resource_filename(__name__, 'secrets.py')), 'secrets_hash'),
             (to_path(resource_filename(__name__, 'charsets.py')), 'charsets_hash'),
-            (dict_path, 'dict_hash'),
+            (None, 'dict_hash'),
         ]:
-            try:
-                contents = path.read_text()
-            except OSError as e:
-                raise PasswordError(os_error(e))
+            if path:
+                try:
+                    contents = path.read_text()
+                except OSErrors as e:
+                    raise PasswordError(os_error(e))
+            else:
+                contents='\n'.join(DICTIONARY.get_words())
             md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
             # Check that file has not changed.
             if md5 != get_setting(kind):
@@ -320,6 +260,7 @@ class PasswordGenerator(object):
         """
         if not name:
             raise PasswordError('no account specified.')
+        self.account_files.load_account(name)
         account = Account.get_account(name)
         account.initialize(request_seed, stealth_name)
         return account
@@ -396,6 +337,7 @@ class PasswordGenerator(object):
     # all_accounts() {{{2
     def all_accounts(self):
         "Iterate through all accounts."
+        self.account_files.load_account_files()
         for account in Account.all_accounts():
             yield account
 
@@ -450,11 +392,12 @@ class PasswordGenerator(object):
                 c.set_seeds([now])
                 challenge = str(c)
             r = Passphrase()
-            r.set_seeds([self.shared_secrets[name], challenge])
+            shared_secrets = self.account_files.shared_secrets
+            r.set_seeds([shared_secrets[name], challenge])
             response = str(r)
             return challenge, response
         except KeyError:
-            choices = conjoin(sorted(self.shared_secrets.keys()))
+            choices = conjoin(sorted(shared_secrets.keys()))
             raise PasswordError(
                 'Unknown partner. Choose from %s.' % choices,
                 culprit=name

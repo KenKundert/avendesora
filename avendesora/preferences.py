@@ -75,7 +75,7 @@ CONFIG_DEFAULTS = {
     'dynamic_fields': '',
     'default_browser': 'x',
     'display_time': 60,
-    'dictionary_file': 'words',
+    'dictionary_file': None,
     'encoding': 'utf-8',
     'edit_account': (
         'gvim',                     # use gvim -v so that user can access

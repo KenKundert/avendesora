@@ -397,6 +397,19 @@ Here, Alt-F2 is the hot key Gnome uses to execute a command. This causes
 manager does not have access to a TTY it will instead mimic the keyboard and 
 autotype the credit card information into the active window.
 
+Alternately, if you did not set up the *ccn* script, you can simply request the 
+individual fields. For example, to enter the account number into a field use::
+
+    Alt-F2 avendesora citi account
+
+Then to enter the CVV use::
+
+    Alt-F2 avendesora citi cvv
+
+The expiration date is difficult to enter in this way because there is so much 
+variation in the way that websites expect the date to be entered, and they often 
+expect drop-downs rather than simple typing.
+
 
 .. index::
     single: swarm accounts

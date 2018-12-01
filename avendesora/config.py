@@ -21,8 +21,8 @@
 # Imports {{{1
 from .error import PasswordError
 from .preferences import CONFIG_DEFAULTS, NONCONFIG_SETTINGS
-from .shlib import to_path
 from inform import comment, warn, is_str
+from pathlib import Path
 
 # Globals {{{1
 Config = {}
@@ -51,7 +51,7 @@ def read_config():
                 continue
             if k.endswith('_executable'):
                 argv = v.split() if is_str(v) else list(v)
-                path = to_path(argv[0])
+                path = Path(argv[0])
                 if not path.is_absolute():
                     warn(
                         'should use absolute path for executables.',
@@ -115,8 +115,10 @@ def get_setting(name, default=None, expand=True):
         return default
     if name == 'gpg_ids':
         value = value.split() if is_str(value) else value
+    elif name == 'settings_dir':
+        value = Path(value)
     elif expand and name.endswith('_file'):
-        value = to_path(get_setting('settings_dir'), value)
+        value = get_setting('settings_dir') / value
     return value
 
 
