@@ -26,7 +26,7 @@ from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import ObscuredSecret
 from .shlib import chmod, cp, rm, to_path
-from .utilities import query_user, two_columns
+from .utilities import query_user, two_columns, OSErrors
 from .writer import get_writer
 from inform import (
     codicil, columns, cull, display, error, full_stop, output, warn,
@@ -219,7 +219,7 @@ class Add(Command):
             tmpfilename = mktemp(suffix='_avendesora.gpg')
             tmpfile = GnuPG(tmpfilename)
             tmpfile.save(template, get_setting('gpg_ids'))
-        except OSError as e:
+        except OSErrors as e:
             raise PasswordError(os_error(e))
 
         # open template in the editor
@@ -264,9 +264,9 @@ class Add(Command):
                             'Giving up, restoring original file.'
                         )
 
-        except (PasswordError, OSError) as e:
+        except (PasswordError) + OSErrors as e:
             orig_accounts_file.restore()
-            if isinstance(e, OSError):
+            if isinstance(e, OSErrors):
                 e = os_error(e)
             error(e)
             codicil(
@@ -336,7 +336,7 @@ class Archive(Command):
             if previous_archive and archive_file.is_file():
                 rm(previous_archive)
                 cp(archive_file, previous_archive)
-        except OSError as e:
+        except OSErrors as e:
             raise PasswordError(os_error(e))
 
         # run the generator
@@ -369,7 +369,7 @@ class Archive(Command):
         try:
             archive.save(contents)
             chmod(0o600, archive_file)
-        except OSError as e:
+        except OSErrors as e:
             raise PasswordError(os_error(e), culprit=archive_file)
 
 
@@ -439,7 +439,7 @@ class Browse(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
 
         # determine the account and open the URL
         account = generator.get_account(cmdline['<account>'])
@@ -677,7 +677,7 @@ class Edit(Command):
             accounts_file = PythonFile(account._file_info.path)
             accounts_file.backup('.saved')
             account_name = account.__name__
-        except OSError as e:
+        except OSErrors as e:
             raise PasswordError(os_error(e))
 
         # allow the user to edit, and then check and make sure it is valid
@@ -701,7 +701,7 @@ class Edit(Command):
         except PasswordError:
             accounts_file.restore()
             raise
-        except OSError as e:
+        except OSErrors as e:
             accounts_file.restore()
             raise PasswordError(os_error(e))
 
@@ -724,7 +724,7 @@ class Find(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
 
         # find accounts whose name matches the criteria
         to_print = []
@@ -858,6 +858,7 @@ class Identity(Command):
 
         # run the generator
         generator = PasswordGenerator()
+        generator.account_files.load_account_files()
 
         if cmdline['<name>']:
             try:
@@ -970,7 +971,7 @@ class Log(Command):
             try:
                 rm(logfile)
                 return
-            except OSError as e:
+            except OSErrors as e:
                 raise PasswordError(os_error(e))
         if not logfile.exists():
             raise PasswordError('log file was not found.')
@@ -1032,7 +1033,7 @@ class LoginCredentials(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
 
         # determine the account and output specified information
         account_name = cmdline['<account>']
@@ -1212,7 +1213,7 @@ class Questions(Command):
         use_clipboard = cmdline['--clipboard'] or cmdline['qc']
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
 
         # get the questions
         account_name = cmdline['<account>']
@@ -1308,7 +1309,7 @@ class Search(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
 
         # search for accounts that match search criteria
         to_print = []
@@ -1448,7 +1449,7 @@ class Value(Command):
             get_informer().suppress_output()
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
 
         # determine the account and output specified information
         account_name = cmdline['<account>']
@@ -1486,7 +1487,7 @@ class Values(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
 
         # determine the account
         account = generator.get_account(cmdline['<account>'])
@@ -1519,3 +1520,4 @@ class Version(Command):
         output('Avendesora version: %s (%s) [%s].' % (
             __version__, __released__, python
         ))
+

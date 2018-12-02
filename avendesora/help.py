@@ -94,7 +94,16 @@ class HelpMessage(object):
             candidates = conjoin(candidates, conj=' or ')
             if candidates:
                 msg.append('did you mean {}?'.format(candidates))
-            raise PasswordError(full_stop(', '.join(msg)), culprit=name)
+            codicil = dedent("""
+                You can also try using:
+                    avendesora help -s {}
+                to search for suitable topics.
+            """).strip().format(name)
+            raise PasswordError(
+                full_stop(', '.join(msg)),
+                culprit=name,
+                codicil=codicil,
+            )
         else:
             if browse:
                 return show_in_browser('')

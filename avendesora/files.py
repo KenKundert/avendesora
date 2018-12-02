@@ -1,19 +1,17 @@
 # Account Files
 #
-# Loads account files either individually or en mass while maintaining the
-# catalog file, which keeps mappings between account names and the files that
-# contain them. For privacy reasons, the catalog does not contain the account
-# names, rather it contains their md5 hash.
+# Loads account files either individually or en mass.
 #
 # Loading account files on demand makes Avendesora more responsive on most
-# commands. With 14 encrypted accounts files the run time for the value command
-# was up around 4 seconds. By only loading one of the accounts files, I got that
-# down to around 2 seconds. I measured the time it took to run Avendesora when
-# the first statement in main() raised SystemExit, and the time required to run
-# was 1.5 - 2 seconds. Furthermore, time required to run value command was 250ms
-# whereas time required to run changed command was 2.9 seconds. So little is to
-# be gained by further optimizing the time required to access a single account.
-# Further attention should be focused on reducing start up time.
+# commands.
+#
+# Avendesora uses the manifests file, stored in configuration directory, to
+# determine which file holds a particular account. This file contains a pickled
+# manifests dictionary, which lists all account names and aliases contained in
+# each account file. The account names and aliases are all hashed so it is not
+# possible to know the names of the user's accounts by examining the manifests
+# file. Once loaded the manifests mapping is inverted to create the account
+# catalog, which maps account names hashes to file names.
 
 # License {{{1
 # Copyright (C) 2016-18 Kenneth S. Kundert
@@ -56,16 +54,16 @@ else:
 
 
 
-# Account Files class {{{1
+# AccountFiles class (private) {{{1
 class AccountFiles:
-
-    def __init__(self, warnings=True):
+    def __init__(self, warnings=True): # {{{2
+        # initialize object {{{3
         self.loaded = set()
         self.catalog = {}
         self.shared_secrets = {}
         self.existing_names = {}
 
-        # check permissions, dates on account files
+        # check permissions, dates on account files {{{3
         most_recently_updated = 0
         mask = get_setting('account_file_mask')
         for filename in get_setting('accounts_files', []):
@@ -85,7 +83,7 @@ class AccountFiles:
             if updated > most_recently_updated:
                 most_recently_updated = updated
 
-        # check for missing or stale archive file
+        # check for missing or stale archive file {{{3
         archive_file = get_setting('archive_file')
         if archive_file and warnings:
             if archive_file.exists():
@@ -122,7 +120,7 @@ class AccountFiles:
                     "to create the archive."
                 )
 
-    def load_account_file(self, filename):
+    def load_account_file(self, filename): # {{{2
         if filename in self.loaded:
             return
 
@@ -142,7 +140,7 @@ class AccountFiles:
 
         self.loaded.add(filename)
 
-    def load_account(self, name):
+    def load_account(self, name): # {{{2
         canonical_name = canonicalize(name)
         self.read_manifests()
         hash = md5(canonical_name.encode('utf8')).digest()
@@ -158,12 +156,12 @@ class AccountFiles:
                     return
         self.write_manifests()
 
-    def load_account_files(self):
+    def load_account_files(self): # {{{2
         for filename in get_setting('accounts_files', []):
             self.load_account_file(filename)
         self.write_manifests()
 
-    def read_manifests(self):
+    def read_manifests(self): # {{{2
         if self.catalog:
             return
         settings_dir = get_setting('settings_dir')
@@ -183,13 +181,13 @@ class AccountFiles:
         except OSErrors as e:
             comment(os_error(e))
 
-    def write_manifests(self):
+    def write_manifests(self): # {{{2
         # do not modify existing catalog if no account files were loaded
         if not self.loaded:
             return
         log('Updating manifests.')
 
-        # remove entries from catalog from loaded files
+        # remove entries for loaded files from catalog
         if self.catalog:
             for k in self.catalog.keys():
                 if k in self.loaded:

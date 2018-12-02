@@ -41,6 +41,7 @@ from .command import Command
 from .config import read_config, get_setting
 from .error import PasswordError
 from .gpg import GnuPG, BufferedFile
+from .utilities import OSErrors
 from . import shlib
 from inform import Inform, Error, done, fatal, output, terminate, os_error
 from docopt import docopt
@@ -75,6 +76,6 @@ def main():
         terminate()
     except (PasswordError, Error) as e:
         e.terminate()
-    except OSError as e:
+    except OSErrors as e:
         fatal(os_error(e))
     done()
