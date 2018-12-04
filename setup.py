@@ -23,7 +23,7 @@ setup(
         'appdirs',
         'arrow',
         'docopt',
-        'inform>=1.11',
+        'inform>=1.14',
         #'pygobject',
             # pygobject seems broken in pypi. You can try uncommenting the above
             # and see if it works. Otherwise, do the following:
