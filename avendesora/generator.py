@@ -89,7 +89,7 @@ class PasswordGenerator(object):
             self._validate_components()
 
         # prepare to read accounts files
-        self.account_files = AccountFiles()
+        self.account_files = AccountFiles(warnings)
 
     # _initialize() (private){{{2
     def _initialize(self, gpg_ids, filename):
