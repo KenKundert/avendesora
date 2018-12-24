@@ -215,7 +215,7 @@ class ClipboardWriter(Writer):
         base_cmd = split_cmd(get_setting('xsel_executable'))
 
         log('Writing to clipboard.')
-        Run(base_cmd + ['-i'], 'soeW', stdin=value+'\n')
+        Run(base_cmd + ['-i'], 'soeW', stdin=value)
 
         if is_secret:
             # produce count down
