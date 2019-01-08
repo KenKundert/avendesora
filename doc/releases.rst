@@ -62,8 +62,8 @@ Releases
     - Improve the account value formatting.
 
 **Latest Development Version**:
-    | Version: 1.11.7
-    | Released: 2018-12-24
+    | Version: 1.11.8
+    | Released: 2019-01-08
 
     - Updated the *networth* API example.
     - Incorporated *shlib* package into *Avendesora* for better security.
