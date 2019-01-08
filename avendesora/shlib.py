@@ -1,4 +1,4 @@
-# scripts -- Scripting utilities
+# shlib -- Scripting utilities
 #
 # A light-weight package with few dependencies that allows users to do 
 # shell-script like things relatively easily in Python.
@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '0.8.4'
-__released__ = '2018-10-24'
+__version__ = '0.8.5'
+__released__ = '2018-12-28'
 
 # Imports {{{1
 try:
@@ -35,8 +35,11 @@ import os
 import sys
 
 # Parameters {{{1
-DEFAULT_ENCODING = 'utf-8'
-preferences = {}
+PREFERENCES = dict(
+    encoding = 'utf-8',
+    log_cmd = False,
+    use_inform = False,
+)
 
 # Utilities {{{1
 # is_str {{{2
@@ -113,7 +116,7 @@ def quote_arg(arg):
 # _use_log {{{2
 def _use_log(log):
     if log is None:
-        return preferences.get('log_cmd')
+        return PREFERENCES['log_cmd']
     return log
 
 # Preferences {{{1
@@ -128,9 +131,20 @@ def set_prefs(**kwargs):
         log_cmd (bool):
             Log the command invocation and exit status in the Cmd class and its
             subclasses. Requires that inform be installed.
+        encoding (str):
+            The encoding to use if one is not specified.
     """
-    preferences.update(kwargs)
+    PREFERENCES.update(kwargs)
 
+# SHLib state
+def get_state():
+    return PREFERENCES
+
+def set_state(state):
+    global PREFERENCES
+    old_state = PREFERENCES
+    PREFERENCES = state
+    return old_state
 
 # File system utility functions (cp, mv, rm, ln, touch, mkdir, ls, etc.) {{{1
 # cp {{{2
@@ -235,6 +249,29 @@ def mkdir(*paths):
         except (IOError, OSError) as err:
             if err.errno != errno.EEXIST or path.is_file():
                 raise
+
+# mount/umount {{{2
+class mount:
+
+    def __init__(self, path):
+        self.path = to_path(path)
+        self.mounted_externally = is_mounted(self.path)
+
+        if not self.mounted_externally:
+            Run(['mount', self.path])
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if not self.mounted_externally:
+            umount(self.path)
+
+def umount(path):
+    Run(['umount', path])
+
+def is_mounted(path):
+    return Run(['mountpoint', '-q', path], '0,1').status == 0
 
 # cd {{{2
 class cd:
@@ -479,7 +516,7 @@ class Cmd(object):
         self.merge_stderr_into_stdout = False
         self.status = None
         self.wait_for_termination = True
-        self.encoding = DEFAULT_ENCODING if encoding is None else encoding
+        self.encoding = PREFERENCES['encoding'] if encoding is None else encoding
         self.log = log
         self.option_args = option_args
         self._interpret_modes(modes)
@@ -545,7 +582,7 @@ class Cmd(object):
                 cmd, shell=self.use_shell, env=self.env, **streams
             )
         except OSError as e:
-            if preferences.get('use_inform'):
+            if PREFERENCES['use_inform']:
                 from inform import Error
                 raise Error(
                     msg = os_error(e),
@@ -636,7 +673,7 @@ class Cmd(object):
                 msg = self.stderr.strip()
             else:
                 msg = 'unexpected exit status (%d)' % self.status
-            if preferences.get('use_inform'):
+            if PREFERENCES['use_inform']:
                 from inform import Error
                 raise Error(
                     msg = msg,
@@ -691,7 +728,7 @@ class Run(Cmd):
         self.wait_for_termination = True
         self.accept = (0,)
         self.env = env
-        self.encoding = DEFAULT_ENCODING if not encoding else encoding
+        self.encoding = PREFERENCES['encoding'] if not encoding else encoding
         self.log = log
         self.option_args = option_args
         self._interpret_modes(modes)
@@ -717,7 +754,7 @@ class Sh(Cmd):
         self.merge_stderr_into_stdout = False
         self.wait_for_termination = True
         self.env = env
-        self.encoding = DEFAULT_ENCODING if not encoding else encoding
+        self.encoding = PREFERENCES['encoding'] if not encoding else encoding
         self.log = log
         self.option_args = option_args
         self._interpret_modes(modes)
@@ -746,7 +783,7 @@ class Start(Cmd):
         self.wait_for_termination = False
         self.accept = (0,)
         self.env = env
-        self.encoding = DEFAULT_ENCODING if not encoding else encoding
+        self.encoding = PREFERENCES['encoding'] if not encoding else encoding
         self.log = log
         self.option_args = option_args
         self._interpret_modes(modes)
@@ -803,7 +840,7 @@ def run(cmd, stdin=None, accept=0, shell=False):
     streams = {} if stdin is None else {'stdin': subprocess.PIPE}
     process = subprocess.Popen(cmd, shell=shell, **streams)
     if stdin is not None:
-        process.stdin.write(stdin.encode(DEFAULT_ENCODING))
+        process.stdin.write(stdin.encode(PREFERENCES['encoding']))
         process.stdin.close()
     status = process.wait()
     if _Accept(accept).unacceptable(status):
@@ -823,7 +860,7 @@ def bg(cmd, stdin=None, shell=False):
     streams = {'stdin': subprocess.PIPE} if stdin is not None else {}
     process = subprocess.Popen(cmd, shell=shell, **streams)
     if stdin is not None:
-        process.stdin.write(stdin.encode(DEFAULT_ENCODING))
+        process.stdin.write(stdin.encode(PREFERENCES['encoding']))
         process.stdin.close()
     return process.pid
 
@@ -890,8 +927,8 @@ def render_command(cmd, option_args=None, width=70):
     if is_str(cmd):
         components = split_cmd(cmd)
     else:
-        components = [quote_arg(c) for c in cmd]
-        cmd = ' '.join(components)
+        components = cmd[:]
+        cmd = ' '.join(str(c) for c in components)
     if len(cmd) <= width:
         return cmd
 

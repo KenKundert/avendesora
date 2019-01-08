@@ -101,7 +101,7 @@ class AccountFiles:
                 stale = float(get_setting('archive_stale'))
                 archive_updated = resolved_path.stat().st_mtime
                 if most_recently_updated > archive_updated:
-                    log('Archive is up-to-date.')
+                    log('Avendesora archive is up-to-date.')
                     age_in_seconds = time() - most_recently_updated
                     if age_in_seconds > 86400 * stale:
                         warn('stale archive.')
@@ -112,7 +112,7 @@ class AccountFiles:
                             update the archive.
                         """).strip()))
                 else:
-                    log('Archive is out of date.')
+                    log('Avendesora archive is out of date.')
             else:
                 warn('archive missing.')
                 codicil(

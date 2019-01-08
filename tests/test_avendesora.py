@@ -57,6 +57,14 @@ def test_mb_savings():
         result = os_error(err)
     assert result == b'23456789\n'
 
+# test_mb_browse() {{{1
+def test_mb_browse():
+    try:
+        result = run('avendesora browse --list  mb')
+    except OSError as err:
+        result = os_error(err)
+    assert result == b'                        : https://mb.com [default]\n'
+
 # test_alertscc() {{{1
 def test_alertscc():
     try:
@@ -80,6 +88,17 @@ def test_alertscc_script():
     except OSError as err:
         result = os_error(err)
     assert result == b'pizzaman@pizza.com#R7ibHyPjWtG2\n'
+
+# test_alertscc_browse() {{{1
+def test_alertscc_browse():
+    try:
+        result = run('avendesora browse --list alertscc')
+    except OSError as err:
+        result = os_error(err)
+    assert sorted(result) == sorted(
+        b'              validation: https://alertscc.bbcportal.com/Validation\n'
+        b'                   login: https://alertscc.bbcportal.com\n'
+    )
 
 # test_scc() {{{1
 def test_scc():
@@ -136,6 +155,17 @@ def test_scc_q2():
     except OSError as err:
         result = os_error(err)
     assert result == b'vestige corny convector\n'
+
+# test_scc_browse() {{{1
+def test_scc_browse():
+    try:
+        result = run('avendesora browse --list scc')
+    except OSError as err:
+        result = os_error(err)
+    assert sorted(result) == sorted(
+        b'              validation: https://alertscc.bbcportal.com/Validation\n'
+        b'                   login: https://alertscc.bbcportal.com\n'
+    )
 
 # test_login() {{{1
 def test_login():

@@ -217,13 +217,13 @@ try:
             url = '?'.join([base_url, url_args])
             try:
                 r = requests.get(url, proxies=proxy)
+            except KeyboardInterrupt:
+                done()
             except Exception as e:
                 # must catch all exceptions as requests.get() can generate 
                 # a variety based on how it fails, and if the exception is not 
                 # caught the thread dies.
-                raise Error('cannot access cryptocurrency prices.', codicil=str(e))
-            except KeyboardInterrupt:
-                done()
+                raise Error('cannot access cryptocurrency prices:', codicil=str(e))
 
             try:
                 data = r.json()

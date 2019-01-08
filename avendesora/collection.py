@@ -69,7 +69,8 @@ class Collection(object):
             the value.
         sep (str):
             The string used to join the formatted items.
-        the value.  The second component is the separator. Thus:
+
+        Example:
 
             >>> from collection import Collection
 

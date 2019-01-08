@@ -65,14 +65,20 @@ class AlertSCC(Account):
     ]
     discovery = [
         RecognizeAll(
-            RecognizeURL('https://alertscc.bbcportal.com/Validation'),
+            RecognizeURL(
+                'https://alertscc.bbcportal.com/Validation',
+                name='validation',
+            ),
             RecognizeUser('ken'),
-            script='{birthdate}{return}'
+            script='{birthdate}{return}',
         ),
         RecognizeAll(
-            RecognizeURL('https://alertscc.bbcportal.com'),
+            RecognizeURL(
+                'https://alertscc.bbcportal.com',
+                name='login',
+            ),
             RecognizeUser('ken'),
-            script='{email}{tab}{password}{return}'
+            script='{email}{tab}{password}{return}',
         ),
     ]
 

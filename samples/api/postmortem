@@ -102,7 +102,7 @@ try:
                 accounts[recipient].append('\n'.join(lines))
 
 
-    # generate encrypted files than contain about accounts for each recipient {{{1
+    # generate encrypted files that contain accounts for each recipient {{{1
     gpg = gnupg.GPG(gpgbinary='gpg2')
     for recipient, idents in recipients.items():
         if recipient in accounts:

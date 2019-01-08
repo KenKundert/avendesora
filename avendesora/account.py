@@ -863,12 +863,26 @@ class Account(object):
         # combine, primary_urls must be added to urls, so they dominate
         urls.update(primary_urls)
 
+        if list_urls:
+            default = getattr(cls, 'default_url', None)
+            for name, url in urls.items():
+                if is_collection(url):
+                    url = list(Collection(url))[0]
+                if name == default:
+                    url += HighlightColor(' [default]')
+                    if not name:
+                        name = ''
+                elif not name:
+                    continue
+                output(LabelColor('{:>24s}:'.format(name)), url)
+            return
+
         # select the urls
         keys = cull(list(urls.keys()))
-        if not key and keys and len(keys) == 1:
-            key = keys[0]
         if not key:
             key = getattr(cls, 'default_url', None)
+        if not key and keys and len(keys) == 1:
+            key = keys[0]
         try:
             urls = urls[key]
         except KeyError:
@@ -890,12 +904,9 @@ class Account(object):
                     raise PasswordError('no url available.')
 
         # open the url
-        if list_urls:
-            for url in urls:
-                output(url)
-        else:
-            url = list(Collection(urls))[0]  # use the first url specified
-            browser.run(url)
+        urls = Collection(urls)
+        url = list(urls)[0]  # use the first url specified
+        browser.run(url)
 
     # has_field() {{{2
     @classmethod
