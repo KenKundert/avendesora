@@ -135,10 +135,10 @@ generally can only be accessed using *torbrowser*:
 **changed** -- Show changes since archive was created
 -----------------------------------------------------
 
-Usage:
+Usage::
 
-|   avendesora changed
-|   avendesora C
+    avendesora changed
+    avendesora C
 
 When you run the :ref:`archive command <archive command>` it overwrites the 
 existing archive. If you have accidentally deleted an account or changed 
