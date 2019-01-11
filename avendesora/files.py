@@ -111,8 +111,8 @@ class AccountFiles:
                             changes are expected, running 'avendesora archive' to
                             update the archive.
                         """).strip()))
-                else:
-                    log('Avendesora archive is out of date.')
+                    else:
+                        log('Avendesora archive is out of date.')
             else:
                 warn('archive missing.')
                 codicil(
