@@ -95,24 +95,28 @@ class AccountFiles:
                 if violation:
                     recommended = permissions & ~mask & 0o777
                     warn("file permissions are too loose.", culprit=path)
-                    codicil("Recommend running 'chmod {:o} {}'.".format(recommended, resolved_path))
+                    codicil("Recommend running 'chmod {:o} {}'.".format(
+                        recommended, resolved_path)
+                    )
 
                 # warn user if archive file is out of date
                 stale = float(get_setting('archive_stale'))
                 archive_updated = resolved_path.stat().st_mtime
                 if most_recently_updated > archive_updated:
-                    log('Avendesora archive is up-to-date.')
-                    age_in_seconds = time() - most_recently_updated
+                    log('Avendesora archive is {:.0f} hours out of date.'.format(
+                        (most_recently_updated - archive_updated)/3600
+                    ))
+                    age_in_seconds = time() - archive_updated
                     if age_in_seconds > 86400 * stale:
                         warn('stale archive.')
                         codicil(fill(dedent("""
                             Recommend running 'avendesora changed' to determine
                             which account entries have changed, and if all the
-                            changes are expected, running 'avendesora archive' to
-                            update the archive.
+                            changes are expected, running 'avendesora archive'
+                            to update the archive.
                         """).strip()))
-                    else:
-                        log('Avendesora archive is out of date.')
+                else:
+                    log('Avendesora archive is up to date.')
             else:
                 warn('archive missing.')
                 codicil(
