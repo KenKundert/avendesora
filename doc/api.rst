@@ -359,7 +359,7 @@ Here is an example of the fields you would add to an account to support
 
     postmortem_recipients = 'kids'
     estimated_value = dict(
-        updated = 'January 2018',
+        updated = 'January 2019',
         equities = '$23k',
         cash = '$1.7k',
         retirement = '$41,326'

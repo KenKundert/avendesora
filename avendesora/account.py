@@ -658,7 +658,7 @@ class Account(object):
             :class:`avendesora.AccountValue`: the desired value.
         """
         # get default if field was not given
-        if field is None:
+        if not field:
             field = cls.get_scalar('default', default=None)
 
         # determine whether field is actually a script
