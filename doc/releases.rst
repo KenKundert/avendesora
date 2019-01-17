@@ -68,6 +68,6 @@ Releases
     - Refactored code to speed up start up.
 
 **Latest Development Version**:
-    | Version: 1.11.11
-    | Released: 2019-01-15
+    | Version: 1.12.0
+    | Released: 2019-01-17
 
