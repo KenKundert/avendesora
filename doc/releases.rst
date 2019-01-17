@@ -61,11 +61,13 @@ Releases
     - Improve  *portmortem* and *networth* api examples.
     - Improve the account value formatting.
 
-**Latest Development Version**:
-    | Version: 1.11.11
-    | Released: 2019-01-15
-
+**1.12 (2019-01-17)**:
     - Updated the *networth* API example.
     - Incorporated *shlib* package into *Avendesora* for better security.
     - Added :ref:`questions command <questions command>`.
     - Refactored code to speed up start up.
+
+**Latest Development Version**:
+    | Version: 1.11.11
+    | Released: 2019-01-15
+
