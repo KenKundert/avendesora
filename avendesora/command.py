@@ -974,10 +974,13 @@ class Interactive(Command):
             for key in keys
         ]
         while True:
-            choice = name_completion(names)
+            choice = name_completion('which field?', names)
             if not choice:
                 return
-            writer.display_field(account, choice)
+            try:
+                writer.display_field(account, choice)
+            except PasswordError as e:
+                e.report()
 
 
 # Log {{{1
@@ -1280,19 +1283,22 @@ class Questions(Command):
         if not is_collection(questions):
             raise PasswordError('scalar field.', culprit=field)
 
+        contains_secret = False
         for k, v in Collection(questions).items():
             try:
                 value = v.get_description()
+                contains_secret = True
             except AttributeError:
                 value = v
-            display(k, value, template='{}: {}')
+            display(k, value, template=('{}: {}', '{}:'))
 
-        writer = get_writer(clipboard=use_clipboard, stdout=False)
-        while True:
-            response = query_user('Which question?')
-            if not response:
-                return
-            writer.display_field(account, field + '.' + response)
+        if contains_secret:
+            writer = get_writer(clipboard=use_clipboard, stdout=False)
+            while True:
+                response = query_user('Which question?')
+                if not response:
+                    return
+                writer.display_field(account, field + '.' + response)
 
 
 # Reveal {{{1

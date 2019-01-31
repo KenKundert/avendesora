@@ -486,6 +486,75 @@ account.
 
 
 .. index::
+    single: interactive queries
+
+.. _interactive:
+
+Interactive Queries
+-------------------
+
+Occasionally you may need several account values or you may be talking to an 
+account services representative on the phone and may want to quickly respond to 
+their questions such as 'what is your account number?' or 'what is your verbal 
+password?'. In these cases using the :ref:`value command <value command>` is 
+cumbersome. *Avendesora* provides two interactive commands that can help out.
+
+The :ref:`questions command <questions command>` allows you to quickly see the 
+available security questions and then answer them on demand.  For example::
+
+    > avendesora questions bank
+    0: Mothers profession?
+    1: Last name of high school best friend?
+    2: Name of first pet?
+    Which question? 1
+    questions.1 (Last name of high school best friend?): dirge revel oboist
+    Which question?
+
+You are presented the available questions and asked to choose one. In the
+example, 1 is entered and that question is answered by *Avendesora*. You can
+then request the answer to another question.  This continues until you give an
+empty selection.
+
+As a short cut, you can use *q* as the name of the command rather than
+*questions*.
+
+By default the *default_vector_field* is queried, which is generally
+*questions*, however you can request any composite field::
+
+    > avendesora q bank accounts
+    checking:
+    savings:
+    credit:
+    Which question? checking
+    accounts.checking: 7610-40-9891
+    Which question?
+
+The *questions* command is useful when confronting one or more unexpected
+challenge questions, but it only handles one composite field at a time. More
+convenient when chatting on the phone to an account representative is the
+*interactive* or *i* command.  This command allows you to interactively query
+the value of any account field::
+
+    > avendesora interactive bank
+    which field? accounts.checking
+    accounts.checking: 7610-40-9891
+    which field?
+
+An empty selection or <Ctrl-d> terminates the command. The command supports
+name completion using the <Tab> key. Simply type the first few characters of
+the name and type <Tab> to complete the name.  Type <Tab><Tab> to get a list of
+available completions::
+
+    > avendesora i bank
+    which field? acc<Tab>.c<Tab>
+    accounts.checking: 7610-40-9891
+    which field?
+
+If the value is a secret, it is displayed for a minute and then erased. To
+erase it early, type <Ctrl-c>.
+
+
+.. index::
     single: OTP
     single: Google Authenticator
     single: Authy

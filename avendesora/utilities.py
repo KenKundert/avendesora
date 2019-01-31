@@ -168,15 +168,15 @@ def query_user(msg):
     msg = HighlightColor(msg)
     try:
         if sys.version_info.major < 3:
-            return raw_input(msg + ' ')
+            return raw_input(msg + ' ').strip()
         else:
-            return input(msg + ' ')
+            return input(msg + ' ').strip()
     except EOFError:
         output()
 
 
 # name_completion {{{1
-def name_completion(choices):
+def name_completion(prompt, choices):
 
     def complete(entered, state):
         for name in choices:
@@ -191,7 +191,7 @@ def name_completion(choices):
     readline.set_completer(complete)
 
     try:
-        return query_user('field: ')
+        return query_user(prompt)
     except EOFError:
         output()
     readline.set_completer(None)
