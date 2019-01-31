@@ -26,7 +26,7 @@ from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import ObscuredSecret
 from .shlib import chmod, cp, rm, to_path
-from .utilities import query_user, two_columns, OSErrors
+from .utilities import query_user, two_columns, OSErrors, name_completion
 from .writer import get_writer
 from inform import (
     codicil, columns, cull, display, error, full_stop, output, warn,
@@ -771,13 +771,13 @@ class Help(Command):
 
 # Identity {{{1
 class Identity(Command):
-    NAMES = 'identity', 'ident', 'i'
+    NAMES = 'identity', 'ident', 'I'
     DESCRIPTION = 'generate an identifying response to a challenge'
     USAGE = dedent("""
         Usage:
             avendesora identity [<name> [<challenge>...]]
             avendesora ident    [<name> [<challenge>...]]
-            avendesora i        [<name> [<challenge>...]]
+            avendesora I        [<name> [<challenge>...]]
     """).strip()
 
     @classmethod
@@ -878,13 +878,12 @@ class Identity(Command):
 
 # Initialize {{{1
 class Initialize(Command):
-    NAMES = 'initialize', 'init', 'I'
+    NAMES = 'initialize', 'init'
     DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
             avendesora initialize [options]
             avendesora init       [options]
-            avendesora I          [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -928,6 +927,57 @@ class Initialize(Command):
 
         # run the generator
         generator = PasswordGenerator(init=True, gpg_ids=gpg_ids)
+
+
+# Interactive {{{1
+class Interactive(Command):
+    NAMES = 'interactive', 'i'
+    DESCRIPTION = 'interactively display account values'
+    USAGE = dedent("""
+        Usage:
+            avendesora interactive [options] <account>
+            avendesora i          [options] <account>
+
+        Options:
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
+    """).strip()
+
+    @classmethod
+    def help(cls):
+        text = dedent("""
+            {title}
+
+            {usage}
+
+            Interactively display values of account fields.  Type the first few
+            characters of the field name, then <Tab> to expand the name.
+            <Tab><Tab> shows all remaining choices. <Enter> selects and shows
+            the value. Type <Ctrl-c> to cancel the display of a secret. Type
+            <Ctrl-d> or enter empty field name to terminate command.
+        """).strip()
+        return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
+
+    @classmethod
+    def run(cls, command, args):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run the generator
+        generator = PasswordGenerator(check_integrity=False)
+        writer = get_writer()
+
+        account = generator.get_account(cmdline['<account>'], cmdline['--seed'])
+        names = [
+            account.combine_field(name, key)
+            for name, keys in account.get_fields()
+            for key in keys
+        ]
+        while True:
+            choice = name_completion(names)
+            if not choice:
+                return
+            writer.display_field(account, choice)
 
 
 # Log {{{1
@@ -1197,7 +1247,9 @@ class Questions(Command):
             avendesora questions bank
 
         It will print out the security questions for *bank* account along with
-        an index. Specify the index of the question you want answered.
+        an index. Specify the index of the question you want answered. You can
+        answer any number of questions. Type <Ctrl-d> or give an empty
+        selection to terminate.
 
         By default *Avendesora* looks for the security questions in the
         *questions* field.  If your questions are in a different field, just
@@ -1226,20 +1278,20 @@ class Questions(Command):
         except AttributeError:
             raise PasswordError('unknown field.', culprit=field)
         if not is_collection(questions):
-            raise PasswordError('unknown field.', culprit=field)
+            raise PasswordError('scalar field.', culprit=field)
 
-        contains_secret = False
         for k, v in Collection(questions).items():
             try:
                 value = v.get_description()
-                contains_secret = True
             except AttributeError:
                 value = v
             display(k, value, template='{}: {}')
 
-        if contains_secret:
+        writer = get_writer(clipboard=use_clipboard, stdout=False)
+        while True:
             response = query_user('Which question?')
-            writer = get_writer(clipboard=use_clipboard, stdout=False)
+            if not response:
+                return
             writer.display_field(account, field + '.' + response)
 
 

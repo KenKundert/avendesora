@@ -194,6 +194,7 @@ You can also have *Avendesora* attempt to show you your :ref:`login credentials
 To show the login credentials *Avendesora* looks for candidate usernames 
 (username, email) and candidate passcodes (passcode, password, passphrase).
 
+
 .. index::
     single: typing, reducing
     single: short cuts

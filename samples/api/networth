@@ -37,14 +37,13 @@ Cryptocurrency values:
 
 Bar graph values:
     screen_width = {screen_width}
-    bar_chars = {bar_chars}
     asset_color = {asset_color}
     debt_color = {debt_color}
 
 The prices and log files can be found in {cache_dir}.
 
 A description of how to configure and use this program can be found at 
-<https://avendesora.readthedocs.io/en/latest/api.html#example-net-worth>`_
+`<https://avendesora.readthedocs.io/en/latest/api.html#example-net-worth>`_.
 """
 
 # Imports {{{1
@@ -52,7 +51,7 @@ from avendesora import PasswordGenerator, PasswordError
 from avendesora.gpg import PythonFile
 from inform import (
     conjoin, display, done, error, fatal, is_str, join, narrate, os_error, 
-    terminate, warn, Color, Error, Inform,
+    render_bar, terminate, warn, Color, Error, Inform,
 )
 from quantiphy import Quantity
 from docopt import docopt
@@ -79,9 +78,6 @@ max_coin_price_age = 86400  # refresh cache if older than this (seconds)
 
 # bar settings {{{2
 screen_width = 79
-bar_chars = '-=#'
-bar_chars = '·╴─━═=#'
-bar_chars = '▏▎▍▌▋▊▉█'
 asset_color = 'green'
 debt_color = 'red'
     # currently we only colorize the bar because ...
@@ -119,19 +115,6 @@ def colorize(value, text = None):
         text = str(value)
     return debt_color(text) if value < 0 else asset_color(text)
 
-# render bar {{{2
-def render_bar(value, width):
-    """Render graphic representation of a value
-
-    value (real): should be normalized (fall between 0 and 1)
-    width (int): the width of the bar in characters when value is 1.
-    """
-    scaled = width*abs(value)
-    buckets = int(scaled)
-    frac = int((num_bar_chars*scaled) % num_bar_chars)
-    extra = bar_chars[frac-1:frac]
-    bar = buckets*bar_chars[-1] + extra
-    return colorize(value, bar)
 
 try:
     # Initialization {{{1
@@ -187,7 +170,6 @@ try:
         date_formats = [date_formats]
     asset_color = Color(asset_color)
     debt_color = Color(debt_color)
-    num_bar_chars = len(bar_chars)
 
     # Get cryptocurrency prices {{{1
     if coins:
@@ -328,7 +310,7 @@ try:
         if value.units != '$':
             continue
         share = value/grand_total
-        bar = render_bar(value/largest_share, barwidth)
+        bar = colorize(value, render_bar(value/largest_share, barwidth))
         asset_type = asset_type.replace('_', ' ')
         display(f'{asset_type:>{width+2}s}: {value:>7s} ({share:>5.1%}) {bar}')
     display(

@@ -316,7 +316,7 @@ Usage::
 
     avendesora identity [<name> [<challenge>...]]
     avendesora ident    [<name> [<challenge>...]]
-    avendesora i        [<name> [<challenge>...]]
+    avendesora I        [<name> [<challenge>...]]
 
 This command allows you to generate a response to any challenge.
 The response identifies you to a partner with whom you have shared
@@ -355,7 +355,6 @@ Usage::
 
     avendesora initialize [options]
     avendesora init       [options]
-    avendesora I          [options]
 
 Options:
     ============================ ==============================================
@@ -371,6 +370,27 @@ it with initial versions of all essential files.
 It is safe to run this command even after the data directory and
 files have been created. Doing so will simply recreate any missing
 files.  Existing files are not modified.
+
+
+.. index::
+    single: interactive command
+    single: command; interactive
+
+.. _interactive command:
+
+**interactive** -- Interactively query account values
+-----------------------------------------------------
+
+Usage::
+
+    avendesora interactive <account>
+    avendesora i           <account>
+
+Interactively display values of account fields.  Type the first few characters 
+of the field name, then <Tab> to expand the name.  <Tab><Tab> shows all 
+remaining choices. <Enter> selects and shows the value. Type <Ctrl-c> to cancel 
+the display of a secret. Type <Ctrl-d> or enter empty field name to terminate 
+command.
 
 
 .. index::
@@ -495,7 +515,8 @@ command.  For example::
      avendesora questions bank
 
 It will print out the security questions for *bank* account along with an index.  
-Specify the index of the question you want answered.
+Specify the index of the question you want answered.  You can answer any number 
+of questions. Type <Ctrl-d> or give an empty selection to terminate.
 
 By default *Avendesora* looks for the security questions in the *questions* 
 field.  If your questions are in a different field, just specify the name of the 

@@ -620,7 +620,6 @@ can be found on Github.
 
     Bar graph values:
         screen_width = {screen_width}
-        bar_chars = {bar_chars}
         asset_color = {asset_color}
         debt_color = {debt_color}
 
@@ -635,7 +634,7 @@ can be found on Github.
     from avendesora.gpg import PythonFile
     from inform import (
         conjoin, display, done, error, fatal, is_str, join, narrate, os_error, 
-        terminate, warn, Color, Error, Inform,
+        render_bar, terminate, warn, Color, Error, Inform,
     )
     from quantiphy import Quantity
     from docopt import docopt
@@ -662,9 +661,6 @@ can be found on Github.
 
     # bar settings
     screen_width = 79
-    bar_chars = '-=#'
-    bar_chars = '·╴─━═=#'
-    bar_chars = '▏▎▍▌▋▊▉█'
     asset_color = 'green'
     debt_color = 'red'
         # currently we only colorize the bar because ...
@@ -702,19 +698,6 @@ can be found on Github.
             text = str(value)
         return debt_color(text) if value < 0 else asset_color(text)
 
-    # render bar
-    def render_bar(value, width):
-        """Render graphic representation of a value
-
-        value (real): should be normalized (fall between 0 and 1)
-        width (int): the width of the bar in characters when value is 1.
-        """
-        scaled = width*abs(value)
-        buckets = int(scaled)
-        frac = int((num_bar_chars*scaled) % num_bar_chars)
-        extra = bar_chars[frac-1:frac]
-        bar = buckets*bar_chars[-1] + extra
-        return colorize(value, bar)
 
     try:
         # Initialization
@@ -770,7 +753,6 @@ can be found on Github.
             date_formats = [date_formats]
         asset_color = Color(asset_color)
         debt_color = Color(debt_color)
-        num_bar_chars = len(bar_chars)
 
         # Get cryptocurrency prices
         if coins:
@@ -800,13 +782,13 @@ can be found on Github.
                 url = '?'.join([base_url, url_args])
                 try:
                     r = requests.get(url, proxies=proxy)
+                except KeyboardInterrupt:
+                    done()
                 except Exception as e:
                     # must catch all exceptions as requests.get() can generate 
                     # a variety based on how it fails, and if the exception is not 
                     # caught the thread dies.
-                    raise Error('cannot access cryptocurrency prices:', str(e))
-                except KeyboardInterrupt:
-                    done()
+                    raise Error('cannot access cryptocurrency prices:', codicil=str(e))
 
                 try:
                     data = r.json()
@@ -911,7 +893,7 @@ can be found on Github.
             if value.units != '$':
                 continue
             share = value/grand_total
-            bar = render_bar(value/largest_share, barwidth)
+            bar = colorize(value, render_bar(value/largest_share, barwidth))
             asset_type = asset_type.replace('_', ' ')
             display(f'{asset_type:>{width+2}s}: {value:>7s} ({share:>5.1%}) {bar}')
         display(
@@ -937,9 +919,9 @@ Here is a typical output of this script::
               coindesk:  $15.3k cryptocurrency
 
     By Type:
-        cryptocurrency:  $15.3k (35.3%) ##########################################
-                  cash:    $10k (23.1%) ###############################
-              equities:     $9k (20.8%) ###########################
-            retirement:     $9k (20.8%) ###########################
+        cryptocurrency:  $15.3k (35.3%) ██████████████████████████████████████████
+                  cash:    $10k (23.1%) ███████████████████████████████
+              equities:     $9k (20.8%) ███████████████████████████
+            retirement:     $9k (20.8%) ███████████████████████████
 
                 TOTAL:  $43.3k (assets = $43.3k, debt = $0)

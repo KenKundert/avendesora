@@ -80,10 +80,11 @@ class AccountValue:
 
     def __str__(self):
         "Returns value as string."
+        secret = str(self.value)
         if hasattr(self.value, 'entropy'):
             entropy = round(self.value.entropy)
             log('Entropy of {} = {} bits.'.format(self.name, entropy))
-        return str(self.value)
+        return secret
 
     def render(self, fmts=('{f} ({d}): {v}', '{f}: {v}')):
         """Return value formatted as a string.
@@ -132,8 +133,8 @@ class AccountValue:
         return value
 
     def __iter__(self):
-        "Cast AccountValue to a tuple to get value, is_secret, name, and desc."
-        for each in [str(self), self.is_secret, self.name, self.desc]:
+        "Cast AccountValue to a tuple to get value, is_secret, field, and desc."
+        for each in [str(self), self.is_secret, self.field, self.desc]:
             yield each
 
 
@@ -419,7 +420,7 @@ class Account(object):
                 if is_collection(value):
                     yield field, Collection(value).keys()
                 else:
-                    yield field, None
+                    yield field, [None]
 
     # get_scalar() {{{2
     @classmethod

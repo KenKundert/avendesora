@@ -20,11 +20,17 @@
 from .config import get_setting
 from .error import PasswordError
 from .shlib import Run, to_path, getmod
-from inform import Error, codicil, os_error, output, warn, is_str, indent
+from inform import Error, codicil, os_error, output, warn, is_str, indent, Color
 from textwrap import dedent, wrap
 import os
 import sys
 
+# Globals {{{1
+HighlightColor = Color(
+    color=get_setting('highlight_color'),
+    scheme=get_setting('color_scheme'),
+    enable=Color.isTTY()
+)
 
 # OSErrors {{{1
 # Define OSError to include IOError with Python2 for backward compatibility
@@ -159,10 +165,36 @@ def error_source():
 
 # query_user {{{1
 def query_user(msg):
-    if sys.version_info.major < 3:
-        return raw_input(msg + ' ')
-    else:
-        return input(msg + ' ')
+    msg = HighlightColor(msg)
+    try:
+        if sys.version_info.major < 3:
+            return raw_input(msg + ' ')
+        else:
+            return input(msg + ' ')
+    except EOFError:
+        output()
+
+
+# name_completion {{{1
+def name_completion(choices):
+
+    def complete(entered, state):
+        for name in choices:
+            if name.startswith(entered):
+                if not state:
+                    return name
+                else:
+                    state -= 1
+
+    import readline
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(complete)
+
+    try:
+        return query_user('field: ')
+    except EOFError:
+        output()
+    readline.set_completer(None)
 
 
 # invert dictionary {{{1

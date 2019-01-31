@@ -398,7 +398,7 @@ def test_identity():
         Usage:
             avendesora identity [<name> [<challenge>...]]
             avendesora ident    [<name> [<challenge>...]]
-            avendesora i        [<name> [<challenge>...]]
+            avendesora I        [<name> [<challenge>...]]
 
         This command allows you to generate a response to any challenge.
         The response identifies you to a partner with whom you have shared
@@ -476,7 +476,6 @@ def test_initialize():
         Usage:
             avendesora initialize [options]
             avendesora init       [options]
-            avendesora I          [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -490,6 +489,31 @@ def test_initialize():
         It is safe to run this command even after the data directory and
         files have been created. Doing so will simply recreate any missing
         files.  Existing files are not modified.
+    """).strip()
+    assert result.decode('utf-8') == expected
+
+# test_interactive() {{{1
+def test_interactive():
+    try:
+        result = run('avendesora help interactive')
+    except OSError as err:
+        result = os_error(err)
+    expected = dedent("""
+        Interactively display account values.
+
+        Usage:
+            avendesora interactive [options] <account>
+            avendesora i          [options] <account>
+
+        Options:
+            -S, --seed              Interactively request additional seed for
+                                    generated secrets.
+
+        Interactively display values of account fields.  Type the first few
+        characters of the field name, then <Tab> to expand the name.
+        <Tab><Tab> shows all remaining choices. <Enter> selects and shows
+        the value. Type <Ctrl-c> to cancel the display of a secret. Type
+        <Ctrl-d> or enter empty field name to terminate command.
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -599,7 +623,9 @@ def test_questions():
             avendesora questions bank
 
         It will print out the security questions for *bank* account along with
-        an index. Specify the index of the question you want answered.
+        an index. Specify the index of the question you want answered. You can
+        answer any number of questions. Type <Ctrl-d> or give an empty
+        selection to terminate.
 
         By default *Avendesora* looks for the security questions in the
         *questions* field.  If your questions are in a different field, just
