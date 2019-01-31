@@ -932,7 +932,7 @@ class Initialize(Command):
 # Interactive {{{1
 class Interactive(Command):
     NAMES = 'interactive', 'i'
-    DESCRIPTION = 'interactively display account values'
+    DESCRIPTION = 'interactively query account values'
     USAGE = dedent("""
         Usage:
             avendesora interactive [options] <account>

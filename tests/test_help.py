@@ -499,7 +499,7 @@ def test_interactive():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Interactively display account values.
+        Interactively query account values.
 
         Usage:
             avendesora interactive [options] <account>
