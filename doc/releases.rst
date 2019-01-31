@@ -71,3 +71,6 @@ Releases
     | Version: 1.12.1
     | Released: 2019-01-31
 
+    - Added :ref:`interactive command <interactive command>`.
+    - Added looping to :ref:`questions command <questions command>`.
+    - Retargeted *i* and *I* command aliases.
