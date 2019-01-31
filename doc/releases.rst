@@ -1,29 +1,34 @@
 Releases
 ========
 
-**1.0 (2017-01-01)**:
-    - Initial production release.
+**Latest Development Version**:
+    | Version: 1.12.1
+    | Released: 2019-01-31
 
-**1.1 (2016-01-03)**:
+    - Added :ref:`interactive command <interactive command>`.
+    - Added looping to :ref:`questions command <questions command>`.
+    - Retargeted *i* and *I* command aliases.
 
-**1.2 (2017-01-05)**:
+**1.12 (2019-01-17)**:
+    - Updated the *networth* API example.
+    - Incorporated *shlib* package into *Avendesora* for better security.
+    - Added :ref:`questions command <questions command>`.
+    - Refactored code to speed up start up.
 
-**1.3 (2017-01-08)**:
-    - Warn about duplicate account names.
+**1.11 (2018-06-14)**:
+    - Added *is_secret* argument to Secret classes.
+    - Added support for *dmenu* as alternative to built-in selection utility.
+    - Added --delete option to log command.
+    - Rename *master* and *seed* *Account* attributes to *master_seed* and *account_seed*.
+    - Improve  *portmortem* and *networth* api examples.
+    - Improve the account value formatting.
 
-**1.4 (2017-01-09)**:
-    - Improved error reporting on encrypted files.
-    - Added RecognizeFile().
+**1.10 (2018-02-18)**:
+    - Added support for *qutebrowser*.
 
-**1.5 (2017-03-01)**:
-    - Fixed bug in account discovery for URLs.
-    - Added get_composite, renamed get_field to get_scalar.
-
-**1.6 (2017-04-07)**:
-    - Fix issues in sleep feature in autotype scripts.
-
-**1.7 (2017-06-01)**:
-    - add :ref:`credentials command <credentials command>`.
+**1.9 (2017-12-25)**:
+    - Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
+    - Added 'vc' command as an alias for 'value --clipboard'.
 
 **1.8 (2017-11-23)**:
     - Created the manual.
@@ -46,31 +51,26 @@ Releases
     ~/.config/avendesora/config file to only include those settings that you 
     explicitly wish to override.
 
-**1.9 (2017-12-25)**:
-    - Adds :ref:`one-time passwords <otp>` (an alternative to Google Authenticator).
-    - Added 'vc' command as an alias for 'value --clipboard'.
+**1.7 (2017-06-01)**:
+    - add :ref:`credentials command <credentials command>`.
 
-**1.10 (2018-02-18)**:
-    - Added support for *qutebrowser*.
+**1.6 (2017-04-07)**:
+    - Fix issues in sleep feature in autotype scripts.
 
-**1.11 (2018-06-14)**:
-    - Added *is_secret* argument to Secret classes.
-    - Added support for *dmenu* as alternative to built-in selection utility.
-    - Added --delete option to log command.
-    - Rename *master* and *seed* *Account* attributes to *master_seed* and *account_seed*.
-    - Improve  *portmortem* and *networth* api examples.
-    - Improve the account value formatting.
+**1.5 (2017-03-01)**:
+    - Fixed bug in account discovery for URLs.
+    - Added get_composite, renamed get_field to get_scalar.
 
-**1.12 (2019-01-17)**:
-    - Updated the *networth* API example.
-    - Incorporated *shlib* package into *Avendesora* for better security.
-    - Added :ref:`questions command <questions command>`.
-    - Refactored code to speed up start up.
+**1.4 (2017-01-09)**:
+    - Improved error reporting on encrypted files.
+    - Added RecognizeFile().
 
-**Latest Development Version**:
-    | Version: 1.12.1
-    | Released: 2019-01-31
+**1.3 (2017-01-08)**:
+    - Warn about duplicate account names.
 
-    - Added :ref:`interactive command <interactive command>`.
-    - Added looping to :ref:`questions command <questions command>`.
-    - Retargeted *i* and *I* command aliases.
+**1.2 (2017-01-05)**:
+
+**1.1 (2016-01-03)**:
+
+**1.0 (2017-01-01)**:
+    - Initial production release.
