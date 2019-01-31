@@ -49,12 +49,13 @@ password managers:
 #. Completely offline
 #. Linux only
 #. Command line centric
+#. The information you can associate with each account is unconstrained
 #. Completely free (free as in freedom and free as in beer)
 #. Supports collaboration
 #. Supports time-based one-time passwords (ala Google Authenticator)
 #. Uses GPG for encryption
 #. Written in Python
-#. Provides a Python API
+#. Provides a Python API and a variety of useful companion programs
 
 
 Quick Tour
