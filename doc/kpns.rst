@@ -2,7 +2,9 @@ Known Issues
 ============
 
 .. index::
-    single: Chrome
+    single: kpns
+    single: known issues
+    single: Chrome issues
 
 Spotty Account Recognition
 --------------------------
@@ -30,3 +32,15 @@ where the title occasionally does not update as you go from the username page to
 the password page.  In these cases *Avendesora* sees the wrong URL and either 
 enters the wrong thing or does not recognize the page.  Generally, refreshing 
 the page allows you to work around this bug.
+
+
+.. index::
+    single: issues, reporting
+    single: reporting issues
+
+Reporting Issues
+----------------
+
+If you discover any issues with *Avendesora*, or have some suggestions, or 
+simply want to help out, please visit `Avendesora issues 
+<https://github.com/KenKundert/avendesora/issues>`_.

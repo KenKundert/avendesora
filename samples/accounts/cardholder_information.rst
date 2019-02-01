@@ -74,7 +74,7 @@ put delays in the script::
 
 Now the account can be given in its final form. This differs from the one above 
 in that the *account* and *cvv* values are concealed and the delays were added 
-to the Costco script.
+to the Costco script::
 
     class CostcoCitiVisa(Account):
         aliases = 'citi costcovisa'

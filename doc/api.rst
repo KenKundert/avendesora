@@ -578,7 +578,8 @@ Here is an example of what your configuration file might look like.
 
 The updated source code for `networth
 <https://github.com/KenKundert/avendesora/tree/master/samples/api/networth>`_ 
-can be found on Github.
+can be found on Github. A more advanced version can be found `here 
+<https://github.com/KenKundert/networth>`_.
 
 .. code-block:: python
 
