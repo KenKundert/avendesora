@@ -2,7 +2,7 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.12.2
+    | Version: 1.12.3
     | Released: 2019-01-31
 
     - Added :ref:`interactive command <interactive command>`.
