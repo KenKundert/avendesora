@@ -385,7 +385,8 @@ include the GPG IDs for yourself and your recipients. For example:
 
 The updated source code for `postmortem
 <https://github.com/KenKundert/avendesora/tree/master/samples/api/postmortem>`_
-can be found on Github.
+can be found on Github. A more advanced version can be found `here 
+<https://github.com/KenKundert/postmortem>`_.
 
 .. code-block:: python
 
