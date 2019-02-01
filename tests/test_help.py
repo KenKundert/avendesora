@@ -805,9 +805,12 @@ def test_values():
         Show all account values.
 
         Usage:
-            avendesora values <account>
-            avendesora vals   <account>
-            avendesora V      <account>
+            avendesora values [options] <account>
+            avendesora vals   [options] <account>
+            avendesora V      [options] <account>
+
+        Options:
+            -s, --sort   sort the fields
     """).strip()
     assert result.decode('utf-8') == expected
 

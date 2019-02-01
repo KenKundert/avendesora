@@ -375,20 +375,24 @@ class Account(object):
 
     # keys() {{{2
     @classmethod
-    def fields(cls, all=False):
-        for field in sorted(cls.__dict__):
+    def fields(cls, all=False, sort=False):
+        if sort:
+            fields = sorted(cls.__dict__)
+        else:
+            fields = cls.__dict__
+        for field in fields:
             if not field.startswith('_') and (all or field not in TOOL_FIELDS):
                 yield field
 
     # items() {{{2
     @classmethod
-    def items(cls, all=False):
-        for field in cls.fields(all):
+    def items(cls, all=False, sort=False):
+        for field in cls.fields(all, sort):
             yield field, getattr(cls, field)
 
     # get_fields() {{{2
     @classmethod
-    def get_fields(cls, all=False):
+    def get_fields(cls, all=False, sort=False):
         """Iterate through fields.
 
         Iterates through the field names.
@@ -396,25 +400,38 @@ class Account(object):
         Example::
 
             for name, keys in account.get_fields():
-                if keys:
-                    display(name + ':')
-                    for key, value in account.get_values(name):
-                        display(indent(
-                            value.render(('{k}) {d}: {v}', '{k}: {v}'))
-                        ))
-                else:
-                    value = account.get_value(name)
-                    display(value.render('{n}: {v}'))
+                for key, value in account.get_values(name):
+                    display(indent(
+                        value.render(('{f} ({d}): {v}', '{f}: {v}'))
+                    ))
+
+        Example::
+
+            fields = [
+                account.combine_field(name, key)
+                for name, keys in account.get_fields()
+                for key in keys
+            ]
+            for field in fields:
+                value = account.get_value(field)
+                display(f'{field}: {value!s}')
 
         Args:
             all (bool):
                 If False, ignore the tool fields.
 
+            sort (bool):
+                If False, use natural sort order.
+
         Returns:
             A pair (2-tuple) that contains both field name and the key names.
             None is returned for the key names if the field holds a scalar value.
         """
-        for field in sorted(cls.__dict__):
+        if sort:
+            fields = sorted(cls.__dict__)
+        else:
+            fields = cls.__dict__
+        for field in fields:
             if not field.startswith('_') and (all or field not in TOOL_FIELDS):
                 value = getattr(cls, field)
                 if is_collection(value):
@@ -764,7 +781,7 @@ class Account(object):
 
     # write_summary() {{{2
     @classmethod
-    def write_summary(cls):
+    def write_summary(cls, sort=False):
         # present all account values that are not explicitly secret to the user
 
         def fmt_field(name, value='', key=None, level=0):
@@ -809,7 +826,7 @@ class Account(object):
         names = [cls.get_name()] + getattr(cls, 'aliases', [])
         lines = [fmt_field('names', ', '.join(names))]
 
-        for key, value in cls.items():
+        for key, value in cls.items(sort=sort):
             if is_collection(value):
                 lines.append(fmt_field(key))
                 for k, v in Collection(value).items():

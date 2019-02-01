@@ -8,6 +8,7 @@ Releases
     - Added :ref:`interactive command <interactive command>`.
     - Added looping to :ref:`questions command <questions command>`.
     - Retargeted *i* and *I* command aliases.
+    - Use natural sort order by default.
 
 **1.12 (2019-01-17)**:
     - Updated the *networth* API example.

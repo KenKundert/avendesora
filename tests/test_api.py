@@ -210,7 +210,7 @@ def test_summary(capsys):
             stdout, stderr = capsys.readouterr()
             assert stdout == ''
             assert stderr == ''
-            account.write_summary()
+            account.write_summary(sort=True)
             stdout, stderr = capsys.readouterr()
             assert stderr == ''
             assert stdout == dedent('''

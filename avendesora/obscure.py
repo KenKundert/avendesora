@@ -40,10 +40,11 @@ def chunk(string, length):
     )
 
 def decorate_concealed(name, encoded):
-    return '%s(%s)' % (
-        name,
-        '\n    "' + '"\n    "'.join(chunk(encoded, 60)) + '"\n'
-    )
+    if len(encoded) <= 60:
+        arg = "'" + encoded + "'"
+    else:
+        arg = "\n    '" + "'\n    '".join(chunk(encoded, 60)) + "'\n"
+    return '{}({})'.format(name, arg)
 
 def group(pattern):
     return '(?:%s)' % pattern

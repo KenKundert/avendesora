@@ -178,7 +178,7 @@ def test_login():
 # test_summary() {{{1
 def test_summary():
     try:
-        result = run('avendesora values mb')
+        result = run('avendesora values -s mb')
     except OSError as err:
         result = os_error(err)
     expected = dedent("""\
@@ -247,11 +247,7 @@ def test_conceal():
         result = run('avendesora conceal 12345678')
     except OSError as err:
         result = os_error(err)
-    assert result == dedent('''
-        Hidden(
-            "MTIzNDU2Nzg="
-        )
-    ''').lstrip().encode('ascii')
+    assert result == "Hidden('MTIzNDU2Nzg=')\n".encode('ascii')
 
 # test_stealth() {{{1
 def test_stealth():

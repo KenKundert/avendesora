@@ -108,15 +108,15 @@ found in a list.
             display(description, len(description)*'=', sep='\n')
 
             for name, keys in account.get_fields():
-                if keys:
+                if keys == [None]:
+                    value = account.get_value(name)
+                    display(value.render('{n}: {v}'))
+                else:
                     display(name + ':')
                     for key, value in account.get_values(name):
                         display(indent(
                             value.render(('{k}) {d}: {v}', '{k}: {v}'))
                         ))
-                else:
-                    value = account.get_value(name)
-                    display(value.render('{n}: {v}'))
             display()
     except PasswordError as e:
         e.terminate()
@@ -480,15 +480,15 @@ can be found on Github.
                     for name, keys in account.get_fields():
                         if name in [avendesora_recipients_fieldname, 'desc', 'NAME']:
                             continue
-                        if keys:
+                        if keys == [None]:
+                            value = account.get_value(name)
+                            lines += value.render('{n}: {v}').split('\n')
+                        else:
                             lines.append(name + ':')
                             for key, value in account.get_values(name):
                                 lines += indent(
                                     value.render(('{k}) {d}: {v}', '{k}: {v}'))
                                 ).split('\n')
-                        else:
-                            value = account.get_value(name)
-                            lines += value.render('{n}: {v}').split('\n')
                     if recipient not in accounts:
                         accounts[recipient] = []
                     accounts[recipient].append('\n'.join(lines))

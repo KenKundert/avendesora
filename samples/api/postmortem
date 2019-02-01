@@ -88,15 +88,15 @@ try:
                 for name, keys in account.get_fields():
                     if name in [avendesora_recipients_fieldname, 'desc', 'NAME']:
                         continue
-                    if keys:
+                    if keys == [None]:
+                        value = account.get_value(name)
+                        lines += value.render('{n}: {v}').split('\n')
+                    else:
                         lines.append(name + ':')
                         for key, value in account.get_values(name):
                             lines += indent(
                                 value.render(('{k}) {d}: {v}', '{k}: {v}'))
                             ).split('\n')
-                    else:
-                        value = account.get_value(name)
-                        lines += value.render('{n}: {v}').split('\n')
                 if recipient not in accounts:
                     accounts[recipient] = []
                 accounts[recipient].append('\n'.join(lines))

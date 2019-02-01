@@ -1534,22 +1534,26 @@ class Values(Command):
         Show all account values.
 
         Usage:
-            avendesora values <account>
-            avendesora vals   <account>
-            avendesora V      <account>
+            avendesora values [options] <account>
+            avendesora vals   [options] <account>
+            avendesora V      [options] <account>
+
+        Options:
+            -s, --sort   sort the fields
     """).strip()
 
     @classmethod
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        sort = cmdline['--sort']
 
         # run the generator
         generator = PasswordGenerator(check_integrity=False)
 
         # determine the account
         account = generator.get_account(cmdline['<account>'])
-        account.write_summary()
+        account.write_summary(sort=sort)
 
 
 # Version {{{1

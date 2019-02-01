@@ -604,23 +604,27 @@ get_values(field):
 
 get_fields():
     Iterates through the fields, each iteration yields a name and possibly 
-    a collection of keys (None is returned if the name corresponds to a scalar).  
-    The name and keys returned are the resolved names, which can be passed to 
-    get_scalar() and get_composite().
+    a collection of keys ([None] is returned if the name corresponds to 
+    a scalar).  The name and keys returned are the resolved names, which can be 
+    passed to get_scalar() and get_composite().
 
     Here is how this method can be used to iterate through the account values:
 
     .. code-block:: python
 
-        for name, keys in acct.get_fields():
-            if keys:
-                for key, value in acct.get_values(name):
+        # gather user fields
+        lines = []
+        for field, keys in account.get_fields():
+            if keys == [None]:
+                v = account.get_value(field)
+                lines += v.render('{n}: {v}').split('\n')
+            else:
+                lines.append(field + ':')
+                for k, v in account.get_values(field):
                     lines += indent(
-                        value.render(('{k}) {d}: {v}', '{k}: {v}'))
+                        v.render(('{k}) {d}: {v}', '{k}: {v}'))
                     ).split('\n')
-            if keys:
-                value = acct.get_value(name)
-                lines += value.render('{n}: {v}').split('\n')
+        account_summary = '\n'.join(lines)
 
     get_fields() accepts a Boolean argument that if specified and is true will 
     iterate through all fields, including those generally only used by 
