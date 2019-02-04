@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.12.3
-    | Released: 2019-01-31
+    | Version: 1.12.4
+    | Released: 2019-02-04
 
     - Added :ref:`interactive command <interactive command>`.
     - Added looping to :ref:`questions command <questions command>`.
