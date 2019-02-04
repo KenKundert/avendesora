@@ -22,6 +22,7 @@ setup(
     install_requires = [
         'appdirs',
         'arrow',
+        'cryptography',
         'docopt',
         'inform>=1.15',
         #'pygobject',
