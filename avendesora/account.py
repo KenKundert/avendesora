@@ -149,14 +149,14 @@ class Account(object):
         # prevents master seed from being added to this base class
     _accounts = {}
 
-    # all_accounts() {{{2
+    # all_loaded_accounts() {{{2
     @classmethod
-    def all_accounts(cls):
+    def all_loaded_accounts(cls):
         for sub in cls.__subclasses__():
             # do not yield the base StealthAccount
             if sub != StealthAccount:
                 yield sub
-            for each in sub.all_accounts():
+            for each in sub.all_loaded_accounts():
                 yield each
 
     # get_account() {{{2

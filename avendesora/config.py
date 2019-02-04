@@ -88,7 +88,11 @@ def read_config():
         user_key_file = PythonFile(get_setting('user_key_file'))
         try:
             contents = user_key_file.run()
-            Config.update({k.lower(): v for k,v in contents.items()})
+            Config.update({
+                k.lower(): v
+                for k,v in contents.items()
+                if not k.startswith('__')
+            })
         except PasswordError:
             pass
 
@@ -115,7 +119,7 @@ def get_setting(name, default=None, expand=True):
         return default
     if name == 'gpg_ids':
         value = value.split() if is_str(value) else value
-    elif name == 'settings_dir':
+    elif name.endswith('_dir'):
         value = Path(value)
     elif expand and name.endswith('_file'):
         value = get_setting('settings_dir') / value

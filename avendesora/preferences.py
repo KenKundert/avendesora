@@ -19,7 +19,7 @@
 # Imports {{{1
 from textwrap import dedent
 import re
-from appdirs import user_config_dir
+from appdirs import user_config_dir, user_cache_dir
 
 # Non-Config Settings {{{1
 # These value can be accessed with get_settings,
@@ -28,6 +28,7 @@ NONCONFIG_SETTINGS = {
     'config_file': 'config',
     'config_doc_file': 'config.doc',
     'settings_dir': user_config_dir('avendesora'),
+    'cache_dir': user_cache_dir('avendesora'),
     'default_accounts_file': 'accounts.gpg',
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': '0120b695fb247d4993b1595ab087cc15',
@@ -839,10 +840,14 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
 
 # Account list file {{{1
 ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
-    # The list of files that contain accounts. The order of the files is
-    # immaterial, except that first file given is the default file, meaning that
-    # the add account will add a new account to the first files specified unless
-    # a different files is specified explicitly.
+    # The list of files that contain accounts.
+    #
+    # The first file given becomes the default file for the add command, meaning
+    # that the add command will add a new account to the first file specified
+    # unless a different files is specified explicitly.
+    #
+    # When an account is not in the cache, these files are searched in the order
+    # given.  You should list the most likely candidates first.
 
     accounts_files = {accounts_files}
 ''')

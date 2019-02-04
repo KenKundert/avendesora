@@ -50,10 +50,8 @@ class PasswordGenerator(object):
     You should pass no arguments unless you are creating the user's Avendesora
     data directory.
 
-    Calling this class causes Avendesora to open all the various account files
-    and returns an object that allows you access to the accounts. Specifically
-    you can use the get_account() or all_accounts() methods to access an account
-    or all the accounts.
+    Once instantiated, you can use get_account() to load a specific account, or
+    all_accounts() to load all accounts.
 
     Args:
         init (bool): Create user's directory.
@@ -293,16 +291,19 @@ class PasswordGenerator(object):
             verbose = get_setting('verbose')
 
         # get and parse the title
-        data = Title(url=url, override=title).get_data()
+        title_components = Title(url=url, override=title).get_data()
+
+        # load candidate account files
+        self.account_files.load_matching(title_components)
 
         # sweep through accounts to see if any recognize this title data
         matches = {}
         seen = set()
-        for account in self.all_accounts():
+        for account in Account.all_loaded_accounts():
             name = account.get_name()
             if verbose:
                 log('Trying:', name)
-            for key, script in account.recognize(data, verbose):
+            for key, script in account.recognize(title_components, verbose):
                 # identify and skip duplicates
                 if (name, script) in seen:
                     continue
@@ -338,7 +339,7 @@ class PasswordGenerator(object):
     def all_accounts(self):
         "Iterate through all accounts."
         self.account_files.load_account_files()
-        for account in Account.all_accounts():
+        for account in Account.all_loaded_accounts():
             yield account
 
     # find_acounts() {{{2

@@ -11,7 +11,11 @@
 # each account file. The account names and aliases are all hashed so it is not
 # possible to know the names of the user's accounts by examining the manifests
 # file. Once loaded the manifests mapping is inverted to create the account
-# catalog, which maps account names hashes to file names.
+# catalog, which maps account names hashes to file names.  The same thing is
+# done for urls and titles in order to speed up loading the right accounts file
+# when account discovery is used. With urls, the url is often a prefix, so along
+# with each hash, the number of characters to match is included. The titles are
+# glob strings and so cannot be hashed.
 
 # License {{{1
 # Copyright (C) 2016-18 Kenneth S. Kundert
@@ -32,15 +36,19 @@
 
 # Imports {{{1
 from .account import Account, canonicalize
+from .collection import Collection
 from .config import get_setting
 from .error import PasswordError
 from .gpg import PythonFile
-from .shlib import getmod
+from .shlib import getmod, mkdir, rm
 from .utilities import OSErrors
+from cryptography.fernet import Fernet
+from fnmatch import fnmatch
 from inform import comment, codicil, log, os_error, warn
-from hashlib import md5
+from hashlib import sha256
 from textwrap import dedent, fill
 from time import time
+import base64
 import pickle
 import sys
 
@@ -59,7 +67,10 @@ class AccountFiles:
     def __init__(self, warnings=True): # {{{2
         # initialize object {{{3
         self.loaded = set()
-        self.catalog = {}
+        self.name_index = {}
+        self.name_manifests = {}
+        self.url_manifests = {}
+        self.title_manifests = {}
         self.shared_secrets = {}
         self.existing_names = {}
 
@@ -139,7 +150,7 @@ class AccountFiles:
 
         # traverse through all accounts and pass in fileinfo and master seed;
         # will be ignored if already set
-        for account in Account.all_accounts():
+        for account in Account.all_loaded_accounts():
             account.preprocess(master_seed, account_file, self.existing_names)
 
         self.loaded.add(filename)
@@ -147,13 +158,12 @@ class AccountFiles:
     def load_account(self, name): # {{{2
         canonical_name = canonicalize(name)
         self.read_manifests()
-        hash = md5(canonical_name.encode('utf8')).digest()
-        if hash in self.catalog:
-            filename = self.catalog[hash]
+        if canonical_name in self.name_index:
+            filename = self.name_index[canonical_name]
             self.load_account_file(filename)
             assert canonical_name in Account._accounts
         else:
-            # not in catalog, just read files until it is found
+            # not in name_index, just read files until it is found
             for filename in get_setting('accounts_files', []):
                 self.load_account_file(filename)
                 if canonical_name in Account._accounts:
@@ -165,54 +175,142 @@ class AccountFiles:
             self.load_account_file(filename)
         self.write_manifests()
 
-    def read_manifests(self): # {{{2
-        if self.catalog:
-            return
-        settings_dir = get_setting('settings_dir')
-        manifests_path = settings_dir / MANIFESTS_FILENAME
-        try:
-            contents = manifests_path.read_bytes()
-            try:
+    def load_matching(self, title_components): # {{{2
+        self.read_manifests()
+        found = False
 
-                manifests = pickle.loads(contents, **PICKLE_ARGS)
-                # build the catalog by inverting the manifests
-                self.catalog = {
-                    h:n for n,l in manifests.items() for h in l
+        # load filenames that contain matching urls
+        if 'host' in title_components:
+            for filename, urls in self.url_manifests.items():
+                for host, path, exact_path in urls:
+                    if host != title_components['host']:
+                        continue
+                    if exact_path:
+                        if path != title_components['path']:
+                            continue
+                    else:
+                        if not title_components['path'].startswith(path):
+                            continue
+                    self.load_account_file(filename)
+                    found = True
+
+        # load filenames that contain matching titles
+        title = title_components.get('rawtitle')
+        if title:
+            for filename, titles in self.title_manifests.items():
+                for candidate in titles:
+                    if fnmatch(title, candidate):
+                        self.load_account_file(filename)
+                        found = True
+
+        # url/title not in cache (perhaps cache was missing), load everything
+        if not found:
+            self.load_account_files()
+
+    def read_manifests(self): # {{{2
+        if self.name_index:
+            return
+        cache_dir = get_setting('cache_dir')
+        manifests_path = cache_dir / MANIFESTS_FILENAME
+        try:
+            encrypted = manifests_path.read_bytes()
+
+            user_key = get_setting('user_key')
+            key = base64.urlsafe_b64encode(sha256(user_key.encode('ascii')).digest())
+            fernet = Fernet(key)
+            contents = fernet.decrypt(encrypted)
+
+            try:
+                cache = pickle.loads(contents, **PICKLE_ARGS)
+                self.name_manifests = cache['names']
+                self.url_manifests = cache['urls']
+                self.title_manifests = cache['titles']
+
+                # build the name_index by inverting the name_manifests
+                self.name_index = {
+                    h:n for n,l in self.name_manifests.items() for h in l
                 }
             except (ValueError, pickle.UnpicklingError) as e:
                 warn('garbled manifest.', culprit=manifests_path, codicil=str(e))
-            assert isinstance(self.catalog, dict)
+            assert isinstance(self.name_index, dict)
         except OSErrors as e:
             comment(os_error(e))
 
     def write_manifests(self): # {{{2
-        # do not modify existing catalog if no account files were loaded
+        # do not modify existing name_index if no account files were loaded
         if not self.loaded:
             return
         log('Updating manifests.')
+        name_manifests = self.name_manifests
+        url_manifests = self.url_manifests
+        title_manifests = self.title_manifests
 
-        # remove entries for loaded files from catalog
-        if self.catalog:
-            for k in self.catalog.keys():
-                if k in self.loaded:
-                    del self.catalog[k]
+        # remove entries for loaded files from name_index
+        for filename in self.loaded:
+            name_manifests[filename] = []
+            url_manifests[filename] = []
+            title_manifests[filename] = []
 
-        # now add back the updated entries
+        # build name manifests
         for name, account in Account._accounts.items():
-            hash = md5(name.encode('utf8')).digest()
-            self.catalog[hash] = account._file_info.path.name
+            filename = account._file_info.path.name
+            name_manifests[filename].append(name)
 
-        # build manifests by inverting the catalog
-        manifests = {n:[] for n in get_setting('accounts_files', [])}
-        for k, v in self.catalog.items():
-            manifests[v].append(k)
+        # build url and title manifests
+        for account in Account.all_loaded_accounts():
+            filename = account._file_info.path.name
+            if filename not in self.loaded:
+                # This should not occur, but if PasswordGenerator is
+                # instantiated more than once, which should only occur in the
+                # tests, then there could be accounts hanging around from
+                # previous instantiations. Ignore them.
+                continue
+            discovery = getattr(account, 'discovery', ())
+
+            # urls
+            urls = []
+            for each in Collection(discovery):
+                for u in each.all_urls(components=True).values():
+                    urls += u
+            # urls is a list of triples, each triple consists of the host and
+            # path components of the url, and a boolean indicating whether the
+            # entire path must match.
+            url_manifests[filename].extend(urls)
+
+            # titles
+            titles = []
+            for each in Collection(discovery):
+                for t in each.all_titles().values():
+                    titles += t
+            title_manifests[filename].extend(titles)
+
+        # trip out the duplicates
+        for filename in url_manifests:
+            if filename in self.loaded:
+                url_manifests[filename] = set(url_manifests[filename])
+                title_manifests[filename] = set(title_manifests[filename])
 
         # write the manifests
-        settings_dir = get_setting('settings_dir')
-        manifests_path = settings_dir / MANIFESTS_FILENAME
-        contents = pickle.dumps(manifests)
+        cache_dir = get_setting('cache_dir')
+        manifests_path = cache_dir / MANIFESTS_FILENAME
+        cache = dict(
+            names=name_manifests, urls=url_manifests, titles=title_manifests
+        )
+        contents = pickle.dumps(cache)
+
+        user_key = get_setting('user_key')
+        key = base64.urlsafe_b64encode(sha256(user_key.encode('ascii')).digest())
+        fernet = Fernet(key)
+        encrypted = fernet.encrypt(contents)
 
         try:
-            manifests_path.write_bytes(contents)
+            mkdir(cache_dir)
+            manifests_path.write_bytes(encrypted)
         except OSError as e:
             warn(os_error(e))
+
+    @staticmethod
+    def delete_manifests(): # {{{2
+        cache_dir = get_setting('cache_dir')
+        manifests_path = cache_dir / MANIFESTS_FILENAME
+        rm(manifests_path)

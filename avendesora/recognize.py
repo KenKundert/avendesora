@@ -21,6 +21,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
+from .collection import Collection
 from .config import get_setting
 from .error import PasswordError
 from .shlib import cwd, to_path, Run
@@ -33,30 +34,31 @@ except ImportError:
     from urlparse import urlparse
 import os
 
-# Utilities {{{1
-# flatten {{{2
-def flatten(collection, split=False):
-    # if split is specified, create list from string by splitting at whitespace
-    if split and is_str(collection):
-        collection = collection.split()
-
-    if is_collection(collection):
-        for each in collection:
-            for e in flatten(each):
-                yield e
-    else:
-        yield collection
-
 # Recognizer Base Class {{{1
 class Recognizer(object):
-    def all_urls(self):
+    def all_urls(self, components=False):
         urls = {}
         if hasattr(self, 'recognizers'):
             for each in self.recognizers:
-                urls.update(each.all_urls())
+                urls.update(each.all_urls(components))
         if hasattr(self, 'get_urls'):
-            urls.update(self.get_urls())
+            urls.update(self.get_urls(components))
+        # returns a dictionary where the keys are the names associated with the
+        # urls, and the value is a list of pairs, the first member of the pair
+        # is a url and the second is a boolean indicating whether an exact match
+        # is needed (use by cache).
         return urls
+
+    def all_titles(self):
+        titles = {}
+        if hasattr(self, 'recognizers'):
+            for each in self.recognizers:
+                titles.update(each.all_titles())
+        if hasattr(self, 'get_titles'):
+            titles.update(self.get_titles())
+        # returns a dictionary where the keys are the names associated with the
+        # titles, and the value is a list of glob strings that match the title.
+        return titles
 
     def get_name(self):
         return self.__class__.__name__
@@ -98,10 +100,10 @@ class RecognizeAll(Recognizer):
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
             match = all([
-                each.match(data, account, verbose) for each in self.recognizers
+                each.match(given, account, verbose) for each in self.recognizers
             ])
             if match:
                 if verbose:
@@ -155,10 +157,10 @@ class RecognizeAny(Recognizer):
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
             match = any([
-                each.match(data, account, verbose) for each in self.recognizers
+                each.match(given, account, verbose) for each in self.recognizers
             ])
             if match:
                 if verbose:
@@ -184,7 +186,7 @@ class RecognizeTitle(Recognizer):
     Script is run if window title matches any of the glob strings.
 
     Args:
-        title (str):
+        titles (str):
             One or more glob strings.
         script (str or True):
             A script that indicates the text that should be typed to active
@@ -207,16 +209,16 @@ class RecognizeTitle(Recognizer):
     """
 
     def __init__(self, *titles, **kwargs):
-        self.titles = flatten(titles, split=False)
+        self.titles = Collection(titles, splitter=False)
         self.script = kwargs.pop('script', True)
         self.name = kwargs.pop('name', None)
         if kwargs:
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
-            actual = data.get('rawtitle')
+            actual = given.get('rawtitle')
             if actual:
                 for candidate in self.titles:
                     if fnmatch(actual, candidate):
@@ -227,6 +229,9 @@ class RecognizeTitle(Recognizer):
             raise PasswordError(str(e), culprit=e.__class__.__name__)
         if verbose:
             log('    %s: no match.' % self.get_name())
+
+    def get_titles(self):
+        return {self.name: self.titles}
 
     def __repr__(self):
         args = [repr(each) for each in self.titles]
@@ -255,8 +260,8 @@ class RecognizeURL(Recognizer):
     (https) is assumed.
 
     Args:
-        url (str):
-            One or more URLs.
+        urls (list):
+            At least one url.
         exact_path (bool):
             If True, path given in the URL must be matched completely, partial
             matches are ignored.
@@ -284,7 +289,7 @@ class RecognizeURL(Recognizer):
     """
 
     def __init__(self, *urls, **kwargs):
-        self.urls = flatten(urls, split=True)
+        self.urls = Collection(urls, splitter=True)
         self.script = kwargs.pop('script', True)
         self.name = kwargs.pop('name', None)
         self.exact_path = kwargs.pop('exact_path', False)
@@ -293,7 +298,7 @@ class RecognizeURL(Recognizer):
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
             for url in self.urls:
                 url = url if '//' in url else ('//'+url)
@@ -305,7 +310,7 @@ class RecognizeURL(Recognizer):
                 host = url_components.netloc
                 path = url_components.path
 
-                # data may contain the following fields after successful title
+                # given may contain the following fields after successful title
                 # recognition:
                 #     rawdata: the original title
                 #     title: the processed title
@@ -315,7 +320,7 @@ class RecognizeURL(Recognizer):
                 #     host: the url host name or IP address
                 #     path: the path component of the url
                 #           does not include options or anchor
-                if host == data.get('host'):
+                if host == given.get('host'):
 
                     def path_matches(expected, actual):
                         if not expected:
@@ -328,10 +333,10 @@ class RecognizeURL(Recognizer):
                             # otherwise just match what was given
                             return actual.startswith(expected)
 
-                    if path_matches(path, data.get('path')):
-                        if self.fragment and data.get('fragment') != self.fragment:
+                    if path_matches(path, given.get('path')):
+                        if self.fragment and given.get('fragment') != self.fragment:
                             continue
-                        if (protocol == data.get('protocol')):
+                        if (protocol == given.get('protocol')):
                             if verbose:
                                 log('    %s: matches.' % self.get_name())
                             return self.script
@@ -344,8 +349,18 @@ class RecognizeURL(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
-    def get_urls(self):
-        return {self.name: self.urls}
+    def get_urls(self, components=False):
+        if components:
+            urls = []
+            for url in self.urls:
+                url = url if '//' in url else ('//'+url)
+                url_components = urlparse(url)
+                host = url_components.netloc
+                path = url_components.path
+                urls.append((host, path, self.exact_path))
+            return {self.name: urls}
+        else:
+            return {self.name: self.urls}
 
     def __repr__(self):
         args = [repr(each) for each in self.urls]
@@ -386,13 +401,13 @@ class RecognizeCWD(Recognizer):
     """
 
     def __init__(self, *dirs, **kwargs):
-        self.dirs = flatten(dirs, split=True)
+        self.dirs = Collection(dirs, splitter=True)
         self.script = kwargs.pop('script', True)
         if kwargs:
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
             cwd = os.cwd()
             for directory in self.dirs:
@@ -443,13 +458,13 @@ class RecognizeHost(Recognizer):
     """
 
     def __init__(self, *hosts, **kwargs):
-        self.hosts = flatten(hosts, split=True)
+        self.hosts = Collection(hosts, splitter=True)
         self.script = kwargs.pop('script', True)
         if kwargs:
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
             hostname = gethostname()
             for host in self.hosts:
@@ -500,13 +515,13 @@ class RecognizeUser(Recognizer):
     """
 
     def __init__(self, *users, **kwargs):
-        self.users = flatten(users, split=True)
+        self.users = Collection(users, splitter=True)
         self.script = kwargs.pop('script', True)
         if kwargs:
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
             username = getusername()
             if username in self.users:
@@ -560,7 +575,7 @@ class RecognizeEnvVar(Recognizer):
         self.value = value
         self.script = script
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         try:
             if self.name in os.environ and self.value == os.environ[self.name]:
                 if verbose:
@@ -608,13 +623,13 @@ class RecognizeNetwork(Recognizer):
     """
 
     def __init__(self, *macs, **kwargs):
-        self.macs = flatten(macs, split=True)
+        self.macs = Collection(macs, splitter=True)
         self.script = kwargs.pop('script', True)
         if kwargs:
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         # should modify this so that 'ip neigh' can be used in lieu of arp,
         # after all, arp is supposedly obsolete.
         try:
@@ -682,7 +697,7 @@ class RecognizeFile(Recognizer):
             raise TypeError(
                 '%s: invalid keyword argument.' % ', '.join(kwargs.keys()))
 
-    def match(self, data, account, verbose=False):
+    def match(self, given, account, verbose=False):
         import arrow
         try:
             mtime = self.filepath.stat().st_mtime

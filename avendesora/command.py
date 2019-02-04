@@ -21,6 +21,7 @@
 from .collection import Collection
 from .config import get_setting, override_setting
 from .editors import GenericEditor
+from .files import AccountFiles
 from .error import PasswordError
 from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
@@ -255,6 +256,9 @@ class Add(Command):
                 # check the changes to see if there are any issues
                 try:
                     new_accounts_file.run()
+
+                    # success, so delete the now out-of-date cache
+                    AccountFiles.delete_manifests()
                     break
                 except PasswordError as e:
                     error(e)
@@ -264,7 +268,7 @@ class Add(Command):
                             'Giving up, restoring original file.'
                         )
 
-        except (PasswordError) + OSErrors as e:
+        except (PasswordError,) + OSErrors as e:
             orig_accounts_file.restore()
             if isinstance(e, OSErrors):
                 e = os_error(e)
@@ -1290,7 +1294,7 @@ class Questions(Command):
                 contains_secret = True
             except AttributeError:
                 value = v
-            display(k, value, template=('{}: {}', '{}:'))
+            display(k, value, template=('{}: {}', '{}:'), remove=None)
 
         if contains_secret:
             writer = get_writer(clipboard=use_clipboard, stdout=False)

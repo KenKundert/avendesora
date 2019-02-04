@@ -37,7 +37,7 @@ HighlightColor = Color(
 if sys.version_info.major < 3:
     OSErrors = (OSError, IOError)
 else:
-    OSErrors = OSError
+    OSErrors = (OSError,)
 
 
 # gethostname {{{1

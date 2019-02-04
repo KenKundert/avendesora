@@ -42,6 +42,7 @@ from .config import read_config, get_setting
 from .error import PasswordError
 from .gpg import GnuPG, BufferedFile
 from .utilities import OSErrors
+from .__init__ import __version__
 from . import shlib
 from inform import Inform, Error, done, fatal, output, terminate, os_error
 from docopt import docopt
@@ -57,7 +58,7 @@ def main():
         # read command line
         cmdline = docopt(
             __doc__.format(commands=Command.summarize()),
-            options_first=True
+            options_first=True, version=__version__
         )
 
         # start logging
