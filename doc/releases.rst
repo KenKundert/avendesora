@@ -5,10 +5,13 @@ Releases
     | Version: 1.12.4
     | Released: 2019-02-04
 
+
+**1.13 (2019-02-06)**:
     - Added :ref:`interactive command <interactive command>`.
     - Added looping to :ref:`questions command <questions command>`.
     - Retargeted *i* and *I* command aliases.
     - Use natural sort order by default.
+    - Refactored code to speed up start up with account discovery.
 
 **1.12 (2019-01-17)**:
     - Updated the *networth* API example.
