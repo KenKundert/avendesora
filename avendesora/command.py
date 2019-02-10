@@ -982,6 +982,13 @@ class Interactive(Command):
             if not choice:
                 return
             try:
+                choice = '{}.{:d}'.format(
+                    get_setting('default_vector_field'),
+                    int(choice)
+                )
+            except:
+                pass
+            try:
                 writer.display_field(account, choice)
             except PasswordError as e:
                 e.report()

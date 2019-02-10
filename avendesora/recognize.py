@@ -633,7 +633,11 @@ class RecognizeNetwork(Recognizer):
         # should modify this so that 'ip neigh' can be used in lieu of arp,
         # after all, arp is supposedly obsolete.
         try:
-            arp = Run([get_setting('arp_executable')], 'sOeW')
+            arp_executable = get_setting('arp_executable')
+            try:
+                arp = Run([arp_executable], 'sOEW')
+            except Error as e:
+                e.reraise(cuplrit=arp_executable)
             lines = arp.stdout.strip().split('\n')
             macs = [field.split()[2] for field in lines[1:]]
 

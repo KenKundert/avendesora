@@ -28,7 +28,8 @@ from .preferences import INITIAL_AUTOTYPE_DELAY
 from .script import Script
 from .shlib import Run, split_cmd
 from inform import (
-    Color, codicil, cull, error, is_str, log, output, warn, indent, os_error,
+    Color, Error,
+    codicil, cull, error, is_str, log, output, warn, indent, os_error,
 )
 from time import sleep
 from textwrap import dedent
@@ -215,7 +216,10 @@ class ClipboardWriter(Writer):
         base_cmd = split_cmd(get_setting('xsel_executable'))
 
         log('Writing to clipboard.')
-        Run(base_cmd + ['-i'], 'soeW', stdin=value)
+        try:
+            Run(base_cmd + ['-i'], 'soEW', stdin=value)
+        except Error as e:
+            e.reraise(culprit=base_cmd)
 
         if is_secret:
             # produce count down
@@ -228,7 +232,10 @@ class ClipboardWriter(Writer):
                 cursor.clear()
 
             # clear the clipboard
-            Run(base_cmd + ['-c'], 'soew')
+            try:
+                Run(base_cmd + ['-c'], 'soEw')
+            except Error as e:
+                e.reraise(culprit=base_cmd)
 
         # Use Gobject Introspection (GTK) to put the information on the
         # clipboard (for some reason I cannot get this to work).
@@ -279,9 +286,12 @@ class KeyboardWriter(Writer):
             else:
                 keysyms.append(keysym)
         xdotool = get_setting('xdotool_executable')
-        Run([xdotool, 'key', '--clearmodifiers'] + keysyms, 'soeW', log=False)
-            # it is important that log be False, it prevents the password from
-            # ending up in the logfile.
+        try:
+            Run([xdotool, 'key', '--clearmodifiers'] + keysyms, 'soEW', log=False)
+                # it is important that log be False, it prevents the password
+                # from ending up in the logfile.
+        except Error as e:
+            e.reraise(culprit=xdotool)
 
     def display_field(self, account, field):
         # get string to display

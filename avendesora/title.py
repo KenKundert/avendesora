@@ -28,7 +28,7 @@
 from .config import get_setting, setting_path
 from .error import PasswordError
 from .shlib import Run
-from inform import log
+from inform import log, Error
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -65,10 +65,11 @@ class Title(object):
                     "must set xdotool_executable'.",
                     culprit=setting_path('xdotool_executable')
                 )
-            output = Run(
-                [xdotool, 'getactivewindow', 'getwindowname'],
-                'sOeW'
-            )
+            cmd = [xdotool, 'getactivewindow', 'getwindowname']
+            try:
+                output = Run(cmd, 'sOEW')
+            except Error as e:
+                e.reraise(culprit=xdotool)
             title = output.stdout.strip()
         log('Focused window title:\n    %s' % title)
         data = {'rawtitle': title}

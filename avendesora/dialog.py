@@ -12,7 +12,10 @@ def dmenu_dialog(title, choices):
     executable = get_setting('dmenu_executable')
     #cmd = [executable, '-l', len(choices), '-i', '-p', title]
     cmd = [executable, '-l', len(choices), '-i']
-    dmenu = Run(cmd, 'sOeW1', stdin='\n'.join(choices))
+    try:
+        dmenu = Run(cmd, 'sOEW1', stdin='\n'.join(choices))
+    except Error as e:
+        e.reraise(culprit=executable)
     return dmenu.stdout.rstrip('\n')
 
 # gtk selection utility interface

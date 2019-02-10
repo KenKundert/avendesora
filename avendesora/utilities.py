@@ -78,9 +78,12 @@ def pager(text):
     if not is_str(program):
         program = os.environ.get('PAGER', 'less')
     if program:
-        Run([program], stdin=text, modes='Woes')
-    else:
-        output(text)
+        try:
+            Run([program], stdin=text, modes='WoEs')
+            return
+        except Error as e:
+            e.report(culprit=program)
+    output(text)
 
 
 # two_columns {{{1

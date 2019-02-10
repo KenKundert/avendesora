@@ -21,6 +21,7 @@
 
 # Imports {{{1
 from .config import get_setting
+from .error import PasswordError
 from .shlib import to_path
 from .utilities import OSErrors
 from inform import error, os_error
