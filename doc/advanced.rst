@@ -66,10 +66,15 @@ seen, use:
         script='{username}{tab}{passcode}{return}'
     )
 
-The title is a glob string, meaning that '*' matches any combination
-of characters. The script describes what *Avendesora* should output
-when there is a match. In this case it outputs the username field,
-then a tab, then the passcode field, then a return (see :ref:`scripts`).
+The title can either be a glob string or a function.  For glob strings, '*' 
+matches any combination of characters and '?' matches any single character (see 
+`fnmatch <https://docs.python.org/3.6/library/fnmatch.html>`_ for a complete 
+description of the glob syntax).  In this way, the entire title must be 
+matched.  For functions, the argument is the title and the return value must be 
+truthy if the title matched and falsey otherwise.  The script describes what 
+*Avendesora* should output when there is a match. In this case it outputs the 
+username field, then a tab, then the passcode field, then a return (see 
+:ref:`scripts`).
 
 Matching window titles can be fragile, especially for websites
 because the titles can vary quite a bit across the site and over

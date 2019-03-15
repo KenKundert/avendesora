@@ -221,7 +221,12 @@ class RecognizeTitle(Recognizer):
             actual = given.get('rawtitle')
             if actual:
                 for candidate in self.titles:
-                    if fnmatch(actual, candidate):
+                    if isinstance(candidate, str):
+                        hit = fnmatch(actual, candidate)
+                    else:
+                        hit = candidate(actual)
+
+                    if hit:
                         if verbose:
                             log('    %s: matches.' % self.get_name())
                         return self.script
