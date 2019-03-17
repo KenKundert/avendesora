@@ -375,10 +375,13 @@ the hostname and the current working directory::
     alias precmd 'echo -n "^[[]2;${USER}@${HOST:r:r}:${cwd}^G"'
 
 Place both of these aliases in your ~/.cshrc file to configure your shell to
-keep your window title up-to-date::
+keep your window title up-to-date. They should be placed at the end of the file 
+and should only be executed for interactive shells::
 
-    alias precmd 'echo -n "^[]2;${USER}@${HOST:r:r}:${cwd}^G"'
-    alias postcmd 'echo -n "^[]2;${USER}@${HOST:r:r}: \!#^G"' 
+    if ($?prompt) then
+        alias precmd 'echo -n "^[]2;${USER}@${HOST:r:r}:${cwd}^G"'
+        alias postcmd 'echo -n "^[]2;${USER}@${HOST:r:r}: \!#^G"'
+    endif
 
 With these aliases in place, you can add the following to the account that
 contains your login password::
