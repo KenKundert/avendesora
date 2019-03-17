@@ -200,7 +200,7 @@ class PasswordGenerator(object):
         if violation:
             recommended = permissions & ~mask & 0o777
             warn("directory permissions are too loose.", culprit=path)
-            codicil("Recommend running 'chmod {:o} {}'.".format(recommended, path))
+            codicil("Recommend running: chmod {:o} {}".format(recommended, path))
 
         # Check that files that are critical to the integrity of the generated
         # secrets have not changed

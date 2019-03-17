@@ -325,6 +325,69 @@ entry:
         )
 
 
+Terminal Windows
+================
+
+.. index::
+    single: terminal windows
+    single: shell windows
+
+It is generally possible to configure you terminal emulator to put the currently
+running command in the window title, which makes it available to Avendesora's
+account discovery.
+
+For this to work you need a terminal emulator that supports xterm's special
+characters for setting the window title, which is quite common.  In this case,
+sending a string to the window that starts with ``esc-]0;`` and ends with
+``ctrl-g`` will set the window title.  How you generate these codes depends on
+which shell you use.
+
+
+Tcsh
+----
+
+Tcsh runs *postcmd* after it has read the command but before it is run. You can
+change *postcmd* by creating an alias of the same name. Here is a version that
+sets the window title to the currently running command::
+
+    alias postcmd 'echo -n "^[]2;${USER}@${HOST:r:r}: \!#^G"'
+
+The ``^[`` is a single character that represents the escape key.  You can enter
+it in *Vim* by typing ``ctrl-v`` and then ``esc``.  ``${USER}` is replaced by
+the username and ${HOST:r:r} is replaced with the hostname with two extensions
+removed. The ``\!#`` is replaced by the currently running command. Finally,
+``^G`` is also a single character that represents ``ctrl-g``. You enter it in
+Vim by typing ``ctrl-v`` and then ``ctrl-g``.  By placing the username and the 
+host name in the window title along with the command you give Avendesora the 
+ability to tailor its response accordingly
+
+Running this alias command causes the window title to be set as a command
+starts.  Still needed is to update the window title after the command completes.
+This is realized using the *precmd* command. Tcsh calls this command before
+generating a prompt.  Here is a version that sets the window title to contain
+the hostname and the current working directory::
+
+    alias precmd 'echo -n "^[[]2;${USER}@${HOST:r:r}:${cwd}^G"'
+
+Place both of these aliases in your ~/.cshrc file to configure your shell to
+keep your window title up-to-date::
+
+    alias precmd 'echo -n "^[]2;${USER}@${HOST:r:r}:${cwd}^G"'
+    alias postcmd 'echo -n "^[]2;${USER}@${HOST:r:r}: \!#^G"' 
+
+With these aliases in place, you can add the following to the account that
+contains your login password::
+
+    discovery = RecognizeTitle(
+        '*@*: sudo *',
+        script='{passcode}{return}'
+    )
+
+With this, you can run a *sudo* command in your shell, and trigger Avendesora
+when *sudo* requests your password.  Avendesora will recognize the title and
+enter your login password.
+
+
 .. index::
     single: questions
     single: security questions

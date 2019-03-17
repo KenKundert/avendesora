@@ -87,7 +87,7 @@ class AccountFiles:
             if violation:
                 recommended = permissions & ~mask & 0o777
                 warn("file permissions are too loose.", culprit=path)
-                codicil("Recommend running 'chmod {:o} {}'.".format(recommended, resolved_path))
+                codicil("Recommend running: chmod {:o} {}".format(recommended, resolved_path))
 
             # determine time of most recently updated account file
             updated = resolved_path.stat().st_mtime
@@ -106,7 +106,7 @@ class AccountFiles:
                 if violation:
                     recommended = permissions & ~mask & 0o777
                     warn("file permissions are too loose.", culprit=path)
-                    codicil("Recommend running 'chmod {:o} {}'.".format(
+                    codicil("Recommend running: chmod {:o} {}".format(
                         recommended, resolved_path)
                     )
 
@@ -161,13 +161,14 @@ class AccountFiles:
         if canonical_name in self.name_index:
             filename = self.name_index[canonical_name]
             self.load_account_file(filename)
-            assert canonical_name in Account._accounts
-        else:
-            # not in name_index, just read files until it is found
-            for filename in get_setting('accounts_files', []):
-                self.load_account_file(filename)
-                if canonical_name in Account._accounts:
-                    return
+            if canonical_name in Account._accounts:
+                self.write_manifests()
+                return
+        # not in name_index, just read files until it is found
+        for filename in get_setting('accounts_files', []):
+            self.load_account_file(filename)
+            if canonical_name in Account._accounts:
+                break
         self.write_manifests()
 
     def load_account_files(self): # {{{2
