@@ -362,9 +362,7 @@ it in *Vim* by typing ``ctrl-v`` and then ``esc``.  ``${USER}` is replaced by
 the username and ${HOST:r:r} is replaced with the hostname with two extensions
 removed. The ``\!#`` is replaced by the currently running command. Finally,
 ``^G`` is also a single character that represents ``ctrl-g``. You enter it in
-Vim by typing ``ctrl-v`` and then ``ctrl-g``.  By placing the username and the 
-host name in the window title along with the command you give Avendesora the 
-ability to tailor its response accordingly
+Vim by typing ``ctrl-v`` and then ``ctrl-g``.
 
 Running this alias command causes the window title to be set as a command
 starts.  Still needed is to update the window title after the command completes.
@@ -393,7 +391,15 @@ contains your login password::
 
 With this, you can run a *sudo* command in your shell, and trigger Avendesora
 when *sudo* requests your password.  Avendesora will recognize the title and
-enter your login password.
+enter your login password.  By placing the username and the host name in the 
+window title along with the command you give Avendesora the ability to tailor 
+its response accordingly. For example, you match a specific user and host names 
+with the following::
+
+    discovery = RecognizeTitle(
+        'elayne@andor: sudo *',
+        script='{passcode}{return}'
+    )
 
 
 .. index::

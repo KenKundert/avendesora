@@ -90,7 +90,7 @@ class GnuPG(object):
             gpg_ids = gpg_ids.split()
         if not gpg_ids:
             # raise PasswordError('must specify GPG ID.')
-            log('no gpg id is available, using symmetric encryption.')
+            log('no gpg id available, using symmetric encryption.')
 
         use_gpg, use_armor = self._choices()
         if use_gpg:
