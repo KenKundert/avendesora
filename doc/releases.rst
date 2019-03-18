@@ -4,7 +4,7 @@ Releases
 **Latest Development Version**:
     | Version: 1.13.2
     | Released: 2019-03-17
-
+    - Allow title recognizers to be functions.
 
 **1.13 (2019-02-06)**:
     - Added :ref:`interactive command <interactive command>`.

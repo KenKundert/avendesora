@@ -402,6 +402,16 @@ with the following::
     )
 
 
+Bash
+----
+
+The following code added to your ~/.bashrc file will accomplish pretty much the 
+same thing if you use Bash as your shell::
+
+    HOST=$(echo "$HOSTNAME" | cut -f 1 -d '.')
+    trap 'printf "\033]0;${USER}@${HOST}: %s\007" "${BASH_COMMAND//[^[:print:]]/}"' DEBUG
+
+
 .. index::
     single: questions
     single: security questions

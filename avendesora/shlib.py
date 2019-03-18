@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '1.0.1'
-__released__ = '2019-01-18'
+__version__ = '1.0.2'
+__released__ = '2019-03-17'
 
 # Imports {{{1
 try:
@@ -49,10 +49,14 @@ def is_str(obj):
     return isinstance(obj, string_types)
 
 # is_iterable {{{2
-import collections
 def is_iterable(obj):
     """Identifies objects that can be iterated over, including strings."""
-    return isinstance(obj, collections.Iterable)
+    import collections
+    try: # python3
+        from collections.abc import Iterable
+    except ImportError: # python2
+        from collections import Iterable
+    return isinstance(obj, Iterable)
 
 # is_collection {{{2
 def is_collection(obj):
@@ -441,7 +445,7 @@ def _leaves(path, hidden=False):
 
 # leaves()  {{{2
 def leaves(path, hidden=False):
-    """Recursively descend into a directory yielding all of the file."""
+    """Recursively descend into a directory yielding all of the files."""
     for each in _leaves(str(path)):
         yield Path(each)
 
