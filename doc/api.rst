@@ -135,7 +135,8 @@ interaction between this script and *ssh-add*.
 
 The updated source code for `addsshkeys
 <https://github.com/KenKundert/avendesora/tree/master/samples/api/addsshkeys>`_
-can be found on Github.
+can be found on Github.  A more advanced version can be found `here 
+<https://github.com/KenKundert/addsshkeys>`_.
 
 .. code-block:: python
 
