@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '1.0.2'
-__released__ = '2019-03-17'
+__version__ = '1.1.0'
+__released__ = '2019-03-21'
 
 # Imports {{{1
 try:
@@ -433,21 +433,36 @@ def lsf(*args, **kwargs):
         yield f
 
 # Path list functions (leaves, cartesian_product, brace_expand, etc.) {{{1
-def _leaves(path, hidden=False):
-    for each in os.scandir(path):
-        if each.is_dir(follow_symlinks=False):
-            for e in _leaves(each):
-                if hidden or not e.startswith('.'):
-                    yield e
-        else:
-            if hidden or not each.name.startswith('.'):
-                yield each.path
+def _leaves(path, hidden, report):
+    try:
+        for each in path.iterdir():
+            if each.is_dir():
+                if hidden or not each.name.startswith('.'):
+                    for p in _leaves(each, hidden, report):
+                        yield p
+            elif each.is_file():
+                if hidden or not each.name.startswith('.'):
+                    yield each
+    except OSError as e:
+        if report:
+            report(e)
 
 # leaves()  {{{2
-def leaves(path, hidden=False):
-    """Recursively descend into a directory yielding all of the files."""
-    for each in _leaves(str(path)):
-        yield Path(each)
+def leaves(path, hidden=False, report=None):
+    """
+    Recursively descend into a directory yielding all of the files.
+
+    path (str or path):
+        Path of directory.
+    hidden (bool):
+        Include hidden files and directories,
+    report (func):
+        Function to call if an error is detected. Takes one argument, the
+        exception, which will only be an OSError.  If not specified, no errors
+        are reported.
+    """
+    for each in _leaves(Path(path), hidden, report):
+        yield each
 
 # cartesian_product()  {{{2
 def cartesian_product(*fragments):
