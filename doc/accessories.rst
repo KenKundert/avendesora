@@ -60,4 +60,4 @@ AddSSHkeys
 An *Avendesora* accessory that allows you to load all of your keys into the SSH 
 agent with one simple command.
 
-`Emborg <https://github.com/KenKundert/addsshkeys>`_
+`AddSSHkeys <https://github.com/KenKundert/addsshkeys>`_
