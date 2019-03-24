@@ -177,7 +177,7 @@ to the TTY so that it can erase any secrets after a minute has elapsed).  In
 this way you can use *Avendesora* within shell scripts (but you should consider 
 rewriting you script in Python using the :ref:`Avendesora API <api>`)::
 
-    > pw value -s login 'user="{username}:{passcode}"' | curl -K - https://mywork.com/~x57107048/latest
+    > avendesora value -s login 'user="{username}:{passcode}"' | curl -K - https://mywork.com/~x57107048/latest
 
 In this example, I needed to create a arbitrary string containing the username 
 and password, so I combined *Avendesora's* :ref:`script <scripts>` feature with 
@@ -362,7 +362,7 @@ simpler names in the account aliases.
 You can specify any information you feel is appropriate. Generally that includes 
 the account number and the email you gave when creating the account.
 
-You can give your passcode as password using PasswordRecipe. In this case you 
+You can make your passcode a password using PasswordRecipe. In this case you 
 give a string that describes the characteristics of the password you want. The 
 first value is the length of the password (12 characters), and then number of 
 required characters of each type (2 upper case, 2 digits, and 2 symbols). If you 

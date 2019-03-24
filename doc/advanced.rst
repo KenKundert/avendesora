@@ -355,14 +355,11 @@ Tcsh runs *postcmd* after it has read the command but before it is run. You can
 change *postcmd* by creating an alias of the same name. Here is a version that
 sets the window title to the currently running command::
 
-    alias postcmd 'echo -n "^[]2;${USER}@${HOST:r:r}: \!#^G"'
+    alias postcmd 'echo -n "\033]2;${USER}@${HOST:r:r}: \!#\007"'
 
-The ``^[`` is a single character that represents the escape key.  You can enter
-it in *Vim* by typing ``ctrl-v`` and then ``esc``.  ``${USER}` is replaced by
-the username and ${HOST:r:r} is replaced with the hostname with two extensions
-removed. The ``\!#`` is replaced by the currently running command. Finally,
-``^G`` is also a single character that represents ``ctrl-g``. You enter it in
-Vim by typing ``ctrl-v`` and then ``ctrl-g``.
+``${USER}`` is replaced by the username and ``${HOST:r:r}`` is replaced with the 
+hostname with two extensions removed. The ``\!#`` is replaced by the currently 
+running command.
 
 Running this alias command causes the window title to be set as a command
 starts.  Still needed is to update the window title after the command completes.
@@ -712,8 +709,7 @@ necessary because you only have one URL in the account.
 This account adds a one time password as *otp*. It adds a *credentials* field 
 that adds the one-time password to the output of the :ref:`credentials command 
 <credentials command>`. It also adds a URL recognizer to allow semiautomatic 
-entry of the one-time password to the browser. And finally it adds the *urls* to 
-specify which URL the :ref:`browse command <browse command>` should use.
+entry of the one-time password to the browser.
 
 It is easy to mimic *Google Authenticator*. Mimicking *Authy* is more difficult.  
 To do so, follow `these instructions 
@@ -942,8 +938,8 @@ your computer to gain access to your previously secret account.
 The secret generator will combine the account name with the master seed before 
 generating the secret. This allows you to use simple predictable account names 
 and still get an unpredictable secret.  The master seed used is taken from 
-master_seed in the file that contains the stealth account if it exists, or the 
-user_key if it does not. By default the stealth accounts file does not contain 
+*master_seed* in the file that contains the stealth account if it exists, or the 
+*user_key* if it does not. By default the stealth accounts file does not contain 
 a master seed, which makes it difficult to share stealth accounts.  You can 
 create additional stealth account files that do contain master seeds that you 
 can share with your associates.

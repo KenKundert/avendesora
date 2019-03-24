@@ -160,8 +160,10 @@ hot key.  This runs *Avendesora* without an account name. In this case,
 to use and the script that should be used to produce the required information.  
 Generally the script would be to enter the username or email, then tab, then the 
 passcode, and finally return, but you can configure the script as you choose.  
-This is all done as part of configuring discovery. The method for associating 
-*Avendesora* to a particular hot key is dependent on your window manager.
+This is all done as part of configuring discovery.
+
+The method for associating *Avendesora* to a particular hot key is dependent on 
+your window manager.
 
 Gnome:
 
