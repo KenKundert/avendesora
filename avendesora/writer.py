@@ -1,7 +1,7 @@
 # Abraxas Password Writers
 # encoding: utf8
 #
-# Given a secret (password or passphrase) the writer is responsible for getting 
+# Given a secret (password or passphrase) the writer is responsible for getting
 # it to the user in a reasonably secure manner.
 
 # License {{{1
@@ -25,11 +25,10 @@ from . import cursor
 from .config import get_setting
 from .error import PasswordError
 from .preferences import INITIAL_AUTOTYPE_DELAY
-from .script import Script
 from .shlib import Run, split_cmd
 from inform import (
     Color, Error,
-    codicil, cull, error, is_str, log, output, warn, indent, os_error,
+    codicil, cull, error, log, output, warn, indent, os_error,
 )
 from time import sleep
 from textwrap import dedent
@@ -80,6 +79,7 @@ KEYSYMS = {
     '\t': 'Tab',
 }
 
+
 # Writer selection {{{1
 def get_writer(tty=None, clipboard=False, stdout=False):
     if clipboard:
@@ -94,6 +94,7 @@ def get_writer(tty=None, clipboard=False, stdout=False):
         return TTY_Writer()
     else:
         return KeyboardWriter()
+
 
 # Writer base class {{{1
 class Writer(object):
@@ -118,7 +119,7 @@ class Writer(object):
                     label += ' (%s)' % alt_name
             except AttributeError:
                 pass
-            return dedent( str(value)).strip(), is_secret, label
+            return dedent(str(value)).strip(), is_secret, label
         script = field
 
         # Run the script

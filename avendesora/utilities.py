@@ -18,10 +18,9 @@
 
 # Imports {{{1
 from .config import get_setting
-from .error import PasswordError
-from .shlib import Run, to_path, getmod
-from inform import Error, codicil, os_error, output, warn, is_str, indent, Color
-from textwrap import dedent, wrap
+from .shlib import Run
+from inform import Error, output, is_str, indent, Color
+from textwrap import dedent
 import os
 import sys
 
@@ -209,23 +208,23 @@ def invert_dict(d, initial_keys=None):
     the first that contain that value.
     You can specify an minimum set of keys by providing *initial_keys*.
     """
-    new = dict((k,set()) for k in initial_keys) if initial_keys else {}
+    new = dict((k, set()) for k in initial_keys) if initial_keys else {}
     for k, v in d.items():
         new.setdefault(v, set())
         new[v].add(k)
     return new
 
+
 # timer {{{1
 start_time = 0
 last_time = 0
+
 def timer(label=None):
     from quantiphy import Quantity
     from time import time
     global start_time, last_time
     t = time()
     if label:
-        elapsed = Quantity(t - start_time, 's')
-        delta = Quantity(t - last_time, 's')
         print('{label}: delta = {delta}, cumulative = {elapsed}'.format(
             label,
             elapsed = Quantity(t - start_time, 's'),

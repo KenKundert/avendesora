@@ -28,14 +28,14 @@
 from .error import PasswordError
 from .secrets import GeneratedSecret
 from .utilities import error_source
-from base64 import b32decode, b32encode
+from base64 import b32decode
 from binascii import Error as BinasciiError
 
-from inform import Error, is_str
 
 # OTP {{{1
 try:
     from pyotp import TOTP
+
     class OTP(GeneratedSecret):
         """One Time Password
 

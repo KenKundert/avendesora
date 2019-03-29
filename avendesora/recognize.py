@@ -24,15 +24,16 @@
 from .collection import Collection
 from .config import get_setting
 from .error import PasswordError
-from .shlib import cwd, to_path, Run
-from .utilities import gethostname, getusername, error_source, OSErrors
-from inform import Error, is_collection, is_str, log, notify, warn, os_error
+from .shlib import to_path, Run
+from .utilities import gethostname, getusername, OSErrors
+from inform import Error, log, notify, warn, os_error
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
 import os
+
 
 # Recognizer Base Class {{{1
 class Recognizer(object):
@@ -375,6 +376,7 @@ class RecognizeURL(Recognizer):
             args.append('name=%r' % self.name)
         return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
+
 # RecognizeCWD {{{1
 class RecognizeCWD(Recognizer):
     """Run script if current working directory matches.
@@ -544,6 +546,7 @@ class RecognizeUser(Recognizer):
             args.append('script=%r' % self.script)
         return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
 
+
 # RecognizeEnvVar {{{1
 class RecognizeEnvVar(Recognizer):
     """Run script if environment variable matches.
@@ -595,6 +598,7 @@ class RecognizeEnvVar(Recognizer):
         return "%s(%s)" % (self.__class__.__name__, ', '.join([
             repr(each) for each in [self.name, self.value, self.script]
         ]))
+
 
 # RecognizeNetwork {{{1
 class RecognizeNetwork(Recognizer):

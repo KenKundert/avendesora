@@ -38,11 +38,13 @@ except ImportError:
 # Globals {{{1
 GPG_EXTENSIONS = ['.gpg', '.asc']
 ARMOR_CHOICES = ['always', 'never', 'extension']
-ActivePythonFile= None
+ActivePythonFile = None
+
 
 # get_active_python_file() {{{1
 def get_active_python_file():
     return ActivePythonFile
+
 
 # GnuPG class {{{1
 class GnuPG(object):
@@ -50,9 +52,7 @@ class GnuPG(object):
         self.path = to_path(path)
 
     @classmethod
-    def initialize(cls,
-        gpg_path=None, gpg_home=None, armor=None
-    ):
+    def initialize(cls, gpg_path=None, gpg_home=None, armor=None):
 
         cls.gpg_path = to_path(
             gpg_path if gpg_path else get_setting('gpg_executable')
@@ -255,7 +255,7 @@ class PythonFile(GnuPG):
             # check to see if file already exists
             if path.exists():
                 # file creation (init) requested, but file already exists
-                # don't overwrite the file, instead read it so the information 
+                # don't overwrite the file, instead read it so the information
                 # can be used to create any remaining files.
                 display("%s: already exists." % path)
                 return

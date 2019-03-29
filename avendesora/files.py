@@ -38,13 +38,12 @@
 from .account import Account, canonicalize
 from .collection import Collection
 from .config import get_setting
-from .error import PasswordError
 from .gpg import PythonFile
 from .shlib import getmod, mkdir, rm
 from .utilities import OSErrors
 from cryptography.fernet import Fernet
 from fnmatch import fnmatch
-from inform import comment, codicil, log, os_error, warn
+from inform import Error, comment, codicil, log, os_error, warn
 from hashlib import sha256
 from textwrap import dedent, fill
 from time import time
@@ -61,10 +60,9 @@ else:
     PICKLE_ARGS = dict(encoding='utf8')
 
 
-
 # AccountFiles class (private) {{{1
 class AccountFiles:
-    def __init__(self, warnings=True): # {{{2
+    def __init__(self, warnings=True):  # {{{2
         # initialize object {{{3
         self.loaded = set()
         self.name_index = {}
@@ -135,7 +133,7 @@ class AccountFiles:
                     "to create the archive."
                 )
 
-    def load_account_file(self, filename): # {{{2
+    def load_account_file(self, filename):  # {{{2
         if filename in self.loaded:
             return
 
@@ -155,7 +153,7 @@ class AccountFiles:
 
         self.loaded.add(filename)
 
-    def load_account(self, name): # {{{2
+    def load_account(self, name):  # {{{2
         canonical_name = canonicalize(name)
         self.read_manifests()
         if canonical_name in self.name_index:
@@ -171,12 +169,12 @@ class AccountFiles:
                 break
         self.write_manifests()
 
-    def load_account_files(self): # {{{2
+    def load_account_files(self):  # {{{2
         for filename in get_setting('accounts_files', []):
             self.load_account_file(filename)
         self.write_manifests()
 
-    def load_matching(self, title_components): # {{{2
+    def load_matching(self, title_components):  # {{{2
         self.read_manifests()
         found = False
 
@@ -208,7 +206,7 @@ class AccountFiles:
         if not found:
             self.load_account_files()
 
-    def read_manifests(self): # {{{2
+    def read_manifests(self):  # {{{2
         if self.name_index:
             return
         cache_dir = get_setting('cache_dir')
@@ -217,6 +215,8 @@ class AccountFiles:
             encrypted = manifests_path.read_bytes()
 
             user_key = get_setting('user_key')
+            if not user_key:
+                raise Error('no user key.')
             key = base64.urlsafe_b64encode(sha256(user_key.encode('ascii')).digest())
             fernet = Fernet(key)
             contents = fernet.decrypt(encrypted)
@@ -237,7 +237,7 @@ class AccountFiles:
         except OSErrors as e:
             comment(os_error(e))
 
-    def write_manifests(self): # {{{2
+    def write_manifests(self):  # {{{2
         # do not modify existing name_index if no account files were loaded
         if not self.loaded:
             return
@@ -311,7 +311,7 @@ class AccountFiles:
             warn(os_error(e))
 
     @staticmethod
-    def delete_manifests(): # {{{2
+    def delete_manifests():  # {{{2
         cache_dir = get_setting('cache_dir')
         manifests_path = cache_dir / MANIFESTS_FILENAME
         rm(manifests_path)

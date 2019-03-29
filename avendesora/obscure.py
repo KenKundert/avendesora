@@ -21,17 +21,15 @@
 
 
 # Imports {{{1
-from .charsets import DIGITS, DISTINGUISHABLE
-from .config import get_setting, override_setting
+from .config import get_setting
 from .error import PasswordError
 from .gpg import GnuPG
 from .utilities import error_source
-from inform import (
-    log, indent, is_str, output, terminate, warn, full_stop, cull
-)
+from inform import indent, is_str, full_stop, cull
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
 import re
+
 
 # Utilities {{{1
 def chunk(string, length):
@@ -48,6 +46,7 @@ def decorate_concealed(name, encoded):
 
 def group(pattern):
     return '(?:%s)' % pattern
+
 
 STRING1 = group('"[^"]+"')
 STRING2 = group("'[^']+'")
@@ -73,6 +72,7 @@ DECORATED_TEXT = re.compile(
     r"\s*({id})\s*\(\s*({s})\s*\)\s*".format(id=ID, s=ML_STRING),
     re.DOTALL,
 )
+
 
 # ObscuredSecret {{{1
 class ObscuredSecret(object):
@@ -158,6 +158,7 @@ class ObscuredSecret(object):
     def __str__(self):
         return self.render()
 
+
 # Hide {{{1
 class Hide(ObscuredSecret):
     """Hide text
@@ -179,6 +180,7 @@ class Hide(ObscuredSecret):
         Marks a value as being secret but the secret is not encoded in any way.
         Generally used in encrypted accounts files or on very low-value secrets.
     '''
+
     def __init__(self, plaintext, secure=True, is_secret=True):
         self.plaintext = plaintext
         self.is_secret = is_secret
@@ -223,6 +225,7 @@ class Hidden(ObscuredSecret):
         encoded text, but if they are able to capture it they can easily
         decode it.
     '''
+
     def __init__(self, encoded_text, secure=True, encoding=None, is_secret=True):
         self.encoded_text = encoded_text
         encoding = encoding if encoding else get_setting('encoding')
@@ -302,6 +305,7 @@ class GPG(ObscuredSecret, GnuPG):
     # Generally one would use their private key to protect the gpg file, and
     # then use a symmetric key, or perhaps a separate private key, to protect an
     # individual piece of data, like a master seed.
+
     def __init__(self, ciphertext, secure=True, encoding=None):
         self.ciphertext = ciphertext
         self.encoding = encoding
@@ -366,9 +370,11 @@ class GPG(ObscuredSecret, GnuPG):
         plaintext = str(decrypted)
         return plaintext
 
+
 # Scrypt {{{1
 try:
     import scrypt
+
     class Scrypt(ObscuredSecret):
         """Scrypt encrypted text
 
@@ -392,6 +398,7 @@ try:
             This encoding fully encrypts the text with your user key. Only
             you can decrypt it, secrets encoded with scrypt cannot be shared.
         '''
+
         def __init__(self, ciphertext, secure=True, encoding='utf8'):
             self.ciphertext = ciphertext
             self.encoding = encoding

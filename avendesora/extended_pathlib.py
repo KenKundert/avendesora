@@ -40,6 +40,7 @@ def _is_readable(path):
 
 PosixPath.is_readable = _is_readable
 
+
 # is_writable {{{1
 def _is_writable(path):
     """
@@ -52,6 +53,7 @@ def _is_writable(path):
     return os.access(str(path), os.W_OK)
 
 PosixPath.is_writable = _is_writable
+
 
 # is_executable {{{1
 def _is_executable(path):
@@ -66,6 +68,7 @@ def _is_executable(path):
 
 PosixPath.is_executable = _is_executable
 
+
 # is_hidden {{{1
 def _is_hidden(path):
     """
@@ -75,9 +78,10 @@ def _is_hidden(path):
     False
 
     """
-    return path.exists() and str(path).startswith('.')
+    return path.exists() and path.name.startswith('.')
 
 PosixPath.is_hidden = _is_hidden
+
 
 # path_from {{{1
 def _path_from(path, start):
@@ -94,6 +98,7 @@ def _path_from(path, start):
 
 PosixPath.path_from = _path_from
 
+
 # sans_ext {{{1
 def _sans_ext(path):
     """
@@ -107,6 +112,7 @@ def _sans_ext(path):
 
     """
     return path.parent / path.stem
+
 
 PosixPath.sans_ext = _sans_ext
 
@@ -173,4 +179,3 @@ if sys.version_info < (3, 5):
         return self
 
     PosixPath.expanduser = _expanduser
-

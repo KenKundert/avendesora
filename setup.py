@@ -34,15 +34,15 @@ setup(
             # installed in linux. For example, gnome-common is one that you will
             # need. Read the error messages carefully to determine
             # what other packages are needed. Then, be sure to install the
-            # development versions. For example, on Fedora23 the libffi, 
+            # development versions. For example, on Fedora23 the libffi,
             # gobject-introspection and pycairo packages were needed. I
             # installed them with:
             #     dnf install libffi-devel
             #     dnf install gobject-introspection-devel
             #     dnf install python3-cairo-devel
         'python-gnupg>=0.4.3',
-            # Be careful.  There's a package called 'gnupg' that's an 
-            # incompatible fork of 'python-gnupg'.  If both are installed, the 
+            # Be careful.  There's a package called 'gnupg' that's an
+            # incompatible fork of 'python-gnupg'.  If both are installed, the
             # user will probably have compatibility issues.
         'pyotp',
             # pyotp is optional, it provides one-time-password (OTP) secrets.

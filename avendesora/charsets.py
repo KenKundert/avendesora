@@ -11,6 +11,7 @@ or:
     'alphabet': ALPHANUMERIC + PUNCTUATION + ' '
 """
 
+
 # Exclude function
 def exclude(chars, exclusions):
     """Exclude Characters
@@ -35,6 +36,7 @@ def exclude(chars, exclusions):
     except AttributeError:
         # this version is compatible with python2
         return chars.translate(None, exclusions)
+
 
 # Character sets
 # Use these to construct alphabets by summing together the ones you want.

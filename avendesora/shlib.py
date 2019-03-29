@@ -1,6 +1,6 @@
 # shlib -- Scripting utilities
 #
-# A light-weight package with few dependencies that allows users to do 
+# A light-weight package with few dependencies that allows users to do
 # shell-script like things relatively easily in Python.
 
 # License {{{1
@@ -27,12 +27,11 @@ try:
     from .extended_pathlib import Path
 except ImportError:
     from pathlib import Path
+from six import string_types
 import itertools
-import shlex
 import shutil
 import errno
 import os
-import sys
 
 # Parameters {{{1
 PREFERENCES = dict(
@@ -43,10 +42,10 @@ PREFERENCES = dict(
 
 # Utilities {{{1
 # is_str {{{2
-from six import string_types
 def is_str(obj):
     """Identifies strings in all their various guises."""
     return isinstance(obj, string_types)
+
 
 # is_iterable {{{2
 def is_iterable(obj):
@@ -58,10 +57,12 @@ def is_iterable(obj):
         from collections import Iterable
     return isinstance(obj, Iterable)
 
+
 # is_collection {{{2
 def is_collection(obj):
     """Identifies objects that can be iterated over, excluding strings."""
     return is_iterable(obj) and not is_str(obj)
+
 
 # to_path {{{2
 def to_path(*args):
@@ -69,6 +70,7 @@ def to_path(*args):
         return Path(*args).expanduser()
     except AttributeError:
         return Path(*args)
+
 
 # to_paths {{{2
 def to_paths(args):
@@ -80,11 +82,13 @@ def to_paths(args):
         else:
             yield to_path(arg)
  
+
 # to_str {{{2
 def to_str(path):
     # first convert to path to assure ~ expansion is done, then convert back to 
     # string.
     return str(to_path(path))
+
 
 # raise_os_error {{{2
 # Raise an error based on the errno.
@@ -94,10 +98,12 @@ def raise_os_error(errno, filename=None):
     else:
         raise OSError(errno, os.strerror(errno))
 
+
 # split_cmd {{{2
 def split_cmd(cmd):
     from shlex import split
     return split(cmd)
+
 
 # quote_arg {{{2
 def quote_arg(arg):
@@ -117,11 +123,13 @@ def quote_arg(arg):
                 return "'" + arg.replace("'", "'\"'\"'") + "'"
     return quote(str(arg))
 
+
 # _use_log {{{2
 def _use_log(log):
     if log is None:
         return PREFERENCES['log_cmd']
     return log
+
 
 # Preferences {{{1
 def set_prefs(**kwargs):
@@ -150,6 +158,7 @@ def set_state(state):
     PREFERENCES = state
     return old_state
 
+
 # File system utility functions (cp, mv, rm, ln, touch, mkdir, ls, etc.) {{{1
 # cp {{{2
 def cp(*paths):
@@ -175,6 +184,7 @@ def cp(*paths):
         shutil.copytree(to_str(src), to_str(dest))
     else:
         shutil.copy2(to_str(src), to_str(dest))
+
 
 # mv {{{2
 def mv(*paths):
@@ -204,6 +214,7 @@ def mv(*paths):
         shutil.move(to_str(src), to_str(dest))
 
 
+
 # rm {{{2
 def rm(*paths):
     "Remove files or directories (equivalent to rm -rf)"
@@ -221,11 +232,13 @@ def rm(*paths):
             if err.errno != errno.ENOENT:
                 raise
 
+
 # ln {{{2
 def ln(src, dest):
     "Create symbolic link."
     dest = to_path(dest)
     dest.symlink_to(src)
+
 
 # touch {{{2
 def touch(*paths):
@@ -234,6 +247,7 @@ def touch(*paths):
     """
     for path in to_paths(paths):
         path.touch()
+
 
 # mkdir {{{2
 def mkdir(*paths):
@@ -253,6 +267,7 @@ def mkdir(*paths):
         except (IOError, OSError) as err:
             if err.errno != errno.EEXIST or path.is_file():
                 raise
+
 
 # mount/umount {{{2
 class mount:
@@ -274,8 +289,10 @@ class mount:
 def umount(path):
     Run(['umount', path])
 
+
 def is_mounted(path):
     return Run(['mountpoint', '-q', path], '0,1').status == 0
+
 
 # cd {{{2
 class cd:
@@ -290,10 +307,12 @@ class cd:
     def __exit__(self, exc_type, exc_value, exc_traceback):
         os.chdir(to_str(self.starting_dir))
 
+
 # cwd {{{2
 def cwd():
     """Return current working directory as a pathlib path"""
     return Path.cwd()
+
 
 # chmod {{{2
 def chmod(mode, *paths):
@@ -301,10 +320,12 @@ def chmod(mode, *paths):
     for path in to_paths(paths):
         path.chmod(mode)
 
+
 # getmod {{{2
 def getmod(path):
     "Return the permission bits for a file or directory"
     return os.stat(str(path)).st_mode & 0o777
+
 
 # ls {{{2
 def ls(*paths, **kwargs):
@@ -316,12 +337,12 @@ def ls(*paths, **kwargs):
 
     Args:
         paths: the paths to list ('.' if no paths given).
-        select: a returned path will match this glob string, use **/* to enable 
+        select: a returned path will match this glob string, use **/* to enable
             recursion
         reject: a returned path will not match this glob string
         only: specifies the type of returned paths, choose from 'file' or 'dir'
-        hidden (bool): specifies whether hidden files should be returned, if 
-            not given hidden files are returned if select string starts with 
+        hidden (bool): specifies whether hidden files should be returned, if
+            not given hidden files are returned if select string starts with
             '.'
 
     KSK: it is a bit weird that I allow paths to be a list, but not select or
@@ -378,6 +399,7 @@ def ls(*paths, **kwargs):
                 if acceptable(each):
                     yield each
 
+
 # lsd {{{2
 def lsd(*args, **kwargs):
     """
@@ -407,6 +429,7 @@ def lsd(*args, **kwargs):
     for d in ls(*args, **kwargs):
         yield d
 
+
 # lsf {{{2
 def lsf(*args, **kwargs):
     """
@@ -432,6 +455,7 @@ def lsf(*args, **kwargs):
     for f in ls(*args, **kwargs):
         yield f
 
+
 # Path list functions (leaves, cartesian_product, brace_expand, etc.) {{{1
 def _leaves(path, hidden, report):
     try:
@@ -446,6 +470,7 @@ def _leaves(path, hidden, report):
     except OSError as e:
         if report:
             report(e)
+
 
 # leaves()  {{{2
 def leaves(path, hidden=False, report=None):
@@ -464,10 +489,11 @@ def leaves(path, hidden=False, report=None):
     for each in _leaves(Path(path), hidden, report):
         yield each
 
+
 # cartesian_product()  {{{2
 def cartesian_product(*fragments):
     """
-    Combine path fragments to to a path list. Each fragment must be a string or 
+    Combine path fragments to to a path list. Each fragment must be a string or
     path or an iterable that generates strings or paths.
     """
     if not len(fragments):
@@ -475,6 +501,7 @@ def cartesian_product(*fragments):
     return [Path(*f) for f in itertools.product(
         *(f if is_collection(f) else (f,) for f in fragments)
     )]
+
 
 # brace_expand()  {{{2
 try:
@@ -487,6 +514,7 @@ try:
 
 except ImportError:
     pass
+
 
 # Execution classes and functions (Cmd, Run, Sh, Start, run, bg, shbg, which) {{{1
 # Command class {{{2
@@ -539,6 +567,7 @@ class Cmd(object):
         self.log = log
         self.option_args = option_args
         self._interpret_modes(modes)
+
 
     # _interpret_modes {{{3
     def _interpret_modes(self, modes):
@@ -753,6 +782,7 @@ class Run(Cmd):
         self._interpret_modes(modes)
         self.run(stdin)
 
+
 # Sh class (deprecated) {{{2
 class Sh(Cmd):
     """Run a command immediately in the shell.
@@ -866,6 +896,7 @@ def run(cmd, stdin=None, accept=0, shell=False):
         raise OSError(None, "unexpected exit status (%d)." % status)
     return status
 
+
 # sh (deprecated) {{{2
 def sh(cmd, stdin=None, accept=0, shell=True):
     "Execute a command with a shell without capturing its output"
@@ -882,6 +913,7 @@ def bg(cmd, stdin=None, shell=False):
         process.stdin.write(stdin.encode(PREFERENCES['encoding']))
         process.stdin.close()
     return process.pid
+
 
 # shbg (deprecated) {{{2
 def shbg(cmd, stdin=None, shell=True):
@@ -900,6 +932,7 @@ def which(name, path=None, flags=os.X_OK):
         if os.access(p, flags):
             result.append(p)
     return result
+
 
 # render_command {{{2
 def render_command(cmd, option_args=None, width=70):

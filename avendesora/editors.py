@@ -19,14 +19,16 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from .config import get_setting, add_setting, setting_path
+from .config import get_setting, setting_path
 from .error import PasswordError
 from .shlib import Run
-from inform import Error, log, os_error
+from inform import Error
+
 
 # Editor base class {{{1
 class Editor(object):
     pass
+
 
 # GenericEditor class {{{1
 class GenericEditor(Editor):

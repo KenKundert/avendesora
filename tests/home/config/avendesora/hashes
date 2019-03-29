@@ -6,6 +6,6 @@
 # complain if the current contents of these files generate a different
 # hash. Only update these hashes if you know what you are doing.
 
-charsets_hash = '0120b695fb247d4993b1595ab087cc15'  # DO NOT CHANGE THIS LINE
+charsets_hash = 'a055240c4c498e1470f5f3e80b3ec599'  # DO NOT CHANGE THIS LINE
 dict_hash     = '5dbabd4114eae520c1de8963a8b8d09d'  # DO NOT CHANGE THIS LINE
-secrets_hash  = 'd46cd28682eb20a116b8593a0831eb53'  # DO NOT CHANGE THIS LINE
+secrets_hash  = '9df1a970cf38caa99a6ca23256fc3048'  # DO NOT CHANGE THIS LINE

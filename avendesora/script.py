@@ -63,7 +63,7 @@ class Script:
         """Iterates through the script.
 
         Yields a tuple for each component of a script. The tuple consists of the
-        type of the component, and the value of the component.  The type may be 
+        type of the component, and the value of the component.  The type may be
         'tab' (a tab character), 'return' (a return character), 'text' (raw
         text), 'value' (the value of a field that is not a secret), 'sleep N' (a
         request to sleep N seconds), and finally a field name (the value of a
@@ -107,12 +107,13 @@ class Script:
                                     sorted(choices.keys())
                                 )
                                 if choice is None:
-                                    raise PasswordError('user abort.',
-                                    culprit=(
-                                        account.get_name(),
-                                        account.combine_field(name, key)
+                                    raise PasswordError(
+                                        'user abort.',
+                                        culprit = (
+                                            account.get_name(),
+                                            account.combine_field(name, key)
+                                        )
                                     )
-                                )
                             key = choices[choice]
                             value = account.get_scalar(name, key)
                         else:
@@ -129,5 +130,3 @@ class Script:
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.script)
-
-

@@ -38,11 +38,10 @@ from .shlib import to_path, getmod, mv, rm
 from .title import Title
 from .utilities import generate_random_string, OSErrors
 from inform import codicil, conjoin, log, os_error, render, warn, is_str
-from textwrap import dedent, fill, wrap
+from textwrap import dedent, wrap
 from pathlib import Path
-from time import time
 import hashlib
-import os
+
 
 # PasswordGenerator class{{{1
 class PasswordGenerator(object):
@@ -72,7 +71,7 @@ class PasswordGenerator(object):
     def __init__(
             self, init=False, gpg_ids=None, check_integrity=True, warnings=True
     ):
-        # initialize avendesora (these should already be done if called from 
+        # initialize avendesora (these should already be done if called from
         # main, but it is safe to call them again)
         read_config()
         GnuPG.initialize()
@@ -215,7 +214,7 @@ class PasswordGenerator(object):
                 except OSErrors as e:
                     raise PasswordError(os_error(e))
             else:
-                contents='\n'.join(DICTIONARY.get_words())
+                contents = '\n'.join(DICTIONARY.get_words())
             md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
             # Check that file has not changed.
             if md5 != get_setting(kind):
@@ -323,7 +322,7 @@ class PasswordGenerator(object):
             log('User selects %s' % choice)
             account, script = matches[choice]
         else:
-            account, script =  matches.popitem()[1]
+            account, script = matches.popitem()[1]
                 # this odd little piece of code gives the value of the one item in
                 # the dictionary
         if script is True:

@@ -757,7 +757,7 @@ class Account(object):
             return None
 
         if is_collection(value):
-            if hasattr(value, 'items'): # a dictionary or dictionary-like object
+            if hasattr(value, 'items'):     # a dictionary or dictionary-like object
                 result = {}
                 for key in value.keys():
                     v = cls.get_scalar(name, key)
@@ -816,7 +816,7 @@ class Account(object):
             if hl:
                 value = HighlightColor(value)
             name = str(name).replace('_', ' ')
-            leader = level*get_setting('indent')
+            leader = level * get_setting('indent')
             return indent(
                 LabelColor((name if key is None else str(key)) + ':') + sep + value,
                 leader

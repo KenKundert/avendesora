@@ -156,7 +156,7 @@ class Add(Command):
 
         def indented_list(l):
             indent = get_setting('indent')
-            return indent + ('\n'+indent).join(sorted(l))
+            return indent + ('\n' + indent).join(sorted(l))
 
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
@@ -331,7 +331,7 @@ class Archive(Command):
     @classmethod
     def run(cls, command, args):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
         archive_file = get_setting('archive_file')
 
         # first, save existing archive if it exists
@@ -481,7 +481,7 @@ class Changed(Command):
             return a != b
 
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         # read archive file
         archive_path = get_setting('archive_file')
@@ -743,7 +743,7 @@ class Find(Command):
                     '{}'
                 ))
             )
-        output(cmdline['<text>']+ ':')
+        output(cmdline['<text>'] + ':')
         output('    ' + ('\n    '.join(sorted(to_print))))
 
 
@@ -930,7 +930,7 @@ class Initialize(Command):
             gpg_ids = get_setting('gpg_ids', [])
 
         # run the generator
-        generator = PasswordGenerator(init=True, gpg_ids=gpg_ids)
+        PasswordGenerator(init=True, gpg_ids=gpg_ids)
 
 
 # Interactive {{{1
@@ -1061,11 +1061,10 @@ class LoginCredentials(Command):
                                     generated secrets.
     """).strip()
 
-
     @classmethod
     def help(cls):
-        idents=conjoin(get_setting('credential_ids').split(), conj=' or ')
-        secrets=conjoin(get_setting('credential_secrets').split(), conj=' or ')
+        idents = conjoin(get_setting('credential_ids').split(), conj=' or ')
+        secrets = conjoin(get_setting('credential_secrets').split(), conj=' or ')
         text = dedent("""
             {title}
 
@@ -1178,7 +1177,7 @@ class New(Command):
             gpg_ids = get_setting('gpg_ids', [])
 
         # run the generator
-        generator = PasswordGenerator(
+        PasswordGenerator(
             init=cmdline['<name>'], gpg_ids=sorted(gpg_ids)
         )
 
@@ -1579,7 +1578,7 @@ class Version(Command):
     @classmethod
     def run(cls, command, args):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         # get the Python version
         python = 'Python %s.%s.%s' % (
@@ -1593,4 +1592,3 @@ class Version(Command):
         output('Avendesora version: %s (%s) [%s].' % (
             __version__, __released__, python
         ))
-

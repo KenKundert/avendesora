@@ -28,6 +28,7 @@ from inform import is_str, is_collection
 __version__ = '0.1.0'
 __released__ = '2018-05-13'
 
+
 # Collection {{{1
 class Collection(object):
     def __init__(self, collection, splitter=None):

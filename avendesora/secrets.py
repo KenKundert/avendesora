@@ -9,7 +9,7 @@
 
 # Ignore {{{1
 """
-The following code should be ignored. It is defined here for the use of the 
+The following code should be ignored. It is defined here for the use of the
 doctests::
 
     >>> from avendesora.secrets import *
@@ -52,17 +52,17 @@ doctests::
 from .charsets import (
     ALPHANUMERIC, DIGITS, DISTINGUISHABLE, LOWERCASE, SYMBOLS, UPPERCASE, SHIFTED
 )
-from .config import get_setting, override_setting
+from .config import get_setting
 from .error import PasswordError
 from .dictionary import DICTIONARY
 from .obscure import ObscuredSecret
 from .utilities import error_source
 from inform import cull, log, output, terminate, warn, is_str
-from textwrap import dedent
 import math
 import hashlib
 import getpass
 import re
+
 
 # Exceptions {{{1
 class SecretExhausted(PasswordError):
@@ -76,12 +76,15 @@ class SecretExhausted(PasswordError):
         self.args = ['entropy exhausted.']
         self.kwargs = kwargs
 
+
 # Utilities {{{1
 def shift_sort_join(chars, sep=''):
     return sep.join(sorted(chars, key=lambda x: x in SHIFTED))
 
+
 def simple_join(chars, sep=''):
     return sep.join(chars)
+
 
 # GeneratedSecret {{{1
 class GeneratedSecret(object):
@@ -95,8 +98,8 @@ class GeneratedSecret(object):
     def __init__(self):
         """Constructor
 
-        This base class should not be instantiated. A constructor is only provided 
-        to so the doctests work on the helper methods.
+        This base class should not be instantiated. A constructor is only
+        provided to so the doctests work on the helper methods.
         """
         self.master = self.version = None
 
@@ -219,9 +222,9 @@ class GeneratedSecret(object):
 
     def _partition(self, radix, num_partitions):
         """
-        An iterator that returns a sequence of numbers. The length of the 
-        sequence is *num_partitions* and each number falls in the range 
-        [0:radix). The sequence of numbers seems random, but it is determined by 
+        An iterator that returns a sequence of numbers. The length of the
+        sequence is *num_partitions* and each number falls in the range
+        [0:radix). The sequence of numbers seems random, but it is determined by
         the components that are passed into the constructor.
 
         >>> secret = GeneratedSecret()
@@ -231,9 +234,9 @@ class GeneratedSecret(object):
 
         """
         assert self.pool, 'initialize() must be called first'
-        max_index = radix-1
+        max_index = radix - 1
         bits_per_chunk = (max_index).bit_length()
-        self.entropy += num_partitions*math.log(radix, 2)
+        self.entropy += num_partitions * math.log(radix, 2)
 
         for i in range(num_partitions):
             if self.pool < max_index:
@@ -243,8 +246,8 @@ class GeneratedSecret(object):
 
     def _symbols(self, alphabet, num_symbols):
         """
-        An iterator that returns a sequence of symbols. The length of the 
-        sequence is *num_symbols* and each symbol is chosen uniformly from the 
+        An iterator that returns a sequence of symbols. The length of the
+        sequence is *num_symbols* and each symbol is chosen uniformly from the
         alphabet.
 
         >>> secret = GeneratedSecret()
@@ -271,9 +274,9 @@ class GeneratedSecret(object):
             # used as it is a slow operation.
             alphabet = alphabet()
         radix = len(alphabet)
-        max_index = radix-1
+        max_index = radix - 1
         bits_per_chunk = (max_index).bit_length()
-        self.entropy += num_symbols*math.log(len(alphabet), 2)
+        self.entropy += num_symbols * math.log(len(alphabet), 2)
 
         for i in range(num_symbols):
             if self.pool < max_index:
@@ -284,7 +287,7 @@ class GeneratedSecret(object):
     def _get_index(self, radix):
         """
         Returns an index that falls in the range [0:radix).
-        Can be called repeatedly with different values for the radix until the 
+        Can be called repeatedly with different values for the radix until the
         secret is exhausted.
 
         >>> secret = GeneratedSecret()
@@ -294,7 +297,7 @@ class GeneratedSecret(object):
 
         """
         assert self.pool, 'initialize() must be called first'
-        max_index = radix-1
+        max_index = radix - 1
         self.entropy += math.log(radix, 2)
 
         if self.pool < max_index:
@@ -309,7 +312,7 @@ class GeneratedSecret(object):
     def _get_symbol(self, alphabet):
         """
         Returns a symbol pulled from the alphabet.
-        Can be called repeatedly with different values for the radix until the 
+        Can be called repeatedly with different values for the radix until the
         secret is exhausted.
 
         >>> secret = GeneratedSecret()
@@ -330,7 +333,7 @@ class GeneratedSecret(object):
         """
         assert self.pool, 'initialize() must be called first'
         radix = len(alphabet)
-        max_index = radix-1
+        max_index = radix - 1
         self.entropy += math.log(len(alphabet), 2)
 
         if self.pool < max_index:
@@ -350,6 +353,7 @@ class GeneratedSecret(object):
     # __str__() {{{2
     def __str__(self):
         return self.render()
+
 
 # Password {{{1
 class Password(GeneratedSecret):
@@ -409,10 +413,10 @@ class Password(GeneratedSecret):
         'wrncpipvtNPF'
 
     """
-    # A relatively high level subclass of GeneratedSecret that is used to generate 
-    # passwords and passphrases. For passwords, pass in a string containing all 
-    # the characters available to the passwords as the alphabet and make *sep* an 
-    # empty string.  For passphrases, pass in a list of words as the alphabet and 
+    # A relatively high level subclass of GeneratedSecret that is used to generate
+    # passwords and passphrases. For passwords, pass in a string containing all
+    # the characters available to the passwords as the alphabet and make *sep* an
+    # empty string.  For passphrases, pass in a list of words as the alphabet and
     # make *sep* a space::
 
     def __init__(self,
@@ -451,8 +455,8 @@ class Password(GeneratedSecret):
         join = shift_sort_join if self.shift_sort else simple_join
         secret = self.secret = (
             self.prefix
-            + join(self._symbols(self.alphabet, self.length), self.sep)
-            + self.suffix
+          + join(self._symbols(self.alphabet, self.length), self.sep)
+          + self.suffix
         )
         return secret
 
@@ -707,12 +711,13 @@ class Question(Passphrase):
             self.question, ObscuredSecret.hide(str(self))
         )
 
+
 # MixedPassword {{{1
 class MixedPassword(GeneratedSecret):
     """Generate mixed password.
 
-    A relatively low level method that is used to generate passwords from 
-    a heterogeneous collection of alphabets. This is used to satisfy the 
+    A relatively low level method that is used to generate passwords from
+    a heterogeneous collection of alphabets. This is used to satisfy the
     character type count requirements of many websites.  It is recommended that
     user use :class:`avendesora.PasswordRecipe` rather than directly use this class.
 
@@ -808,6 +813,7 @@ class MixedPassword(GeneratedSecret):
         secret = join(password)
         self.secret = secret
         return secret
+
 
 # PasswordRecipe{{{1
 class PasswordRecipe(MixedPassword):
@@ -931,13 +937,13 @@ class BirthDate(GeneratedSecret):
         >>> str(secret)
         '1970-03-22'
 
-    For year, enter the year the account that contains BirthDate was created.  
+    For year, enter the year the account that contains BirthDate was created.
     Doing so anchors the age range. In this example, the creation date is 2015,
     the minimum age is 18 and the maximum age is 65, meaning that a birthdate
     will be chosen such that in 2015 the birth date could correspond to someone
     that is between 18 and 65 years old.
 
-    You can use the fmt argument to change the way in which the date is 
+    You can use the fmt argument to change the way in which the date is
     formatted::
 
         >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
@@ -984,8 +990,8 @@ class BirthDate(GeneratedSecret):
         is_secret = True,
     ):
         self.fmt = fmt
-        self.last_year = year-min_age
-        self.first_year = year-max_age
+        self.last_year = year - min_age
+        self.first_year = year - max_age
         self.master = master
         self.version = version
         self.is_secret = is_secret
@@ -1006,6 +1012,7 @@ class BirthDate(GeneratedSecret):
         secret = birthdate.format(self.fmt)
         self.secret = secret
         return secret
+
 
 if __name__ == "__main__":
     import doctest

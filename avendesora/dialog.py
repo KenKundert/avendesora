@@ -4,7 +4,7 @@
 
 from .config import get_setting
 from .shlib import Run
-from inform import Error, os_error
+from inform import Error
 
 
 # dmenu selection utility interface
@@ -17,6 +17,7 @@ def dmenu_dialog(title, choices):
     except Error as e:
         e.reraise(culprit=executable)
     return dmenu.stdout.rstrip('\n')
+
 
 # gtk selection utility interface
 try:
@@ -80,7 +81,8 @@ try:
                 model, iter = selection.get_selected()
                 path = self.model.get_path(iter)
 
-                scroll = lambda path, dx: (path[0] + dx) % len(self.choices)
+                def scroll(path, dx):
+                    return (path[0] + dx) % len(self.choices)
 
                 if key in ['j', 'Down']:
                     self.view.set_cursor(scroll(path, 1))

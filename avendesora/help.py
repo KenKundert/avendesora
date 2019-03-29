@@ -28,6 +28,7 @@ from difflib import get_close_matches
 from inform import conjoin, full_stop, output
 from textwrap import dedent
 
+
 # HelpMessage base class {{{1
 class HelpMessage(object):
     URL = None
@@ -337,7 +338,7 @@ class Accounts(HelpMessage):
             field. This allows you to create account names that contain dashes
             or any other character that would not be acceptable in a class name
             (best to avoid characters that are meaningful to your shell, such as
-            !$&*()|<>'"\{};`.  For example:
+            !$&*()|<>'"\\{};`.  For example:
 
                 class Root_Work(Account):
                     NAME = 'root@work'
@@ -419,14 +420,14 @@ class Browsing(HelpMessage):
                     x = 'xdg-open {url}',
                 )
 
-            Each entry pairs a key with a command. The command will be run with {url} 
-            replaced by the selected URL when the browser is selected. You can choose which 
-            browser is used by specifying the --browser command line option on the 
-            browse command, by adding the browser attribute to the account, or by 
-            specifying the default_browser setting in the :ref:`config file 
-            <configuring>`.  If more than one is specified, the command line option 
-            dominates over the account attribute, which dominates over the setting.  By 
-            default, the default browser is x, which uses the default browser for your 
+            Each entry pairs a key with a command. The command will be run with {url}
+            replaced by the selected URL when the browser is selected. You can choose which
+            browser is used by specifying the --browser command line option on the
+            browse command, by adding the browser attribute to the account, or by
+            specifying the default_browser setting in the :ref:`config file
+            <configuring>`.  If more than one is specified, the command line option
+            dominates over the account attribute, which dominates over the setting.  By
+            default, the default browser is x, which uses the default browser for your
             account.
         """).strip()
         return text
