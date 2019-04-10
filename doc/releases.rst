@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.13.3
-    | Released: 2019-04-08
+    | Version: 1.13.4
+    | Released: 2019-04-10
     - Allow title recognizers to be functions.
 
 **1.13 (2019-02-06)**:
