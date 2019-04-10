@@ -6,6 +6,9 @@ Releases
     | Released: 2019-04-10
 
     - Allow title recognizers to be functions.
+    - Add --add option to :ref:`values command <values command>`.
+    - Add instructions on how to support Symantic VIP OTP tokens.
+
 
 **1.13 (2019-02-06)**:
     - Added :ref:`interactive command <interactive command>`.
