@@ -233,6 +233,7 @@ class AccountFiles:
                 }
             except (ValueError, pickle.UnpicklingError) as e:
                 warn('garbled manifest.', culprit=manifests_path, codicil=str(e))
+                manifests_path.unlink()
             assert isinstance(self.name_index, dict)
         except OSErrors as e:
             comment(os_error(e))

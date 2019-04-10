@@ -781,7 +781,7 @@ class Account(object):
 
     # write_summary() {{{2
     @classmethod
-    def write_summary(cls, sort=False):
+    def write_summary(cls, all=False, sort=False):
         # present all account values that are not explicitly secret to the user
 
         def fmt_field(name, value='', key=None, level=0):
@@ -826,7 +826,7 @@ class Account(object):
         names = [cls.get_name()] + getattr(cls, 'aliases', [])
         lines = [fmt_field('names', ', '.join(names))]
 
-        for key, value in cls.items(sort=sort):
+        for key, value in cls.items(all=all, sort=sort):
             if is_collection(value):
                 lines.append(fmt_field(key))
                 for k, v in Collection(value).items():

@@ -70,6 +70,8 @@ try:
                     culprit=error_source()
                 )
             self.shared_secret = shared_secret
+            self.is_secret = False
+                # no need to conceal OTPs as they are ephemeral
 
         def initialize(self, account, field_name, field_key=None):
             self.totp = TOTP(

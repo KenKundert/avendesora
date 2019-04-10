@@ -1549,6 +1549,7 @@ class Values(Command):
             avendesora V      [options] <account>
 
         Options:
+            -a, --all    show all fields, including tool fields
             -s, --sort   sort the fields
     """).strip()
 
@@ -1556,6 +1557,7 @@ class Values(Command):
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        all = cmdline['--all']
         sort = cmdline['--sort']
 
         # run the generator
@@ -1563,7 +1565,7 @@ class Values(Command):
 
         # determine the account
         account = generator.get_account(cmdline['<account>'])
-        account.write_summary(sort=sort)
+        account.write_summary(all=all, sort=sort)
 
 
 # Version {{{1

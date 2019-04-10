@@ -657,7 +657,14 @@ keyloggers.
 
 *Avendesora* supports time-based one-time passwords (TOTP) that are fully 
 compatible with, and can act as an alternative to or a replacement for, the 
-*Google Authenticator* or *Authy* apps.
+*Google Authenticator*, *Authy*, or Symantic VIP apps.
+
+
+.. index::
+    single: Google Authenticator
+
+Google Authenticator
+''''''''''''''''''''
 
 When first enabling one-time passwords with *Google Authenticator* you are 
 generally presented with a QR code. Also included is a string of characters that 
@@ -710,6 +717,13 @@ This account adds a one time password as *otp*. It adds a *credentials* field
 that adds the one-time password to the output of the :ref:`credentials command 
 <credentials command>`. It also adds a URL recognizer to allow semiautomatic 
 entry of the one-time password to the browser.
+
+
+.. index::
+    single: Authy
+
+Authy
+'''''
 
 It is easy to mimic *Google Authenticator*. Mimicking *Authy* is more difficult.  
 To do so, follow `these instructions 
@@ -770,6 +784,64 @@ your need for the Authy application. Occasionally, an authorization request will
 be pushed to your Authy application to allow you to approve a transaction.  
 Avendesora cannot provide this particular service.  In the Authy parlance, 
 Avendesora supports Authy Tokens, but not Authy Requests.
+
+
+.. index::
+    single: Symantic VIP
+
+Symantic VIP
+''''''''''''
+
+You can download and install `python-vipaccess 
+<https://github.com/dlenski/python-vipaccess>`_ and use it to generate OTP 
+credentials that are compatible with the Symantic VIP authenticator 
+applications.  You can download and install it using::
+
+    git clone https://github.com/dlenski/python-vipaccess.git
+    cd python-vipaccess
+    pip3 install --user .
+
+Once installed, you can generate the credentials using:
+
+    vipaccess provision
+
+It produces an ID, a secret, and an expiration date and places them into 
+~/.vipaccess.  You provide the ID to the provider of your account in order to 
+register your OTP token and you use the secret as the argument to the Avendesoa 
+OTP class.  For example, if after running *vipaccess* ~/.vipaccess contains::
+
+    version 1
+    secret AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    id VSST12345678
+    expiry 2019-01-15T12:00:00.000Z
+
+As an example, consider adding a Symantic VIP one-time password to a Schwab 
+account as a second factor.
+Then you can configure your *Avendesora* account using::
+
+    otp = OTP('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+    otp_expiration = '2019-01-15T12:00:00.000Z'
+    ephemeral_passcode = Script('{passcode}{otp}')
+    credentials = 'username ephemeral_passcode'
+    discovery = RecognizeURL(
+        'https://client.schwab.com',
+        script='{username}{tab}{passcode}{otp}{return}',
+    )
+
+The addition of *otp_expiration* is not necessary, it just a way of keeping 
+a useful piece of information in a convenient place. The discovery script 
+includes the one-time password after the passcode, as per Schwab instructions.  
+Then you would register your one-time password with Schwab by giving them the 
+ID, in this case VSST12345678, and the current one-time password, which you can 
+get with::
+
+    avendesora schwab otp
+
+Then you can login directly using account discovery, the script adds the 
+one-time password to the end of the passcode.  The *ephemeral_passcode* field is 
+used to combine the passcode and the one-time password, then *credentials* is 
+used to tell the credentials command to output the ephemeral passcode rather 
+than the base passcode.
 
 
 .. index::

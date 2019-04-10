@@ -26,7 +26,7 @@ from .config import get_setting
 from .error import PasswordError
 from .shlib import to_path, Run
 from .utilities import gethostname, getusername, OSErrors
-from inform import Error, log, notify, warn, os_error
+from inform import Error, log, notify, warn, os_error, indent
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
@@ -64,6 +64,14 @@ class Recognizer(object):
     def get_name(self):
         return self.__class__.__name__
 
+    def render(self, args):
+        args = [repr(each) for each in args]
+        if hasattr(self, 'script') and self.script:
+            args.append('script=%r' % self.script)
+        if hasattr(self, 'name') and self.name:
+            args.append('name=%r' % self.name)
+        args = '\n' + indent(',\n'.join(args)) + '\n'
+        return "%s(%s)" % (self.get_name(), args)
 
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):
@@ -116,10 +124,7 @@ class RecognizeAll(Recognizer):
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
-        args = [repr(each) for each in self.recognizers]
-        if self.script:
-            args.append('script=%r' % self.script)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.recognizers)
 
 
 # RecognizeAny {{{1
@@ -173,10 +178,7 @@ class RecognizeAny(Recognizer):
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
-        args = [repr(each) for each in self.recognizers]
-        if self.script:
-            args.append('script=%r' % self.script)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.recognizers)
 
 
 # RecognizeTitle {{{1
@@ -240,12 +242,7 @@ class RecognizeTitle(Recognizer):
         return {self.name: self.titles}
 
     def __repr__(self):
-        args = [repr(each) for each in self.titles]
-        if self.script:
-            args.append('script=%r' % self.script)
-        if self.name:
-            args.append('name=%r' % self.name)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.titles)
 
 
 # RecognizeURL {{{1
@@ -369,12 +366,7 @@ class RecognizeURL(Recognizer):
             return {self.name: self.urls}
 
     def __repr__(self):
-        args = [repr(each) for each in self.urls]
-        if self.script:
-            args.append('script=%r' % self.script)
-        if self.name:
-            args.append('name=%r' % self.name)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.urls)
 
 
 # RecognizeCWD {{{1
@@ -428,10 +420,7 @@ class RecognizeCWD(Recognizer):
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
-        args = [repr(each) for each in self.dirs]
-        if self.script:
-            args.append('script=%r' % self.script)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.dirs)
 
 
 # RecognizeHost {{{1
@@ -485,10 +474,7 @@ class RecognizeHost(Recognizer):
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
-        args = [repr(each) for each in self.hosts]
-        if self.script:
-            args.append('script=%r' % self.script)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.hosts)
 
 
 # RecognizeUser {{{1
@@ -541,10 +527,7 @@ class RecognizeUser(Recognizer):
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
-        args = [repr(each) for each in self.users]
-        if self.script:
-            args.append('script=%r' % self.script)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.users)
 
 
 # RecognizeEnvVar {{{1
@@ -663,10 +646,7 @@ class RecognizeNetwork(Recognizer):
             log('    %s: no match.' % self.get_name())
 
     def __repr__(self):
-        args = [repr(each) for each in self.macs]
-        if self.script:
-            args.append('script=%r' % self.script)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render(self.macs)
 
 
 # RecognizeFile {{{1
