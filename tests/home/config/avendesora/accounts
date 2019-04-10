@@ -128,7 +128,7 @@ class MyBank(Account):
     ])
     checking=Script('{accounts.checking}')
     customer_service = '1-866-229-6633'
-    otp = OTP('JBSWY3DPEHPK3PXP')
+    #otp = OTP('JBSWY3DPEHPK3PXP')
     discovery = RecognizeTitle(
         'easy peasy',
         script='lemon squeezy'

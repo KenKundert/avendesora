@@ -810,6 +810,7 @@ def test_values():
             avendesora V      [options] <account>
 
         Options:
+            -a, --all    show all fields, including tool fields
             -s, --sort   sort the fields
     """).strip()
     assert result.decode('utf-8') == expected

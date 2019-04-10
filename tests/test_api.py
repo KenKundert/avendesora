@@ -226,7 +226,6 @@ def test_summary(capsys):
                     It spans more than one line.
                 customer service: 1-866-229-6633
                 email: pizzaman@pizza.com
-                otp: reveal with: avendesora value mybank otp
                 passcode: reveal with: avendesora value mybank passcode
                 pin: reveal with: avendesora value mybank pin
                 questions:
@@ -287,7 +286,6 @@ def test_archive(capsys):
             customer_service = '1-866-229-6633',
             discovery = RecognizeTitle('easy peasy', script='lemon squeezy'),
             email = 'pizzaman@pizza.com',
-            otp = OTP('JBSWY3DPEHPK3PXP'),
             passcode = Hidden('b1UkJHcwVU1YZTc0'),
             pin = Hidden('OTk4Mg=='),
             questions = [
