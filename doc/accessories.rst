@@ -27,7 +27,7 @@ makes it easy to manage your backups interactively from the command line.
 
 
 SpareKeys
-------
+---------
 
 Spare Keys makes and distributes encrypted copies of the files that you would 
 need to recover from a catastrophic hard drive failure, e.g. SSH keys, GPG keys, 
