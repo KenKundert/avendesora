@@ -331,7 +331,7 @@ entry:
 
 
 Terminal Windows
-================
+""""""""""""""""
 
 .. index::
     single: terminal windows
@@ -349,7 +349,7 @@ which shell you use.
 
 
 Tcsh
-----
+''''
 
 Tcsh runs *postcmd* after it has read the command but before it is run. You can
 change *postcmd* by creating an alias of the same name. Here is a version that
@@ -400,7 +400,7 @@ with the following::
 
 
 Bash
-----
+''''
 
 The following code added to your ~/.bashrc file will accomplish pretty much the 
 same thing if you use Bash as your shell::
@@ -640,8 +640,6 @@ erase it early, type <Ctrl-c>.
 
 .. index::
     single: OTP
-    single: Google Authenticator
-    single: Authy
     single: One-time passwords
     single: second factor
     single: 2FA
@@ -664,7 +662,7 @@ compatible with, and can act as an alternative to or a replacement for, the
     single: Google Authenticator
 
 Google Authenticator
-''''''''''''''''''''
+""""""""""""""""""""
 
 When first enabling one-time passwords with *Google Authenticator* you are 
 generally presented with a QR code. Also included is a string of characters that 
@@ -723,7 +721,7 @@ entry of the one-time password to the browser.
     single: Authy
 
 Authy
-'''''
+"""""
 
 It is easy to mimic *Google Authenticator*. Mimicking *Authy* is more difficult.  
 To do so, follow `these instructions 
@@ -790,7 +788,7 @@ Avendesora supports Authy Tokens, but not Authy Requests.
     single: Symantic VIP
 
 Symantic VIP
-''''''''''''
+""""""""""""
 
 You can download and install `python-vipaccess 
 <https://github.com/dlenski/python-vipaccess>`_ and use it to generate OTP 
