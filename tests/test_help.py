@@ -807,6 +807,7 @@ def test_values():
         Usage:
             avendesora values [options] <account>
             avendesora vals   [options] <account>
+            avendesora vs     [options] <account>
             avendesora V      [options] <account>
 
         Options:
