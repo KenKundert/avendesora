@@ -7,7 +7,8 @@ Releases
 
     - Allow title recognizers to be functions.
     - Add --add option to :ref:`values command <values command>`.
-    - Add instructions on how to support Symantic VIP OTP tokens.
+    - Add *vs* alias to :ref:`values command <values command>`.
+    - Add instructions on how to mimic Symantec VIP authentication app.
 
 
 **1.13 (2019-02-06)**:
