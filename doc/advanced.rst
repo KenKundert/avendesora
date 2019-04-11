@@ -849,16 +849,16 @@ You should now be able to login using a single keystroke.
 Once you have registered and *Avendesora* is able to authenticate your access to 
 Schwab, you can delete the ~/.vipaccess file.
 
-You can adapt the :ref:`credentials command <credentials command>` to the 
-addition of the one-time password in one of two possible ways. In the first, you 
-simply list out the one-time password along with the username and passcode::
+You can add the one-time password to the :ref:`credentials command <credentials 
+command>` in two alternate ways.  In the first, you simply list out the one-time 
+password along with the username and passcode::
 
     credentials = 'username otp passcode'
 
 Alternatively, you have *Avendesora* show the one-time password as part of the 
 passcode, just as Schwab wants it. To accomplish this a new field, 
 *ephemeral_passcode*, is created that combines the passcode and the one-time 
-password. This field is included in the *credentials* field::
+password. This field is replaces *passcode* in the *credentials* field::
 
     ephemeral_passcode = Script('{passcode}{otp}')
     credentials = 'username ephemeral_passcode'
