@@ -63,7 +63,11 @@ try:
             self.interval = interval
             self.digits = digits
             try:
-                b32decode(shared_secret, casefold=True)
+                shared_secret = shared_secret.render()
+            except AttributeError:
+                pass
+            try:
+                b32decode(str(shared_secret), casefold=True)
             except BinasciiError:
                 raise PasswordError(
                     'invalid value specified to OTP: %s.' % str(shared_secret),

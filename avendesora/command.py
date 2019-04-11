@@ -1538,7 +1538,7 @@ class Value(Command):
 
 # Values {{{1
 class Values(Command):
-    NAMES = 'values', 'vals', 'V'
+    NAMES = 'values', 'vals', 'vs', 'V'
     DESCRIPTION = 'display all account values'
     USAGE = dedent("""
         Show all account values.
@@ -1546,6 +1546,7 @@ class Values(Command):
         Usage:
             avendesora values [options] <account>
             avendesora vals   [options] <account>
+            avendesora vs     [options] <account>
             avendesora V      [options] <account>
 
         Options:

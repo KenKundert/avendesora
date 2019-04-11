@@ -454,8 +454,9 @@ use::
     questions.0 (oldest aunt): ampere reimburse duster
 
 You can get a list of your questions and then select which one you want answered 
-using the *questions* command. Specifically, if Citibank asks for the name of 
-your oldest uncle you can use the following to find the answer::
+using the :ref:`questions command <questions command>`.  Specifically, if 
+Citibank asks for the name of your oldest uncle you can use the following to 
+find the answer::
 
     > avendesora questions citi
     0: oldest aunt?
@@ -505,8 +506,9 @@ with *urls* being preferred if both exist.  *urls* may either be a string,
 a list, or a dictionary. If it is a string, it is split at white spaces to make 
 it a list.  If *urls* is a list, the URLs are considered unnamed and the first 
 one given is used. If it a dictionary, the URLs are named.  When named, you may 
-specify the URL you wish to use by specifying the name to the *browse* command.  
-For example, consider a *urls* attribute that looks like this:
+specify the URL you wish to use by specifying the name to the :ref:`browse 
+command <browse command>`.  For example, consider a *urls* attribute that looks 
+like this:
 
 .. code-block:: python
 
@@ -524,8 +526,8 @@ You would access *vpn* with::
     avendesora browse dragon vpn
 
 By specifying *default_url* you indicate which URL is desired when you do not 
-explicitly specify which you want on the *browse* command. In this way, you can 
-access your email with either of the following::
+explicitly specify which you want on the :ref:`browse command <browse command>`. 
+In this way, you can access your email with either of the following::
 
     avendesora browse dragon email
     avendesora browse dragon
@@ -536,8 +538,8 @@ If *urls* is not given, *Avendesora* looks for URLs in
 as a named URL, otherwise it is treated as an unnamed URL.
 
 If named URLs are found in both *urls* and *discovery* they are all available to 
-*browse* command, with those given in *urls* being preferred when the same name 
-is found in both attributes.
+:ref:`browse command <browse command>`, with those given in *urls* being 
+preferred when the same name is found in both attributes.
 
 
 Selecting the Browser
@@ -560,9 +562,9 @@ By default, *browsers* contains the following:
 
 Each entry pairs a key with a command. The command will be run with *{url}* 
 replaced by the selected URL when the browser is selected. You can choose which 
-browser is used by specifying the *--browser* command line option on the 
-*browse* command, by adding the *browser* attribute to the account, or by 
-specifying the *default_browser* setting in the :ref:`config file 
+browser is used by specifying the *--browser* command line option on the
+:ref:`browse command <browse command>`, by adding the *browser* attribute to the 
+account, or by specifying the *default_browser* setting in the :ref:`config file 
 <configuring>`.  If more than one is specified, the command line option 
 dominates over the account attribute, which dominates over the setting.  By 
 default, the default browser is *x*, which uses the default browser for your 
@@ -613,11 +615,11 @@ By default the *default_vector_field* is queried, which is generally
     accounts.checking: 7610-40-9891
     Which question?
 
-The *questions* command is useful when confronting one or more unexpected
-challenge questions, but it only handles one composite field at a time. More
-convenient when chatting on the phone to an account representative is the
-*interactive* or *i* command.  This command allows you to interactively query
-the value of any account field::
+The :ref:`questions command <questions command>` is useful when confronting one 
+or more unexpected challenge questions, but it only handles one composite field 
+at a time. More convenient when chatting on the phone to an account 
+representative is the *interactive* or *i* command.  This command allows you to 
+interactively query the value of any account field::
 
     > avendesora interactive bank
     which field? accounts.checking
@@ -655,7 +657,7 @@ keyloggers.
 
 *Avendesora* supports time-based one-time passwords (TOTP) that are fully 
 compatible with, and can act as an alternative to or a replacement for, the 
-*Google Authenticator*, *Authy*, or Symantic VIP apps.
+*Google Authenticator*, *Authy*, or *Symantec VIP* apps.
 
 
 .. index::
@@ -785,61 +787,94 @@ Avendesora supports Authy Tokens, but not Authy Requests.
 
 
 .. index::
-    single: Symantic VIP
+    single: Symantec VIP
 
-Symantic VIP
+Symantec VIP
 """"""""""""
 
-You can download and install `python-vipaccess 
-<https://github.com/dlenski/python-vipaccess>`_ and use it to generate OTP 
-credentials that are compatible with the Symantic VIP authenticator 
-applications.  You can download and install it using::
+You can use `vipaccess <https://github.com/dlenski/python-vipaccess>`_ to 
+generate OTP credentials for *Avendesora* that are compatible with the *Symantec 
+VIP* authenticator application.  Download and install *vipaccess* using::
 
     git clone https://github.com/dlenski/python-vipaccess.git
     cd python-vipaccess
     pip3 install --user .
 
-Once installed, you can generate the credentials using:
+Once installed, you generate the credentials using:
 
     vipaccess provision
 
 It produces an ID, a secret, and an expiration date and places them into 
-~/.vipaccess.  You provide the ID to the provider of your account in order to 
-register your OTP token and you use the secret as the argument to the Avendesoa 
-OTP class.  For example, if after running *vipaccess* ~/.vipaccess contains::
+~/.vipaccess.
+The ID and secret are like a public and private key pair. You keep *secret* 
+private and you give the ID to the site when registering your authenticator.  
+With *Avendesora* you give the secret as the argument to 
+:class:`avendesora.OTP`.
+
+As an example, consider configuring *Avendesora* to provide two-factor 
+authentication for a Schwab account. Assume that you have run *vipaccess* and it 
+generated the following ~/.vipaccess file::
 
     version 1
     secret AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     id VSST12345678
     expiry 2019-01-15T12:00:00.000Z
 
-As an example, consider adding a Symantic VIP one-time password to a Schwab 
-account as a second factor.
-Then you can configure your *Avendesora* account using::
+You would configure *Avendesora* to generate one-time passwords by adding the 
+following to the desired account::
 
     otp = OTP('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-    otp_expiration = '2019-01-15T12:00:00.000Z'
-    ephemeral_passcode = Script('{passcode}{otp}')
-    credentials = 'username ephemeral_passcode'
+    otp_expires = '2019-01-15T12:00:00.000Z'
+
+The addition of *otp_expires* is not necessary, it just a way of keeping 
+a useful piece of information in a convenient place.  It is not necessary to 
+save the ID.
+
+You would register your authenticator with Schwab by giving them the ID, in this 
+case VSST12345678, and the current one-time password, which you get with::
+
+    avendesora schwab otp
+
+Once registered, Schwab expects you to add the one-time password to the end of 
+your passcode when logging in. You can implement this in account discovery 
+using::
+
     discovery = RecognizeURL(
         'https://client.schwab.com',
         script='{username}{tab}{passcode}{otp}{return}',
     )
 
-The addition of *otp_expiration* is not necessary, it just a way of keeping 
-a useful piece of information in a convenient place. The discovery script 
-includes the one-time password after the passcode, as per Schwab instructions.  
-Then you would register your one-time password with Schwab by giving them the 
-ID, in this case VSST12345678, and the current one-time password, which you can 
-get with::
+You should now be able to login using a single keystroke.
 
-    avendesora schwab otp
+Once you have registered and *Avendesora* is able to authenticate your access to 
+Schwab, you can delete the ~/.vipaccess file.
 
-Then you can login directly using account discovery, the script adds the 
-one-time password to the end of the passcode.  The *ephemeral_passcode* field is 
-used to combine the passcode and the one-time password, then *credentials* is 
-used to tell the credentials command to output the ephemeral passcode rather 
-than the base passcode.
+You can adapt the :ref:`credentials command <credentials command>` to the 
+addition of the one-time password in one of two possible ways. In the first, you 
+simply list out the one-time password along with the username and passcode::
+
+    credentials = 'username otp passcode'
+
+Alternatively, you have *Avendesora* show the one-time password as part of the 
+passcode, just as Schwab wants it. To accomplish this a new field, 
+*ephemeral_passcode*, is created that combines the passcode and the one-time 
+password. This field is included in the *credentials* field::
+
+    ephemeral_passcode = Script('{passcode}{otp}')
+    credentials = 'username ephemeral_passcode'
+
+In this example, the *otp*, *otp_expires*, and *ephemeral_passcode* field names 
+are arbitrary. You are free to choose names more to your liking.
+
+A variation on this process is used when registering *Avendesora*'s one-time 
+password feature as a second-factor with ETrade. Symantec VIP has several types 
+of tokens.  By default, *vipaccess* generates VSST (desktop) tokens, but Etrade 
+requires a VSMT (mobile) token.  To generate a mobile token, use::
+
+    vipaccess provision -t VSMT
+
+Except for this one detail, the rest of the process is the same as described for 
+Schwab.
 
 
 .. index::
@@ -1187,14 +1222,15 @@ forgotten the desired response, she can also specify the challenge to the
 
 Alternately, when Siuan sends a message to Moiraine, she can proactively prove 
 her identity by providing both the challenge and the response. Moiraine could 
-then run the *identity* command with the challenge and confirm that she gets the 
-same response. Other than herself, only Siuan could predict the correct response 
-to any challenge.  However, this is not recommended as it would allow someone 
-with brief access to Suian's Avendesora, perhaps Leane her Keeper, to generate 
-and store multiple challenge/response pairs. Leane could then send messages to 
-Moiraine while pretending to be Siuan using the saved challenge/response pairs.  
-The subterfuge would not work if Moiraine generated the challenge unless Leane 
-currently has access to Siuan's Avendesora.
+then run the :ref:`credentials command <credentials command>` with the challenge 
+and confirm that she gets the same response. Other than herself, only Siuan 
+could predict the correct response to any challenge.  However, this is not 
+recommended as it would allow someone with brief access to Suian's Avendesora, 
+perhaps Leane her Keeper, to generate and store multiple challenge/response 
+pairs. Leane could then send messages to Moiraine while pretending to be Siuan 
+using the saved challenge/response pairs.  The subterfuge would not work if 
+Moiraine generated the challenge unless Leane currently has access to Siuan's 
+Avendesora.
 
 
 .. index::
