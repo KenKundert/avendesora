@@ -46,31 +46,26 @@ like some aspect of it. Please consider contributing your enhancements back to
 the project. Here are some of the ways *Avendesora* differs from more 
 traditional password managers:
 
-**Private:**
+:Private:
+    * Local storage and operation
+    * Open source (no back doors)
 
-* Local storage and operation
-* Open source (no back doors)
+:Secure:
+    * GPG encryption
 
-**Secure:**
+:Flexible:
+    * :ref:`Free form account data <accounts>`
+    * Configurable :ref:`account recognition <discovery>` and :ref:`autotype <scripts>`
 
-* GPG encryption
+:Powerful:
+    * :ref:`Python API <api>`
+    * :ref:`Numerous companion programs <accessories>`
+    * :ref:`Collaboration support <collaboration>`
+    * :ref:`One-time password support <otp>`
 
-**Flexible:**
-
-* :ref:`Free form account data <accounts>`
-* Configurable :ref:`account recognition <discovery>` and :ref:`autotype <scripts>`
-
-**Powerful:**
-
-* :ref:`Python API <api>`
-* :ref:`Numerous companion programs <accessories>`
-* :ref:`Collaboration support <collaboration>`
-* :ref:`One-time password support <otp>`
-
-**Efficient:**
-
-* Keyboard centric
-* Edit accounts with your text editor (Vim, etc.)
+:Efficient:
+    * Keyboard centric
+    * Edit accounts with your text editor (Vim, etc.)
 
 
 Quick Tour
