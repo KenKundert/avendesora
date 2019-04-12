@@ -192,7 +192,9 @@ You can also have *Avendesora* attempt to show you your :ref:`login credentials
     passcode: wigwam mistrust afflict refit
 
 To show the login credentials *Avendesora* looks for candidate usernames 
-(username, email) and candidate passcodes (passcode, password, passphrase).
+(username, email) and candidate passcodes (passcode, password, passphrase), 
+though you can specify exactly which fields are used by adding a *credentials* 
+field in the account.
 
 
 .. index::
@@ -373,9 +375,9 @@ like in the shell account above.  Or, you can explicitly specify the password.
 In this case you should indicate that the value is a secret so it is somewhat 
 protected.  There are two ways of doing that.
 
-1. You specify the password as an argument to Hide(). Example: Hide('catch22').
-   In this case *Avendesora* protects the value as a secret, but it will show up 
-   unconcealed when viewing your account file.
+1. You specify the password as an argument to :class:`avendesora.Hide()`.  
+   Example: ``Hide('catch22')``.  In this case *Avendesora* protects the value 
+   as a secret, but it will show up unconcealed when viewing your account file.
 2. You can specify the password embedded in << and >>. For example: <<catch22>>.  
    If you do that, the value is converted to base64 and passed as an argument to 
    Hidden(). Thus, when you view the account file you will see: 
@@ -543,7 +545,7 @@ In this case, since this account holds real money, a bit more attention is given
 to security. For example, the username was specified as a 2 word passphrase, 
 making very unlikely that anyone could guess your username. Furthermore, your 
 account numbers and your credit-cards CCV number are hidden by decorating them 
-with << >> (you could also just use Hide()).
+with << >> (you could also just use :class:`avendesora.Hide()`).
 
 Also, a verbal password is included. Many financial institutions allow you to 
 set up a verbal password that you use when calling in. This is an important 

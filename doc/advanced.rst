@@ -1081,7 +1081,7 @@ use --seed or you do and give the wrong seed, you will get a
 different value for your secret.  In effect, using --seed when
 generating the original value of the secret causes *Avendesora* to
 generate the wrong secret by default, allowing you to say "See, I
-told you it would not work". But when you want it to work, you just
+told you it wouldn't work". But when you want it to work, you just
 interactively provide the correct seed.
 
 You would typically only use misdirection for secrets you are
