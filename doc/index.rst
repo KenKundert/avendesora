@@ -43,19 +43,34 @@ likely already familiar with, such as Python, GPG, and Vim.  As such, it should
 be both welcoming and powerful for those that are comfortable with Unix and its 
 utilities.  Also, it is fully open source, so you can change it if you do not 
 like some aspect of it. Please consider contributing your enhancements back to 
-the project. Here are some of the ways *Avendesora* differs from other available 
-password managers:
+the project. Here are some of the ways *Avendesora* differs from more 
+traditional password managers:
 
-#. Completely offline
-#. Linux only
-#. Command line centric
-#. The information you can associate with each account is unconstrained
-#. Completely free (free as in freedom and free as in beer)
-#. Supports collaboration
-#. Supports time-based one-time passwords (ala Google Authenticator)
-#. Uses GPG for encryption
-#. Written in Python
-#. Provides a Python API and a variety of useful companion programs
+**Private:**
+
+* Local storage and operation
+* Open source (no back doors)
+
+**Secure:**
+
+* GPG encryption
+
+**Flexible:**
+
+* :ref:`Free form account data <accounts>`
+* Configurable :ref:`account recognition <discovery>` and :ref:`autotype <scripts>`
+
+**Powerful:**
+
+* :ref:`Python API <api>`
+* :ref:`Numerous companion programs <accessories>`
+* :ref:`Collaboration support <collaboration>`
+* :ref:`One-time password support <otp>`
+
+**Efficient:**
+
+* Keyboard centric
+* Edit accounts with your text editor (Vim, etc.)
 
 
 Quick Tour

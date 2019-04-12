@@ -65,7 +65,7 @@ files:
 .. index::
     single: account files
 
-*account files*:
+*<account files>*:
 
     A file containing a collection of related accounts. All accounts in a file 
     share a common master seed.
@@ -73,7 +73,7 @@ files:
 .. index::
     single: archive file
 
-*archive file*:
+*<archive file>*:
 
     This file contains all known accounts with any generated secrets expanded.  
     It is used to identify account values that may have inadvertently changed.
@@ -81,7 +81,7 @@ files:
 .. index::
     single: log file
 
-*log file*:
+*<log file>*:
 
     The log file is created after each invocation of Avendesora. It provides 
     details about the run that can help understand what happened during the run, 
@@ -197,7 +197,7 @@ specifying the desired values in the *config* file (found in
 **display_time** = 60:
 
     The number of seconds that the secret will be displayed before it is
-    erase when writing to the TTY or clibboard.
+    erased when writing to the TTY or the clipboard.
 
 
 .. index::

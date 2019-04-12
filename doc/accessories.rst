@@ -1,6 +1,8 @@
 .. index::
     single: accessories
 
+.. _accessories:
+
 Accessories
 ===========
 
