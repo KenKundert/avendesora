@@ -33,7 +33,7 @@ SpareKeys
 
 Spare Keys makes and distributes encrypted copies of the files that you would 
 need to recover from a catastrophic hard drive failure, e.g. SSH keys, GPG keys, 
-password vaults, etc.
+password vaults, encryption keys for backups, etc.
 
 `SpareKeys <https://github.com/kalekundert/sparekeys>`_
 
