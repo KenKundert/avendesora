@@ -730,8 +730,7 @@ the users' guide.
 Getting Help
 ------------
 
-You can find the documentation on You can find the documentation on `ReadTheDocs
-<https://avendesora.readthedocs.io>`_.
+You can find the documentation on `ReadTheDocs <https://avendesora.readthedocs.io>`_.
 
 The *help* command provides information on how to use Avendesora's various 
 features.  To get a listing of the topics available, use::
