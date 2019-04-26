@@ -93,6 +93,7 @@ class GeneratedSecret(object):
     def __new__(cls, *args, **kwargs):
         self = super(GeneratedSecret, cls).__new__(cls)
         self.reset()
+        self.is_secret = True
         return self
 
     def __init__(self):
@@ -348,7 +349,11 @@ class GeneratedSecret(object):
 
     # __repr__() {{{2
     def __repr__(self):
-        return "Hidden('%s')" % ObscuredSecret.hide(str(self))
+        secret = ObscuredSecret.hide(str(self))
+        if self.is_secret:
+            return "Hidden('{}')".format(secret)
+        else:
+            return "Hidden('{}', is_secret=False)".format(secret)
 
     # __str__() {{{2
     def __str__(self):

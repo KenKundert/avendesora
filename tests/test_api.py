@@ -269,20 +269,19 @@ def test_archive(capsys):
         pw = PasswordGenerator()
         account = pw.get_account('mybank')
         archive = account.archive()
-        assert render(archive, sort=True) == render(dict(
+        expected = dict(
             accounts = dict(
                 checking = Hidden('MTIzNDU2Nzg='),
                 creditcard = Hidden('MzQ1Njc4OTA='),
                 savings = Hidden('MjM0NTY3ODk=')
             ),
             aliases = 'mb'.split(),
-            birthdate = Hidden('MTk4MS0xMC0wMQ=='),
+            birthdate = Hidden('MTk4MS0xMC0wMQ==', is_secret=False),
             checking = Script('{accounts.checking}'),
-            comment =
-                '\n'
-                '        This is a multiline comment.\n'
-                '        It spans more than one line.\n'
-                '    ',
+            comment = dedent('''
+                This is a multiline comment.
+                It spans more than one line.
+            '''),
             customer_service = '1-866-229-6633',
             discovery = RecognizeTitle('easy peasy', script='lemon squeezy'),
             email = 'pizzaman@pizza.com',
@@ -305,6 +304,11 @@ def test_archive(capsys):
             urls = 'https://mb.com',
             username = 'pizzaman',
             verbal = Hidden('Zml6emxlIGxlb3BhcmQ=')
-        ), sort=True)
+        )
+        #with open('expected', 'w') as f:
+        #    f.write(render(expected, sort=True))
+        #with open('result', 'w') as f:
+        #    f.write(render(archive, sort=True))
+        assert render(archive, sort=True) == render(expected, sort=True)
 
 

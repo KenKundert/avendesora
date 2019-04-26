@@ -26,7 +26,7 @@ from .config import get_setting
 from .error import PasswordError
 from .shlib import to_path, Run
 from .utilities import gethostname, getusername, OSErrors
-from inform import Error, log, notify, warn, os_error, indent
+from inform import Error, log, notify, warn, os_error, indent, render
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
@@ -70,8 +70,8 @@ class Recognizer(object):
             args.append('script=%r' % self.script)
         if hasattr(self, 'name') and self.name:
             args.append('name=%r' % self.name)
-        args = '\n' + indent(',\n'.join(args)) + '\n'
-        return "%s(%s)" % (self.get_name(), args)
+        args = '\n' + ',\n'.join(args) + '\n'
+        return "%s(%s)" % (self.get_name(), render(args))
 
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):

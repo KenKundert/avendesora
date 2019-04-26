@@ -152,7 +152,11 @@ class ObscuredSecret(object):
 
     # __repr__() {{{2
     def __repr__(self):
-        return "Hidden('%s')" % (ObscuredSecret.hide(self.plaintext, 'base64'))
+        secret = ObscuredSecret.hide(self.plaintext, 'base64')
+        if hasattr(self, 'is_secret') and not self.is_secret:
+            return "Hidden('{}', is_secret=False)".format(secret)
+        else:
+            return "Hidden('{}')".format(secret)
 
     # __str__() {{{2
     def __str__(self):

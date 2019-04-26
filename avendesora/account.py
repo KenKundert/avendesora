@@ -31,7 +31,7 @@ from .secrets import GeneratedSecret
 from difflib import get_close_matches
 from inform import (
     Color, codicil, conjoin, cull, full_stop, is_collection, is_str,
-    join, log, notify, output, warn, indent,
+    join, log, notify, output, warn, indent, render
 )
 from textwrap import dedent
 try:
@@ -236,10 +236,15 @@ class Account(object):
 
         # return if this account has already been processed
         if hasattr(cls, '_file_info'):
-            return  # don't override on those accounts where it was already set
+            return  # account has already been processed
 
         # add fileinfo
         cls._file_info = fileinfo
+
+        # dedent any string attributes
+        for k, v in cls.__dict__.items():
+            if is_str(v) and '\n' in v:
+                setattr(cls, k, dedent(v))
 
         # add master seed
         if master and not hasattr(cls, '_%s__NO_MASTER' % cls.__name__):
@@ -807,7 +812,7 @@ class Account(object):
 
             # format values
             if '\n' in value:
-                value = indent(dedent(value), get_setting('indent')).strip('\n')
+                value = indent(value, get_setting('indent')).strip('\n')
                 sep = '\n'
             elif value:
                 sep = ' '
@@ -856,6 +861,35 @@ class Account(object):
             for k, v in cls.items(True)
             if k not in ['master_seed', 'account_seed']
         }
+
+    # export() {{{2
+    @classmethod
+    def export(cls):
+        # return all account fields along with their values as an Account class
+
+        def extract(value, name, key=None):
+            if not is_collection(value):
+                if hasattr(value, 'initialize'):
+                    value.initialize(cls, name, key)
+                return value
+            try:
+                return {k: extract(v, name, k) for k, v in value.items()}
+            except AttributeError:
+                return [extract(v, name, i) for i, v in enumerate(value)]
+
+        values = [
+            '{} = {}'.format(k, render(extract(v, k), level=1))
+            for k, v in cls.items(True)
+            if k not in ['master_seed', 'account_seed']
+        ]
+        return dedent('''
+            class {name}(Account): {fold}
+                {values}
+        ''').format(
+            fold = '# {{' + '{1',
+            name = cls.__name__,
+            values = '\n    '.join(values),
+        ).strip()
 
     # open_browser() {{{2
     @classmethod
