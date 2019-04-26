@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.13.6
-    | Released: 2019-04-11
+    | Version: 1.13.7
+    | Released: 2019-04-26
 
     - Allow title recognizers to be functions.
     - Add --all option to :ref:`values command <values command>`.
