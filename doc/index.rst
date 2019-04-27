@@ -279,4 +279,5 @@ Contents
    kpns
    upgrading
    releases
-   :ref:`genindex`
+
+*  :ref:`genindex`
