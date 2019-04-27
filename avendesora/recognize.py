@@ -26,7 +26,7 @@ from .config import get_setting
 from .error import PasswordError
 from .shlib import to_path, Run
 from .utilities import gethostname, getusername, OSErrors
-from inform import Error, log, notify, warn, os_error, indent, render
+from inform import Error, cull, log, notify, warn, os_error, indent, render
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
@@ -34,6 +34,16 @@ except ImportError:
     from urlparse import urlparse
 import os
 
+
+# Utilities {{{1
+def render_arg(value, name=None):
+    if hasattr(value, 'render'):
+        rendered_value = value.render()
+    else:
+        rendered_value = render(value, level=1)
+    if name:
+        return name + '=' + rendered_value
+    return rendered_value
 
 # Recognizer Base Class {{{1
 class Recognizer(object):
@@ -64,14 +74,18 @@ class Recognizer(object):
     def get_name(self):
         return self.__class__.__name__
 
-    def render(self, args):
-        args = [repr(each) for each in args]
-        if hasattr(self, 'script') and self.script:
-            args.append('script=%r' % self.script)
-        if hasattr(self, 'name') and self.name:
-            args.append('name=%r' % self.name)
-        args = '\n' + ',\n'.join(args) + '\n'
-        return "%s(%s)" % (self.get_name(), render(args))
+    def _inform_get_kwargs(self):
+        kwargs = {}
+        if hasattr(self, 'script'):
+            kwargs['script'] = getattr(self, 'script')
+            if kwargs['script'] is True:
+                del kwargs['script']  # don't clutter arg list with a default
+        if hasattr(self, 'name'):
+            kwargs['name'] = getattr(self, 'name')
+        return cull(kwargs)
+
+    def render(self):
+        return render(self)
 
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):
@@ -123,8 +137,11 @@ class RecognizeAll(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+    def _inform_get_args(self):
+        return self.recognizers
+
     def __repr__(self):
-        return self.render(self.recognizers)
+        return self.render()
 
 
 # RecognizeAny {{{1
@@ -177,8 +194,11 @@ class RecognizeAny(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+    def _inform_get_args(self):
+        return self.recognizers
+
     def __repr__(self):
-        return self.render(self.recognizers)
+        return self.render()
 
 
 # RecognizeTitle {{{1
@@ -241,8 +261,11 @@ class RecognizeTitle(Recognizer):
     def get_titles(self):
         return {self.name: self.titles}
 
+    def _inform_get_args(self):
+        return self.titles
+
     def __repr__(self):
-        return self.render(self.titles)
+        return self.render()
 
 
 # RecognizeURL {{{1
@@ -365,8 +388,11 @@ class RecognizeURL(Recognizer):
         else:
             return {self.name: self.urls}
 
+    def _inform_get_args(self):
+        return self.urls
+
     def __repr__(self):
-        return self.render(self.urls)
+        return self.render()
 
 
 # RecognizeCWD {{{1
@@ -419,8 +445,11 @@ class RecognizeCWD(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+    def _inform_get_args(self):
+        return self.dirs
+
     def __repr__(self):
-        return self.render(self.dirs)
+        return self.render()
 
 
 # RecognizeHost {{{1
@@ -473,8 +502,11 @@ class RecognizeHost(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+    def _inform_get_args(self):
+        return self.hosts
+
     def __repr__(self):
-        return self.render(self.hosts)
+        return self.render()
 
 
 # RecognizeUser {{{1
@@ -526,8 +558,11 @@ class RecognizeUser(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+    def _inform_get_args(self):
+        return self.users
+
     def __repr__(self):
-        return self.render(self.users)
+        return self.render()
 
 
 # RecognizeEnvVar {{{1
@@ -577,10 +612,15 @@ class RecognizeEnvVar(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+
+    def _inform_get_args(self):
+        return []
+
+    def _inform_get_kwargs(self):
+        return dict(name=self.name, value=self.value, script=self.script)
+
     def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__, ', '.join([
-            repr(each) for each in [self.name, self.value, self.script]
-        ]))
+        return self.render()
 
 
 # RecognizeNetwork {{{1
@@ -645,8 +685,11 @@ class RecognizeNetwork(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+    def _inform_get_args(self):
+        return self.macs
+
     def __repr__(self):
-        return self.render(self.macs)
+        return self.render()
 
 
 # RecognizeFile {{{1
@@ -715,8 +758,17 @@ class RecognizeFile(Recognizer):
         if verbose:
             log('    %s: no match.' % self.get_name())
 
+    def _inform_get_args(self):
+        return [str(self.filepath)]
+
+    def _inform_get_kwargs(self):
+        return cull(
+            dict(
+                contents = self.expected,
+                wait = self.wait,
+                script = self.script
+            )
+        )
+
     def __repr__(self):
-        args = [repr(str(self.filepath))]
-        if self.script:
-            args.append('script=%r' % self.script)
-        return "%s(%s)" % (self.__class__.__name__, ', '.join(args))
+        return self.render()

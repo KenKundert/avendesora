@@ -252,6 +252,13 @@ account attributes.  The secrets are not printed with this command.
 Finally, you can use the :ref:`help command <help command>` to get information 
 on the various commands and other useful topics.
 
+Issues
+------
+
+Please ask questions or report problems on
+`Github <https://github.com/KenKundert/avendesora/issues>`_.
+
+
 Contents
 --------
 
@@ -272,11 +279,4 @@ Contents
    kpns
    upgrading
    releases
-
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   :ref:`genindex`
