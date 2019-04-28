@@ -24,8 +24,7 @@ setup(
         'arrow',
         'cryptography',
         'docopt',
-        'inform>=1.15',
-            # this should be 'inform>=1.16', but that version is not available yet --ksk
+        'inform>=1.16',
         #'pygobject',
             # pygobject seems broken in pypi. You can try uncommenting the above
             # and see if it works. Otherwise, do the following:
