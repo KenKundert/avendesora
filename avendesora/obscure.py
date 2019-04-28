@@ -189,11 +189,6 @@ class Hide(ObscuredSecret):
         self.plaintext = plaintext
         self.is_secret = is_secret
 
-    def initialize(self, account, field_name, field_key=None):
-        # we don't need to do anything, but having this method marks this value
-        # as being confidential
-        pass
-
     def is_secure(self):
         return self.secure
 
@@ -242,11 +237,6 @@ class Hidden(ObscuredSecret):
                 culprit=error_source()
             )
         self.is_secret = is_secret
-
-    def initialize(self, account, field_name, field_key=None):
-        # we don't need to do anything, but having this method marks this value
-        # as being confidential
-        pass
 
     def is_secure(self):
         return self.secure

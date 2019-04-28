@@ -617,7 +617,10 @@ class RecognizeEnvVar(Recognizer):
         return []
 
     def _inform_get_kwargs(self):
-        return dict(name=self.name, value=self.value, script=self.script)
+        kwargs = dict(name=self.name, value=self.value)
+        base = super()._inform_get_kwargs()
+        kwargs['script'] = base.get('script')
+        return cull(kwargs)
 
     def __repr__(self):
         return self.render()
@@ -762,13 +765,10 @@ class RecognizeFile(Recognizer):
         return [str(self.filepath)]
 
     def _inform_get_kwargs(self):
-        return cull(
-            dict(
-                contents = self.expected,
-                wait = self.wait,
-                script = self.script
-            )
-        )
+        kwargs = dict(contents = self.expected, wait = self.wait)
+        base = super()._inform_get_kwargs()
+        kwargs['script'] = base.get('script')
+        return cull(kwargs)
 
     def __repr__(self):
         return self.render()
