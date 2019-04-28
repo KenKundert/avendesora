@@ -10,7 +10,6 @@ Releases
     - Add *vs* alias to :ref:`values command <values command>`.
     - Add instructions on how to mimic Symantec VIP authentication app.
 
-
 **1.13 (2019-02-06)**:
     - Added :ref:`interactive command <interactive command>`.
     - Added looping to :ref:`questions command <questions command>`.

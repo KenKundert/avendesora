@@ -841,23 +841,30 @@ class Account(object):
 
         output(*lines, sep='\n')
 
+    @classmethod
+    def extract(cls, value, name, key=None):
+        "Generate all secrets in an account value"
+        if not is_collection(value):
+            if hasattr(value, 'initialize'):
+                value.initialize(cls, name, key)
+            return value
+        try:
+            return {k: cls.extract(v, name, k) for k, v in value.items()}
+        except AttributeError:
+            return [cls.extract(v, name, i) for i, v in enumerate(value)]
+
     # archive() {{{2
     @classmethod
     def archive(cls):
-        # return all account fields along with their values as a dictionary
+        """Return all account fields along with their values
 
-        def extract(value, name, key=None):
-            if not is_collection(value):
-                if hasattr(value, 'initialize'):
-                    value.initialize(cls, name, key)
-                return value
-            try:
-                return {k: extract(v, name, k) for k, v in value.items()}
-            except AttributeError:
-                return [extract(v, name, i) for i, v in enumerate(value)]
+        Used when creating the accounts archive.
 
+        Returns:
+            A dictionary containing all account fields with all secrets included.
+        """
         return {
-            k: extract(v, k)
+            k: cls.extract(v, k)
             for k, v in cls.items(True)
             if k not in ['master_seed', 'account_seed']
         }
@@ -865,20 +872,17 @@ class Account(object):
     # export() {{{2
     @classmethod
     def export(cls):
-        # return all account fields along with their values as an Account class
+        # return all account fields along with their values
+        """Return all account fields along with their values as a dictionary
 
-        def extract(value, name, key=None):
-            if not is_collection(value):
-                if hasattr(value, 'initialize'):
-                    value.initialize(cls, name, key)
-                return value
-            try:
-                return {k: extract(v, name, k) for k, v in value.items()}
-            except AttributeError:
-                return [extract(v, name, i) for i, v in enumerate(value)]
+        Used when exporting accounts.
 
+        Returns:
+            A string that contains all account fields with all secrets included
+            formatted as an Account class.
+        """
         values = [
-            '{} = {}'.format(k, render(extract(v, k), level=1))
+            '{} = {}'.format(k, render(cls.extract(v, k), level=1))
             for k, v in cls.items(True)
             if k not in ['master_seed', 'account_seed']
         ]
