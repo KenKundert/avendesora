@@ -883,7 +883,7 @@ def test_accounts():
         result = run('avendesora help accounts')
     except OSError as err:
         result = os_error(err)
-    expected = dedent("""
+    expected = dedent(r"""
         Account information is stored in account files. The list of account
         files is given in ~/.config/avendesora/accounts_files.  New account
         files are created using 'avendesora new', but to delete an accounts
@@ -1037,7 +1037,7 @@ def test_accounts():
         field. This allows you to create account names that contain dashes
         or any other character that would not be acceptable in a class name
         (best to avoid characters that are meaningful to your shell, such as
-        !$&*()|<>'"\{};`.  For example:
+        !$&*()|<>'"{}\;`.  For example:
 
             class Root_Work(Account):
                 NAME = 'root@work'
