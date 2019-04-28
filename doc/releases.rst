@@ -5,6 +5,7 @@ Releases
     | Version: 1.13.9
     | Released: 2019-04-28
 
+**1.14 (2019-04-28)**:
     - Allow title recognizers to be functions.
     - Add --all option to :ref:`values command <values command>`.
     - Add *vs* alias to :ref:`values command <values command>`.

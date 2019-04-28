@@ -378,7 +378,7 @@ class Account(object):
                 culprit=cls.get_name()
             )
 
-    # keys() {{{2
+    # fields() {{{2
     @classmethod
     def fields(cls, all=False, sort=False):
         if sort:
