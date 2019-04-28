@@ -67,6 +67,10 @@ traditional password managers:
     * Keyboard centric
     * Edit accounts with your text editor (Vim, etc.)
 
+:Well Documented:
+    * command line help
+    * `Online documentation <https://avendesora.readthedocs.io>`_
+
 
 Quick Tour
 ----------
@@ -269,6 +273,7 @@ Contents
    installing
    overview
    accounts
+   secrets
    advanced
    commands
    helpers

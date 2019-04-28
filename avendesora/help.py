@@ -1201,9 +1201,9 @@ class Secrets(HelpMessage):
         observers that get a quick glance of the encoded text, but if they are able to
         capture it they can easily decode it.
 
-            Hidden(encodetext, secure=True, encoding=None)
+            Hidden(encoded_text, secure=True, encoding=None)
 
-            plaintext (str):
+            encoded_text (str):
                 The secret encoded in base64.
             secure (bool):
                 Indicates that this secret should only be contained in an
@@ -1590,11 +1590,41 @@ class Secrets(HelpMessage):
         provide the text version of the shared secret (the backup code) that is
         presented to you when first configuring your second factor authentication.
 
+            OTP(shared_secret, interval=30, digits=6)
+
+            shared_secret (base32 string):
+                The shared secret, it will be provided by the account provider.
+            interval (int):
+                Update interval in seconds.
+            max_age (int):
+                The number of digits to output.
+
         Example:
 
             otp = OTP('JBSWY3DPEHPK3PXP')
+
+
+        Changing a Generated Secret
+        ---------------------------
+
+        It is sometimes necessary to change a generated secret. Perhaps because
+        it was inadvertently exposed, or perhaps because the account provider
+        requires you change your secret periodically.  To do so, you would
+        simply add the *version* argument to the secret and then update its
+        value.  *version* may be a number or a string. You should choose a way
+        of versioning that is simple, easy to guess and would not
+        repeat. For example, if you expect that updating the version would be
+        extremely rare, you can simply number them sequentially. Or, if you you
+        need to update them every month or every quarter, you can name them
+        after the month or quarter (ex: jan19 or 19q1).
+
+        Examples:
+            passcode = PasswordRecipe('16 1d', version=2)
+            passcode = PasswordRecipe('16 1d', version='19q2')
         """).strip()
         return text
+
+
 
 
 # Stealth class {{{1
