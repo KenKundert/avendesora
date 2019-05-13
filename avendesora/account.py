@@ -30,7 +30,7 @@ from .script import Script
 from .secrets import GeneratedSecret
 from difflib import get_close_matches
 from inform import (
-    Color, codicil, conjoin, cull, full_stop, is_collection, is_str,
+    Color, codicil, conjoin, cull, full_stop, is_collection, is_mapping, is_str,
     join, log, notify, output, warn, indent, render
 )
 from textwrap import dedent
@@ -330,7 +330,7 @@ class Account(object):
             return
 
         # If no recognizers specified, just check the urls
-        for url in Collection(cls.get_scalar('urls', default=[])):
+        for url in Collection(cls.get_composite('urls', default=[])):
             url = url if '//' in url else ('//'+url)
             url_components = urlparse(url)
             if url_components.scheme:
@@ -739,7 +739,7 @@ class Account(object):
 
     # get_composite() {{{2
     @classmethod
-    def get_composite(cls, name):
+    def get_composite(cls, name, default=None):
         """Get field value given a field name.
 
         A lower level interface than *get_value()* that given a name returns the
@@ -759,25 +759,23 @@ class Account(object):
         if value is None:
             if name == 'NAME':
                 return cls.get_name()
-            return None
+            return default
 
         if is_collection(value):
-            if hasattr(value, 'items'):     # a dictionary or dictionary-like object
+            if is_mapping(value):     # a dictionary or dictionary-like object
                 result = {}
                 for key in value.keys():
                     v = cls.get_scalar(name, key)
                     if isinstance(v, GeneratedSecret) or isinstance(v, ObscuredSecret):
                         v = str(v)
                     result[key] = v
-            elif hasattr(value, 'append'):  # a list or list-like object
+            else:
                 result = []
                 for index in range(len(value)):
                     v = cls.get_scalar(name, index)
                     if isinstance(v, GeneratedSecret) or isinstance(v, ObscuredSecret):
                         v = str(v)
                     result.append(v)
-            else:
-                raise NotImplementedError
         else:
             result = cls.get_scalar(name)
             if isinstance(result, GeneratedSecret) or isinstance(result, ObscuredSecret):

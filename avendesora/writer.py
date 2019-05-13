@@ -311,7 +311,7 @@ class KeyboardWriter(Writer):
                 out.append(val)
                 scrubbed.append(val)
             elif cmd.startswith('sleep '):
-                scrubbed.append(cmd)
+                scrubbed.append('<%s>' % cmd)
                 try:
                     kw, seconds = cmd.split()
                     assert kw == 'sleep'
