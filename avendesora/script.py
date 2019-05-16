@@ -20,6 +20,7 @@
 # Imports {{{1
 from .dialog import show_list_dialog
 from .error import PasswordError
+from inform import notify
 from textwrap import dedent
 import re
 
@@ -91,6 +92,9 @@ class Script:
                     val = '\n'
                 elif cmd.startswith('sleep '):
                     val = ''
+                elif cmd.startswith('remind '):
+                    val = ''
+                    notify(term[8:-1])
                 else:
                     name, key = account.split_field(cmd)
                     try:

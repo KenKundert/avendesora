@@ -879,6 +879,10 @@ Schwab.
 
 .. index::
     single: scripts
+    single: tab (in script)
+    single: return (in script)
+    single: sleep (in script)
+    single: remind (in script)
 
 .. _scripts:
 
@@ -996,10 +1000,24 @@ recognize Gmail:
     ]
 
 Besides the account attributes, you can use several other special attributes 
-including: *{tab}*, *{return}*, and *{sleep N}*.  *{tab}* is replaced by a tab 
-character, *{return}* is replaced by a carriage return character, and *{sleep 
-N}* causes a pause of N seconds. The sleep function is only active when 
+including: *{tab}*, *{return}*, *{sleep <N>}* and *{remind <message>}*.  *{tab}* 
+is replaced by a tab character, *{return}* is replaced by a carriage return 
+character, *{sleep <N>}* causes a pause of *N* seconds, and *{remind <message>}* 
+displays message as a notification.  The *sleep* function is only active when 
 auto-typing in account discovery.
+
+The *remind* function is used to remind you of next steps. For example, the 
+following uses *remind* to instruct you to use your YubiKey to provide the 
+second factor that completes the login process:
+
+.. code-block:: python
+
+    RecognizeURL(
+        'https://www.kraken.com/en-us/sign-in',
+        'https://www.kraken.com/sign-in',
+        script='{username}{tab}{passcode}{tab}{remind Use Yubikey as 2nd factor.}',
+        name = 'login',
+    )
 
 
 .. index::

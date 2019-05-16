@@ -24,7 +24,7 @@ setup(
         'arrow',
         'cryptography',
         'docopt',
-        'inform>=1.16',
+        'inform>=1.17',
         #'pygobject',
             # pygobject seems broken in pypi. You can try uncommenting the above
             # and see if it works. Otherwise, do the following:

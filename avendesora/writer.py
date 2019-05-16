@@ -28,7 +28,7 @@ from .preferences import INITIAL_AUTOTYPE_DELAY
 from .shlib import Run, split_cmd
 from inform import (
     Color, Error,
-    codicil, cull, error, log, output, warn, indent, os_error,
+    codicil, cull, error, log, notify, output, warn, indent, os_error,
 )
 from time import sleep
 from textwrap import dedent
@@ -129,13 +129,15 @@ class Writer(object):
         for term in regex.split(script):
             if term and term[0] == '{' and term[-1] == '}':
                 # we have found a command
-                cmd = term[1:-1].lower()
+                cmd = term[1:-1].lower().strip()
                 if cmd == 'tab':
                     out.append('\t')
                 elif cmd == 'return':
                     out.append('\n')
                 elif cmd.startswith('sleep '):
                     pass
+                elif cmd.startswith('remind '):
+                    notify(term[8:-1])
                 else:
                     name, key = account.split_field(cmd)
                     value = account.get_scalar(name, key)
@@ -325,6 +327,8 @@ class KeyboardWriter(Writer):
                     raise PasswordError(
                         'syntax error in keyboard script.', culprit=cmd
                     )
+            elif cmd.startswith('sleep '):
+                notify(cmd[7:])
             else:
                 out.append(val)
                 scrubbed.append('<%s>' % cmd)
