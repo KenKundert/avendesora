@@ -718,6 +718,11 @@ that adds the one-time password to the output of the :ref:`credentials command
 <credentials command>`. It also adds a URL recognizer to allow semiautomatic 
 entry of the one-time password to the browser.
 
+Finally, some sites want you to concatenate the OTP to the end of your password.  
+You can do that with::
+
+    script='{email}{tab}{passcode}{otp}{return}',
+
 
 .. index::
     single: Authy
@@ -779,11 +784,12 @@ following to your account to generate the one-time password:
 The string passed to *OTP* should be the value of SEED as output by the above 
 script.  The *interval* and *digits* are specific to *Authy*.
 
-Be aware that training Avendesora to output your Authy codes does not eliminate 
-your need for the Authy application. Occasionally, an authorization request will 
-be pushed to your Authy application to allow you to approve a transaction.  
-Avendesora cannot provide this particular service.  In the Authy parlance, 
-Avendesora supports Authy Tokens, but not Authy Requests.
+Be aware that training *Avendesora* to output your *Authy* codes does not 
+eliminate your need for the *Authy* application. Occasionally, an authorization 
+request will be pushed to your *Authy* application to allow you to approve 
+a transaction.  *Avendesora* cannot provide this particular service.  In the 
+*Authy* parlance, *Avendesora* supports *Authy Tokens*, but not *Authy 
+Requests*.
 
 
 .. index::
@@ -812,8 +818,8 @@ With *Avendesora* you give the secret as the argument to
 :class:`avendesora.OTP`.
 
 As an example, consider configuring *Avendesora* to provide two-factor 
-authentication for a Schwab account. Assume that you have run *vipaccess* and it 
-generated the following ~/.vipaccess file::
+authentication for a *Schwab* account. Assume that you have run *vipaccess* and 
+it generated the following ~/.vipaccess file::
 
     version 1
     secret AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -830,12 +836,12 @@ The addition of *otp_expires* is not necessary, it just a way of keeping
 a useful piece of information in a convenient place.  It is not necessary to 
 save the ID.
 
-You would register your authenticator with Schwab by giving them the ID, in this 
-case VSST12345678, and the current one-time password, which you get with::
+You would register your authenticator with *Schwab* by giving them the ID, in 
+this case VSST12345678, and the current one-time password, which you get with::
 
     avendesora schwab otp
 
-Once registered, Schwab expects you to add the one-time password to the end of 
+Once registered, *Schwab* expects you to add the one-time password to the end of 
 your passcode when logging in. You can implement this in account discovery 
 using::
 
@@ -856,7 +862,7 @@ password along with the username and passcode::
     credentials = 'username otp passcode'
 
 Alternatively, you have *Avendesora* show the one-time password as part of the 
-passcode, just as Schwab wants it. To accomplish this a new field, 
+passcode, just as *Schwab* wants it. To accomplish this a new field, 
 *ephemeral_passcode*, is created that combines the passcode and the one-time 
 password. This field is replaces *passcode* in the *credentials* field::
 
@@ -867,14 +873,14 @@ In this example, the *otp*, *otp_expires*, and *ephemeral_passcode* field names
 are arbitrary. You are free to choose names more to your liking.
 
 A variation on this process is used when registering *Avendesora*'s one-time 
-password feature as a second-factor with ETrade. Symantec VIP has several types 
-of tokens.  By default, *vipaccess* generates VSST (desktop) tokens, but Etrade 
-requires a VSMT (mobile) token.  To generate a mobile token, use::
+password feature as a second-factor with *ETrade*. *Symantec VIP* has several 
+types of tokens.  By default, *vipaccess* generates VSST (desktop) tokens, but 
+*Etrade* requires a VSMT (mobile) token.  To generate a mobile token, use::
 
     vipaccess provision -t VSMT
 
 Except for this one detail, the rest of the process is the same as described for 
-Schwab.
+*Schwab*.
 
 
 .. index::
@@ -889,7 +895,7 @@ Schwab.
 Scripts
 -------
 
-Scripts are strings that contain embedded account attributes.  For
+*Scripts* are strings that contain embedded account attributes.  For
 example:
 
 .. code-block:: python
