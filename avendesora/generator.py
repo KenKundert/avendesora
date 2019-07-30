@@ -307,7 +307,7 @@ class PasswordGenerator(object):
                 if (name, script) in seen:
                     continue
                 seen.add((name, script))
-                ident = '%s (%s)' % (name, key) if key else name
+                ident = '%s (%s)' % ((name, key) if key else (name, script))
                 ident = '%s: %s' % (len(matches), ident)  # assure uniqueness
                 matches[ident] = account, script
                 log('%s matches' % ident)

@@ -334,7 +334,7 @@ class Archive(Command):
         docopt(cls.USAGE, argv=[command] + args)
         archive_file = get_setting('archive_file')
 
-        # first, save existing archive if it exists
+        # save existing archive if it exists
         try:
             previous_archive = get_setting('previous_archive_file')
             if previous_archive and archive_file.is_file():
@@ -342,6 +342,9 @@ class Archive(Command):
                 cp(archive_file, previous_archive)
         except OSErrors as e:
             raise PasswordError(os_error(e))
+
+        # delete the manifests, causing them to be recreated clean
+        AccountFiles.delete_manifests()
 
         # run the generator
         generator = PasswordGenerator(warnings=False)

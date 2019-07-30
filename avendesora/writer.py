@@ -327,7 +327,7 @@ class KeyboardWriter(Writer):
                     raise PasswordError(
                         'syntax error in keyboard script.', culprit=cmd
                     )
-            elif cmd.startswith('sleep '):
+            elif cmd.startswith('remind '):
                 notify(cmd[7:])
             else:
                 out.append(val)

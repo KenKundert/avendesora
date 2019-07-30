@@ -20,7 +20,6 @@
 # Imports {{{1
 from .dialog import show_list_dialog
 from .error import PasswordError
-from inform import notify
 from textwrap import dedent
 import re
 
@@ -57,14 +56,18 @@ class Script:
         if self.rendered is not None:
             return self.rendered
         self.is_secret = False
-        self.rendered = ''.join(val for cmd, val in self.components())
-        return self.rendered
+        components = []
+        for cmd, val in self.components():
+            components.append(val)
+            if cmd == 'secret':
+                self.is_secret = True
+        return ''.join(components)
 
     def components(self, ask=False):
         """Iterates through the script.
 
         Yields a tuple for each component of a script. The tuple consists of the
-        type of the component, and the value of the component.  The type may be
+        type of the component and the value of the component.  The type may be
         'tab' (a tab character), 'return' (a return character), 'text' (raw
         text), 'value' (the value of a field that is not a secret), 'sleep N' (a
         request to sleep N seconds), and finally a field name (the value of a
@@ -94,7 +97,6 @@ class Script:
                     val = ''
                 elif cmd.startswith('remind '):
                     val = ''
-                    notify(term[8:-1])
                 else:
                     name, key = account.split_field(cmd)
                     try:
@@ -123,7 +125,9 @@ class Script:
                         else:
                             raise
                     val = dedent(str(value)).strip()
-                    if not account.is_secret(name, key):
+                    if account.is_secret(name, key):
+                        cmd = 'secret'
+                    else:
                         cmd = 'value'
             else:
                 cmd = 'text'
