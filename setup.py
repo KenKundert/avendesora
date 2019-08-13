@@ -21,7 +21,7 @@ setup(
     },
     install_requires = [
         'appdirs',
-        'arrow',
+        'arrow!=0.14.*',
         'cryptography',
         'docopt',
         'inform>=1.17',

@@ -88,7 +88,7 @@ CONFIG_DEFAULTS = {
     'edit_template': (
         'gvim',                     # use gvim -v so that user can access
         '-v',                       # the X clipboard buffers
-        '+silent! /_[A-Z0-9_]\+_/', # matches user modifiable template fields
+        r'+silent! /_[A-Z0-9_]\+_/',# matches user modifiable template fields
                                     # fields take the form '_AAA_'
         '+silent! normal zozt',     # open the fold, position near top of screen
         '{filepath}'

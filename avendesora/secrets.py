@@ -1013,7 +1013,7 @@ class BirthDate(GeneratedSecret):
         dec31 = arrow.get(year, 12, 31)
         days_in_year = (dec31 - jan1).days
         day = self._get_symbol(range(days_in_year))
-        birthdate = jan1.replace(days=day)
+        birthdate = jan1.shift(days=day)
         secret = birthdate.format(self.fmt)
         self.secret = secret
         return secret
