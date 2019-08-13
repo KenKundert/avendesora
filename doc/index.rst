@@ -67,8 +67,12 @@ traditional password managers:
     * Keyboard centric
     * Edit accounts with your text editor (Vim, etc.)
 
+:Private:
+    * Supports :ref:`stealth accounts <stealth accounts>` and secret 
+      :ref:`misdirection <misdirection>` for sensitive and high value secrets.
+
 :Well Documented:
-    * command line help
+    * Command line help
     * `Online documentation <https://avendesora.readthedocs.io>`_
 
 

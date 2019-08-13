@@ -1176,15 +1176,18 @@ generate the secrets, but now both partners can. At a minimum you
 would need to share only the account name and the user name if one
 is needed. With that, the other partner can generate the passcode.
 
+When creating accounts to share, the fields should either be generated secrets 
+or information that is not secret.  Specifically, you should not use 
+:class:`avendesora.Hide` or :class:`avendesora.Hidden`.  In addition, you cannot 
+share secrets encrypted with :class:`avendesora.Scrypt`. Finally, you cannot 
+share stealth accounts unless the file that contains the account templates has 
+a *master_seed* specified, which they do not by default. You would need to 
+create a separate file for shared stealth account templates and add a master 
+seed to that file manually.
+
 Once you have shared an accounts file, you can also use the :ref:`identity
 command <identity command>` to prove your identity to your partner (described 
 next).
-
-You cannot share secrets encrypted with Scrypt. Also, you cannot
-share stealth accounts unless the file that contains the account
-templates has a *master_seed* specified, which they do not by
-default. You would need to create a separate file for shared stealth
-account templates and add a master seed to that file manually.
 
 
 .. index::
