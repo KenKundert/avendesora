@@ -1076,6 +1076,8 @@ can share with your associates.
 
 .. index::
     single: misdirection
+    single: duress
+    single: compulsion
 
 .. _misdirection:
 
@@ -1116,6 +1118,24 @@ chance someone could guess it.
 Be aware that when you employ misdirection on a secret, the value of
 the secret stored in the archive will not be the true value, it
 will instead be the misdirected value.
+
+Secret misdirection works extremely well with the `ColdCard hardware bitcoin 
+wallet <https://coldcardwallet.com>`_.  This wallet expects you to provide a PIN 
+when accessing your wallet, but it does not print an error message if you give 
+the wrong pin, instead it simply gives you access to a different wallet.  
+Putting a small amount of bitcoin into the wallet you access with no seed makes 
+the ruse more convincing. In this way, the wallet you get when you run::
+
+    avendesora value coldcard pin
+
+opens a valid and active wallet that contains very little money. At this point 
+you can say, "Yeah, its largely all gone. I was hacked. That is why I got this 
+secure hardware wallet. However, it's a lesson I learned too late.". Then, when 
+you are alone, you can run::
+
+    avendesora value --seed coldcard pin
+
+and give the correct seed to access all your riches.
 
 
 .. index::

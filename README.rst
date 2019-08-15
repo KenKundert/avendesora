@@ -27,7 +27,7 @@ Avendesora Collaborative Password Manager
 :Version: 1.14.2
 :Released: 2019-07-29
 
-Avendesora replaces the Abraxas, which are both alternatives to the traditional 
+Avendesora replaces Abraxas, which are both alternatives to the traditional 
 password vault.
 
 Please report all bugs and suggestions to avendesora@nurdletech.com
@@ -36,48 +36,48 @@ Introduction
 ------------
 
 Avendesora is powerful command-line utility that can securely hold and 
-conveniently provide access to a wide variety of information about your online 
+conveniently provide access to a wide variety of information about your 
 accounts, including its secrets such as passwords. Account values can be 
 displayed, copied to the clipboard, or automatically typed into running 
 applications such as you web browser or terminal windows.  Avendesora can also 
 open accounts in your web browser, automatically recognize which account to use 
-based on the window title, and warn you if you are not using encryption when you 
-go to enter your password.
+based on the window title, and warn you if the browser is not using encryption 
+when you go to enter your password.
 
 Account secrets can be saved in encrypted form, as with password vaults, or 
 generated from a root secret.  Generated secrets have two important benefits.  
 First, they are produced from a random seed, and so are quite unpredictable.  
 This is important, because the predictability of a passwords can be exploited 
-when cracking passwords.  Second, if the root secret is shared with another 
+when cracking passwords.  Second, if a root secret is shared with another 
 trusted party, then you both can generate new shared secrets without passing any 
 further secrets.
 
 Secrets are generated from a collection of seeds, one of which must be random 
 with a very high degree of entropy. The random seed is referred to as the 
-'master seed'.  It is extremely important that the master seed remain completely 
-secure.  Never disclose a master seed to anyone except for a person you wish to 
-collaborate with, and then only used the shared master seed for shared secrets.  
-All of your private secrets should be generated from private master seeds.  The 
-seeds generally include the master seed, the account name, the secret name, and 
-perhaps a version name.  For example, imagine having a Gmail account, then the 
-account name might simply be 'gmail', and the secret name might be 'passcode'.  
-In this case, your master seed is combined with the words 'gmail' and 
-'passcode', the combination is hashed, and then password is generated with an 
-appropriate recipe that you specify.  There are recipes for passwords, pass 
-phrases, PINs, security questions, etc.  The password itself is not stored, 
-rather it is the seeds that are stored and the password is regenerated when 
-needed. Notice that all the seeds except the master seed need not be kept 
-secure. Thus, once you have shared a master seed with a collaborator, all you 
-need to do is share the remaining seeds and your collaborator can generate 
-exactly the same password. Another important thing to notice is that the 
-generated password is dependent on the account and secret names. Thus if you 
-rename your account or your secret, the password will change.  So you should be 
-careful when you first create your account to name it appropriately so you don't 
-feel the need to change it in the future. For example, 'gmail' might not be 
-a good account name if you expect to have multiple Gmail accounts. In this case 
-you might want to include your username in the account name. You can always make 
-the shorter 'gmail' as an account alias so you can still access the account 
-quickly.
+'master seed' or the 'root seed'.  It is extremely important that the master 
+seed remain completely secure.  Never disclose a master seed to anyone except 
+for a person you wish to collaborate with, and then only used the shared master 
+seed for shared secrets.  All of your private secrets should be generated from 
+private master seeds.  The seeds generally include the master seed, the account 
+name, the secret name, and perhaps a version name.  For example, imagine having 
+a Gmail account, then the account name might simply be 'gmail', and the secret 
+name might be 'passcode'.  In this case, your master seed is combined with the 
+words 'gmail' and 'passcode', the combination is hashed, and then password is 
+generated with an appropriate recipe that you specify.  There are recipes for 
+passwords, pass phrases, PINs, security questions, etc.  The password itself is 
+not stored, rather it is the seeds that are stored and the password is 
+regenerated when needed. Notice that all the seeds except the master seed need 
+not be kept secure. Thus, once you have shared a master seed with 
+a collaborator, all you need to do is share the remaining seeds and your 
+collaborator can generate exactly the same password. Another important thing to 
+notice is that the generated password is dependent on the account and secret 
+names. Thus if you rename your account or your secret, the password will change.  
+So you should be careful when you first create your account to name it 
+appropriately so you don't feel the need to change it in the future. For 
+example, 'gmail' might not be a good account name if you expect to have multiple 
+Gmail accounts. In this case you might want to include your username in the 
+account name. You can always make the shorter 'gmail' as an account alias so you 
+can still access the account quickly.
 
 
 Installation
