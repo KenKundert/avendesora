@@ -295,6 +295,7 @@ can be found on Github.
         login_password
         login_totp
     '''.split()
+    output_filename = 'bw.csv'
 
     # Program
     try:
@@ -304,7 +305,7 @@ can be found on Github.
         # Scan accounts and gather accounts to export
         pw = PasswordGenerator()
         accounts = {}
-        with open('bw.csv', 'w', newline='') as csvfile:
+        with open(output_filename, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -323,6 +324,7 @@ can be found on Github.
                         value.initialize(account)
                         fields[k] = str(value)
                     writer.writerow(fields)
+        os.chmod(output_filename, 0o600)
 
     # Process exceptions
     except KeyboardInterrupt:
