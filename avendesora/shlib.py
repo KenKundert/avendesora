@@ -510,7 +510,7 @@ try:
     def brace_expand(pattern):
         """Bash-style brace expansion"""
         for path in braceexpand(pattern):
-            yield Path(path)
+            yield to_path(path)
 
 except ImportError:
     pass
