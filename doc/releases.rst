@@ -5,7 +5,8 @@ Releases
     | Version: 1.15.0
     | Released: 2019-09-28
 
-    - add *remind* script command.
+**1.15 (2019-09-28)**:
+    - Add *remind* script command.
 
 **1.14 (2019-04-28)**:
     - Allow title recognizers to be functions.
