@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.14.2
-    | Released: 2019-07-29
+    | Version: 1.15.0
+    | Released: 2019-09-28
 
     - add *remind* script command.
 
