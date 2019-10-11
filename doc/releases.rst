@@ -5,6 +5,9 @@ Releases
     | Version: 1.15.0
     | Released: 2019-09-28
 
+    - Added *ms_per_char* setting that allows user to slow autotyping.
+    - Added *rate* attribute to scripts that allows user to slow autotyping.
+
 **1.15 (2019-09-28)**:
     - Add *remind* script command.
 

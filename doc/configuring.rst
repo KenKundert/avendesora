@@ -201,6 +201,14 @@ specifying the desired values in the *config* file (found in
 
 
 .. index::
+    single: ms_per_char setting
+
+**ms_per_char** = 12:
+
+    The time between keystrokes when autotyping. The default is 12ms.
+
+
+.. index::
     single: encoding setting
 
 **encoding** = 'utf-8':

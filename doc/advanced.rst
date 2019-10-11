@@ -888,6 +888,7 @@ Except for this one detail, the rest of the process is the same as described for
     single: tab (in script)
     single: return (in script)
     single: sleep (in script)
+    single: rate (in script)
     single: remind (in script)
 
 .. _scripts:
@@ -1006,11 +1007,12 @@ recognize Gmail:
     ]
 
 Besides the account attributes, you can use several other special attributes 
-including: *{tab}*, *{return}*, *{sleep <N>}* and *{remind <message>}*.  *{tab}* 
-is replaced by a tab character, *{return}* is replaced by a carriage return 
-character, *{sleep <N>}* causes a pause of *N* seconds, and *{remind <message>}* 
-displays message as a notification.  The *sleep* function is only active when 
-auto-typing in account discovery.
+including: *{tab}*, *{return}*, *{sleep <N>}*, *{rate <N>}, and *{remind 
+<message>}*.  *{tab}* is replaced by a tab character, *{return}* is replaced by 
+a carriage return character, *{sleep <N>}* causes a pause of *N* seconds, *{rate 
+<N>} sets the autotype rate to one keystroke every *N* milliseconds, and 
+*{remind <message>}* displays message as a notification.  The *sleep* and *rate* 
+functions are only active when auto-typing in account discovery.
 
 The *remind* function is used to remind you of next steps. For example, the 
 following uses *remind* to instruct you to use your YubiKey to provide the 

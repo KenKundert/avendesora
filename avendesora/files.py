@@ -45,7 +45,7 @@ from cryptography.fernet import Fernet
 from fnmatch import fnmatch
 from inform import Error, comment, codicil, log, os_error, warn
 from hashlib import sha256
-from textwrap import dedent, fill
+from textwrap import dedent
 from time import time
 import base64
 import pickle
@@ -115,15 +115,16 @@ class AccountFiles:
                     log('Avendesora archive is {:.0f} hours out of date.'.format(
                         (most_recently_updated - archive_updated)/3600
                     ))
-                    age_in_seconds = time() - archive_updated
-                    if age_in_seconds > 86400 * stale:
+                    # archive_age = time() - archive_updated
+                    account_age = time() - most_recently_updated
+                    if account_age > 86400 * stale:
                         warn('stale archive.')
-                        codicil(fill(dedent("""
+                        codicil(dedent("""\
                             Recommend running 'avendesora changed' to determine
                             which account entries have changed, and if all the
                             changes are expected, running 'avendesora archive'
                             to update the archive.
-                        """).strip()))
+                        """), wrap=True)
                 else:
                     log('Avendesora archive is up to date.')
             else:

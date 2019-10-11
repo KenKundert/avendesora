@@ -70,7 +70,8 @@ class Script:
         type of the component and the value of the component.  The type may be
         'tab' (a tab character), 'return' (a return character), 'text' (raw
         text), 'value' (the value of a field that is not a secret), 'sleep N' (a
-        request to sleep N seconds), and finally a field name (the value of a
+        request to sleep N seconds), 'rate N' (set the autotype to 1 keystroke
+        every N milliseconds), and finally a field name (the value of a
         field that is secret)..
 
         Args:
@@ -94,6 +95,8 @@ class Script:
                 elif cmd == 'return':
                     val = '\n'
                 elif cmd.startswith('sleep '):
+                    val = ''
+                elif cmd.startswith('rate '):
                     val = ''
                 elif cmd.startswith('remind '):
                     val = ''

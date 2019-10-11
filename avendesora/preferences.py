@@ -76,6 +76,7 @@ CONFIG_DEFAULTS = {
     'dynamic_fields': '',
     'default_browser': 'x',
     'display_time': 60,
+    'ms_per_char': None,
     'dictionary_file': None,
     'encoding': 'utf-8',
     'edit_account': (
@@ -286,6 +287,10 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     display_time = {display_time}
         # The number of seconds that the secret will be displayed before it is
         # erase when writing to the TTY or clibboard.
+
+    ms_per_char = {ms_per_char}
+        # The time between keystrokes when autotyping in milliseconds. The
+        # default is 12ms.
 
     encoding = {encoding!r}
         # The unicode encoding to use when reading or writing files.

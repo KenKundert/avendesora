@@ -136,6 +136,8 @@ class Writer(object):
                     out.append('\n')
                 elif cmd.startswith('sleep '):
                     pass
+                elif cmd.startswith('rate '):
+                    pass
                 elif cmd.startswith('remind '):
                     notify(term[8:-1])
                 else:
@@ -272,7 +274,7 @@ class StdoutWriter(Writer):
 class KeyboardWriter(Writer):
     """Writes output via pseudo-keyboard."""
 
-    def _autotype(self, text):
+    def _autotype(self, text, ms_per_char=None):
         if not text:
             return
         # Split the text into individual key strokes and convert the special
@@ -290,8 +292,14 @@ class KeyboardWriter(Writer):
                 keysyms.append(keysym)
         xdotool = get_setting('xdotool_executable')
         try:
-            Run([xdotool, 'key', '--clearmodifiers'] + keysyms, 'soEW', log=False)
-                # it is important that log be False, it prevents the password
+            cmd = [xdotool, 'key', '--clearmodifiers']
+            if not ms_per_char:
+                ms_per_char = get_setting('ms_per_char')
+            if ms_per_char:
+                cmd += ['--delay', str(ms_per_char)]
+            cmd += keysyms
+            Run(cmd, 'soEW', log=False)
+                # it is important that log be False; it prevents the password
                 # from ending up in the logfile.
         except Error as e:
             e.reraise(culprit=xdotool)
@@ -308,6 +316,7 @@ class KeyboardWriter(Writer):
         out = []
         scrubbed = []
         sleep(INITIAL_AUTOTYPE_DELAY)
+        ms_per_char = None
         for cmd, val in script.components(True):
             if cmd in ['tab', 'return', 'text', 'value']:
                 out.append(val)
@@ -320,9 +329,24 @@ class KeyboardWriter(Writer):
                     if out:
                         # drain the buffer before sleeping
                         if not dryrun:
-                            self._autotype(''.join(out))
+                            self._autotype(''.join(out), ms_per_char)
                         out = []
                     sleep(float(seconds))
+                except (TypeError, ValueError):
+                    raise PasswordError(
+                        'syntax error in keyboard script.', culprit=cmd
+                    )
+            elif cmd.startswith('rate '):
+                scrubbed.append('<%s>' % cmd)
+                try:
+                    kw, rate = cmd.split()
+                    assert kw == 'rate'
+                    if out:
+                        # drain the buffer before changing rate
+                        if not dryrun:
+                            self._autotype(''.join(out), ms_per_char)
+                        out = []
+                    ms_per_char = int(rate)
                 except (TypeError, ValueError):
                     raise PasswordError(
                         'syntax error in keyboard script.', culprit=cmd
@@ -338,4 +362,4 @@ class KeyboardWriter(Writer):
         if dryrun:
             output(script.account.get_name(), scrubbed, sep=': ')
         else:
-            self._autotype(''.join(out))
+            self._autotype(''.join(out), ms_per_char)

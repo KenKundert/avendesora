@@ -1146,11 +1146,13 @@ class Scripts(HelpMessage):
                 ]
 
             Besides the account attributes, you can use several other special
-            attributes including: {tab}, {return}, and {sleep N}.  {tab} is
-            replaced by a tab character, {return} is replaced by a carriage
-            return character, and {sleep N} causes a pause of N seconds. The
-            sleep function is only active when autotyping after account
-            discovery.
+            attributes including: {tab}, {return}, {sleep N}, {rate N} and
+            {remind <message>}.  {tab} is replaced by a tab character, {return}
+            is replaced by a carriage return character, {sleep N} causes a pause
+            of N seconds, {rate N} sets the autotype rate to one keystroke every
+            N milliseconds, and {remind <message>} displays message as a
+            notification.  The sleep and rate functions are only active when
+            auto-typing in account discovery.
         """).strip()
         return text
 
