@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.15.0
-    | Released: 2019-09-28
+    | Version: 1.15.1
+    | Released: 2019-10-11
 
     - Added *ms_per_char* setting that allows user to slow autotyping.
     - Added *rate* attribute to scripts that allows user to slow autotyping.
