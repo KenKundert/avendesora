@@ -206,6 +206,13 @@ specifying the desired values in the *config* file (found in
 **ms_per_char** = 12:
 
     The time between keystrokes when autotyping. The default is 12ms.
+    This is the global setting. Generally it is not necessary to change this. 
+    Leaving at its default value works in most cases and result in a pleasingly 
+    fast response times. However, some websites, particularly those that are 
+    infested with javascript helpers, cannot tolerate extremely fast typing 
+    rates. In these cases it is better to use the *rate* attribute to the 
+    discovery :ref:`script <scripts>` to limit the typing rate. Doing so only 
+    slows the entry of your credentials on those websites.
 
 
 .. index::
