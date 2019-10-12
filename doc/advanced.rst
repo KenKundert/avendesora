@@ -1014,7 +1014,15 @@ a carriage return character, *{sleep <N>}* causes a pause of *N* seconds, *{rate
 *{remind <message>}* displays message as a notification.  The *sleep* and *rate* 
 functions are only active when auto-typing in account discovery.
 
-The *remind* function is used to remind you of next steps. For example, the 
+The *sleep* function is useful with two-page authentication sites as it gives 
+the website time to load the second page.
+
+The *rate* function is useful with fields that have javascript helpers. The 
+javascript helpers often limit the rate at which you can type characters.  The 
+*rate* function allows you to slow down the autotyping to the point where you 
+avoid the problems that stem from exceeding the limit.
+
+The *remind* function is used to remind you of neyt steps. For example, the 
 following uses *remind* to instruct you to use your YubiKey to provide the 
 second factor that completes the login process:
 
