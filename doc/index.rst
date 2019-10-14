@@ -186,9 +186,10 @@ a URL or URLs.  You can visit the FasTrak website using::
 
     > avendesora browse fastrak
 
-This the :ref:`browse <browse command>`. You can shorten *browse* to *b* (the 
-most common *Avendesora* commands have one or two character aliases). Running 
-that command opens your browser if it is not already open, and navigates to the 
+This runs the :ref:`browse <browse command>` command, which opens the URL for 
+the account in your web browser.  You can shorten *browse* to *b* (the most 
+common *Avendesora* commands have one or two character aliases).  Running that 
+command opens your browser if it is not already open, and navigates to the 
 FasTrak URL.  Generally you would run this command directly from your window 
 manager, which allows you to navigate to your account without opening a shell.
 
