@@ -1,4 +1,4 @@
-.. _configuring:
+.. _configuring_avendesora:
 
 Configuring
 ===========

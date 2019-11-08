@@ -565,9 +565,9 @@ replaced by the selected URL when the browser is selected. You can choose which
 browser is used by specifying the *--browser* command line option on the
 :ref:`browse command <browse command>`, by adding the *browser* attribute to the 
 account, or by specifying the *default_browser* setting in the :ref:`config file 
-<configuring>`.  If more than one is specified, the command line option 
-dominates over the account attribute, which dominates over the setting.  By 
-default, the default browser is *x*, which uses the default browser for your 
+<configuring_avendesora>`.  If more than one is specified, the command line 
+option dominates over the account attribute, which dominates over the setting.  
+By default, the default browser is *x*, which uses the default browser for your 
 account.
 
 

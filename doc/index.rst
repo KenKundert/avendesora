@@ -59,7 +59,7 @@ traditional password managers:
     * Configurable :ref:`account recognition <discovery>` and :ref:`autotype <scripts>`
 
 :Powerful:
-    * :ref:`Python API <api>`
+    * :ref:`Python API <avendesora_api>`
     * :ref:`Numerous companion programs <accessories>`
     * :ref:`Collaboration support <collaboration>`
     * :ref:`Time-based one-time password support <otp>` (TOTP)

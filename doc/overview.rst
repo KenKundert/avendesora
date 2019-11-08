@@ -1,4 +1,4 @@
-.. _overview:
+.. _avendesora overview:
 
 Overview
 ========
@@ -175,7 +175,8 @@ middle mouse button to paste from the primary clipboard. You can also modify the
 You can also write directly to the standard output (normally *Avendesora* writes 
 to the TTY so that it can erase any secrets after a minute has elapsed).  In 
 this way you can use *Avendesora* within shell scripts (but you should consider 
-rewriting you script in Python using the :ref:`Avendesora API <api>`)::
+rewriting you script in Python using the :ref:`Avendesora API 
+<avendesora_api>`)::
 
     > avendesora value -s login 'user="{username}:{passcode}"' | curl -K - https://mywork.com/~x57107048/latest
 

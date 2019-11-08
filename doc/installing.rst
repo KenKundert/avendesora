@@ -1,7 +1,7 @@
 .. index::
     single: installing
 
-.. _installing:
+.. _installing_avendesora:
 
 Installing and First Use
 ========================
@@ -140,7 +140,7 @@ recreated, and this time they will be encrypted or not based on the extensions
 you gave.
 
 More information on the various configuration options can be found in 
-:ref:`configuring`.
+:ref:`configuring_avendesora`.
 
 .. index::
     single: configuring window manager

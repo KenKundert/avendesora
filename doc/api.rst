@@ -1,4 +1,4 @@
-.. _api:
+.. _avendesora_api:
 
 Python API
 ==========

@@ -980,6 +980,10 @@ class Interactive(Command):
             for name, keys in account.get_fields()
             for key in keys
         ]
+        display(
+            'Use Ctrl-C to end display of secret,',
+            'leave empty or use Ctrl-D to exit.'
+        )
         while True:
             choice = name_completion('which field?', names)
             if not choice:

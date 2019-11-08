@@ -54,8 +54,10 @@ class PasswordGenerator(object):
 
     Args:
         init (bool): Create user's directory.
+
         gpg_ids (list of strings):
             List of GPG identities to use when creating user's directory.
+
         check_integrity (bool):
             If true will validate that certain critical components in Avendesora
             have not be tampered with.  Checking the integrity can take up to a
@@ -275,7 +277,10 @@ class PasswordGenerator(object):
             url (str):
                 Specifying the URL short-circuits the processing of the
                 title that is used to find the URL.
-            title (str): Override the window title. This is used for debugging.
+
+            title (str):
+                Override the window title. This is used for debugging.
+
             verbose (bool):
                 Run the discovery process in verbose mode (adds more information
                 to log file that can help debug account discovery.

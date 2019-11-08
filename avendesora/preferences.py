@@ -132,9 +132,9 @@ CONFIG_DEFAULTS = {
             # Avendesora: Tailor the account entry to suit you needs.
             # Avendesora: You can add or delete class attributes as you see fit.
             # Avendesora: The 'n' key should take you to the next field name.
-            # Avendesora: Use 'cw' to specify a field value, or 'dw' to delete it if unneeded.
+            # Avendesora: Use 'cw' to specify a field value, or 'dd' to delete it if unneeded.
             # Avendesora: Fields surrounded by << and >> will be hidden.
-            # Avendesora: All lines that begin with '# Avendesora:' are removed.
+            # Avendesora: All lines that begin with '# Avendesora:' are automatically removed.
         """ % (3*'{')),
         'shell': dedent("""
             class _NAME_(Account): # %s1
