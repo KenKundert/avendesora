@@ -97,19 +97,18 @@ patterns:
     single: Chrome browser
     single: browsers
 
-However, in general, it is better to match the URL. This can be done in Firefox 
-and Chrome by adding extensions that place the URL in the window title and then 
+However, in general, it is better to match the URL. This can be done in Firefox
+and Chrome by adding extensions that place the URL in the window title and then
 using :class:`avendesora.RecognizeURL` to do the recognition.
 
-If you use Firefox, you should install the `Add URL to Window Title 
+If you use Firefox, you should install the `Add URL to Window Title
 <https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title>`_
-extension.  It is a plugin that makes discovery easier and more
-robust by adding the URL to the title.  For *Chrome* the appropriate
-plugin is  is `URL in Title 
-<https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb>`_.  
-It is recommended that you install
-the appropriate one into your browser.  For *Add URL To Window Title*, set
-the following options:
+extension by Eric.  It is a plugin that makes discovery easier and more robust
+by adding the URL to the title.  For *Chrome* the appropriate plugin is  is `URL
+in Title
+<https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb>`_
+by Guillaume Ryder.  It is recommended that you install the appropriate one into
+your browser.  For *Add URL To Window Title*, set the following options:
 
 .. code-block:: python
 
@@ -146,22 +145,22 @@ deployed the appropriate plugin, you can use:
 When giving the URL, anything specified must match and globbing is
 not supported. If you give a partial path, by default *Avendesora*
 matches up to what you have given, but you can require an exact
-match of the entire path by specifying exact_path=True to
-:class:`avendesora.RecognizeURL`.  If you do not give the protocol, the 
+match of the entire path by specifying ``exact_path=True`` to
+:class:`avendesora.RecognizeURL`.  If you do not give the protocol, the
 default_protocol (https) is assumed.
 
-In general you should use :class:`avendesora.RecognizeURL` rather than 
-:class:`avendesora.RecognizeTitle` for websites if you can. Doing so helps 
+In general you should use :class:`avendesora.RecognizeURL` rather than
+:class:`avendesora.RecognizeTitle` for websites if you can. Doing so helps
 protect you from phishing attacks by carefully examining the URL.
 
-When account discovery fails it can be difficult to determine what is going 
+When account discovery fails it can be difficult to determine what is going
 wrong. When this occurs, you should first examine the log file::
 
     > avendesora log
 
-It should show you the window title and the recognized title components. You 
-should first assure the title is as expected. If *Add URL to Window Title* or 
-*URL in Title* generated the title, then the various title components should 
+It should show you the window title and the recognized title components. You
+should first assure the title is as expected. If *Add URL to Window Title* or
+*URL in Title* generated the title, then the various title components should
 also be shown.  Then run *Avendesora* as follows::
 
     > avendesora value --verbose --title '<title>'
