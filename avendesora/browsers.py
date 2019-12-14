@@ -60,13 +60,10 @@ class StandardBrowser(Browser):
                     culprit=setting_path('browsers', name)
                 )
 
-            browser = Cmd(cmd, 'sOe')
+            browser = Cmd(cmd, 'sOE')
+                # capture both stdout and stderr because browsers are
+                # notoriously noisy
             log("running '%s'" % str(browser))
-            try:
-                browser.start()
-            except OSErrors as e:
-                raise PasswordError(
-                    os_error(e), culprit=setting_path('browsers')
-                )
+            browser.start()
         else:
             raise PasswordError('url not available from account.')

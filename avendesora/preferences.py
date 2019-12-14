@@ -56,6 +56,7 @@ CONFIG_DEFAULTS = {
     'previous_archive_file': 'archive.prev.gpg',
     'config_dir_mask': 0o077,
     'account_file_mask': 0o077,
+    'command_aliases': None,
     'credential_ids': 'username email',
     'credential_secrets': 'passcode password passphrase',
     'label_color': 'blue',
@@ -225,6 +226,47 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     # Default identity to use when creating encrypted files.
     gpg_ids = {gpg_ids}
 
+    default_browser = 'f'
+    browsers = {
+        'c': 'google-chrome {url}',
+        'ci': 'google-chrome --incognito {url}',
+        'f': 'firefox -new-tab {url}',
+        'fp': 'firefox -private-window {url}',
+        'q': 'qutebrowser {url}',
+        't': 'torbrowser {url}',
+        'x': 'xdg-open {url}',
+    }
+    command_aliases = dict(
+        a = ('add', None),
+        A = ('archive', None),
+        b = ('browse', None),
+        bc = ('browse', ['--browser', 'c']),
+        c = ('conceal', None),
+        C = ('changed', None),
+        e = ('edit', None),
+        f = ('find', None),
+        h = ('help', None),
+        ident = ('identity', None),
+        I = ('identity', None),
+        init = ('initialize', None),
+        i = ('interactive', None),
+        login = ('credentials', None),
+        l = ('credentials', None),
+        N = ('new', None),
+        alphabet = ('phonetic', None),
+        p = ('phonetic', None),
+        quest = ('questions', None),
+        q = ('questions', None),
+        qc = ('questions', ['--clipboard']),
+        r = ('reveal', None),
+        s = ('search', None),
+        val = ('value', None),
+        v = ('value', None),
+        vc = ('value', ['--clipboard']),
+        vals = ('values', None),
+        vs = ('values', None),
+        V = ('values', None),
+    )
     # vim: filetype=python sw=4 sts=4 et ai ff=unix nofen fileencoding={encoding} :
 ''')
 
@@ -315,6 +357,15 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     default_browser = {default_browser}
         # The name of the default browser. This name should be one of the keys
         # in the browsers dictionary.
+
+    command_aliases = {command_aliases}
+        # A dictionary of command short cuts. Each alias should map to two
+        # values, the full command name and a list of command line options,
+        # which may be None.  For example:
+        #     command_aliases = dict(
+        #         v = ('value', None),
+        #         vc = ('value', ['--clipboard']),
+        #     )
 
     default_protocol = {default_protocol}
         # The default protocol to use for a URL if the protocol is not specified

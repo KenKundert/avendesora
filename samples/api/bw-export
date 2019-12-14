@@ -23,11 +23,12 @@ format.
 from avendesora import PasswordGenerator, PasswordError, Script
 from inform import conjoin, os_error, terminate
 from docopt import docopt
+from textwrap import dedent
 import csv
 import os
 
 # Globals {{{1
-fieldnames='''
+fieldnames = '''
     folder
     favorite
     type
@@ -38,6 +39,12 @@ fieldnames='''
     login_username
     login_password
     login_totp
+'''.split()
+types = '''
+    login
+    card
+    identity
+    note
 '''.split()
 output_filename = 'bw.csv'
 
@@ -64,7 +71,12 @@ try:
             if fields:
                 # expand fields
                 for k, v in fields.items():
-                    value = Script(v)
+                    if k not in fieldnames:
+                        warn(
+                            'field unknown by bitwarden.',
+                            culprit=(account_name, k)
+                        )
+                    value = Script(dedent(v))
                     value.initialize(account)
                     fields[k] = str(value)
                 writer.writerow(fields)

@@ -33,7 +33,6 @@ def test_add():
 
         Usage:
             avendesora add [options] [<template>]
-            avendesora a   [options] [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -74,7 +73,6 @@ def test_archive():
 
         Usage:
             avendesora archive
-            avendesora A
 
         This command creates an encrypted archive that contains all the
         information in your accounts files, including the fully generated
@@ -109,7 +107,6 @@ def test_browse():
 
         Usage:
             avendesora browse [options] <account> [<key>]
-            avendesora b      [options] <account> [<key>]
 
         Options:
             -b <browser>, --browser <browser>
@@ -163,7 +160,6 @@ def test_changed():
 
         Usage:
             avendesora changed
-            avendesora C
 
         When you run the 'archive' command it overwrites the existing
         archive. If you have accidentally deleted an account or changed a
@@ -255,7 +251,6 @@ def test_conceal():
 
         Usage:
             avendesora conceal [options] [<text>]
-            avendesora c       [options] [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -306,8 +301,6 @@ def test_credentials():
 
         Usage:
             avendesora credentials [options] <account>
-            avendesora login       [options] <account>
-            avendesora l           [options] <account>
 
         Options:
             -S, --seed              Interactively request additional seed for
@@ -341,7 +334,6 @@ def test_edit():
 
         Usage:
             avendesora edit <account>
-            avendesora e    <account>
 
         Opens an existing account in your editor.
 
@@ -363,7 +355,6 @@ def test_find():
 
         Usage:
             avendesora find <text>
-            avendesora f    <text>
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -378,7 +369,6 @@ def test_help():
 
         Usage:
             avendesora help [options] [<topic>]
-            avendesora h    [options] [<topic>]
 
         Options:
             -s, --search            list topics that include <topic> as a search term.
@@ -397,8 +387,6 @@ def test_identity():
 
         Usage:
             avendesora identity [<name> [<challenge>...]]
-            avendesora ident    [<name> [<challenge>...]]
-            avendesora I        [<name> [<challenge>...]]
 
         This command allows you to generate a response to any challenge.
         The response identifies you to a partner with whom you have shared
@@ -475,7 +463,6 @@ def test_initialize():
 
         Usage:
             avendesora initialize [options]
-            avendesora init       [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -503,7 +490,6 @@ def test_interactive():
 
         Usage:
             avendesora interactive [options] <account>
-            avendesora i          [options] <account>
 
         Options:
             -S, --seed              Interactively request additional seed for
@@ -550,7 +536,6 @@ def test_new():
 
         Usage:
             avendesora new [options] <name>
-            avendesora N   [options] <name>
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -582,9 +567,7 @@ def test_phonetic():
         Display NATO phonetic alphabet.
 
         Usage:
-            avendesora alphabet [<text>]
             avendesora phonetic [<text>]
-            avendesora p [<text>]
 
         If <text> is given, it is converted character by character to the
         phonetic alphabet. If not given, the entire phonetic alphabet is
@@ -606,16 +589,11 @@ def test_questions():
 
         Usage:
             avendesora questions [options] <account> [<field>]
-            avendesora quest     [options] <account> [<field>]
-            avendesora q         [options] <account> [<field>]
-            avendesora qc        [options] <account> [<field>]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
             -S, --seed              Interactively request additional seed for
                                     generated secrets.
-
-        The 'qc' command is a shortcut for 'questions --clipboard'.
 
         Request the answer to a security question by giving the account name to
         this command.  For example:
@@ -648,7 +626,6 @@ def test_reveal():
 
         Usage:
             avendesora reveal [<text>]
-            avendesora r      [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -675,7 +652,6 @@ def test_search():
 
         Usage:
             avendesora search <text>
-            avendesora s      <text>
     """).strip()
     assert result.decode('utf-8') == expected
 
@@ -693,9 +669,6 @@ def test_value():
 
         Usage:
             avendesora value [options] [<account> [<field>]]
-            avendesora val   [options] [<account> [<field>]]
-            avendesora v     [options] [<account> [<field>]]
-            avendesora vc    [options] [<account> [<field>]]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
@@ -707,8 +680,6 @@ def test_value():
                                     help identify issues in account discovery.
             -T <title>, --title <title>
                                     Use account discovery on this title.
-
-        The 'vc' command is a shortcut for 'value --clipboard'.
 
         You request a scalar value by specifying its name after the account.
         For example:
@@ -806,9 +777,6 @@ def test_values():
 
         Usage:
             avendesora values [options] <account>
-            avendesora vals   [options] <account>
-            avendesora vs     [options] <account>
-            avendesora V      [options] <account>
 
         Options:
             -a, --all    show all fields, including tool fields
@@ -2390,6 +2358,7 @@ def test_urls():
         assert url_exists(url), url
     for topic in HelpMessage.topics():
         path = topic.URL
-        url = base_url + path
-        assert url_exists(url), url
+        if path:
+            url = base_url + path
+            assert url_exists(url), url
 

@@ -7,6 +7,10 @@ Releases
 
     - Added *ms_per_char* setting that allows user to slow autotyping.
     - Added *rate* attribute to scripts that allows user to slow autotyping.
+    - Added *command_aliases* setting to allow user to define their own command 
+      short-cuts. As part of this the built-in short cuts were removed. See 
+      description of *command_aliases* in :ref:`configuring_avendesora` to get 
+      them back.
 
 **1.15 (2019-09-28)**:
     - Add *remind* script command.

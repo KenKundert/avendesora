@@ -1,7 +1,7 @@
 # shlib -- Scripting utilities
 #
 # A light-weight package with few dependencies that allows users to do
-# shell-script like things relatively easily in Python.
+# shell-script-like things relatively easily in Python.
 
 # License {{{1
 # Copyright (C) 2016-2019 Kenneth S. Kundert
@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '1.1.0'
-__released__ = '2019-03-21'
+__version__ = '1.1.1'
+__released__ = '2019-12-13'
 
 # Imports {{{1
 try:
@@ -237,7 +237,7 @@ def rm(*paths):
 def ln(src, dest):
     "Create symbolic link."
     dest = to_path(dest)
-    dest.symlink_to(src)
+    dest.symlink_to(to_path(src))
 
 
 # touch {{{2
@@ -681,9 +681,20 @@ class Cmd(object):
             streams['stderr'] = DEVNULL
 
         # run the command
-        process = subprocess.Popen(
-            cmd, shell=self.use_shell, env=self.env, **streams
-        )
+        try:
+            process = subprocess.Popen(
+                cmd, shell=self.use_shell, env=self.env, **streams
+            )
+        except OSError as e:
+            if PREFERENCES['use_inform']:
+                from inform import Error, os_error
+                raise Error(
+                    msg = os_error(e),
+                    cmd = render_command(self.cmd),
+                    template = '{msg}'
+                )
+            else:
+                raise
 
         # store needed information and wait for termination if desired
         self.pid = process.pid
@@ -979,7 +990,7 @@ def render_command(cmd, option_args=None, width=70):
     if is_str(cmd):
         components = split_cmd(cmd)
     else:
-        components = cmd[:]
+        components = list(cmd[:])
         cmd = ' '.join(str(c) for c in components)
     if len(cmd) <= width:
         return cmd

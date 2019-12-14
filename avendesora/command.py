@@ -30,7 +30,7 @@ from .shlib import chmod, cp, rm, to_path
 from .utilities import query_user, two_columns, OSErrors, name_completion
 from .writer import get_writer
 from inform import (
-    codicil, columns, cull, display, error, full_stop, output, warn,
+    codicil, columns, cull, display, error, full_stop, narrate, output, warn,
     conjoin, join, os_error, is_collection, indent, render,
 )
 from docopt import docopt
@@ -69,6 +69,24 @@ class Command(object):
         if args is None:
             args = []
         command = cls.find(name)
+
+        if not command:
+            # consider an alias
+            aliases = get_setting('command_aliases')
+            if aliases and name in aliases:
+                new_name, new_args = aliases[name]
+                if new_args:
+                    narrate("Replacing '{}' in command with '{} {}'".format(
+                        name, new_name, ' '.join(new_args)
+                    ))
+                    args = new_args + args
+                else:
+                    narrate("Replacing '{}' in command with '{}'".format(
+                        name, new_name,
+                    ))
+                name = new_name
+                command = cls.find(new_name)
+
         if not command:
             # no recognizable command was specified
             # in this case, run 'credentials' if one argument is given
@@ -80,6 +98,7 @@ class Command(object):
                 error('unknown command.', culprit=name)
                 codicil("Use 'avendesora help' for list of available commands."),
                 return
+
         command.run(name, args)
 
     @classmethod
@@ -115,12 +134,11 @@ class Command(object):
 
 # Add {{{1
 class Add(Command):
-    NAMES = 'add', 'a'
+    NAMES = 'add',
     DESCRIPTION = 'add a new account'
     USAGE = dedent("""
         Usage:
             avendesora add [options] [<template>]
-            avendesora a   [options] [<template>]
 
         Options:
             -f <file>, --file <file>
@@ -289,12 +307,11 @@ class Add(Command):
 
 # Archive {{{1
 class Archive(Command):
-    NAMES = 'archive', 'A'
+    NAMES = 'archive',
     DESCRIPTION = 'generates archive of all account information'
     USAGE = dedent("""
         Usage:
             avendesora archive
-            avendesora A
     """).strip()
 
     @classmethod
@@ -382,12 +399,11 @@ class Archive(Command):
 
 # Browse {{{1
 class Browse(Command):
-    NAMES = 'browse', 'b'
+    NAMES = 'browse',
     DESCRIPTION = 'open account URL in web browser'
     USAGE = dedent("""
         Usage:
             avendesora browse [options] <account> [<key>]
-            avendesora b      [options] <account> [<key>]
 
         Options:
             -b <browser>, --browser <browser>
@@ -457,12 +473,11 @@ class Browse(Command):
 
 # Changed {{{1
 class Changed(Command):
-    NAMES = 'changed', 'C'
+    NAMES = 'changed',
     DESCRIPTION = 'show changes since archive was created'
     USAGE = dedent("""
         Usage:
             avendesora changed
-            avendesora C
 
         When you run the 'archive' command it overwrites the existing
         archive. If you have accidentally deleted an account or changed a
@@ -573,12 +588,11 @@ class Changed(Command):
 
 # Conceal {{{1
 class Conceal(Command):
-    NAMES = 'conceal', 'c'
+    NAMES = 'conceal',
     DESCRIPTION = 'conceal text by encoding it'
     USAGE = dedent("""
         Usage:
             avendesora conceal [options] [<text>]
-            avendesora c       [options] [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -648,12 +662,11 @@ class Conceal(Command):
 
 # Edit {{{1
 class Edit(Command):
-    NAMES = 'edit', 'e'
+    NAMES = 'edit',
     DESCRIPTION = 'edit an account'
     USAGE = dedent("""
         Usage:
             avendesora edit <account>
-            avendesora e    <account>
     """).strip()
 
     @classmethod
@@ -715,14 +728,13 @@ class Edit(Command):
 
 # Find {{{1
 class Find(Command):
-    NAMES = 'find', 'f'
+    NAMES = 'find',
     DESCRIPTION = 'find an account'
     USAGE = dedent("""
         Find accounts whose name contains the search text.
 
         Usage:
             avendesora find <text>
-            avendesora f    <text>
     """).strip()
 
     @classmethod
@@ -752,12 +764,11 @@ class Find(Command):
 
 # Help {{{1
 class Help(Command):
-    NAMES = 'help', 'h'
+    NAMES = 'help',
     DESCRIPTION = 'give information about commands or other topics'
     USAGE = dedent("""
         Usage:
             avendesora help [options] [<topic>]
-            avendesora h    [options] [<topic>]
 
         Options:
             -s, --search            list topics that include <topic> as a search term.
@@ -778,13 +789,11 @@ class Help(Command):
 
 # Identity {{{1
 class Identity(Command):
-    NAMES = 'identity', 'ident', 'I'
+    NAMES = 'identity',
     DESCRIPTION = 'generate an identifying response to a challenge'
     USAGE = dedent("""
         Usage:
             avendesora identity [<name> [<challenge>...]]
-            avendesora ident    [<name> [<challenge>...]]
-            avendesora I        [<name> [<challenge>...]]
     """).strip()
 
     @classmethod
@@ -885,12 +894,11 @@ class Identity(Command):
 
 # Initialize {{{1
 class Initialize(Command):
-    NAMES = 'initialize', 'init'
+    NAMES = 'initialize',
     DESCRIPTION = 'create initial set of Avendesora files'
     USAGE = dedent("""
         Usage:
             avendesora initialize [options]
-            avendesora init       [options]
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -938,12 +946,11 @@ class Initialize(Command):
 
 # Interactive {{{1
 class Interactive(Command):
-    NAMES = 'interactive', 'i'
+    NAMES = 'interactive',
     DESCRIPTION = 'interactively query account values'
     USAGE = dedent("""
         Usage:
             avendesora interactive [options] <account>
-            avendesora i          [options] <account>
 
         Options:
             -S, --seed              Interactively request additional seed for
@@ -1052,7 +1059,7 @@ class Log(Command):
 
 # Login Credentials {{{1
 class LoginCredentials(Command):
-    NAMES = 'credentials', 'login', 'l'
+    NAMES = 'credentials',
     DESCRIPTION = 'show login credentials'
     USAGE = dedent("""
         Displays the account's login credentials, which generally consist of an
@@ -1060,8 +1067,6 @@ class LoginCredentials(Command):
 
         Usage:
             avendesora credentials [options] <account>
-            avendesora login       [options] <account>
-            avendesora l           [options] <account>
 
         Options:
             -S, --seed              Interactively request additional seed for
@@ -1136,12 +1141,11 @@ class LoginCredentials(Command):
 
 # New {{{1
 class New(Command):
-    NAMES = 'new', 'N'
+    NAMES = 'new',
     DESCRIPTION = 'create new accounts file'
     USAGE = dedent("""
         Usage:
             avendesora new [options] <name>
-            avendesora N   [options] <name>
 
         Options:
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
@@ -1191,13 +1195,11 @@ class New(Command):
 
 # Phonetic Alphabet {{{1
 class PhoneticAlphabet(Command):
-    NAMES = 'phonetic', 'alphabet', 'p'
+    NAMES = 'phonetic',
     DESCRIPTION = 'display NATO phonetic alphabet'
     USAGE = dedent("""
         Usage:
-            avendesora alphabet [<text>]
             avendesora phonetic [<text>]
-            avendesora p [<text>]
     """).strip()
 
     @classmethod
@@ -1242,7 +1244,7 @@ class PhoneticAlphabet(Command):
 
 # Questions {{{1
 class Questions(Command):
-    NAMES = 'questions', 'quest', 'q', 'qc'
+    NAMES = 'questions',
     DESCRIPTION = 'answer a security question'
     USAGE = dedent("""
         Displays the security questions and then allows you to select one
@@ -1250,16 +1252,11 @@ class Questions(Command):
 
         Usage:
             avendesora questions [options] <account> [<field>]
-            avendesora quest     [options] <account> [<field>]
-            avendesora q         [options] <account> [<field>]
-            avendesora qc        [options] <account> [<field>]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
             -S, --seed              Interactively request additional seed for
                                     generated secrets.
-
-        The 'qc' command is a shortcut for 'questions --clipboard'.
 
         Request the answer to a security question by giving the account name to
         this command.  For example:
@@ -1282,7 +1279,7 @@ class Questions(Command):
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
-        use_clipboard = cmdline['--clipboard'] or cmdline['qc']
+        use_clipboard = cmdline['--clipboard']
 
         # run the generator
         generator = PasswordGenerator(check_integrity=False)
@@ -1320,14 +1317,13 @@ class Questions(Command):
 
 # Reveal {{{1
 class Reveal(Command):
-    NAMES = 'reveal', 'r'
+    NAMES = 'reveal',
     DESCRIPTION = 'reveal concealed text'
     USAGE = dedent("""
         Transform concealed text to reveal its original form.
 
         Usage:
             avendesora reveal [<text>]
-            avendesora r      [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
@@ -1368,14 +1364,13 @@ class Reveal(Command):
 
 # Search {{{1
 class Search(Command):
-    NAMES = 'search', 's'
+    NAMES = 'search',
     DESCRIPTION = 'search accounts'
     USAGE = dedent("""
         Search for accounts whose values contain the search text.
 
         Usage:
             avendesora search <text>
-            avendesora s      <text>
     """).strip()
 
     @classmethod
@@ -1405,7 +1400,7 @@ class Search(Command):
 
 # Value {{{1
 class Value(Command):
-    NAMES = 'value', 'val', 'v', 'vc'
+    NAMES = 'value',
     DESCRIPTION = 'show an account value'
     USAGE = dedent("""
         Produce an account value. If the value is secret, it is produced only
@@ -1413,9 +1408,6 @@ class Value(Command):
 
         Usage:
             avendesora value [options] [<account> [<field>]]
-            avendesora val   [options] [<account> [<field>]]
-            avendesora v     [options] [<account> [<field>]]
-            avendesora vc    [options] [<account> [<field>]]
 
         Options:
             -c, --clipboard         Write output to clipboard rather than stdout.
@@ -1427,8 +1419,6 @@ class Value(Command):
                                     help identify issues in account discovery.
             -T <title>, --title <title>
                                     Use account discovery on this title.
-
-        The 'vc' command is a shortcut for 'value --clipboard'.
 
         You request a scalar value by specifying its name after the account.
         For example:
@@ -1516,7 +1506,7 @@ class Value(Command):
     def run(cls, command, args):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
-        use_clipboard = cmdline['--clipboard'] or cmdline['vc']
+        use_clipboard = cmdline['--clipboard']
 
         # mute any warnings if using --stdout
         if cmdline['--stdout']:
@@ -1545,16 +1535,13 @@ class Value(Command):
 
 # Values {{{1
 class Values(Command):
-    NAMES = 'values', 'vals', 'vs', 'V'
+    NAMES = 'values',
     DESCRIPTION = 'display all account values'
     USAGE = dedent("""
         Show all account values.
 
         Usage:
             avendesora values [options] <account>
-            avendesora vals   [options] <account>
-            avendesora vs     [options] <account>
-            avendesora V      [options] <account>
 
         Options:
             -a, --all    show all fields, including tool fields

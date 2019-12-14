@@ -25,7 +25,7 @@ from .config import get_setting
 from .error import PasswordError
 from .utilities import pager, two_columns
 from difflib import get_close_matches
-from inform import conjoin, full_stop, output
+from inform import conjoin, full_stop, join, output
 from textwrap import dedent
 
 
@@ -78,6 +78,16 @@ class HelpMessage(object):
                     return show_in_browser(cmd.get_help_url())
                 else:
                     return pager(cmd.help())
+            else:
+                aliases = get_setting('command_aliases')
+                if aliases and name in aliases:
+                    new_name, new_args = aliases[name]
+                    if new_args:
+                        desc = ' '.join([name, 'aliased to:', new_name] + new_args)
+                    else:
+                        desc = ' '.join([name, 'aliased to:', new_name])
+                    return pager(desc)
+
             for topic in cls.topics():
                 if name == topic.get_name():
                     if browse:
@@ -355,6 +365,23 @@ class Accounts(HelpMessage):
             to the account you use most often.
         """).strip()
         return text
+
+
+# Aliases class {{{1
+class Aliases(HelpMessage):
+    DESCRIPTION = "list available aliases"
+
+    @staticmethod
+    def help():
+        lines = ['Available aliases:']
+        aliases = get_setting('command_aliases')
+        if aliases:
+            for alias in sorted(aliases, key=str.lower):
+                new_name, new_args = aliases[alias]
+                if new_args:
+                    new_name += ' ' + ' '.join(new_args)
+                lines.append(join('    ', alias, '-->', new_name))
+        return '\n'.join(lines)
 
 
 # Browsing class {{{1
