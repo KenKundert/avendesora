@@ -307,7 +307,7 @@ class GPG(ObscuredSecret, GnuPG):
     def initialize(self, account, field_name, field_key=None):
         # must do this here in initialize rather than in constructor to avoid
         # decrypting this, and perhaps asking for a passcode,  every time
-        # Advendesora is run.
+        # Avendesora is run.
         decrypted = self.gpg.decrypt(dedent(self.ciphertext))
         if not decrypted.ok:
             msg = 'unable to decrypt argument to GPG()'

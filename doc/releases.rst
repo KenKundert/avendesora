@@ -11,6 +11,7 @@ Releases
       short-cuts. As part of this the built-in short cuts were removed. See 
       description of *command_aliases* in :ref:`configuring_avendesora` to get 
       them back.
+    - :ref:`interactive command <interactive command>` now accepts '*'.
 
 **1.15 (2019-09-28)**:
     - Add *remind* script command.

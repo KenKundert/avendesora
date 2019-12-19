@@ -193,10 +193,11 @@ def name_completion(prompt, choices):
     readline.set_completer(complete)
 
     try:
-        return query_user(prompt)
+        given = query_user(prompt)
     except EOFError:
         output()
     readline.set_completer(None)
+    return given.strip() if given else given
 
 
 # invert dictionary {{{1

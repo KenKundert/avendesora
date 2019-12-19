@@ -498,8 +498,9 @@ def test_interactive():
         Interactively display values of account fields.  Type the first few
         characters of the field name, then <Tab> to expand the name.
         <Tab><Tab> shows all remaining choices. <Enter> selects and shows
-        the value. Type <Ctrl-c> to cancel the display of a secret. Type
-        <Ctrl-d> or enter empty field name to terminate command.
+        the value. Use '*' to display all names and values. Type <Ctrl-c> to
+        cancel the display of a secret. Type <Ctrl-d> or enter empty field
+        name to terminate command.
     """).strip()
     assert result.decode('utf-8') == expected
 

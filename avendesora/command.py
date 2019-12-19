@@ -967,8 +967,9 @@ class Interactive(Command):
             Interactively display values of account fields.  Type the first few
             characters of the field name, then <Tab> to expand the name.
             <Tab><Tab> shows all remaining choices. <Enter> selects and shows
-            the value. Type <Ctrl-c> to cancel the display of a secret. Type
-            <Ctrl-d> or enter empty field name to terminate command.
+            the value. Use '*' to display all names and values. Type <Ctrl-c> to
+            cancel the display of a secret. Type <Ctrl-d> or enter empty field
+            name to terminate command.
         """).strip()
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE)
 
@@ -995,17 +996,20 @@ class Interactive(Command):
             choice = name_completion('which field?', names)
             if not choice:
                 return
-            try:
-                choice = '{}.{:d}'.format(
-                    get_setting('default_vector_field'),
-                    int(choice)
-                )
-            except:
-                pass
-            try:
-                writer.display_field(account, choice)
-            except PasswordError as e:
-                e.report()
+            if choice == '*':
+                account.write_summary(all=False, sort=True)
+            else:
+                try:
+                    choice = '{}.{:d}'.format(
+                        get_setting('default_vector_field'),
+                        int(choice)
+                    )
+                except:
+                    pass
+                try:
+                    writer.display_field(account, choice)
+                except PasswordError as e:
+                    e.report()
 
 
 # Log {{{1
