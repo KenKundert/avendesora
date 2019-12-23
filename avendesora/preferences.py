@@ -227,15 +227,15 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
     gpg_ids = {gpg_ids}
 
     default_browser = 'f'
-    browsers = {
-        'c': 'google-chrome {url}',
-        'ci': 'google-chrome --incognito {url}',
-        'f': 'firefox -new-tab {url}',
-        'fp': 'firefox -private-window {url}',
-        'q': 'qutebrowser {url}',
-        't': 'torbrowser {url}',
-        'x': 'xdg-open {url}',
-    }
+    browsers = {{
+        'c': 'google-chrome {{url}}',
+        'ci': 'google-chrome --incognito {{url}}',
+        'f': 'firefox -new-tab {{url}}',
+        'fp': 'firefox -private-window {{url}}',
+        'q': 'qutebrowser {{url}}',
+        't': 'torbrowser {{url}}',
+        'x': 'xdg-open {{url}}',
+    }}
     command_aliases = dict(
         a = ('add', None),
         A = ('archive', None),
