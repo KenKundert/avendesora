@@ -274,16 +274,28 @@ specifying the desired values in the *config* file (found in
     You can create custom short cuts for *Avendesora* commands using the this 
     setting.  By default, *Avendesora* comes with a collection of aliases, but 
     you can change them, delete them, or add others.  Aliases are specified with 
-    a dictionary, where the key is the alias, and the value is a tuple of two 
-    values, the full command name and an optional set of command line arguments.  
+    a dictionary, where the key is the alias, and the value is a list that 
+    consists of full command name and an optional set of command line arguments.  
     For example:
 
     .. code-block:: python
 
         command_aliases = dict(
-            b = ('browse', None),
-            bc = ('browse', ['--browser', 'c']),
+            b = ['browse'],
+            bc = ['browse', '--browser', 'c'],
         )
+
+    Alternately, you can specify the value of each alias as a string, in which 
+    case it is split at white space to provide the command name and options:
+
+    .. code-block:: python
+
+        command_aliases = dict(
+            b = 'browse',
+            bc = 'browse --browser c',
+        )
+
+    In either case, the first item must be the name of a built-in command.
 
     With this set of aliases, 'b' becomes a short cut for 'browse' and 'bc' 
     becomes a short cut for 'browse --browser c'.
@@ -295,35 +307,35 @@ specifying the desired values in the *config* file (found in
     .. code-block:: python
 
         command_aliases = dict(
-            a = ('add', None),
-            A = ('archive', None),
-            b = ('browse', None),
-            bc = ('browse', ['--browser', 'c']),
-            c = ('conceal', None),
-            C = ('changed', None),
-            e = ('edit', None),
-            f = ('find', None),
-            h = ('help', None),
-            ident = ('identity', None),
-            I = ('identity', None),
-            init = ('initialize', None),
-            i = ('interactive', None),
-            login = ('credentials', None),
-            l = ('credentials', None),
-            N = ('new', None),
-            alphabet = ('phonetic', None),
-            p = ('phonetic', None),
-            quest = ('questions', None),
-            q = ('questions', None),
-            qc = ('questions', ['--clipboard']),
-            r = ('reveal', None),
-            s = ('search', None),
-            val = ('value', None),
-            v = ('value', None),
-            vc = ('value', ['--clipboard']),
-            vals = ('values', None),
-            vs = ('values', None),
-            V = ('values', None),
+            a = 'add',
+            A = 'archive',
+            b = 'browse',
+            bc = 'browse --browser c',
+            c = 'conceal',
+            C = 'changed',
+            e = 'edit',
+            f = 'find',
+            h = 'help',
+            ident = 'identity',
+            I = 'identity',
+            init = 'initialize',
+            i = 'interactive',
+            login = 'credentials',
+            l = 'credentials',
+            N = 'new',
+            alphabet = 'phonetic',
+            p = 'phonetic',
+            quest = 'questions',
+            q = 'questions',
+            qc = 'questions --clipboard',
+            r = 'reveal',
+            s = 'search',
+            val = 'value',
+            v = 'value',
+            vc = 'value --clipboard',
+            vals = 'values',
+            vs = 'values',
+            V = 'values',
         )
 
 

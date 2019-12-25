@@ -74,7 +74,10 @@ class Command(object):
             # consider an alias
             aliases = get_setting('command_aliases')
             if aliases and name in aliases:
-                new_name, new_args = aliases[name]
+                aliases = Collection(aliases[name])
+                new_name = aliases[0]
+                new_args = aliases[1:]
+
                 if new_args:
                     narrate("Replacing '{}' in command with '{} {}'".format(
                         name, new_name, ' '.join(new_args)
