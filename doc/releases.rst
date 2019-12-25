@@ -5,6 +5,8 @@ Releases
     | Version: 1.15.5
     | Released: 2019-12-25
 
+
+**1.16 (2019-12-25)**:
     - Added *ms_per_char* setting that allows user to slow autotyping.
     - Added *rate* attribute to scripts that allows user to slow autotyping.
     - Added *command_aliases* setting to allow user to define their own command 
