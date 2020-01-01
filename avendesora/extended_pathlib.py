@@ -1,7 +1,7 @@
 # pathlib -- extends system pathlib
 
 # License {{{1
-# Copyright (C) 2016-2019 Kenneth S. Kundert
+# Copyright (C) 2016-2020 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

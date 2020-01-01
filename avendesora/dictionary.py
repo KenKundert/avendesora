@@ -4,7 +4,7 @@
 # used to create pass phrases).
 
 # License {{{1
-# Copyright (C) 2013-18 Kenneth S. Kundert and Kale Kundert
+# Copyright (C) 2013-2020 Kenneth S. Kundert and Kale Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
