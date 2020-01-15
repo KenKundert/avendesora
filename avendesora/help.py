@@ -25,7 +25,7 @@ from .config import get_setting
 from .error import PasswordError
 from .utilities import pager, two_columns
 from difflib import get_close_matches
-from inform import conjoin, full_stop, join, output
+from inform import conjoin, full_stop, join, output, is_str
 from textwrap import dedent
 
 
@@ -81,11 +81,10 @@ class HelpMessage(object):
             else:
                 aliases = get_setting('command_aliases')
                 if aliases and name in aliases:
-                    new_name, new_args = aliases[name]
-                    if new_args:
-                        desc = ' '.join([name, 'aliased to:', new_name] + new_args)
-                    else:
-                        desc = ' '.join([name, 'aliased to:', new_name])
+                    alias = aliases[name]
+                    if is_str(alias):
+                        alias = alias.split()
+                    desc = join(name, 'aliased to:', *alias)
                     return pager(desc)
 
             for topic in cls.topics():
