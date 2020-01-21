@@ -255,6 +255,8 @@ def test_conceal():
         Options:
             -e <encoding>, --encoding <encoding>
                                     Encoding used when concealing information.
+            -f <path>, --file <path>
+                                    Read text from file
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
                                     Use commas with no spaces to separate multiple IDs.
             -h <path>, --gpg-home <path>
