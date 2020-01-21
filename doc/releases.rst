@@ -5,6 +5,8 @@ Releases
     | Version: 1.16.1
     | Released: 2020-01-14
 
+    - Enhance :ref:`conceal command <conceal command>` so that it can read text 
+      from a file.
 
 **1.16 (2019-12-25)**:
     - Added *ms_per_char* setting that allows user to slow autotyping.

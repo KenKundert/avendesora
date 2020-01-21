@@ -600,6 +600,8 @@ class Conceal(Command):
         Options:
             -e <encoding>, --encoding <encoding>
                                     Encoding used when concealing information.
+            -f <path>, --file <path>
+                                    Read text from file
             -g <id>, --gpg-id <id>  Use this ID when creating any missing encrypted files.
                                     Use commas with no spaces to separate multiple IDs.
             -h <path>, --gpg-home <path>
@@ -642,6 +644,7 @@ class Conceal(Command):
 
         # get the text
         encoding = cmdline['--encoding']
+        path = cmdline['--file']
         text = cmdline['<text>']
         symmetric = cmdline['--symmetric']
 
@@ -655,6 +658,10 @@ class Conceal(Command):
         if cmdline['--gpg-home']:
             override_setting('gpg_home', cmdline['--gpg-home'])
 
+        if path:
+            if text:
+                raise Error('cannot give text in file and on command line.')
+            text = to_path(path).read_text()
         if not text:
             output('Enter text to obscure, type ctrl-d to terminate.')
             text = sys.stdin.read()[:-1]

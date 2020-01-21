@@ -83,6 +83,28 @@ def _is_hidden(path):
 PosixPath.is_hidden = _is_hidden
 
 
+# is_newer {{{1
+def _is_newer(path, ref):
+    """
+    Tests whether path is newer than ref where ref is either another path or a
+    date.
+
+    >>> Path('/usr/bin/python').is_newer(0)
+    True
+
+    """
+    mtime = path.stat().st_mtime
+    try:
+        return mtime > ref
+    except TypeError:
+        try:
+            return mtime > ref.timestamp
+        except AttributeError:
+            return mtime > ref.stat().st_mtime
+
+PosixPath.is_newer = _is_newer
+
+
 # path_from {{{1
 def _path_from(path, start):
     """
