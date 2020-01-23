@@ -91,14 +91,7 @@ This will place avendesora in ~/.local/bin, which should be added to your path.
 
 You will also need to install some operating system commands. On Fedora use::
 
-   yum install gnupg2 xdotool xsel
-
-You should also install python-gobject. Conceivably this could be installed with 
-the above pip command, but gobject appears broken in pypi, so it is better use 
-the operating system's package manager to install it.  See the setup.py file for 
-more information.  On Redhat systems use::
-
-   yum install python3-gobject
+   dnf install gnupg2 xdotool xsel gobject-introspection-devel
 
 If you would like to use scrypt as a way of encrypting fields, you will need to 
 install scrypt by hand using::

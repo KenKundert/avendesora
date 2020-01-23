@@ -26,21 +26,7 @@ setup(
         'cryptography',
         'docopt',
         'inform>=1.17',
-        #'pygobject',
-            # pygobject seems broken in pypi. You can try uncommenting the above
-            # and see if it works. Otherwise, do the following:
-            #   > git clone git://git.gnome.org/pygobject
-            #   > pip3.5 install ./pygobject
-            # This install will fail if you do not have the right packages
-            # installed in linux. For example, gnome-common is one that you will
-            # need. Read the error messages carefully to determine
-            # what other packages are needed. Then, be sure to install the
-            # development versions. For example, on Fedora23 the libffi,
-            # gobject-introspection and pycairo packages were needed. I
-            # installed them with:
-            #     dnf install libffi-devel
-            #     dnf install gobject-introspection-devel
-            #     dnf install python3-cairo-devel
+        'pygobject',
         'python-gnupg>=0.4.4',
             # Be careful.  There's a package called 'gnupg' that's an
             # incompatible fork of 'python-gnupg'.  If both are installed, the
