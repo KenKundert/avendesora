@@ -13,8 +13,6 @@ matrix:
     - python: nightly
       dist: xenial
       sudo: true
-#before_install:
-#  - sudo apt-get -y install 
 addons:
   apt:
     packages:
