@@ -913,6 +913,22 @@ You can specify them as account attributes (in this case then need to be
 embedded in :class:`avendesora.Script`).  Or you can specify them to 
 :ref:`account discovery recognizers <discovery>`.
 
+Besides account attributes, there are also some special codes that can be 
+inserted in the script surrounded by braces:
+
+============  ============================================================
+Code          Meaning
+============  ============================================================
+tab           insert a tab character
+return        insert a carriage return character
+sleep *N*     pause for *N* seconds
+rate *N*      set the autotype rate to one character per *N* milliseconds.
+remind *msg*  show the msg as a notification
+============  ============================================================
+
+*tab* and *return* are suitable for all scripts, but *sleep*, *rate* and 
+*remind* are only suitable for account discovery scripts.
+
 Scripts are useful if you need to combine an account value with
 other text, if you need to combine more than one account value, or
 if you want quick access to something that would otherwise need an
@@ -1021,7 +1037,7 @@ javascript helpers often limit the rate at which you can type characters.  The
 *rate* function allows you to slow down the autotyping to the point where you 
 avoid the problems that stem from exceeding the limit.
 
-The *remind* function is used to remind you of neyt steps. For example, the 
+The *remind* function is used to remind you of next steps. For example, the 
 following uses *remind* to instruct you to use your YubiKey to provide the 
 second factor that completes the login process:
 

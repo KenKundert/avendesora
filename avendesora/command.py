@@ -896,7 +896,7 @@ class Identity(Command):
             except PasswordError as e:
                 e.report()
         else:
-            names = sorted(generator.shared_secrets.keys())
+            names = sorted(generator.account_files.shared_secrets.keys())
             output('Available names:')
             for name in names:
                 output('  ', name)
