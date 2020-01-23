@@ -17,6 +17,7 @@ addons:
   apt:
     packages:
       - gnupg
+      - libgirepository
 install:
   - pip install scrypt coveralls pexpect
   - pip install .
