@@ -536,7 +536,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # Imports {section}
     from avendesora import (
         # Basics
-        Account, StealthAccount, Hide, Hidden, GPG, Script, WriteFile,
+        Account, StealthAccount, Hide, Hidden, GPG, Script,
 
         # Character sets
         exclude, LOWERCASE, UPPERCASE, LETTERS, DIGITS, ALPHANUMERIC,
@@ -882,7 +882,7 @@ ARCHIVE_FILE_CONTENTS = dedent('''\
     #
 
     from avendesora import (
-        Hidden, Question, Script, OTP, WriteFile,
+        Hidden, Question, Script, OTP,
         RecognizeAll, RecognizeAny, RecognizeTitle, RecognizeURL, RecognizeCWD,
         RecognizeHost, RecognizeUser, RecognizeEnvVar, RecognizeNetwork,
         RecognizeFile

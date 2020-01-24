@@ -6,7 +6,6 @@ from .charsets import (
 from .error import PasswordError
 from .generator import PasswordGenerator
 from .obscure import Hide, Hidden, GPG
-from .file import WriteFile
 try:
     from .obscure import Scrypt
 except ImportError:  # pragma: no cover
