@@ -259,5 +259,4 @@ def setup(app):
 
 # KSK: the following is needed by read-the-docs because they do not install
 # gobject-introspection-1.0
-#
-autodoc_mock_inports = ['pygobject']
+autodoc_mock_inports = []
