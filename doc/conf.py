@@ -257,3 +257,7 @@ def setup(app):
     if os.path.exists('.static/css/custom.css'):
         app.add_stylesheet('css/custom.css')
 
+# KSK: the following is needed by read-the-docs because they do not install
+# gobject-introspection-1.0
+#
+autodoc_mock_inports = ['pygobject']
