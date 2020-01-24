@@ -38,6 +38,8 @@ requested, :exc:`avendesora.SecretExhausted` is raised.
 
 .. autoclass:: avendesora.OTP
 
+.. autoclass:: avendesora.WriteFile
+
 .. autoexception:: avendesora.SecretExhausted
     :members: report, terminate
 

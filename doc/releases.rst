@@ -7,6 +7,9 @@ Releases
 
     - Enhance :ref:`conceal command <conceal command>` so that it can read text 
       from a file.
+    - Add :class:`avendesora.WriteFile`; allows the contents of a file to be 
+      held as an account field. When requested, the contents are written to the 
+      file system.
 
 **1.16 (2019-12-25)**:
     - Added *ms_per_char* setting that allows user to slow autotyping.

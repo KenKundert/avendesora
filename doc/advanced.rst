@@ -1052,6 +1052,71 @@ second factor that completes the login process:
 
 
 .. index::
+    single: files as secrets
+    single: writing files
+
+Files as Secrets
+----------------
+
+It is possible to place the contents of entire files in *Avendesora*, and then 
+when you request an account field that holds the file, that file is written to 
+the filesystem.
+
+To see how this would work, consider your SSH private keys.  You would first 
+encode each of the keys using the :ref:`conceal command <conceal command>`::
+
+    > avendesora conceal --file ~/ssh/id_rsa
+    Hidden(
+        'LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnph'
+        ...
+        'RCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K'
+    )
+    ...
+
+You would then create an *Avendesora* account for your SSH keys and copy the 
+encoded contents in to the arguments of :class:`avendesora.WriteFile` along with 
+the path to the file and the desired file mode:
+
+.. code-block:: python
+
+    class SSH_Keys(Account):
+        desc = 'ssh private keys'
+        aliases = 'sshkeys'
+        all = Script('\n    {id_rsa}\n    {github}')
+        id_rsa = WriteFile(
+            path = '~/.ssh/id_rsa',
+            contents = Hidden(
+                'LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnph'
+                ...
+                'RCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K'
+            ),
+            mode = 0o0600
+        )
+        github = WriteFile(
+            path = '~/.ssh/github',
+            contents = Hidden(
+                'LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnph'
+                ...
+                'RXdIK1BWSTFmUUFBQUtpcDZsS1VxZXBTCmxB=='
+            ),
+            mode = 0o0600
+        )
+
+Then, when you run *Avendesora* the contents are decoded and written to the 
+specified file::
+
+    > avendesora sshkeys id_rsa
+    id-rsa: Contents written to ~/.ssh/id_rsa.
+
+Using :class:`avendesora.Script` allows you to write multiple files at once::
+
+    > avendesora sshkeys all
+    all:
+        Contents written to ~/.ssh/id_ed25519.
+        Contents written to ~/.ssh/id_rsa.
+
+
+.. index::
     single: stealth accounts
 
 .. _stealth accounts:
