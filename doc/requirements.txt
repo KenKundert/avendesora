@@ -1,0 +1,13 @@
+appdirs==1.4.3
+arrow==0.15.5
+avendesora==1.16.4
+cffi==1.13.2
+cryptography==2.8
+docopt==0.6.2
+inform==1.20.0
+pycairo==1.19.0
+pycparser==2.19
+pyotp==2.3.0
+python-dateutil==2.8.1
+python-gnupg==0.4.5
+six==1.14.0
