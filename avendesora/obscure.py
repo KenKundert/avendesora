@@ -366,64 +366,81 @@ class GPG(ObscuredSecret, GnuPG):
 
 
 # Scrypt {{{1
-try:
-    import scrypt
+def scrypt_not_installed():
+    raise PasswordError(dedent('''
+        Scrypt based encryption and decryption is not available. To use, you
+        must install scrypt support using:
+            pip3 install scrypt
+    ''').strip())
 
-    class Scrypt(ObscuredSecret):
-        """Scrypt encrypted text
+class Scrypt(ObscuredSecret):
+    """Scrypt encrypted text
 
-        The secret is fully encrypted with scrypt.
+    The secret is fully encrypted with scrypt.
 
-        Only available if scrypt is installed (pip install scrypt).
+    Only available if scrypt is installed (pip install scrypt).
 
-        Args:
-            ciphertext (str):
-                The secret encrypted and armored by GPG.
-            encoding (str):
-                The encoding to use for the deciphered text.
+    Args:
+        ciphertext (str):
+            The secret encrypted and armored by GPG.
+        encoding (str):
+            The encoding to use for the deciphered text.
 
-        Raises:
-            :exc:`avendesora.PasswordError`: invalid value.
-        """
+    Raises:
+        :exc:`avendesora.PasswordError`: invalid value.
+    """
 
-        # This encrypts/decrypts a string with scrypt. The user's key is used as the
-        # passcode for this symmetric encryption.
-        DESC = '''
-            This encoding fully encrypts the text with your user key. Only
-            you can decrypt it, secrets encoded with scrypt cannot be shared.
-        '''
+    # This encrypts/decrypts a string with scrypt. The user's key is used as the
+    # passcode for this symmetric encryption.
+    DESC = '''
+        This encoding fully encrypts the text with your user key. Only
+        you can decrypt it, secrets encoded with scrypt cannot be shared.
+    '''
 
-        def __init__(self, ciphertext, secure=True, encoding='utf8'):
-            self.ciphertext = ciphertext
-            self.encoding = encoding
+    def __init__(self, ciphertext, secure=True, encoding='utf8'):
+        self.ciphertext = ciphertext
+        self.encoding = encoding
 
-        def initialize(self, account, field_name, field_key=None):
-            encrypted = a2b_base64(self.ciphertext.encode(self.encoding))
-            self.plaintext = scrypt.decrypt(encrypted, get_setting('user_key'))
+    def initialize(self, account, field_name, field_key=None):
+        try:
+            import scrypt
+        except ImportError:
+            scrypt_not_installed()
 
-        def is_secure(self):
-            return False
+        encrypted = a2b_base64(self.ciphertext.encode(self.encoding))
+        self.plaintext = scrypt.decrypt(encrypted, get_setting('user_key'))
 
-        def render(self):
-            return str(self.plaintext).strip()
+    def is_secure(self):
+        return False
 
-        @staticmethod
-        def conceal(plaintext, decorate=False, encoding=None, **kwargs):
-            encoding = encoding if encoding else get_setting('encoding')
-            plaintext = str(plaintext).encode(encoding)
-            encrypted = scrypt.encrypt(
-                plaintext, get_setting('user_key'), maxtime=0.25
-            )
-            encoded = b2a_base64(encrypted).rstrip().decode('ascii')
-            if decorate:
-                return decorate_concealed('Scrypt', encoded)
-            else:
-                return encoded
+    def render(self):
+        return str(self.plaintext).strip()
 
-        @staticmethod
-        def reveal(ciphertext, encoding=None):
-            encrypted = a2b_base64(ciphertext)
-            return scrypt.decrypt(encrypted, get_setting('user_key'))
+    @staticmethod
+    def conceal(plaintext, decorate=False, encoding=None, **kwargs):
+        try:
+            import scrypt
+        except ImportError:
+            scrypt_not_installed()
 
-except ImportError:
-    pass
+        encoding = encoding if encoding else get_setting('encoding')
+        plaintext = str(plaintext).encode(encoding)
+        encrypted = scrypt.encrypt(
+            plaintext, get_setting('user_key'), maxtime=0.25
+        )
+        encoded = b2a_base64(encrypted).rstrip().decode('ascii')
+        if decorate:
+            return decorate_concealed('Scrypt', encoded)
+        else:
+            return encoded
+
+    @staticmethod
+    def reveal(ciphertext, encoding=None):
+        try:
+            import scrypt
+        except ImportError:
+            scrypt_not_installed()
+
+        encrypted = a2b_base64(ciphertext)
+        return scrypt.decrypt(encrypted, get_setting('user_key'))
+
