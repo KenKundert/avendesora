@@ -38,8 +38,6 @@ requested, :exc:`avendesora.SecretExhausted` is raised.
 
 .. autoclass:: avendesora.OTP
 
-.. autoclass:: avendesora.WriteFile
-
 .. autoexception:: avendesora.SecretExhausted
     :members: report, terminate
 
@@ -151,6 +149,8 @@ These classes are used when creating account secrets (see :ref:`accounts`).
 .. autoclass:: avendesora.GPG
 
 .. autoclass:: avendesora.Scrypt
+
+.. autoclass:: avendesora.WriteFile
 
 
 Recognizer Classes

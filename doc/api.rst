@@ -133,10 +133,9 @@ Example: Add SSH Keys
 This example adds SSH keys to your SSH agent. It uses *pexpect* to manage the 
 interaction between this script and *ssh-add*.
 
-The updated source code for `addsshkeys
-<https://github.com/KenKundert/avendesora/tree/master/samples/api/addsshkeys>`_
-can be found on Github.  A more advanced version can be found `here 
-<https://github.com/KenKundert/addsshkeys>`_.
+A more advanced version of
+`addsshkeys <https://github.com/KenKundert/addsshkeys>`_
+can be found on *GitHub*.
 
 .. code-block:: python
 
@@ -386,10 +385,9 @@ include the GPG IDs for yourself and your recipients. For example:
         partners='taringail.damodred@andor.gov',
     )
 
-The updated source code for `postmortem
-<https://github.com/KenKundert/avendesora/tree/master/samples/api/postmortem>`_
-can be found on Github. A more advanced version can be found `here 
-<https://github.com/KenKundert/postmortem>`_.
+A more advanced version of
+`postmortem <https://github.com/KenKundert/postmortem>`_.
+can be found on *GitHub*.
 
 .. code-block:: python
 
@@ -579,10 +577,8 @@ Here is an example of what your configuration file might look like.
     # bar settings
     screen_width = 110
 
-The updated source code for `networth
-<https://github.com/KenKundert/avendesora/tree/master/samples/api/networth>`_ 
-can be found on Github. A more advanced version can be found `here 
-<https://github.com/KenKundert/networth>`_.
+A more advanced version of `networth <https://github.com/KenKundert/networth>`_
+can be found on *GitHub*.
 
 .. code-block:: python
 
