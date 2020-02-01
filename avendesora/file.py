@@ -26,7 +26,7 @@ from .shlib import to_path
 
 # WriteFile {{{1
 class WriteFile():
-    """Write a file containing a secret.
+    """Write a text file containing a secret.
 
 
     Args:

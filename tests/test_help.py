@@ -628,7 +628,7 @@ def test_reveal():
         Transform concealed text to reveal its original form.
 
         Usage:
-            avendesora reveal [<text>]
+            avendesora reveal [options] [<text>]
 
         Options:
             -e <encoding>, --encoding <encoding>
