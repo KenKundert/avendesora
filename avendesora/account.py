@@ -331,6 +331,7 @@ class Account(object):
 
         # If no recognizers specified, just check the urls
         for url in Collection(cls.get_composite('urls', default=[])):
+            url = str(url)  # this is needed because url may be Script
             url = url if '//' in url else ('//'+url)
             url_components = urlparse(url)
             if url_components.scheme:
