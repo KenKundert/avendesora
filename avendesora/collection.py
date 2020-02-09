@@ -19,29 +19,66 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see http://www.gnu.org/licenses/.
+# along with this program.  If not, see http://www.gnu.org/licenses.
 
 # Imports {{{1
-from inform import is_str, is_collection
+from inform import is_str, is_collection, cull as inform_cull
 
 # Globals {{{1
-__version__ = '0.1.0'
-__released__ = '2018-05-13'
+__version__ = '0.2.0'
+__released__ = '2020-02-09'
 
+# Utilities {{{1
+def split_lines(text, comment=None, strip=False, cull=False):
+    """Split lines
+
+    Can be passed as a splitter to Collection. Takes a multiline string,
+    converts it to individual lines where each line is stripped (if strip is
+    True), comments are removed (if comment string is provided, and empty lines
+    are culled (if cull is True).
+    """
+    lines = text.splitlines()
+    if comment:
+        lines = [l.partition(comment)[0] for l in lines]
+    if strip:
+        lines = [l.strip() for l in lines]
+    if cull:
+        return inform_cull(lines)
+    else:
+        return lines
 
 # Collection {{{1
 class Collection(object):
-    def __init__(self, collection, splitter=None):
-        if splitter is not False and is_str(collection):
-            # strings will be split unless splitter is False
-            self.collection = collection.split(splitter)
-        elif is_collection(collection):
+    """Collection
+
+    Takes a list or dictionary and provides both a list like and dictionary like
+    API, meaning that it provides the keys, values, and items methods like
+    dictionary and you can iterate through the value like a list.  When applying
+    keys to a list, the indices are returned as the keys. You can also use an
+    index or a key to get a value, you test to see if a value is in the
+    collection using the *in* operator, and you can get the length of the
+    collection.
+
+    If splitter is a string or None, then you can pass in a string and it will
+    be split into a list to form the collection.  You can also pass in a
+    splitting function.
+    """
+    def __init__(self, collection, splitter=None, **kwargs):
+        if is_str(collection):
+            if callable(splitter):
+                self.collection = splitter(collection, **kwargs)
+                return
+            elif splitter is not False:
+                self.collection = collection.split(splitter)
+                return
+        if is_collection(collection):
             self.collection = collection
-        elif collection is None:
+            return
+        if collection is None:
             self.collection = []
-        else:
-            # is scalar
-            self.collection = {None: collection}
+            return
+        # is scalar
+        self.collection = {None: collection}
 
     def keys(self):
         try:
