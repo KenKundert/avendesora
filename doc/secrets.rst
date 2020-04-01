@@ -36,7 +36,9 @@ accounts file to protect its secret.
  |      Indicates that this secret should only be contained in an
  |      encrypted accounts file. Default is True.
 
-Example::
+Example:
+
+.. code-block:: python
 
     account = Hide('9646-3440')
 
@@ -61,7 +63,9 @@ capture it they can easily decode it.
  |  encoding (str):
  |      The encoding to use for the deciphered text.
 
-Example::
+Example:
+
+.. code-block:: python
 
     account = Hidden('NTIwNi03ODQ0')
 
@@ -90,7 +94,9 @@ is generally used.
  |  encoding (str):
  |      The encoding to use for the deciphered text.
 
-Example::
+Example:
+
+.. code-block:: python
 
     secret = GPG('''
         -----BEGIN PGP MESSAGE-----
@@ -139,7 +145,9 @@ import it yourself before using it.
  |  encoding (str):
  |      The encoding to use for the deciphered text.
 
-Example::
+Example:
+
+.. code-block:: python
 
     from avendesora import Scrypt
     ...
@@ -219,7 +227,9 @@ length*log2(len(alphabet)).
  |  suffix (str):
  |      A string added to the end of the generated password.
 
-Example::
+Example:
+
+.. code-block:: python
 
     passcode = Password(10)
 
@@ -263,7 +273,9 @@ the default alphabet is a dictionary containing about 10,000 words.
  |  suffix (str):
  |      A string added to the end of the generated password.
 
-Example::
+Example:
+
+.. code-block:: python
 
     passcode = Passphrase()
     verbal = Passphrase(2)
@@ -298,7 +310,9 @@ alphabet is the set of digits (0-9).
  |      An optional seed. Changing this value will change the generated
  |      PIN.
 
-Example::
+Example:
+
+.. code-block:: python
 
     pin = PIN(6)
 
@@ -353,7 +367,9 @@ than the field name when generating the secret.
  |      The answer. If provided, this would override the generated
  |      answer.  May be a string, or it may be an Obscured object.
 
-Example::
+Example:
+
+.. code-block:: python
 
     questions = [
         Question('Favorite foreign city'),
@@ -455,7 +471,9 @@ Generates an arbitrary birth date for someone in a specified age range.
  |      An optional seed. Changing this value will change the generated
  |      answer.
 
-Example::
+Example:
+
+.. code-block:: python
 
     birthdate = BirthDate(2015, 21, 55)
 
@@ -481,7 +499,9 @@ presented to you when first configuring your second factor authentication.
  |  max_age (int):
  |      The number of digits to output.
 
-Example::
+Example:
+
+.. code-block:: python
 
     otp = OTP('JBSWY3DPEHPK3PXP')
 
@@ -504,7 +524,9 @@ extremely rare, you can simply number them sequentially. Or, if you you
 need to update them every month or every quarter, you can name them
 after the month or quarter (ex: jan19 or 19q1).
 
-Examples::
+Examples:
+
+.. code-block:: python
 
     passcode = PasswordRecipe('16 1d', version=2)
     passcode = PasswordRecipe('16 1d', version='19q2')

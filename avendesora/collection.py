@@ -22,11 +22,12 @@
 # along with this program.  If not, see http://www.gnu.org/licenses.
 
 # Imports {{{1
-from inform import is_str, is_collection, cull as inform_cull
+from inform import is_collection, is_str
 
 # Globals {{{1
-__version__ = '0.2.0'
-__released__ = '2020-02-09'
+__version__ = "0.3.1"
+__released__ = "2020-02-21"
+
 
 # Utilities {{{1
 def split_lines(text, comment=None, strip=False, cull=False):
@@ -39,16 +40,21 @@ def split_lines(text, comment=None, strip=False, cull=False):
     """
     lines = text.splitlines()
     if comment:
-        lines = [l.partition(comment)[0] for l in lines]
+        lines = (l.partition(comment)[0] for l in lines)
     if strip:
-        lines = [l.strip() for l in lines]
+        lines = (l.strip() for l in lines)
     if cull:
-        return inform_cull(lines)
+        return (l for l in lines if l)
     else:
         return lines
 
+
 # Collection {{{1
 class Collection(object):
+    fmt = {}  # default value format
+    sep = " "  # default separator
+    splitter = "|"  # default format splitter (goes between fmt and sep)
+
     """Collection
 
     Takes a list or dictionary and provides both a list like and dictionary like
@@ -63,6 +69,7 @@ class Collection(object):
     be split into a list to form the collection.  You can also pass in a
     splitting function.
     """
+
     def __init__(self, collection, splitter=None, **kwargs):
         if is_str(collection):
             if callable(splitter):
@@ -98,7 +105,7 @@ class Collection(object):
         except AttributeError:
             return enumerate(self.collection)
 
-    def render(self, fmt='{v}', sep=', '):
+    def render(self, fmt="{v}", sep=", "):
         """Convert the collection into a string
 
         fmt (str):
@@ -121,7 +128,7 @@ class Collection(object):
 
         """
         if not fmt:
-            fmt = '{}'
+            fmt = "{}"
 
         return sep.join(fmt.format(v, k=k, v=v) for k, v in self.items())
 
@@ -138,16 +145,19 @@ class Collection(object):
             dogs: collie (3), beagle (1), sheppard (2).
 
         """
-        components = template.split('|')
-        if len(components) == 2:
-            fmt, sep = components
-        elif len(components) == 1:
-            fmt, sep = components[0], ', '
+        if template:
+            components = template.split(self.splitter)
+            if len(components) == 2:
+                fmt, sep = components
+            else:
+                fmt, sep = components[0], " "
         else:
-            raise ValueError('invalid format string for {!r}', self)
+            fmt, sep = self.fmt, self.sep
         if not fmt:
-            fmt = '{}'
+            fmt = "{}"
 
+        if callable(fmt):
+            return sep.join(fmt(k, v) for k, v in self.items())
         return sep.join(fmt.format(v, k=k, v=v) for k, v in self.items())
 
     def __contains__(self, item):

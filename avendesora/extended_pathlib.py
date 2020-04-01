@@ -16,14 +16,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '0.4.0'
 
 # Imports {{{1
-from pathlib import Path, PosixPath
 import codecs
-import six
 import os
 import sys
+from pathlib import Path, PosixPath
+import six
+
+# Globals {{{1
+__version__ = "0.4.1"
 
 
 # is_readable {{{1
@@ -37,6 +39,7 @@ def _is_readable(path):
 
     """
     return os.access(str(path), os.R_OK)
+
 
 PosixPath.is_readable = _is_readable
 
@@ -52,6 +55,7 @@ def _is_writable(path):
     """
     return os.access(str(path), os.W_OK)
 
+
 PosixPath.is_writable = _is_writable
 
 
@@ -66,6 +70,7 @@ def _is_executable(path):
     """
     return os.access(str(path), os.X_OK)
 
+
 PosixPath.is_executable = _is_executable
 
 
@@ -78,7 +83,8 @@ def _is_hidden(path):
     False
 
     """
-    return path.exists() and path.name.startswith('.')
+    return path.exists() and path.name.startswith(".")
+
 
 PosixPath.is_hidden = _is_hidden
 
@@ -102,6 +108,7 @@ def _is_newer(path, ref):
         except AttributeError:
             return mtime > ref.stat().st_mtime
 
+
 PosixPath.is_newer = _is_newer
 
 
@@ -117,6 +124,7 @@ def _path_from(path, start):
 
     """
     return Path(os.path.relpath(str(path), str(start)))
+
 
 PosixPath.path_from = _path_from
 
@@ -146,7 +154,7 @@ if sys.version_info < (3, 5):
         """
         Open the file in binary mode, read it, and close the file.
         """
-        with self.open(mode='rb') as f:
+        with self.open(mode="rb") as f:
             return f.read()
 
     PosixPath.read_bytes = _read_bytes
@@ -156,7 +164,7 @@ if sys.version_info < (3, 5):
         """
         Open the file in text mode, read it, and close the file.
         """
-        with self.open(mode='r', encoding=encoding, errors=errors) as f:
+        with self.open(mode="r", encoding=encoding, errors=errors) as f:
             return f.read()
 
     PosixPath.read_text = _read_text
@@ -168,11 +176,10 @@ if sys.version_info < (3, 5):
         """
         if not isinstance(data, six.binary_type):
             raise TypeError(
-                'data must be %s, not %s.' % (
-                    six.binary_type.__name__, data.__class__.__name__
-                )
+                "data must be %s, not %s."
+                % (six.binary_type.__name__, data.__class__.__name__)
             )
-        with self.open(mode='wb') as f:
+        with self.open(mode="wb") as f:
             return f.write(data)
 
     PosixPath.write_bytes = _write_bytes
@@ -183,7 +190,7 @@ if sys.version_info < (3, 5):
         Open the file in text mode, write it, and close the file.
         """
         path = str(self)
-        with codecs.open(path, mode='w', encoding=encoding, errors=errors) as f:
+        with codecs.open(path, mode="w", encoding=encoding, errors=errors) as f:
             return f.write(text)
 
     PosixPath.write_text = _write_text
@@ -195,7 +202,7 @@ if sys.version_info < (3, 5):
         """
 
         path = str(self)
-        if path[:1] == '~':
+        if path[:1] == "~":
             path = os.path.expanduser(path)
             self = Path(path)
         return self

@@ -38,7 +38,9 @@ Secrets classes. PIN() converts it to a sequence of digits, Password() converts
 it to a sequence of characters, Passphrase converts it to a sequence of words, 
 etc.
 
-For example, consider the following rather abbreviated accounts file::
+For example, consider the following rather abbreviated accounts file:
+
+.. code-block:: python
 
     from avendesora import Account, Passphrase
 

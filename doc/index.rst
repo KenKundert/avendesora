@@ -109,7 +109,9 @@ accounts file based on the *website* template.
 
 *Avendesora* responds by opening your editor with a rough template containing
 the fields needed for a typical website account. You should modify it to suit 
-your needs. For example, your entry for FasTrak might look like this::
+your needs. For example, your entry for FasTrak might look like this:
+
+.. code-block:: python
 
     class FasTrak(Account):
         desc = 'payment service for automated toll collection'

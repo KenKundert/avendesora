@@ -190,6 +190,7 @@ def name_completion(prompt, choices):
 
     import readline
     readline.parse_and_bind("tab: complete")
+    readline.parse_and_bind("set editing-mode vi")
     readline.set_completer(complete)
 
     try:

@@ -108,9 +108,7 @@ by adding the URL to the title.  For *Chrome* the appropriate plugin is  is `URL
 in Title
 <https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb>`_
 by Guillaume Ryder.  It is recommended that you install the appropriate one into
-your browser.  For *Add URL To Window Title*, set the following options:
-
-.. code-block:: python
+your browser.  For *Add URL To Window Title*, set the following options::
 
     show full URL = yes
     separator string = '-'
@@ -378,7 +376,9 @@ and should only be executed for interactive shells::
     endif
 
 With these aliases in place, you can add the following to the account that
-contains your login password::
+contains your login password:
+
+.. code-block:: python
 
     discovery = RecognizeTitle(
         '*@*: sudo *',
@@ -390,7 +390,9 @@ when *sudo* requests your password.  Avendesora will recognize the title and
 enter your login password.  By placing the username and the host name in the 
 window title along with the command you give Avendesora the ability to tailor 
 its response accordingly. For example, you match a specific user and host names 
-with the following::
+with the following:
+
+.. code-block:: python
 
     discovery = RecognizeTitle(
         'elayne@andor: sudo *',
@@ -718,7 +720,9 @@ that adds the one-time password to the output of the :ref:`credentials command
 entry of the one-time password to the browser.
 
 Finally, some sites want you to concatenate the OTP to the end of your password.  
-You can do that with::
+You can do that with:
+
+.. code-block:: python
 
     script='{email}{tab}{passcode}{otp}{return}',
 
