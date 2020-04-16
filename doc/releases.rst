@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.16.7
-    | Released: 2020-02-09
+    | Version: 1.17.0
+    | Released: 2020-04-15
 
 **1.17 (2020-04-15)**:
     - Enhance :ref:`conceal command <conceal command>` so that it can read text 
