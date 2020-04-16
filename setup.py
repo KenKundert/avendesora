@@ -48,6 +48,7 @@ setup(
     author_email = 'avendesora@nurdletech.com',
     description = 'A password generator and account manager.',
     long_description = readme,
+    long_description_content_type='text/x-rst',
     url = 'https://avendesora.readthedocs.io',
     download_url = 'https://github.com/kenkundert/avendesora/tarball/master',
     license = 'GPLv3+',
