@@ -5,6 +5,7 @@ Releases
     | Version: 1.16.7
     | Released: 2020-02-09
 
+**1.17 (2020-04-15)**:
     - Enhance :ref:`conceal command <conceal command>` so that it can read text 
       from a file.
     - Add :class:`avendesora.WriteFile`; allows the contents of a file to be 
