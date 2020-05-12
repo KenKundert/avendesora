@@ -12,13 +12,13 @@ Generated Secrets
 Account secrets can be saved in encrypted form, as with password vaults, or 
 generated from a root secret.  Generated secrets have several important 
 benefits.  First, they are produced from a random seed, and so are quite 
-unpredictable.  This is important, because the predictability can be exploited 
-when cracking passwords.  Second, if the root secret is shared with another 
-trusted party, then you both can generate new shared secrets without passing any 
-further secrets.  Furthermore, if you keep a copy of the root secret, say in 
-a safe deposit box, then there is a good chance you can resurrect your secrets 
-if you happen to lose your accounts files.  Finally, with generated secrets, it 
-is possible to have :ref:`stealth secrets <stealth accounts>`, which are secrets 
+unpredictable.  This is important, because predictability can be exploited when 
+cracking passwords.  Second, if the root secret is shared with another trusted 
+party, then you both can generate new shared secrets without passing any further 
+secrets.  Furthermore, if you keep a copy of the root secret, say in a safe 
+deposit box, then there is a good chance you can resurrect your secrets if you 
+happen to lose your accounts files.  Finally, with generated secrets, it is 
+possible to have :ref:`stealth secrets <stealth accounts>`, which are secrets 
 for which there is absolutely no evidence.
 
 Secrets are generated from a collection of seeds, one of which must be random 
@@ -55,9 +55,9 @@ master seed is combined with the words 'login' (the account name, down cased)
 and 'passcode' (the attribute name); the combination is hashed, and the hash is 
 used to generate the passphrase.  The words in the passphrase are chosen at 
 random from a dictionary of roughly 10,000 words.  The first word is chosen by 
-taking the first 14 bits from the hash and using that to number to select 
-a word. The second word is chosen using the next 14 bits, and so on.  The hash 
-is constructed such that even the smallest changes in any seed results in 
+taking the first 14 bits from the hash and using that number to select a word. 
+The second word is chosen using the next 14 bits, and so on.  The hash is 
+constructed such that even the smallest changes in any seed results in 
 a completely different hash. As such, the resulting passphrase is quite 
 unpredictable::
 
