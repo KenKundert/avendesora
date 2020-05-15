@@ -1134,7 +1134,8 @@ presence of the account itself, even though it is contained within an encrypted
 file can be problematic.  The mere presence of an encrypted file may result in 
 you being compelled to open it. For the most damaging secrets, it is best if 
 there is no evidence that the secret exists at all. This is the purpose of 
-stealth accounts. (:ref:`Misdirection` is an alternative to stealth accounts).
+stealth accounts (:ref:`misdirection <misdirection>` is an alternative to 
+stealth accounts).
 
 The stealth accounts are predefined and have names that are descriptive of the 
 form of the secret they generate, for example word4 generates a 4-word pass 
