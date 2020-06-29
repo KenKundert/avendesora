@@ -5,6 +5,8 @@ Releases
     | Version: 1.17.0
     | Released: 2020-04-15
 
+    - Deprecate Python 2.7 and Python 3.5.
+
 **1.17 (2020-04-15)**:
     - Enhance :ref:`conceal command <conceal command>` so that it can read text 
       from a file.
