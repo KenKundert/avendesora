@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.17.0
-    | Released: 2020-04-15
+    | Version: 1.17.1
+    | Released: 2020-06-28
 
     - Deprecate Python 2.7 and Python 3.5.
 
