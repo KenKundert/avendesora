@@ -448,7 +448,7 @@ class Account(object):
     # get_scalar() {{{2
     @classmethod
     def get_scalar(cls, name, key=None, default=False):
-        """Get field Value given a field name and key.
+        """Get field value given a field name and key.
 
         A lower level interface than *get_value()* that given a name and perhaps
         a key returns a scalar value.  Also takes an optional default value that is

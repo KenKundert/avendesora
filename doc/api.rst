@@ -3,8 +3,30 @@
 Python API
 ==========
 
-A Simple Example
-----------------
+Introductory Examples
+---------------------
+
+Access an Account Value
+"""""""""""""""""""""""
+
+There are times where you might want to access an account value using a single 
+string that contains both the account and the field name, as shown in this 
+example:
+
+.. code-block:: python
+
+    from avendesora import PasswordGenerator, PasswordError
+
+    access_key_in_avendesora = 'iexcloud:api_key'
+    try:
+        pw = PasswordGenerator()
+        api_key = str(pw.get_value(access_key_in_avendesora))
+    except PasswordError as e:
+        e.terminate()
+
+
+Access Several Values for a Particular Account
+""""""""""""""""""""""""""""""""""""""""""""""
 
 You can access account information from Avendesora using Python using a simple 
 relatively high-level interface as shown in this example:
@@ -39,6 +61,50 @@ relatively high-level interface as shown in this example:
 Basically, the approach is to open the password generator, open an account, and 
 then access values of that account. The various components of the Avendesora 
 programming interface are described next.
+
+
+Using an Account Value
+""""""""""""""""""""""
+
+Both of the two examples given above us an *get_value* method, but they are 
+methods to two different classes. In the first example, *get_value* is a method 
+of the :class:`avendesora.PasswordGenerator` class; it requires you to specify 
+both the account and field names in a single string passed as the primary 
+argument.  In the second example, *get_value* is a method of the 
+:class:`avendesora.Account` class. In this case you have already specified the 
+account, so you only need to specify the desired field name as an argument. In 
+both cases the methods return an :class:`avendesora.AccountValue` object.  This 
+is also true for :meth:`avendesora.Account.get_username` and
+:meth:`avendesora.Account.get_password`.
+
+
+The various aspects of the value are available as attributes.
+
+   | value -- the value itself
+   | is_secret -- indicates whether the value is a secret
+   | name -- identifier for the first level of a field
+   | key -- identifier for the second level of a field
+   | field -- name.key
+   | desc -- description
+
+If you cast the object to a string, you get the value in the form of a string.
+
+In addition, the object provides the :meth:`avendesora.AccountValue.render` 
+method for flexibly converting the account value to a string.  You use it by 
+providing one or more template strings where the attributes are accessed using 
+a single letter contained with braces. So for example:
+
+.. code-block:: python
+
+    print(passcode.render('{n} = {v}')
+    print(passcode.render(('{f} ({d}): {v}', '{f}: {v}'))
+
+You can include normal Python string formatting codes as well.
+
+.. code-block:: python
+
+    print(passcode.render('{n:>10} = {v}')
+
 
 
 Components

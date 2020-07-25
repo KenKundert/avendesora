@@ -6,6 +6,9 @@ Releases
     | Released: 2020-06-28
 
     - Deprecate Python 2.7 and Python 3.5.
+    - Add :meth:`avendesora.PasswordGenerator.get_value()`, a method of getting 
+      an account value from a string that includes the account and field 
+      names.
 
 **1.17 (2020-04-15)**:
     - Enhance :ref:`conceal command <conceal command>` so that it can read text 

@@ -264,6 +264,42 @@ class PasswordGenerator(object):
         account.initialize(request_seed, stealth_name)
         return account
 
+    # get_value() {{{2
+    def get_value(self, path, request_seed=False, stealth_name=None):
+        """Get account value given path that includes account and field names.
+
+        Args:
+            path (str):
+                Path includes account name and field name separated by a colon.
+                Paths of the following forms are accepted:
+
+                    |  *account*: account's default field
+                    |  *account:name*: account and field name of a scalar value
+                    |  *account:name.key* or *account:name[key]*:
+                    |      member of a dictionary or array
+                    |      key is string for dictionary, integer for array
+
+            request_seed (str or bool):
+                If specified an additional seed is provided to the account (see:
+                :ref:`misdirection <misdirection>`).  It may be specified as a
+                string, in which case it is used as the seed.  Otherwise if
+                true, the seed it requested directly from the user.
+            stealth_name (str):
+                The name used as the account name if the account is a stealth
+                account.
+
+        Returns:
+            :class:`avendesora.Account`: An account. The class itself is
+            returned, and not an instance of the class.
+
+        Raises:
+            :exc:`avendesora.PasswordError`:
+                There is no account of field that matches the given path.
+        """
+        name, _, field = path.partition(':')
+        account = self.get_account(name, request_seed, stealth_name)
+        return account.get_value(field)
+
     # discover_account() {{{2
     def discover_account(self, url=None, title=None, verbose=False):
         """Discover the account from the environment.

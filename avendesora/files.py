@@ -238,6 +238,8 @@ class AccountFiles:
             assert isinstance(self.name_index, dict)
         except OSErrors as e:
             comment(os_error(e))
+        except Exception as e:
+            comment(e)
 
     def write_manifests(self):  # {{{2
         # do not modify existing name_index if no account files were loaded
