@@ -61,6 +61,14 @@ def test_xkcd():
         password = err
     assert str(password) == 'tauten polymer rudder lively'
 
+def test_xkcd2():
+    try:
+        pw = PasswordGenerator()
+        password = pw.get_value('xkcd', stealth_name='chaos')
+    except PasswordError as err:
+        password = err
+    assert str(password) == 'tauten polymer rudder lively'
+
 def test_alertscc():
     try:
         pw = PasswordGenerator()
@@ -72,6 +80,14 @@ def test_alertscc():
 
     try:
         password = account.get_value(('password',))
+    except PasswordError as err:
+        password = err
+    assert str(password) == 'R7ibHyPjWtG2'
+
+def test_alertscc2():
+    try:
+        pw = PasswordGenerator()
+        password = pw.get_value('alertscc:password')
     except PasswordError as err:
         password = err
     assert str(password) == 'R7ibHyPjWtG2'
