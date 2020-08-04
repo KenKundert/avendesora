@@ -224,10 +224,10 @@ account name without disturbing the generated secrets.  The values of
 *master_seed* and *account_seed* are not accessible using either the command 
 line or the API interfaces.
 
-Account attributes that start with underscore (_) are hidden, meaning that they 
-are not shown by the :ref:`values <values command>` or :ref:`interactive 
+Account attributes that start with an underscore (_) are hidden, meaning that 
+they are not shown by the :ref:`values <values command>` or :ref:`interactive 
 <interactive command>` commands.  However, you can access their value by
 explicitly requesting them using the :ref:`value <value command>` command.
 Account attributes should not have a trailing underscore.
-Use of a trailing leading underscore creates the risk of collision with an 
-attribute added by Avendesora itself.
+Such attributes create the risk of collision with an attribute added by 
+Avendesora itself and are inaccessible.
