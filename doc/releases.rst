@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest Development Version**:
-    | Version: 1.17.2
-    | Released: 2020-07-25
+    | Version: 1.17.3
+    | Released: 2020-08-04
 
     - Deprecate Python 2.7 and Python 3.5.
     - Add :meth:`avendesora.PasswordGenerator.get_value()`, a method of getting 
