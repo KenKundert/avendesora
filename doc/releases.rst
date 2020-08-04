@@ -10,7 +10,7 @@ Releases
       an account value from a string that includes the account and field 
       names.
     - Add hidden account attributes.
-    - This release requires secrets_hash to be updated.
+    - This release requires *secrets_hash* to be updated.
 
 **1.17 (2020-04-15)**:
     - Enhance :ref:`conceal command <conceal command>` so that it can read text 

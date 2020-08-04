@@ -11,12 +11,12 @@ Accounts
 
 Account information is stored in account files. The list of account files is 
 given in ~/.config/avendesora/accounts_files.  New account files are created 
-using :ref:`avendesora new <new command>`, but to delete an accounts file, you 
+using ':ref:`avendesora new <new command>`', but to delete an accounts file, you 
 must manually remove it from accounts_files. Once an accounts file exists, you 
-may add accounts to it using :ref:`account add <add command>`. Use the ``-f`` 
-option to specify which file is to contain the new account.  Modifying or 
-deleting an account is done with :ref:`account edit account_name <edit 
-command>`.  To delete the account, simply remove all lines associated with the 
+may add accounts to it using ':ref:`avendesora add <add command>`'. Use the 
+``-f`` option to specify which file is to contain the new account.  Modifying or 
+deleting an account is done with ':ref:`avendesora edit account_name <edit 
+command>`'.  To delete the account, simply remove all lines associated with the 
 account.
 
 An account is basically a collection of attributes organized as a subclass of 
