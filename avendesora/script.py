@@ -41,7 +41,7 @@ class Script:
     Args:
         script (str):  The script.
     """
-    SPLITTER = re.compile(r'({[\w. ]+})')
+    SPLITTER = re.compile(r'({[\w. -]+})')
 
     def __init__(self, script='username: {username}, password: {passcode}'):
         self.script = script

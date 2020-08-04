@@ -130,7 +130,7 @@ class GeneratedSecret(object):
         account_seed = account.get_seed()
         if self.master is None:
             master_seed = account.get_scalar('master_seed', default=None)
-            master_source = account.get_scalar('_master_source', default=None)
+            master_source = account.get_scalar('_master_source_', default=None)
         else:
             master_seed = self.master
             master_source = 'secret'

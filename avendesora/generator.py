@@ -62,7 +62,12 @@ class PasswordGenerator(object):
             If true will validate that certain critical components in Avendesora
             have not be tampered with.  Checking the integrity can take up to a
             second, so recommend you pass False on interactive commands that
-            benefit from low startup overhead.
+            benefit from low startup overhead and True on the more expensive
+            commands to assure integrity is occasionally checked.
+
+        warnings (bool):
+            Suppress warnings from accounts. Useful when processing many
+            accounts.  Does not affect warnings from the integrity check.
 
     Raises:
         :exc:`avendesora.PasswordError`:
@@ -71,7 +76,7 @@ class PasswordGenerator(object):
 
     # Constructor {{{2
     def __init__(
-            self, init=False, gpg_ids=None, check_integrity=True, warnings=True
+            self, init=False, gpg_ids=None, check_integrity=False, warnings=True
     ):
         # initialize avendesora (these should already be done if called from
         # main, but it is safe to call them again)

@@ -367,7 +367,7 @@ class Archive(Command):
         AccountFiles.delete_manifests()
 
         # run the generator
-        generator = PasswordGenerator(warnings=False)
+        generator = PasswordGenerator(check_integrity=True, warnings=False)
 
         # get dictionary that fully describes the contents of each account
         entries = []
@@ -520,7 +520,7 @@ class Changed(Command):
             )
 
         # run the generator
-        generator = PasswordGenerator(warnings=False)
+        generator = PasswordGenerator(check_integrity=True, warnings=False)
 
         # collect the accounts
         current_accounts = {}
@@ -699,12 +699,12 @@ class Edit(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=True)
 
         # determine the account file and back it up
         try:
             account = generator.get_account(cmdline['<account>'])
-            accounts_file = PythonFile(account._file_info.path)
+            accounts_file = PythonFile(account._file_info_.path)
             accounts_file.backup('.saved')
             account_name = account.__name__
         except OSErrors as e:
@@ -883,7 +883,7 @@ class Identity(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run the generator
-        generator = PasswordGenerator()
+        generator = PasswordGenerator(check_integrity=False)
         generator.account_files.load_account_files()
 
         if cmdline['<name>']:
@@ -951,7 +951,7 @@ class Initialize(Command):
             gpg_ids = get_setting('gpg_ids', [])
 
         # run the generator
-        PasswordGenerator(init=True, gpg_ids=gpg_ids)
+        PasswordGenerator(init=True, gpg_ids=gpg_ids, check_integrity=True)
 
 
 # Interactive {{{1
@@ -1203,7 +1203,7 @@ class New(Command):
 
         # run the generator
         PasswordGenerator(
-            init=cmdline['<name>'], gpg_ids=sorted(gpg_ids)
+            init=cmdline['<name>'], gpg_ids=sorted(gpg_ids), check_integrity=True
         )
 
 

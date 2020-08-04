@@ -11,12 +11,12 @@ Accounts
 
 Account information is stored in account files. The list of account files is 
 given in ~/.config/avendesora/accounts_files.  New account files are created 
-using ':ref:`avendesora new <new command>`', but to delete an accounts file, you 
+using :ref:`avendesora new <new command>`, but to delete an accounts file, you 
 must manually remove it from accounts_files. Once an accounts file exists, you 
-may add accounts to it using ':ref:`account add <add command>`'. Use the ``-f`` 
+may add accounts to it using :ref:`account add <add command>`. Use the ``-f`` 
 option to specify which file is to contain the new account.  Modifying or 
-deleting an account is done with ':ref:`account edit account_name <edit 
-command>`'.  To delete the account, simply remove all lines associated with the 
+deleting an account is done with :ref:`account edit account_name <edit 
+command>`.  To delete the account, simply remove all lines associated with the 
 account.
 
 An account is basically a collection of attributes organized as a subclass of 
@@ -150,14 +150,13 @@ Notice the passcode is not shown. You can circumvent this protection by adding
 
 The *aliases* and *discovery* fields are not shown because they are considered 
 tool fields (see :ref:`discovery` for more information on discovery).  Other 
-tool fields include *NAME*, *default*, *master_seed*, *account_seed*, *browser*, 
-and *default_url*.  *default* is the name of the default field, which is the 
-field you get if you do not request a particular field. Its value defaults to 
-*password*, *pasphrase*, or *passcode* (as set by *default_field* setting), but 
-it can be set to any account attribute name or it can be a :ref:`script 
-<scripts>`.  *browser* is the default browser to use when opening the account, 
-run the :ref:`browse command <browse command>` to see a list of available 
-browsers.
+tool fields include *NAME*, *default*, *browser*, and *default_url*.  *default* 
+is the name of the default field, which is the field you get if you do not 
+request a particular field. Its value defaults to *password*, *pasphrase*, or 
+*passcode* (as set by *default_field* setting), but it can be set to any account 
+attribute name or it can be a :ref:`script <scripts>`.  *browser* is the default 
+browser to use when opening the account, run the :ref:`browse command <browse 
+command>` to see a list of available browsers.
 
 The value of *passcode* is considered sensitive because it is an instance of 
 :class:`PasswordRecipe`, which is a subclass of :class:`GeneratedSecret`.  If 
@@ -221,4 +220,14 @@ Normally the user need not specify any of the seeds used when generating
 passwords. However, it is possible to override the master seed and the account 
 seed.  To do so, specify these seeds using the *master_seed* and *account_seed* 
 attributes on the account. This would allow you to change the account file or 
-account name without disturbing the generated secrets.
+account name without disturbing the generated secrets.  The values of 
+*master_seed* and *account_seed* are not accessible using either the command 
+line or the API interfaces.
+
+Account attributes that start with underscore (_) are hidden, meaning that they 
+are not shown by the :ref:`values <values command>` or :ref:`interactive 
+<interactive command>` commands.  However, you can access their value by
+explicitly requesting them using the :ref:`value <value command>` command.
+Account attributes should not have a trailing underscore.
+Use of a trailing leading underscore creates the risk of collision with an 
+attribute added by Avendesora itself.

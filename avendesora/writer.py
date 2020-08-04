@@ -170,7 +170,10 @@ class TTY_Writer(Writer):
             sep = '\n'
 
         if label:
-            text = LabelColor(label.replace('_', '-') + ':') + sep + value
+            if label[0] == '_':
+                # hidden field
+                label = '!' + label[1:]
+            text = LabelColor(label.replace('_', ' ') + ':') + sep + value
         else:
             text = value
             label = field

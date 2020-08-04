@@ -258,12 +258,12 @@ class AccountFiles:
 
         # build name manifests
         for name, account in Account._accounts.items():
-            filename = account._file_info.path.name
+            filename = account._file_info_.path.name
             name_manifests[filename].append(name)
 
         # build url and title manifests
         for account in Account.all_loaded_accounts():
-            filename = account._file_info.path.name
+            filename = account._file_info_.path.name
             if filename not in self.loaded:
                 # This should not occur, but if PasswordGenerator is
                 # instantiated more than once, which should only occur in the

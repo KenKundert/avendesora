@@ -24,7 +24,7 @@ from .collection import Collection
 from .config import get_setting
 from .error import PasswordError
 from .obscure import ObscuredSecret
-from .preferences import TOOL_FIELDS
+from .preferences import HIDDEN_TOOL_FIELDS, FORBIDDEN_TOOL_FIELDS
 from .recognize import Recognizer
 from .script import Script
 from .secrets import GeneratedSecret
@@ -59,6 +59,9 @@ HighlightColor = Color(
 def canonicalize(name):
     return name.replace('-', '_').lower()
 
+def is_forbidden_field(name):
+    # return true if a field name is intended only for internal use only
+    return name.endswith('_') or name in FORBIDDEN_TOOL_FIELDS
 
 # AccountValue class {{{1
 class AccountValue:
@@ -228,18 +231,18 @@ class Account(object):
     # override_master() {{{2
     @classmethod
     def request_seed(cls):
-        return getattr(cls, '_interactive_seed', False)
+        return getattr(cls, '_interactive_seed_', False)
 
     # preprocess() {{{2
     @classmethod
     def preprocess(cls, master, fileinfo, seen):
 
         # return if this account has already been processed
-        if hasattr(cls, '_file_info'):
+        if hasattr(cls, '_file_info_'):
             return  # account has already been processed
 
         # add fileinfo
-        cls._file_info = fileinfo
+        cls._file_info_ = fileinfo
 
         # dedent any string attributes
         for k, v in cls.__dict__.items():
@@ -250,9 +253,9 @@ class Account(object):
         if master and not hasattr(cls, '_%s__NO_MASTER' % cls.__name__):
             if not hasattr(cls, 'master_seed'):
                 cls.master_seed = master
-                cls._master_source = 'file'
+                cls._master_source_ = 'file'
             else:
-                cls._master_source = 'account'
+                cls._master_source_ = 'account'
 
         # convert aliases to a list
         if hasattr(cls, 'aliases'):
@@ -264,7 +267,7 @@ class Account(object):
         # canonicalize names and look for duplicates
         new = {}
         account_name = cls.get_name()
-        path = cls._file_info.path
+        path = cls._file_info_.path
         for name in [account_name] + aliases:
             canonical = canonicalize(name)
             Account._accounts[canonical] = cls
@@ -353,11 +356,11 @@ class Account(object):
     # initialize() {{{2
     @classmethod
     def initialize(cls, interactive_seed=False, stealth_name=None):
-        cls._interactive_seed = interactive_seed
+        cls._interactive_seed_ = interactive_seed
         log('Initializing account:', cls.get_name())
         try:
             if cls.master_seed.is_secure():
-                if not cls._file_info.encrypted:
+                if not cls._file_info_.encrypted:
                     warn(
                         'high value master seed not contained in encrypted',
                         'account file.', culprit=cls.get_name()
@@ -387,7 +390,9 @@ class Account(object):
         else:
             fields = cls.__dict__
         for field in fields:
-            if not field.startswith('_') and (all or field not in TOOL_FIELDS):
+            if field.startswith('_') or is_forbidden_field(field):
+                continue
+            if all or field not in HIDDEN_TOOL_FIELDS:
                 yield field
 
     # items() {{{2
@@ -433,17 +438,12 @@ class Account(object):
             A pair (2-tuple) that contains both field name and the key names.
             None is returned for the key names if the field holds a scalar value.
         """
-        if sort:
-            fields = sorted(cls.__dict__)
-        else:
-            fields = cls.__dict__
-        for field in fields:
-            if not field.startswith('_') and (all or field not in TOOL_FIELDS):
-                value = getattr(cls, field)
-                if is_collection(value):
-                    yield field, Collection(value).keys()
-                else:
-                    yield field, [None]
+        for field in cls.fields():
+            value = getattr(cls, field)
+            if is_collection(value):
+                yield field, Collection(value).keys()
+            else:
+                yield field, [None]
 
     # get_scalar() {{{2
     @classmethod
@@ -619,7 +619,7 @@ class Account(object):
         names = {
             n.replace('-', '_').lower(): n
             for n in cls.__dict__.keys()
-            if not n.startswith('_')
+            if not is_forbidden_field(n)
         }
         try:
             name = names[name.replace('-', '_').lower()]
@@ -1024,7 +1024,7 @@ class StealthAccount(Account):
     # initialize() {{{2
     @classmethod
     def initialize(cls, interactive_seed=False, stealth_name=None):
-        cls._interactive_seed = interactive_seed
+        cls._interactive_seed_ = interactive_seed
         cls._stealth_name = stealth_name
         log('Initializing stealth account:', cls.get_name())
         for key, value in cls.items():

@@ -912,7 +912,5 @@ ACCOUNT_LIST_FILE_CONTENTS = dedent('''\
 # Fields {{{1
 # Fields reserved for use by Avendesora
 # They are not displayed by the values command.
-TOOL_FIELDS = '''
-    NAME aliases default discovery browser default_url
-    master_seed account_seed
-'''.split()
+HIDDEN_TOOL_FIELDS = 'NAME aliases default discovery browser default_url'.split()
+FORBIDDEN_TOOL_FIELDS = 'master_seed account_seed'.split()
