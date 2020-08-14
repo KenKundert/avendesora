@@ -185,7 +185,7 @@ class Hide(ObscuredSecret):
         Generally used in encrypted accounts files or on very low-value secrets.
     '''
 
-    def __init__(self, plaintext, secure=True, is_secret=True):
+    def __init__(self, plaintext, *, secure=True, is_secret=True):
         self.plaintext = plaintext
         self.is_secret = is_secret
 
@@ -225,7 +225,7 @@ class Hidden(ObscuredSecret):
         decode it.
     '''
 
-    def __init__(self, encoded_text, secure=True, encoding=None, is_secret=True):
+    def __init__(self, encoded_text, *, secure=True, encoding=None, is_secret=True):
         self.encoded_text = encoded_text
         encoding = encoding if encoding else get_setting('encoding')
         try:
@@ -300,7 +300,7 @@ class GPG(ObscuredSecret, GnuPG):
     # then use a symmetric key, or perhaps a separate private key, to protect an
     # individual piece of data, like a master seed.
 
-    def __init__(self, ciphertext, secure=True, encoding=None):
+    def __init__(self, ciphertext, *, secure=True, encoding=None):
         self.ciphertext = ciphertext
         self.encoding = encoding
 
@@ -397,7 +397,7 @@ class Scrypt(ObscuredSecret):
         you can decrypt it, secrets encoded with scrypt cannot be shared.
     '''
 
-    def __init__(self, ciphertext, secure=True, encoding='utf8'):
+    def __init__(self, ciphertext, *, secure=True, encoding='utf8'):
         self.ciphertext = ciphertext
         self.encoding = encoding
 

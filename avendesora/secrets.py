@@ -426,6 +426,7 @@ class Password(GeneratedSecret):
 
     def __init__(self,
         length = 12,
+        *,
         alphabet = DISTINGUISHABLE,
         master = None,
         version = None,
@@ -515,6 +516,7 @@ class Passphrase(Password):
 
     def __init__(self,
         length = 4,
+        *,
         alphabet = None,
         master = None,
         version = None,
@@ -587,6 +589,7 @@ class PIN(Password):
     """
     def __init__(self,
         length = 4,
+        *,
         alphabet = DIGITS,
         master = None,
         version = None,
@@ -673,13 +676,14 @@ class Question(Passphrase):
     def __init__(self,
         question,
         length = 3,
+        *,
+        answer = None,
         alphabet = None,
         master = None,
         version = None,
         sep = ' ',
         prefix = '',
         suffix = '',
-        answer = None,
         is_secret = True,
     ):
         self.question = question
@@ -772,6 +776,7 @@ class MixedPassword(GeneratedSecret):
         length,
         def_alphabet,
         requirements,
+        *,
         master = None,
         version = None,
         shift_sort = False,
@@ -893,6 +898,7 @@ class PasswordRecipe(MixedPassword):
     def __init__(
         self,
         recipe,
+        *,
         def_alphabet = ALPHANUMERIC,
         master = None,
         version = None,
@@ -990,6 +996,7 @@ class BirthDate(GeneratedSecret):
         min_age = 18,
         max_age = 65,
         fmt = 'YYYY-MM-DD',
+        *,
         master = None,
         version = None,
         is_secret = True,

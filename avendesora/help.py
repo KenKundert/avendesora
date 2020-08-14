@@ -1216,6 +1216,8 @@ class Secrets(HelpMessage):
             secure (bool):
                 Indicates that this secret should only be contained in an
                 encrypted accounts file. Default is True.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 
@@ -1238,6 +1240,8 @@ class Secrets(HelpMessage):
                 encrypted accounts file. Default is True.
             encoding (str):
                 The encoding to use for the deciphered text.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 
@@ -1383,6 +1387,8 @@ class Secrets(HelpMessage):
                 A string added to the front of the generated password.
             suffix (str):
                 A string added to the end of the generated password.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 
@@ -1424,6 +1430,8 @@ class Secrets(HelpMessage):
                 A string added to the front of the generated password.
             suffix (str):
                 A string added to the end of the generated password.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 
@@ -1455,6 +1463,8 @@ class Secrets(HelpMessage):
             version (str):
                 An optional seed. Changing this value will change the generated
                 PIN.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 
@@ -1485,6 +1495,9 @@ class Secrets(HelpMessage):
                 The number of items to draw from the alphabet when creating the
                 password. When using the default alphabet, this will be the
                 number of words in the answer.
+            answer:
+                The answer. If provided, this would override the generated
+                answer.  May be a string, or it may be an Obscured object.
             alphabet (list of strs):
                 The reservoir of legal symbols to use when creating the
                 password. By default, this is a predefined list of 10,000 words.
@@ -1504,9 +1517,8 @@ class Secrets(HelpMessage):
                 A string added to the front of the generated password.
             suffix (str):
                 A string added to the end of the generated password.
-            answer:
-                The answer. If provided, this would override the generated
-                answer.  May be a string, or it may be an Obscured object.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 
@@ -1566,6 +1578,8 @@ class Secrets(HelpMessage):
                 the characters that require the shift key when typing are placed
                 last, making it easier to type. Use this option if you expect to
                 be typing the password by hand.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 
@@ -1603,6 +1617,8 @@ class Secrets(HelpMessage):
             version (str):
                 An optional seed. Changing this value will change the generated
                 answer.
+            is_secret (bool):
+                Should value be hidden from user unless explicitly requested.
 
         Example:
 

@@ -10,6 +10,7 @@ Releases
       an account value from a string that includes the account and field 
       names.
     - Add hidden account attributes.
+    - Require secondary arguments on secrets to be passed by name.
     - This release requires *secrets_hash* to be updated.
 
 **1.17 (2020-04-15)**:
