@@ -811,7 +811,7 @@ class Account(object):
 
             # format values
             if '\n' in value:
-                value = indent(value, get_setting('indent')).strip('\n')
+                value = indent(dedent(value), get_setting('indent')).strip('\n')
                 sep = '\n'
             elif value:
                 sep = ' '
