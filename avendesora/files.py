@@ -304,6 +304,8 @@ class AccountFiles:
         contents = pickle.dumps(cache)
 
         user_key = get_setting('user_key')
+        if not user_key:
+            return
         key = base64.urlsafe_b64encode(sha256(user_key.encode('ascii')).digest())
         fernet = Fernet(key)
         encrypted = fernet.encrypt(contents)
