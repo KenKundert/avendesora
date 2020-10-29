@@ -4,8 +4,7 @@ addons:
   apt:
     packages:
       - gnupg
-      - libgirepository-dev
-      - cairo
+      - libgirepository1.0-dev
 install:
   - pip install scrypt coveralls pexpect
   - pip install .
