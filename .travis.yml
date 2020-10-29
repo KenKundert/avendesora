@@ -1,9 +1,11 @@
 language: python
+dist: focal
 addons:
   apt:
     packages:
       - gnupg
       - libgirepository1.0-dev
+      - cairo
 install:
   - pip install scrypt coveralls pexpect
   - pip install .
@@ -17,6 +19,7 @@ jobs:
     - python: 3.6
     - python: 3.7
     - python: 3.8
+    - python: 3.9-dev
     - python: nightly
   allow_failures:
     - python: nightly
