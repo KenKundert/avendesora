@@ -4,8 +4,8 @@ Releases
 .. currentmodule:: avendesora
 
 **Latest Development Version**:
-    | Version: 1.17.4
-    | Released: 2020-08-14
+    | Version: 1.17.5
+    | Released: 2020-11-10
 
     - Deprecate Python 2.7 and Python 3.5.
     - Add :meth:`PasswordGenerator.get_value()`, a method of getting an account 
