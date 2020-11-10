@@ -245,17 +245,24 @@ selecting symbols from the given alphabet at random, but in this case
 the default alphabet is a dictionary containing about 10,000 words.
 
  |  Passphrase(
- |      length=4, alphabet=None, master=None, version=None, sep=' ', prefix='',
- |      suffix=''
+ |      length=4, dictionary=None, master=None, version=None, sep=' ',
+ |      prefix='', suffix=''
  |  )
 
  |  length (int):
  |      The number of items to draw from the alphabet when creating the
  |      password.  When using the default alphabet, this will be the
  |      number of words in the passphrase.
- |  alphabet (str):
+ |  dictionary (str, [str], or callable):
  |      The reservoir of legal symbols to use when creating the
- |      password. By default, this is a predefined list of 10,000 words.
+ |      password. If not give, or if 'default' is given, this is a
+ |      predefined list of 10,000 words. If given as 'bip39' or
+ |      'mnemonic', this is a predefined list of the 2048 bitcoin BIP-39
+ |      seed words.  Any other string is treated as a path to a file
+ |      that would contain the words. A list is taken as is.  Finally, you can 
+ |      pass a function that returns the list of words, in which case the 
+ |      calling of the function is deferred until the words are needed, which is
+ |      helpful if creating the list is slow.
  |  master (str):
  |      Overrides the master seed that is used when generating the
  |      password.  Generally, there is one master seed shared by all
@@ -333,7 +340,7 @@ and it is taken to be the security question. The question is used rather
 than the field name when generating the secret.
 
  |  Question(
- |      question, length=3, alphabet=None, master=None, version=None,
+ |      question, length=3, dictionary=None, master=None, version=None,
  |      sep=' ', prefix='', suffix='', answer=None
  |  )
 
@@ -344,9 +351,16 @@ than the field name when generating the secret.
  |      The number of items to draw from the alphabet when creating the
  |      password. When using the default alphabet, this will be the
  |      number of words in the answer.
- |  alphabet (list of strs):
+ |  dictionary (str, [str], or callable):
  |      The reservoir of legal symbols to use when creating the
- |      password. By default, this is a predefined list of 10,000 words.
+ |      password. If not give, or if 'default' is given, this is a
+ |      predefined list of 10,000 words. If given as 'bip39' or
+ |      'mnemonic', this is a predefined list of the 2048 bitcoin BIP-39
+ |      seed words.  Any other string is treated as a path to a file
+ |      that would contain the words. A list is taken as is.  Finally, you can 
+ |      pass a function that returns the list of words, in which case the 
+ |      calling of the function is deferred until the words are needed, which is
+ |      helpful if creating the list is slow.
  |  master (str):
  |      Overrides the master seed that is used when generating the
  |      password.  Generally, there is one master seed shared by all

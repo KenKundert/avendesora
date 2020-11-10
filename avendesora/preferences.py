@@ -33,7 +33,8 @@ NONCONFIG_SETTINGS = {
     'default_stealth_accounts_file': 'stealth_accounts',
     'charsets_hash': 'a055240c4c498e1470f5f3e80b3ec599',
     'dict_hash': '5dbabd4114eae520c1de8963a8b8d09d',
-    'secrets_hash': 'f7a47122864464703212663a407e4cb6',
+    'mnemonic_hash': 'cafd522d6627011d78e576f2d0b6ed58',
+    'secrets_hash': '3d5964fab16b99f73704cbdd2ac50f6b',
     'discard_logfile': False,
     'commonly_mistaken_attributes': {
         'url': 'urls',
@@ -504,9 +505,18 @@ HASH_FILE_INITIAL_CONTENTS = dedent('''\
     # 5. If there are changes, do not upgrade and report the situation to
     #    Avendesora's authors.
 
-    charsets_hash = {charsets_hash}  # DO NOT CHANGE THIS LINE
-    dict_hash     = {dict_hash}  # DO NOT CHANGE THIS LINE
-    secrets_hash  = {secrets_hash}  # DO NOT CHANGE THIS LINE
+    charsets_hash = {charsets_hash}
+    dict_hash     = {dict_hash}
+    mnemonic_hash = {mnemonic_hash}
+    secrets_hash  = {secrets_hash}
+
+    # CHANGE THESE VALUES ONLY WHEN REQUESTED BY AVENDESORA AND IF YOU HAVE
+    # FOLLOWED THE ABOVE PROCEDURE TO ASSURE YOUR GENERATED SECRETS HAVE NOT
+    # CHANGED.
+
+    # Generally the best way to upgrade this file is to simply delete it and
+    # then run 'avendesora init', which will regenerate it with the updated
+    # values.
 ''')
 
 

@@ -79,7 +79,7 @@ class Char20(StealthAccount):
 
 # Extreme passwords {{{1
 class Extreme(StealthAccount):
-    passcode = Passphrase(length=64, alphabet=PRINTABLE)
+    passcode = Password(length=64, alphabet=PRINTABLE)
 
 # Hex passwords {{{1
 class Hex4(StealthAccount):

@@ -54,7 +54,7 @@ from .charsets import (
 )
 from .config import get_setting
 from .error import PasswordError
-from .dictionary import DICTIONARY
+from .dictionary import Dictionary
 from .obscure import ObscuredSecret
 from .utilities import error_source
 from inform import cull, log, output, terminate, warn, is_str
@@ -479,9 +479,16 @@ class Passphrase(Password):
         length (int):
             The number of items to draw from the alphabet when creating the
             password.
-        alphabet (collection of symbols):
-            The reservoir of legal symbols to use when creating the password.
-            By default this is a list of 10,000 words.
+        dictionary (str, [str], or callable):
+            The reservoir of legal symbols to use when creating the
+            password. If not given, or if 'default' is given, this is a
+            predefined list of 10,000 words. If given as 'bip39' or
+            'mnemonic', this is a predefined list of the 2048 bitcoin BIP-39
+            seed words.  Any other string is treated as a path to a file
+            that would contain the words. A list is taken as is. Finally,
+            you can pass a function that returns the list of words, in which
+            case the calling of the function is deferred until the words are
+            needed, which is helpful if creating the list is slow.
         master (str):
             Overrides the master seed that is used when generating the password.
             Generally, there is one master seed shared by all accounts contained
@@ -517,7 +524,7 @@ class Passphrase(Password):
     def __init__(self,
         length = 4,
         *,
-        alphabet = None,
+        dictionary = None,
         master = None,
         version = None,
         sep = ' ',
@@ -531,7 +538,10 @@ class Passphrase(Password):
             raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
-        self.alphabet = alphabet if alphabet else DICTIONARY.get_words
+        if not dictionary or is_str(dictionary):
+            self.alphabet = Dictionary(dictionary).get_words
+        else:
+            self.alphabet = dictionary
         self.master = master
         self.version = version
         self.shift_sort = False
@@ -626,8 +636,16 @@ class Question(Passphrase):
         length (int):
             The number of items to draw from the alphabet when creating the
             answer.
-        alphabet (collection of symbols):
-            The reservoir of legal symbols to use when creating the password.
+        dictionary (str, [str], or callable):
+            The reservoir of legal symbols to use when creating the
+            password. If not given, or if 'default' is given, this is a
+            predefined list of 10,000 words. If given as 'bip39' or
+            'mnemonic', this is a predefined list of the 2048 bitcoin BIP-39
+            seed words.  Any other string is treated as a path to a file
+            that would contain the words. A list is taken as is. Finally,
+            you can pass a function that returns the list of words, in which
+            case the calling of the function is deferred until the words are
+            needed, which is helpful if creating the list is slow.
         master (str):
             Overrides the master seed that is used when generating the password.
             Generally, there is one master seed shared by all accounts contained
@@ -678,7 +696,7 @@ class Question(Passphrase):
         length = 3,
         *,
         answer = None,
-        alphabet = None,
+        dictionary = None,
         master = None,
         version = None,
         sep = ' ',
@@ -693,7 +711,10 @@ class Question(Passphrase):
             raise PasswordError(
                 'expecting an integer for length.', culprit=error_source()
             )
-        self.alphabet = alphabet if alphabet else DICTIONARY.get_words
+        if not dictionary or is_str(dictionary):
+            self.alphabet = Dictionary(dictionary).get_words
+        else:
+            self.alphabet = dictionary
         self.master = master
         self.version = version
         self.shift_sort = False

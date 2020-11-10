@@ -2031,9 +2031,16 @@ def test_secrets():
                 The number of items to draw from the alphabet when creating the
                 password.  When using the default alphabet, this will be the
                 number of words in the passphrase.
-            alphabet (str):
+            dictionary (str, [str], or callable):
                 The reservoir of legal symbols to use when creating the
-                password. By default, this is a predefined list of 10,000 words.
+                password. If not given, or if 'default' is given, this is a
+                predefined list of 10,000 words. If given as 'bip39' or
+                'mnemonic', this is a predefined list of the 2048 bitcoin BIP-39
+                seed words.  Any other string is treated as a path to a file
+                that would contain the words. A list is taken as is. Finally,
+                you can pass a function that returns the list of words, in which
+                case the calling of the function is deferred until the words are
+                needed, which is helpful if creating the list is slow.
             master (str):
                 Overrides the master seed that is used when generating the
                 password.  Generally, there is one master seed shared by all
@@ -2118,9 +2125,16 @@ def test_secrets():
             answer:
                 The answer. If provided, this would override the generated
                 answer.  May be a string, or it may be an Obscured object.
-            alphabet (list of strs):
+            dictionary (str, [str], or callable):
                 The reservoir of legal symbols to use when creating the
-                password. By default, this is a predefined list of 10,000 words.
+                password. If not given, or if 'default' is given, this is a
+                predefined list of 10,000 words. If given as 'bip39' or
+                'mnemonic', this is a predefined list of the 2048 bitcoin BIP-39
+                seed words.  Any other string is treated as a path to a file
+                that would contain the words. A list is taken as is. Finally,
+                you can pass a function that returns the list of words, in which
+                case the calling of the function is deferred until the words are
+                needed, which is helpful if creating the list is slow.
             master (str):
                 Overrides the master seed that is used when generating the
                 password.  Generally, there is one master seed shared by all

@@ -21,7 +21,7 @@
 from .account import Account
 from .config import read_config, get_setting
 from .dialog import show_list_dialog
-from .dictionary import DICTIONARY
+from .dictionary import Dictionary
 from .error import PasswordError
 from .files import AccountFiles
 from .gpg import GnuPG, PythonFile, GPG_EXTENSIONS
@@ -213,15 +213,15 @@ class PasswordGenerator(object):
         for path, kind in [
             (to_path(resource_filename(__name__, 'secrets.py')), 'secrets_hash'),
             (to_path(resource_filename(__name__, 'charsets.py')), 'charsets_hash'),
-            (None, 'dict_hash'),
+            ('default', 'dict_hash'),
+            ('mnemonic', 'mnemonic_hash'),
         ]:
-            if path:
-                try:
-                    contents = path.read_text()
-                except OSErrors as e:
-                    raise PasswordError(os_error(e))
-            else:
-                contents = '\n'.join(DICTIONARY.get_words())
+            try:
+                contents = path.read_text()
+            except AttributeError:
+                contents = '\n'.join(Dictionary(path).get_words())
+            except OSErrors as e:
+                raise PasswordError(os_error(e))
             md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
             # Check that file has not changed.
             if md5 != get_setting(kind):

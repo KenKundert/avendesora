@@ -581,6 +581,8 @@ class Changed(Command):
                     else:
                         if differ(archive_value, current_value):
                             output(account_name, 'field differs', field_name, sep=': ')
+                except PasswordError as e:
+                    e.terminate()
                 except Exception:
                     error(
                         'unanticipated situation.',

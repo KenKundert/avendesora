@@ -1,24 +1,33 @@
 Releases
 ========
 
+.. currentmodule:: avendesora
+
 **Latest Development Version**:
     | Version: 1.17.4
     | Released: 2020-08-14
 
     - Deprecate Python 2.7 and Python 3.5.
-    - Add :meth:`avendesora.PasswordGenerator.get_value()`, a method of getting 
-      an account value from a string that includes the account and field 
-      names.
+    - Add :meth:`PasswordGenerator.get_value()`, a method of getting an account 
+      value from a string that includes the account and field names.
     - Add hidden account attributes.
     - Require secondary arguments on secrets to be passed by name.
+    - Renamed *alphabet* argument to :class:`Passphrase` and :class:`Question` 
+      to *dictionary*.
+
+      .. warning::
+
+          This change is not backward compatible and may require you to change
+          entries in your account files.
+
     - This release requires *secrets_hash* to be updated.
 
 **1.17 (2020-04-15)**:
     - Enhance :ref:`conceal command <conceal command>` so that it can read text 
       from a file.
-    - Add :class:`avendesora.WriteFile`; allows the contents of a file to be 
-      held as an account field. When requested, the contents are written to the 
-      file system.
+    - Add :class:`WriteFile`; allows the contents of a file to be held as an 
+      account field. When requested, the contents are written to the file 
+      system.
 
 **1.16 (2019-12-25)**:
     - Added *ms_per_char* setting that allows user to slow autotyping.
