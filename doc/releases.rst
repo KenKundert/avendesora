@@ -7,6 +7,7 @@ Releases
     | Version: 1.17.5
     | Released: 2020-11-10
 
+**1.18 (2020-11-12)**:
     - Deprecate Python 2.7 and Python 3.5.
     - Add :meth:`PasswordGenerator.get_value()`, a method of getting an account 
       value from a string that includes the account and field names.

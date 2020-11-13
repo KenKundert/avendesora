@@ -19,9 +19,9 @@ Avendesora Collaborative Password Manager
     .. image:: https://img.shields.io/pypi/dm/avendesora.svg
         :target: https://pypi.python.org/pypi/avendesora/
 
-.. image:: https://requires.io/github/KenKundert/avendesora/requirements.svg?branch=master
-     :target: https://requires.io/github/KenKundert/avendesora/requirements/?branch=master
-     :alt: Requirements Status
+    .. image:: https://requires.io/github/KenKundert/avendesora/requirements.svg?branch=master
+        :target: https://requires.io/github/KenKundert/avendesora/requirements/?branch=master
+        :alt: Requirements Status
 
 :Authors: Ken & Kale Kundert
 :Version: 1.17.5
