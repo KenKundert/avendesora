@@ -120,7 +120,7 @@ class AddURLToWindowTitle(Title):
     # This matches the default pattern produced by AddURLToWindowTitle in
     # Firefox, though sometimes it outputs the host, and sometimes it does not.
     PATTERN = re.compile(
-        r'\A{title}- {url} - (?:{host} - )?{browser}\Z'.format(**REGEX_COMPONENTS)
+        r'\A{title}- {url} [-—] (?:{host} [-—] )?{browser}\Z'.format(**REGEX_COMPONENTS)
     )
     PRIORITY = 1
 
