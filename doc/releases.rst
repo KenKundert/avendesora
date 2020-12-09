@@ -4,8 +4,8 @@ Releases
 .. currentmodule:: avendesora
 
 **Latest Development Version**:
-    | Version: 1.18.0
-    | Released: 2020-11-12
+    | Version: 1.18.1
+    | Released: 2020-12-09
 
 **1.18 (2020-11-12)**:
     - Deprecate Python 2.7 and Python 3.5.
