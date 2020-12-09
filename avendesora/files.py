@@ -39,7 +39,7 @@ from .account import Account, canonicalize
 from .collection import Collection
 from .config import get_setting
 from .gpg import PythonFile
-from .shlib import getmod, mkdir, rm
+from .shlib import getmod, mkdir, rm, chmod
 from .utilities import OSErrors
 from cryptography.fernet import Fernet
 from fnmatch import fnmatch
@@ -84,8 +84,12 @@ class AccountFiles:
             violation = permissions & mask
             if violation:
                 recommended = permissions & ~mask & 0o777
-                warn("file permissions are too loose.", culprit=path)
-                codicil("Recommend running: chmod {:o} {}".format(recommended, resolved_path))
+                warn(
+                    "file permissions are too loose;",
+                    f"tightening to {recommended:03o}.",
+                    culprit = path
+                )
+                chmod(recommended, resolved_path)
 
             # determine time of most recently updated account file
             updated = resolved_path.stat().st_mtime
@@ -103,10 +107,12 @@ class AccountFiles:
                 violation = permissions & mask
                 if violation:
                     recommended = permissions & ~mask & 0o777
-                    warn("file permissions are too loose.", culprit=path)
-                    codicil("Recommend running: chmod {:o} {}".format(
-                        recommended, resolved_path)
+                    warn(
+                        "file permissions are too loose;",
+                        f"tightening to {recommended:03o}.",
+                        culprit = path
                     )
+                    chmod(recommended, resolved_path)
 
                 # warn user if archive file is out of date
                 stale = float(get_setting('archive_stale'))

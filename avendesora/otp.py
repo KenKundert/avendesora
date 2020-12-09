@@ -62,28 +62,39 @@ try:
         def __init__(self, shared_secret, *, interval=30, digits=6):
             self.interval = interval
             self.digits = digits
+
+            # convert original secret to string (for archives)
             try:
                 shared_secret = shared_secret.render()
             except AttributeError:
                 pass
+            shared_secret = str(shared_secret)
+
             # strip spaces and convert to bytes
-            shared_secret = str(shared_secret).replace(' ', '').encode('utf-8')
+            secret = shared_secret.replace(' ', '').encode('utf-8')
+
             # add padding if needed
-            shared_secret += b'='*((8 - len(shared_secret))%8)
+            secret += b'='*((8 - len(secret))%8)
+
+            # check validity
             try:
-                b32decode(shared_secret, casefold=True)
+                b32decode(secret, casefold=True)
+                # don't need return value, only checking for errors
             except BinasciiError:
                 raise PasswordError(
-                    'invalid value specified to OTP: %s.' % str(shared_secret),
-                    culprit=error_source()
+                    f'invalid value specified to OTP: {shared_secret}.',
+                    culprit = error_source()
                 )
+
+            # save results
             self.shared_secret = shared_secret
+            self.secret = secret
             self.is_secret = False
                 # no need to conceal OTPs as they are ephemeral
 
         def initialize(self, account, field_name, field_key=None):
             self.totp = TOTP(
-                self.shared_secret, interval=self.interval, digits=self.digits
+                self.secret, interval=self.interval, digits=self.digits
             )
 
         def render(self):
@@ -91,8 +102,8 @@ try:
 
         # __repr__() {{{2
         def __repr__(self):
-            # this is used to create the archive, archive the shared secret
-            # rather than OTP
+            # this is used to create the archive
+            # archive the shared secret rather than OTP
             return "OTP({!r})".format(self.shared_secret)
 
 
