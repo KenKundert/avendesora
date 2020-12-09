@@ -7,6 +7,9 @@ Releases
     | Version: 1.18.1
     | Released: 2020-12-09
 
+    - Make :class:`OTP` less persnickety about form of shared secrets.
+    - Automatically fix file permission issues when found.
+
 **1.18 (2020-11-12)**:
     - Deprecate Python 2.7 and Python 3.5.
     - Add :meth:`PasswordGenerator.get_value()`, a method of getting an account 
