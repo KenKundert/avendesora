@@ -59,15 +59,19 @@ try:
                 Use 6 to mimic Google Authenticator, 7 to mimic Authy.
         """
 
-        def __init__(self, shared_secret, interval=30, digits=6):
+        def __init__(self, shared_secret, *, interval=30, digits=6):
             self.interval = interval
             self.digits = digits
             try:
                 shared_secret = shared_secret.render()
             except AttributeError:
                 pass
+            # strip spaces and convert to bytes
+            shared_secret = str(shared_secret).replace(' ', '').encode('utf-8')
+            # add padding if needed
+            shared_secret += b'='*((8 - len(shared_secret))%8)
             try:
-                b32decode(str(shared_secret), casefold=True)
+                b32decode(shared_secret, casefold=True)
             except BinasciiError:
                 raise PasswordError(
                     'invalid value specified to OTP: %s.' % str(shared_secret),
