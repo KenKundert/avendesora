@@ -112,10 +112,13 @@ CONFIG_DEFAULTS = {
                 aliases = '_ALIAS1_ _ALIAS2_'
                 username = '_USERNAME_'
                 email = '_EMAIL_'
-                passcode = PasswordRecipe('12 2u 2d 2s')
-            # Avendesora: length is 12, includes 2 upper, 2 digits and 2 symbols
-            # Avendesora: Alternatively use '12 2u 2d 2c!@#$&' to specify valid symbol characters.
-            # Avendesora: Alternatively use Passphrase()
+                passcode = Password()
+            # Avendesora: above provides a random selection of letters and digits
+            # Avendesora: Alternative 1: passcode = PasswordRecipe('12 2u 2d 2s')
+            # Avendesora:     length is 12, includes 2 upper, 2 digits and 2 symbols
+            # Avendesora:     use '12 2u 2d 2c!@#$&' to specify valid symbol characters.
+            # Avendesora: Alternative 2: passcode = Passphrase()
+            # Avendesora:     provides a random selection of 4 words
                 questions = [
                     Question("_QUESTION1_?"),
                     Question("_QUESTION2_?"),

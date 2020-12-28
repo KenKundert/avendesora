@@ -25,7 +25,7 @@ from .config import get_setting
 from .error import PasswordError
 from .utilities import pager, two_columns
 from difflib import get_close_matches
-from inform import conjoin, full_stop, join, output, is_str
+from inform import conjoin, full_stop, join, output, is_str, is_collection
 from textwrap import dedent
 
 
@@ -376,10 +376,10 @@ class Aliases(HelpMessage):
         aliases = get_setting('command_aliases')
         if aliases:
             for alias in sorted(aliases, key=str.lower):
-                new_name, new_args = aliases[alias]
-                if new_args:
-                    new_name += ' ' + ' '.join(new_args)
-                lines.append(join('    ', alias, '-->', new_name))
+                cmd = aliases[alias]
+                if is_collection(cmd):
+                    cmd = ' '.join(cmd)
+                lines.append(join('    ', alias, '-->', cmd))
         return '\n'.join(lines)
 
 
