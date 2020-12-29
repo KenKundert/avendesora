@@ -57,7 +57,7 @@ from .error import PasswordError
 from .dictionary import Dictionary
 from .obscure import ObscuredSecret
 from .utilities import error_source
-from inform import cull, log, output, terminate, warn, is_str
+from inform import conjoin, cull, log, output, terminate, warn, is_str
 import math
 import hashlib
 import getpass
@@ -944,8 +944,8 @@ class PasswordRecipe(MixedPassword):
                 requirements += [(alphabet, int('0' + num))]
         except (ValueError, AttributeError):
             raise PasswordError(
-                each, recipe,
-                template="{0}: invalid term in recipe '{1}'.",
+                each, recipe, conjoin(self.ALPHABETS.keys(), conj=' or '),
+                template="{0}: invalid term in recipe '{1}'. Choose from {2}.",
                 culprit=error_source()
             )
 
