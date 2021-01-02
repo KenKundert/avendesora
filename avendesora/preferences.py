@@ -1,7 +1,7 @@
 # Avendesora Password Generator Preferences
 
 # License {{{1
-# Copyright (C) 2016-2020 Kenneth S. Kundert
+# Copyright (C) 2016-2021 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ NONCONFIG_SETTINGS = {
     'charsets_hash': 'a055240c4c498e1470f5f3e80b3ec599',
     'dict_hash': '5dbabd4114eae520c1de8963a8b8d09d',
     'mnemonic_hash': 'cafd522d6627011d78e576f2d0b6ed58',
-    'secrets_hash': '62d9b1479e33fbebfe40090f631efba1',
+    'secrets_hash': 'd0e7d25e0c4e2e7281d62b44e2203a21',
     'discard_logfile': False,
     'commonly_mistaken_attributes': {
         'url': 'urls',

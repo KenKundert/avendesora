@@ -7,7 +7,7 @@ Releases
     | Version: 1.18.3
     | Released: 2020-12-28
 
-**1.19 (2020-12-??)**:
+**1.19 (2021-01-02
     - Make :class:`OTP` less persnickety about form of shared secrets.
     - Automatically fix file permission issues when found.
 
