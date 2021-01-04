@@ -24,8 +24,8 @@ Avendesora Collaborative Password Manager
         :alt: Requirements Status
 
 :Authors: Ken & Kale Kundert
-:Version: 1.18.3
-:Released: 2020-12-28
+:Version: 1.19.0
+:Released: 2021-01-03
 
 Avendesora replaces Abraxas, which are both alternatives to the traditional 
 password vault.

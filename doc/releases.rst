@@ -4,8 +4,8 @@ Releases
 .. currentmodule:: avendesora
 
 **Latest Development Version**:
-    | Version: 1.18.3
-    | Released: 2020-12-28
+    | Version: 1.19.0
+    | Released: 2021-01-03
 
 **1.19 (2021-01-03)
     - Make :class:`OTP` less persnickety about form of shared secrets.
