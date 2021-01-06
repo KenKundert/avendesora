@@ -76,6 +76,7 @@ CONFIG_DEFAULTS = {
     'default_field': 'passcode password passphrase',
     'default_vector_field': 'questions',
     'dynamic_fields': '',
+    'hidden_fields': '',
     'default_browser': 'x',
     'display_time': 60,
     'ms_per_char': None,
@@ -321,6 +322,11 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
         # Fields whose values can change in real time. These fields will not be
         # mentioned by the *changed* command, even if their value differs from
         # when the last archive was created.
+
+    hidden_fields = {hidden_fields}
+        # Names of fields that should not appear in the summary produced by the
+        # values command unless the --all option is specified.  A typical value
+        # includes estimated_value, postmortem_recipients, and bitwarden.
 
     credential_ids = {credential_ids}
         # A string that contains the field names (space separated) that should be

@@ -172,6 +172,17 @@ specifying the desired values in the *config* file (found in
 
 
 .. index::
+    single: hidden_fields setting
+
+**hidden_fields** = '':
+
+    Names of fields that should not appear in the summary produced by the 
+    :ref:`values <values command>` command unless the ``--all`` option is 
+    specified.  A typical value includes *estimated_value*, 
+    *postmortem_recipients*, and *bitwarden*.
+
+
+.. index::
     single: credential_ids setting
 
 **credential_ids** = 'username email':

@@ -389,10 +389,11 @@ class Account(object):
             fields = sorted(cls.__dict__)
         else:
             fields = cls.__dict__
+        hidden_fields = get_setting('hidden_fields').split() + HIDDEN_TOOL_FIELDS
         for field in fields:
             if field.startswith('_') or is_forbidden_field(field):
                 continue
-            if all or field not in HIDDEN_TOOL_FIELDS:
+            if all or field not in hidden_fields:
                 yield field
 
     # items() {{{2

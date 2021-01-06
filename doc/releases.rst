@@ -7,6 +7,8 @@ Releases
     | Version: 1.19.0
     | Released: 2021-01-03
 
+    - added *hidden_fields* setting.
+
 **1.19 (2021-01-03)
     - Make :class:`OTP` less persnickety about form of shared secrets.
     - Automatically fix file permission issues when found.
