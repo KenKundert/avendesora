@@ -1,5 +1,8 @@
 language: python
 dist: focal
+os:
+  - linux
+  - osx
 addons:
   apt:
     packages:
@@ -24,4 +27,5 @@ jobs:
   allow_failures:
     - python: 3.10-dev
     - python: nightly
+    - os: osx
   fast_finish: true
