@@ -91,7 +91,7 @@ This will place avendesora in ~/.local/bin, which should be added to your path.
 
 You will also need to install some operating system commands. On Fedora use::
 
-   dnf install gnupg2 xdotool xsel gobject-introspection-devel
+   dnf install gnupg2 xdotool xsel gobject-introspection-devel cairo-gobject-devel
 
 If you would like to use scrypt as a way of encrypting fields, you will need to 
 install scrypt by hand using::
