@@ -76,9 +76,12 @@ try:
                             'field unknown by bitwarden.',
                             culprit=(account_name, k)
                         )
-                    value = Script(dedent(v))
-                    value.initialize(account)
-                    fields[k] = str(value)
+                    try:
+                        value = Script(dedent(v))
+                        value.initialize(account)
+                        fields[k] = str(value)
+                    except PasswordError as e:
+                        e.reraise(culprit=(class_name, k, e.culprit))
                 writer.writerow(fields)
     os.chmod(output_filename, 0o600)
 
