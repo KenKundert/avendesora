@@ -4,8 +4,8 @@ Releases
 .. currentmodule:: avendesora
 
 **Latest Development Version**:
-    | Version: 1.19.1
-    | Released: 2021-01-05
+    | Version: 1.20.0
+    | Released: 2021-02-13
 
 **1.20 (2021-02-13)
     - added *hidden_fields* setting.
