@@ -39,7 +39,7 @@ Avendesora is powerful command-line utility that can securely hold and
 conveniently provide access to a wide variety of information about your 
 accounts, including its secrets such as passwords. Account values can be 
 displayed, copied to the clipboard, or automatically typed into running 
-applications such as you web browser or terminal windows.  Avendesora can also 
+applications such as your web browser or terminal windows.  Avendesora can also 
 open accounts in your web browser, automatically recognize which account to use 
 based on the window title, and warn you if the browser is not using encryption 
 when you go to enter your password.

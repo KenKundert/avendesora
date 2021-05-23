@@ -118,7 +118,7 @@ class AccountFiles:
                 stale = float(get_setting('archive_stale'))
                 archive_updated = resolved_path.stat().st_mtime
                 if most_recently_updated > archive_updated:
-                    log('Avendesora archive is {:.0f} hours out of date.'.format(
+                    log('Avendesora archive is {:.0f} hours old and out of date.'.format(
                         (most_recently_updated - archive_updated)/3600
                     ))
                     # archive_age = time() - archive_updated
