@@ -1,4 +1,4 @@
-# Abraxas Password Writers
+# Avendesora Password Writers
 # encoding: utf8
 #
 # Given a secret (password or passphrase) the writer is responsible for getting
@@ -139,9 +139,11 @@ class Writer(object):
                 elif cmd.startswith('rate '):
                     pass
                 elif cmd.startswith('remind '):
-                    notify(term[8:-1])
+                    notify(term[8:-1].strip())
                 else:
-                    name, key = account.split_field(cmd)
+                    if cmd.startswith('paste '):
+                        cmd = cmd[6:]
+                    name, key = account.split_field(cmd.strip())
                     value = account.get_scalar(name, key)
                     out.append(dedent(str(value)).strip())
                     if account.is_secret(name, key):
@@ -320,48 +322,67 @@ class KeyboardWriter(Writer):
         scrubbed = []
         sleep(INITIAL_AUTOTYPE_DELAY)
         ms_per_char = None
-        for cmd, val in script.components(True):
-            if cmd in ['tab', 'return', 'text', 'value']:
-                out.append(val)
-                scrubbed.append(val)
-            elif cmd.startswith('sleep '):
-                scrubbed.append('<%s>' % cmd)
-                try:
+        try:
+            for cmd, val in script.components(True):
+                if cmd in ['tab', 'return', 'text', 'value']:
+                    out.append(val)
+                    scrubbed.append(val)
+                elif cmd.startswith('sleep '):
+                    scrubbed.append('<%s>' % cmd)
                     kw, seconds = cmd.split()
-                    assert kw == 'sleep'
                     if out:
                         # drain the buffer before sleeping
                         if not dryrun:
                             self._autotype(''.join(out), ms_per_char)
                         out = []
                     sleep(float(seconds))
-                except (TypeError, ValueError):
-                    raise PasswordError(
-                        'syntax error in keyboard script.', culprit=cmd
-                    )
-            elif cmd.startswith('rate '):
-                scrubbed.append('<%s>' % cmd)
-                try:
+                elif cmd.startswith('rate '):
+                    scrubbed.append('<%s>' % cmd)
                     kw, rate = cmd.split()
-                    assert kw == 'rate'
                     if out:
                         # drain the buffer before changing rate
                         if not dryrun:
                             self._autotype(''.join(out), ms_per_char)
                         out = []
                     ms_per_char = int(rate)
-                except (TypeError, ValueError):
-                    raise PasswordError(
-                        'syntax error in keyboard script.', culprit=cmd
-                    )
-            elif cmd.startswith('remind '):
-                notify(cmd[7:])
-            else:
-                out.append(val)
-                scrubbed.append('<%s>' % cmd)
+                elif cmd.startswith('paste '):
+                    # This is an experiment.  It is an attempt to get wellsfargo
+                    # to work without forcing me to solve captchas.  The idea is
+                    # that if wellsfargo is timing my keystrokes, then I could
+                    # try replacing the typing with a paste operation. To make
+                    # this work, you have to click on the password field and
+                    # then hover over the password field before typing the
+                    # autotype hotkey.
+                    scrubbed.append('<%s>' % cmd)
+                    kw, field = cmd.split()
+                    if out:
+                        # drain the buffer before pasting
+                        if not dryrun:
+                            self._autotype(''.join(out), ms_per_char)
+                        out = []
+                    if not dryrun:
+                        log(f'Writing {field} to primary selection and pasting.')
+                        xsel = split_cmd(get_setting('xsel_executable'))
+                        xdotool = split_cmd(get_setting('xdotool_executable'))
+                        try:
+                            Run(xsel + ['--input', '--primary'], 'soEW', stdin=val)
+                            sleep(0.1)
+                            Run(xdotool + ['click', '--clearmodifiers', '2'], 'soEW')
+                        finally:
+                            sleep(0.1)
+                            Run(xsel + ['--clear', '--primary'], 'soEW')
+                elif cmd.startswith('remind '):
+                    notify(cmd[7:])
+                else:
+                    out.append(val)
+                    scrubbed.append('<%s>' % cmd)
+        except (TypeError, ValueError):
+            raise PasswordError(
+                'syntax error in keyboard script.', culprit=cmd
+            )
 
         scrubbed = ''.join(scrubbed).replace('\t', '→').replace('\n', '↲')
-        log('Autotyping "%s"%s.' % (scrubbed, ' -- dry run' if dryrun else ''))
+        log(f'Autotyping "{scrubbed}"{" -- dry run" if dryrun else ""}.')
         if dryrun:
             output(script.account.get_name(), scrubbed, sep=': ')
         else:

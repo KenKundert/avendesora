@@ -892,6 +892,7 @@ Except for this one detail, the rest of the process is the same as described for
     single: return (in script)
     single: sleep (in script)
     single: rate (in script)
+    single: paste (in script)
     single: remind (in script)
 
 .. _scripts:
@@ -920,15 +921,16 @@ embedded in :class:`avendesora.Script`).  Or you can specify them to
 Besides account attributes, there are also some special codes that can be 
 inserted in the script surrounded by braces:
 
-============  ============================================================
-Code          Meaning
-============  ============================================================
-tab           insert a tab character
-return        insert a carriage return character
-sleep *N*     pause for *N* seconds
-rate *N*      set the autotype rate to one character per *N* milliseconds.
-remind *msg*  show the msg as a notification
-============  ============================================================
+=============  ============================================================
+Code           Meaning
+=============  ============================================================
+tab            insert a tab character
+return         insert a carriage return character
+sleep *N*      pause for *N* seconds
+rate *N*       set the autotype rate to one character per *N* milliseconds.
+paste *field*  paste the value of the field using the primary selection
+remind *msg*   show the msg as a notification
+=============  ============================================================
 
 *tab* and *return* are suitable for all scripts, but *sleep*, *rate* and 
 *remind* are only suitable for account discovery scripts.
@@ -1026,12 +1028,14 @@ recognize Gmail:
     ]
 
 Besides the account attributes, you can use several other special attributes 
-including: *{tab}*, *{return}*, *{sleep <N>}*, *{rate <N>}, and *{remind 
-<message>}*.  *{tab}* is replaced by a tab character, *{return}* is replaced by 
-a carriage return character, *{sleep <N>}* causes a pause of *N* seconds, *{rate 
-<N>} sets the autotype rate to one keystroke every *N* milliseconds, and 
-*{remind <message>}* displays message as a notification.  The *sleep* and *rate* 
-functions are only active when auto-typing in account discovery.
+including: *{tab}*, *{return}*, *{sleep <N>}*, *{rate <N>}, *{paste <field>}*,
+and *{remind <message>}*.  *{tab}* is replaced by a tab character, *{return}* is 
+replaced by a carriage return character, *{sleep <N>}* causes a pause of *N* 
+seconds, *{rate <N>} sets the autotype rate to one keystroke every *N* 
+milliseconds, *{paste <field>}* pastes the value of the given field using the 
+middle mouse button, and *{remind <message>}* displays message as 
+a notification.  The *sleep* and *rate* functions are only active when 
+auto-typing in account discovery.
 
 The *sleep* function is useful with two-page authentication sites as it gives 
 the website time to load the second page.
@@ -1040,6 +1044,18 @@ The *rate* function is useful with fields that have javascript helpers. The
 javascript helpers often limit the rate at which you can type characters.  The 
 *rate* function allows you to slow down the autotyping to the point where you 
 avoid the problems that stem from exceeding the limit.
+
+The *paste* is useful when websites monitor typing rate to look for automation.  
+The regular rate used by Avendesora can trigger captchas.  Using *paste* can 
+avoid this problem.  The paste occurs where the mouse is placed before the 
+script is triggered. So to use this when you have to enter a username and 
+a password, you would click on the username field, then position the mouse over 
+the password field, then trigger the script.  The script should enter the 
+username normally and paste the password (the paste always occurs at the mouse 
+location, so it only really makes sense to use *paste* once in a script).  For 
+example, this would be a typical script that employs *paste*::
+
+    "{username}{paste passcode}{return}"
 
 The *remind* function is used to remind you of next steps. For example, the 
 following uses *remind* to instruct you to use your YubiKey to provide the 

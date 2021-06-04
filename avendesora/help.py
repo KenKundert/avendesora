@@ -1172,13 +1172,40 @@ class Scripts(HelpMessage):
                 ]
 
             Besides the account attributes, you can use several other special
-            attributes including: {tab}, {return}, {sleep N}, {rate N} and
-            {remind <message>}.  {tab} is replaced by a tab character, {return}
-            is replaced by a carriage return character, {sleep N} causes a pause
-            of N seconds, {rate N} sets the autotype rate to one keystroke every
-            N milliseconds, and {remind <message>} displays message as a
-            notification.  The sleep and rate functions are only active when
-            auto-typing in account discovery.
+            attributes including: {tab}, {return}, {sleep N}, {rate N}, {paste
+            <field>}  and {remind <message>}.  {tab} is replaced by a tab
+            character, {return} is replaced by a carriage return character,
+            {sleep N} causes a pause of N seconds, {rate N} sets the autotype
+            rate to one keystroke every N milliseconds, {paste <field>} pastes
+            the value of the given field using the middle mouse button, and
+            {remind <message>} displays message as a notification.  The sleep
+            and rate functions are only active when auto-typing in account
+            discovery.
+
+            The sleep function is useful with two-page authentication sites as
+            it gives the website time to load the second page.
+
+            The rate function is useful with fields that have javascript
+            helpers. The javascript helpers often limit the rate at which you
+            can type characters.  The rate function allows you to slow down
+            the autotyping to the point where you avoid the problems that stem
+            from exceeding the limit.
+
+            The paste is useful when websites monitor typing rate to look for
+            automation. The regular rate used by Avendesora can trigger
+            captchas.  Using paste can avoid this problem.  The paste occurs where
+            the mouse is placed before the script is triggered. So to use this
+            when you have to enter a username and a password, you would click
+            on the username field, then position the mouse over the password
+            field, then trigger the script.  The script should enter the
+            username normally and paste the password (the paste always occurs
+            at the mouse location, so it only really makes sense to use paste
+            once in a script).  For example, this would be a typical script
+            that employs paste::
+
+                "{username}{paste passcode}{return}"
+
+            The remind function is used to remind you of next steps.
         """).strip()
         return text
 

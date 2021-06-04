@@ -101,7 +101,12 @@ class Script:
                 elif cmd.startswith('remind '):
                     val = ''
                 else:
-                    name, key = account.split_field(cmd)
+                    if cmd.startswith('paste '):
+                        _, field = cmd.split(maxsplit=1)
+                    else:
+                        field = cmd
+                        cmd = None
+                    name, key = account.split_field(field)
                     try:
                         value = account.get_scalar(name, key)
                     except PasswordError as e:
@@ -128,10 +133,11 @@ class Script:
                         else:
                             raise
                     val = dedent(str(value)).strip()
-                    if account.is_secret(name, key):
-                        cmd = 'secret'
-                    else:
-                        cmd = 'value'
+                    if not cmd:
+                        if account.is_secret(name, key):
+                            cmd = 'secret'
+                        else:
+                            cmd = 'value'
             else:
                 cmd = 'text'
                 val = term

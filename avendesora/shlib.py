@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = "1.2.1"
-__released__ = "2020-02-22"
+__version__ = "1.2.2"
+__released__ = "2021-05-24"
 
 # Imports {{{1
 try:
@@ -212,7 +212,8 @@ def mv(*paths):
             shutil.move(to_str(src), to_str(dest))
     else:
         # destination does not exist
-        assert not dest.exists()
+        if dest.exists():
+            raise_os_error(errno.EEXIST, dest)
         shutil.move(to_str(src), to_str(dest))
 
 
@@ -275,9 +276,10 @@ class mount:
     def __init__(self, path):
         self.path = to_path(path)
         self.mounted_externally = is_mounted(self.path)
+        modes = 'sOEW0' if PREFERENCES["use_inform"] else 'soeW0'
 
         if not self.mounted_externally:
-            Run(["mount", self.path])
+            Run(["mount", self.path], modes=modes)
 
     def __enter__(self):
         pass
@@ -288,11 +290,13 @@ class mount:
 
 
 def umount(path):
-    Run(["umount", path])
+    modes = 'sOEW0' if PREFERENCES["use_inform"] else 'soeW0'
+    Run(["umount", path], modes=modes)
 
 
 def is_mounted(path):
-    return Run(["mountpoint", "-q", path], "0,1").status == 0
+    modes = 'sOEW1' if PREFERENCES["use_inform"] else 'soeW1'
+    return Run(["mountpoint", "-q", path], modes=modes).status == 0
 
 
 # cd {{{2

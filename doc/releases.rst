@@ -7,6 +7,8 @@ Releases
     | Version: 1.20.0
     | Released: 2021-02-13
 
+    - Added *paste* attribute to scripts that can be used to avoid captchas
+
 **1.20 (2021-02-13)**
     - added *hidden_fields* setting.
 
