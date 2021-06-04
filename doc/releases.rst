@@ -4,8 +4,8 @@ Releases
 .. currentmodule:: avendesora
 
 **Latest Development Version**:
-    | Version: 1.20.0
-    | Released: 2021-02-13
+    | Version: 1.20.1
+    | Released: 2021-06-04
 
     - Added *paste* attribute to scripts that can be used to avoid captchas
 
