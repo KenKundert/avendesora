@@ -29,7 +29,7 @@ def test_add():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Add a new account.
+        Add a New Account
 
         Usage:
             avendesora add [options] [<template>]
@@ -69,7 +69,7 @@ def test_archive():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Generates archive of all account information.
+        Generates Archive of All Account Information
 
         Usage:
             avendesora archive
@@ -103,7 +103,7 @@ def test_browse():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Open account URL in web browser.
+        Open Account URL in Web Browser
 
         Usage:
             avendesora browse [options] <account> [<key>]
@@ -156,7 +156,7 @@ def test_changed():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Show changes since archive was created.
+        Show Changes Since Archive Was Created
 
         Usage:
             avendesora changed
@@ -247,7 +247,7 @@ def test_conceal():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Conceal text by encoding it.
+        Conceal Text by Encoding It
 
         Usage:
             avendesora conceal [options] [<text>]
@@ -296,7 +296,7 @@ def test_credentials():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Show login credentials.
+        Show Login Credentials
 
         Displays the account's login credentials, which generally consist of an
         identifier and a secret.
@@ -332,7 +332,7 @@ def test_edit():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Edit an account.
+        Edit an Account
 
         Usage:
             avendesora edit <account>
@@ -351,7 +351,7 @@ def test_find():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Find an account.
+        Find an Account
 
         Find accounts whose name contains the search text.
 
@@ -367,7 +367,7 @@ def test_help():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Give information about commands or other topics.
+        Give Information About Commands or Other Topics
 
         Usage:
             avendesora help [options] [<topic>]
@@ -385,7 +385,7 @@ def test_identity():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Generate an identifying response to a challenge.
+        Generate an Identifying Response to a Challenge
 
         Usage:
             avendesora identity [<name> [<challenge>...]]
@@ -461,7 +461,7 @@ def test_initialize():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Create initial set of Avendesora files.
+        Create Initial Set of Avendesora Files
 
         Usage:
             avendesora initialize [options]
@@ -488,7 +488,7 @@ def test_interactive():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Interactively query account values.
+        Interactively Query Account Values
 
         Usage:
             avendesora interactive [options] <account>
@@ -513,7 +513,7 @@ def test_log():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Open the logfile.
+        Open the Logfile
 
         Usage:
             avendesora [options] log
@@ -535,7 +535,7 @@ def test_new():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Create new accounts file.
+        Create New Accounts File
 
         Usage:
             avendesora new [options] <name>
@@ -567,7 +567,7 @@ def test_phonetic():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Display NATO phonetic alphabet.
+        Display NATO Phonetic Alphabet
 
         Usage:
             avendesora phonetic [<text>]
@@ -585,7 +585,7 @@ def test_questions():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Answer a security question.
+        Answer a Security Question
 
         Displays the security questions and then allows you to select one
         to be answered.
@@ -623,7 +623,7 @@ def test_reveal():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Reveal concealed text.
+        Reveal Concealed Text
 
         Transform concealed text to reveal its original form.
 
@@ -649,7 +649,7 @@ def test_search():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Search accounts.
+        Search Accounts
 
         Search for accounts whose values contain the search text.
 
@@ -665,7 +665,7 @@ def test_value():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Show an account value.
+        Show an Account Value
 
         Produce an account value. If the value is secret, it is produced only
         temporarily unless --stdout is specified.
@@ -774,7 +774,7 @@ def test_values():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Display all account values.
+        Display All Account Values
 
         Show all account values.
 
@@ -794,7 +794,7 @@ def test_version():
     except OSError as err:
         result = os_error(err)
     expected = dedent("""
-        Display Avendesora version.
+        Display Avendesora Version
 
         Usage:
             avendesora version

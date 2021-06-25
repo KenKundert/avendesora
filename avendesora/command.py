@@ -41,7 +41,7 @@ import sys
 
 # Utilities {{{1
 def title(text):
-    return full_stop(title_case(text))
+    return title_case(text)
 
 
 # Command base class {{{1

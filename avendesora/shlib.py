@@ -133,7 +133,7 @@ def _use_log(log):
 
 # Preferences {{{1
 def set_prefs(**kwargs):
-    """Set ShLib preferences
+    """Set shlib preferences
 
     Args:
         use_inform (bool):
