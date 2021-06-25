@@ -15,7 +15,7 @@ install_requirements = '''
     arrow!=0.14.*
     cryptography
     docopt
-    inform>=1.17
+    inform>=1.21
     pygobject
     python-gnupg>=0.4.4
         # Be careful.  There's a package called 'gnupg' that's an

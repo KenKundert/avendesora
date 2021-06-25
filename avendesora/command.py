@@ -27,11 +27,11 @@ from .generator import PasswordGenerator
 from .gpg import GnuPG, PythonFile
 from .obscure import ObscuredSecret
 from .shlib import chmod, cp, rm, to_path
-from .utilities import query_user, two_columns, OSErrors, name_completion
+from .utilities import query_user, two_columns, name_completion
 from .writer import get_writer
 from inform import (
     codicil, columns, cull, display, error, full_stop, narrate, output, warn,
-    conjoin, join, os_error, is_collection, indent, render,
+    conjoin, join, os_error, is_collection, indent, render, title_case,
 )
 from docopt import docopt
 from textwrap import dedent
@@ -41,7 +41,7 @@ import sys
 
 # Utilities {{{1
 def title(text):
-    return full_stop(text[0].upper() + text[1:])
+    return full_stop(title_case(text))
 
 
 # Command base class {{{1
@@ -241,7 +241,7 @@ class Add(Command):
             tmpfilename = mktemp(suffix='_avendesora.gpg')
             tmpfile = GnuPG(tmpfilename)
             tmpfile.save(template, get_setting('gpg_ids'))
-        except OSErrors as e:
+        except OSError as e:
             raise PasswordError(os_error(e))
 
         # open template in the editor
@@ -289,9 +289,9 @@ class Add(Command):
                             'Giving up, restoring original file.'
                         )
 
-        except (PasswordError,) + OSErrors as e:
+        except (PasswordError, OSError) as e:
             orig_accounts_file.restore()
-            if isinstance(e, OSErrors):
+            if isinstance(e, OSError):
                 e = os_error(e)
             error(e)
             codicil(
@@ -360,7 +360,7 @@ class Archive(Command):
             if previous_archive and archive_file.is_file():
                 rm(previous_archive)
                 cp(archive_file, previous_archive)
-        except OSErrors as e:
+        except OSError as e:
             raise PasswordError(os_error(e))
 
         # delete the manifests, causing them to be recreated clean
@@ -396,7 +396,7 @@ class Archive(Command):
         try:
             archive.save(contents)
             chmod(0o600, archive_file)
-        except OSErrors as e:
+        except OSError as e:
             raise PasswordError(os_error(e), culprit=archive_file)
 
 
@@ -709,7 +709,7 @@ class Edit(Command):
             accounts_file = PythonFile(account._file_info_.path)
             accounts_file.backup('.saved')
             account_name = account.__name__
-        except OSErrors as e:
+        except OSError as e:
             raise PasswordError(os_error(e))
 
         # allow the user to edit, and then check and make sure it is valid
@@ -733,7 +733,7 @@ class Edit(Command):
         except PasswordError:
             accounts_file.restore()
             raise
-        except OSErrors as e:
+        except OSError as e:
             accounts_file.restore()
             raise PasswordError(os_error(e))
 
@@ -1065,7 +1065,7 @@ class Log(Command):
             try:
                 rm(logfile)
                 return
-            except OSErrors as e:
+            except OSError as e:
                 raise PasswordError(os_error(e))
         if not logfile.exists():
             raise PasswordError('log file was not found.')

@@ -1,6 +1,6 @@
 # Editors
 #
-# Open and editor on a file.
+# Open an editor on a file.
 
 # License {{{1
 # Copyright (C) 2016-2021 Kenneth S. Kundert
@@ -21,8 +21,9 @@
 # Imports {{{1
 from .config import get_setting, setting_path
 from .error import PasswordError
-from .shlib import Run
+from .shlib import Run, set_prefs as shlib_prefs
 from inform import Error
+shlib_prefs(use_inform=True)
 
 
 # Editor base class {{{1

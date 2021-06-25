@@ -36,7 +36,7 @@ from .script import Script
 from .secrets import Passphrase
 from .shlib import to_path, getmod, mv, rm
 from .title import Title
-from .utilities import generate_random_string, OSErrors
+from .utilities import generate_random_string
 from inform import codicil, conjoin, log, os_error, render, warn, is_str
 from textwrap import dedent, wrap
 from pathlib import Path
@@ -139,7 +139,7 @@ class PasswordGenerator(object):
         if (get_setting('config_doc_file')):
             try:
                 rm(get_setting('config_doc_file'))
-            except OSErrors as e:
+            except OSError as e:
                 warn(os_error(e))
 
         # create the initial versions of the files in the settings directory
@@ -188,7 +188,7 @@ class PasswordGenerator(object):
             try:
                 mv(path, str(path) + '~')
                 f.create(ACCOUNT_LIST_FILE_CONTENTS.format(**fields), gpg_ids)
-            except OSErrors as e:
+            except OSError as e:
                 raise PasswordError(os_error(e))
 
     # _validate_components() (private) {{{2
@@ -220,7 +220,7 @@ class PasswordGenerator(object):
                 contents = path.read_text()
             except AttributeError:
                 contents = '\n'.join(Dictionary(path).get_words())
-            except OSErrors as e:
+            except OSError as e:
                 raise PasswordError(os_error(e))
             md5 = hashlib.md5(contents.encode('utf-8')).hexdigest()
             # Check that file has not changed.

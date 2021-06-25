@@ -23,7 +23,6 @@
 from .config import get_setting, setting_path
 from .error import PasswordError
 from .shlib import Cmd
-from .utilities import OSErrors
 from inform import log, os_error
 
 

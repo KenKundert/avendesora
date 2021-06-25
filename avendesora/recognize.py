@@ -25,7 +25,7 @@ from .collection import Collection
 from .config import get_setting
 from .error import PasswordError
 from .shlib import to_path, Run
-from .utilities import gethostname, getusername, OSErrors
+from .utilities import gethostname, getusername
 from inform import Error, cull, log, notify, warn, os_error, indent, render
 from fnmatch import fnmatch
 try:
@@ -756,7 +756,7 @@ class RecognizeFile(Recognizer):
                 return
         except FileNotFoundError:
             pass
-        except OSErrors as e:
+        except OSError as e:
             warn(os_error(e))
         if verbose:
             log('    %s: no match.' % self.get_name())

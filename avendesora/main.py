@@ -41,7 +41,6 @@ from .command import Command
 from .config import read_config, get_setting
 from .error import PasswordError
 from .gpg import BufferedFile
-from .utilities import OSErrors
 from .__init__ import __version__, __released__
 from . import shlib
 from inform import Inform, Error, done, fatal, output, terminate, os_error
@@ -77,6 +76,6 @@ def main():
         terminate()
     except (PasswordError, Error) as e:
         e.terminate()
-    except OSErrors as e:
+    except OSError as e:
         fatal(os_error(e))
     done()

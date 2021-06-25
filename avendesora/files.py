@@ -40,7 +40,6 @@ from .collection import Collection
 from .config import get_setting
 from .gpg import PythonFile
 from .shlib import getmod, mkdir, rm, chmod
-from .utilities import OSErrors
 from cryptography.fernet import Fernet
 from fnmatch import fnmatch
 from inform import Error, comment, codicil, log, os_error, warn
@@ -242,7 +241,7 @@ class AccountFiles:
                 warn('garbled manifest.', culprit=manifests_path, codicil=str(e))
                 manifests_path.unlink()
             assert isinstance(self.name_index, dict)
-        except OSErrors as e:
+        except OSError as e:
             comment(os_error(e))
         except Exception as e:
             comment(e)

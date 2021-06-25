@@ -31,14 +31,6 @@ HighlightColor = Color(
     enable=Color.isTTY()
 )
 
-# OSErrors {{{1
-# Define OSError to include IOError with Python2 for backward compatibility
-if sys.version_info.major < 3:
-    OSErrors = (OSError, IOError)
-else:
-    OSErrors = (OSError,)
-
-
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
 def gethostname():

@@ -22,7 +22,6 @@
 # Imports {{{1
 from .config import get_setting
 from .error import PasswordError
-from .utilities import OSErrors
 from inform import os_error
 from .shlib import to_path
 
@@ -53,7 +52,7 @@ class Dictionary(object):
                     try:
                         path = to_path(self.dictionary)
                         contents = path.read_text()
-                    except OSErrors as e:
+                    except OSError as e:
                         raise PasswordError(os_error(e))
                     self.words = contents.split()
                 known_dictionaries[self.dictionary] = self.words
