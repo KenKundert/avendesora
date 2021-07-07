@@ -1,7 +1,7 @@
 .. index::
     single: accessories
 
-.. _accessories:
+.. _avendesora_accessories:
 
 Accessories
 ===========

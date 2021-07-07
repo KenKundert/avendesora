@@ -60,7 +60,7 @@ traditional password managers:
 
 :Powerful:
     * :ref:`Python API <avendesora_api>`
-    * :ref:`Numerous companion programs <accessories>`
+    * :ref:`Numerous companion programs <avendesora_accessories>`
     * :ref:`Collaboration support <collaboration>`
     * :ref:`Time-based one-time password support <otp>` (TOTP)
 
