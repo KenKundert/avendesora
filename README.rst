@@ -3,6 +3,9 @@ Avendesora Collaborative Password Manager
 
 *Avendesora, the leaf of the Tree of Life is the key.*
 
+.. image:: https://pepy.tech/badge/avendesora/month
+    :target: https://pepy.tech/project/avendesora
+
 .. image:: https://img.shields.io/travis/KenKundert/avendesora/master.svg
     :target: https://travis-ci.org/KenKundert/avendesora
 
