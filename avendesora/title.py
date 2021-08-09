@@ -40,6 +40,7 @@ import re
 def labelRegex(label, regex):
     return "(?P<%s>%s)" % (label, regex)
 
+
 URL_REGEX = r'[^ ]+://[^ ]+'
 URL_REGEX = r'.*'
     # KSK -- qutebrowser sometimes gives a URL with spaces (economist.com)

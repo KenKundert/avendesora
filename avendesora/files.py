@@ -235,7 +235,7 @@ class AccountFiles:
 
                 # build the name_index by inverting the name_manifests
                 self.name_index = {
-                    h:n for n,l in self.name_manifests.items() for h in l
+                    h: n for n, l in self.name_manifests.items() for h in l
                 }
             except (ValueError, pickle.UnpicklingError) as e:
                 warn('garbled manifest.', culprit=manifests_path, codicil=str(e))

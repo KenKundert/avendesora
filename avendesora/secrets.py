@@ -460,9 +460,9 @@ class Password(GeneratedSecret):
 
         join = shift_sort_join if self.shift_sort else simple_join
         secret = self.secret = (
-            self.prefix
-          + join(self._symbols(self.alphabet, self.length), self.sep)
-          + self.suffix
+            self.prefix +
+            join(self._symbols(self.alphabet, self.length), self.sep) +
+            self.suffix
         )
         return secret
 

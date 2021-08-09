@@ -10,7 +10,6 @@ from inform import Error
 # dmenu selection utility interface
 def dmenu_dialog(title, choices):
     executable = get_setting('dmenu_executable')
-    #cmd = [executable, '-l', len(choices), '-i', '-p', title]
     cmd = [executable, '-l', len(choices), '-i']
     try:
         dmenu = Run(cmd, 'sOEW1', stdin='\n'.join(choices))
@@ -115,7 +114,7 @@ try:
         import gi
         gi.require_version('Gtk', '3.0')
         from gi.repository import Gtk as gtk
-        from gi.repository import Gdk as gdk
+        # from gi.repository import Gdk as gdk
 
         class ErrorDialog (gtk.MessageDialog):
             def __init__(self, message, description=None):

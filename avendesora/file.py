@@ -22,6 +22,7 @@
 # Imports {{{1
 from .error import PasswordError
 from .shlib import to_path
+from inform import os_error
 
 
 # WriteFile {{{1
@@ -64,4 +65,3 @@ class WriteFile():
     # __str__() {{{2
     def __str__(self):
         return self.render()
-

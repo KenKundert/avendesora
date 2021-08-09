@@ -37,12 +37,14 @@ def chunk(string, length):
         string[0+i:length+i] for i in range(0, len(string), length)
     )
 
+
 def decorate_concealed(name, encoded):
     if len(encoded) <= 60:
         arg = "'" + encoded + "'"
     else:
         arg = "\n    '" + "'\n    '".join(chunk(encoded, 60)) + "'\n"
     return '{}({})'.format(name, arg)
+
 
 def group(pattern):
     return '(?:%s)' % pattern
@@ -373,6 +375,7 @@ def scrypt_not_installed():
             pip3 install scrypt
     ''').strip())
 
+
 class Scrypt(ObscuredSecret):
     """Scrypt encrypted text
 
@@ -443,4 +446,3 @@ class Scrypt(ObscuredSecret):
 
         encrypted = a2b_base64(ciphertext)
         return scrypt.decrypt(encrypted, get_setting('user_key'))
-

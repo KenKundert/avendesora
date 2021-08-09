@@ -26,7 +26,7 @@ from .config import get_setting
 from .error import PasswordError
 from .shlib import to_path, Run
 from .utilities import gethostname, getusername
-from inform import Error, cull, log, notify, warn, os_error, indent, render
+from inform import Error, cull, log, notify, warn, os_error, render
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
@@ -44,6 +44,7 @@ def render_arg(value, name=None):
     if name:
         return name + '=' + rendered_value
     return rendered_value
+
 
 # Recognizer Base Class {{{1
 class Recognizer(object):
@@ -86,6 +87,7 @@ class Recognizer(object):
 
     def render(self):
         return render(self)
+
 
 # RecognizeAll {{{1
 class RecognizeAll(Recognizer):
@@ -611,7 +613,6 @@ class RecognizeEnvVar(Recognizer):
             raise PasswordError(str(e), culprit=e.__class__.__name__)
         if verbose:
             log('    %s: no match.' % self.get_name())
-
 
     def _inform_get_args(self):
         return []

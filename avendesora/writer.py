@@ -28,7 +28,7 @@ from .preferences import INITIAL_AUTOTYPE_DELAY
 from .shlib import Run, split_cmd
 from inform import (
     Color, Error,
-    codicil, cull, error, log, notify, output, warn, indent, os_error,
+    codicil, cull, error, log, notify, output, warn, indent,
 )
 from time import sleep
 from textwrap import dedent
@@ -247,18 +247,18 @@ class ClipboardWriter(Writer):
             except Error as e:
                 e.reraise(culprit=base_cmd)
 
-        # Use Gobject Introspection (GTK) to put the information on the
-        # clipboard (for some reason I cannot get this to work).
-        #try:
-        #    from gi.repository import Gtk, Gdk
+        #  Use Gobject Introspection (GTK) to put the information on the
+        #  clipboard (for some reason I cannot get this to work).
+        # try:
+        #     from gi.repository import Gtk, Gdk
         #
-        #    clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        #    clipboard.set_text(text, len(text))
-        #    clipboard.store()
-        #    sleep(self.wait)
-        #    clipboard.clear()
-        #except ImportError:
-        #    error('Clipboard is not supported.')
+        #     clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        #     clipboard.set_text(text, len(text))
+        #     clipboard.store()
+        #     sleep(self.wait)
+        #     clipboard.clear()
+        # except ImportError:
+        #     error('Clipboard is not supported.')
 
 
 # StdoutWriter class {{{1

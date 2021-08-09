@@ -66,7 +66,7 @@ def read_config():
     hashes_file = PythonFile(get_setting('hashes_file'))
     try:
         contents = hashes_file.run()
-        Config.update({k.lower(): v for k,v in contents.items()})
+        Config.update({k.lower(): v for k, v in contents.items()})
     except PasswordError:
         pass
 
@@ -74,7 +74,7 @@ def read_config():
     account_list_file = PythonFile(get_setting('account_list_file'))
     try:
         contents = account_list_file.run()
-        Config.update({k.lower(): v for k,v in contents.items()})
+        Config.update({k.lower(): v for k, v in contents.items()})
     except PasswordError:
         pass
 
@@ -90,7 +90,7 @@ def read_config():
             contents = user_key_file.run()
             Config.update({
                 k.lower(): v
-                for k,v in contents.items()
+                for k, v in contents.items()
                 if not k.startswith('__')
             })
         except PasswordError:

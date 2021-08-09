@@ -31,6 +31,7 @@ HighlightColor = Color(
     enable=Color.isTTY()
 )
 
+
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
 def gethostname():
@@ -161,10 +162,7 @@ def error_source():
 def query_user(msg):
     msg = HighlightColor(msg)
     try:
-        if sys.version_info.major < 3:
-            return raw_input(msg + ' ').strip()
-        else:
-            return input(msg + ' ').strip()
+        return input(msg + ' ').strip()
     except EOFError:
         output()
 
@@ -213,6 +211,7 @@ def invert_dict(d, initial_keys=None):
 start_time = 0
 last_time = 0
 
+
 def timer(label=None):
     from quantiphy import Quantity
     from time import time
@@ -220,7 +219,7 @@ def timer(label=None):
     t = time()
     if label:
         print('{label}: delta = {delta}, cumulative = {elapsed}'.format(
-            label,
+            label = label,
             elapsed = Quantity(t - start_time, 's'),
             delta = Quantity(t - last_time, 's'),
         ))

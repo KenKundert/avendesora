@@ -96,8 +96,8 @@ class HelpMessage(object):
 
             # topic not found, give some alternatives
             topics = (
-                [c.get_name() for c in Command.commands()]
-              + [t.get_name() for t in cls.topics()]
+                [c.get_name() for c in Command.commands()] +
+                [t.get_name() for t in cls.topics()]
             )
             candidates = get_close_matches(name, topics, 3, 0.6)
             msg = ['topic not found']
@@ -1708,8 +1708,6 @@ class Secrets(HelpMessage):
             passcode = PasswordRecipe('16 1d', version='19q2')
         """).strip()
         return text
-
-
 
 
 # Stealth class {{{1

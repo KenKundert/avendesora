@@ -74,7 +74,7 @@ try:
             secret = shared_secret.replace(' ', '').encode('utf-8')
 
             # add padding if needed
-            secret += b'='*((8 - len(secret))%8)
+            secret += b'='*((8 - len(secret)) % 8)
 
             # check validity
             try:

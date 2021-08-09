@@ -30,8 +30,8 @@ from .shlib import chmod, cp, rm, to_path
 from .utilities import query_user, two_columns, name_completion
 from .writer import get_writer
 from inform import (
-    codicil, columns, cull, display, error, full_stop, narrate, output, warn,
-    conjoin, join, os_error, is_collection, indent, render, title_case,
+    codicil, columns, conjoin, cull, display, error, Error, indent,
+    is_collection, join, narrate, os_error, output, render, title_case, warn,
 )
 from docopt import docopt
 from textwrap import dedent
@@ -304,7 +304,7 @@ class Add(Command):
         # delete the temp file
         try:
             tmpfile.remove()
-        except:
+        except Exception:
             pass
 
 
@@ -1016,7 +1016,7 @@ class Interactive(Command):
                         get_setting('default_vector_field'),
                         int(choice)
                     )
-                except:
+                except Exception:
                     pass
                 try:
                     writer.display_field(account, choice)
@@ -1238,7 +1238,7 @@ class PhoneticAlphabet(Command):
             Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform
             Victor Whiskey X-ray Yankee Zulu
         """.split()
-        mapping = {w[0].lower():w for w in words}
+        mapping = {w[0].lower(): w for w in words}
         mapping.update({
             '0':'Zero', '1':'One', '2':'Two', '3':'Three', '4':'Four',
             '5':'Five', '6':'Six', '7':'Seven', '8':'Eight', '9':'Nine'

@@ -59,9 +59,11 @@ HighlightColor = Color(
 def canonicalize(name):
     return name.replace('-', '_').replace(' ', '_').lower()
 
+
 def is_forbidden_field(name):
     # return true if a field name is intended only for internal use only
     return name.endswith('_') or name in FORBIDDEN_TOOL_FIELDS
+
 
 # AccountValue class {{{1
 class AccountValue:

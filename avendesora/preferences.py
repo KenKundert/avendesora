@@ -18,7 +18,6 @@
 
 # Imports {{{1
 from textwrap import dedent
-import re
 from appdirs import user_config_dir, user_cache_dir
 
 # Non-Config Settings {{{1
@@ -70,7 +69,7 @@ CONFIG_DEFAULTS = {
         'fp':  'firefox -private-window {url}',
         'q':  'qutebrowser {url}',
         't':  'torbrowser {url}',
-        'x':  'xdg-open {url}', # system default browser
+        'x':  'xdg-open {url}',  # system default browser
     },
     'help_url': 'https://avendesora.readthedocs.io/en/latest',
     'default_field': 'passcode password passphrase',
@@ -83,18 +82,18 @@ CONFIG_DEFAULTS = {
     'dictionary_file': None,
     'encoding': 'utf-8',
     'edit_account': (
-        'gvim',                     # use gvim -v so that user can access
-        '-v',                       # the X clipboard buffers
+        'gvim',                       # use gvim -v so that user can access
+        '-v',                         # the X clipboard buffers
         '+silent! /^class {account}(Account):/',
-        '+silent! normal zozt',     # open the fold, position near top of screen
+        '+silent! normal zozt',       # open the fold, position near top of screen
         '{filepath}'
     ),
     'edit_template': (
-        'gvim',                     # use gvim -v so that user can access
-        '-v',                       # the X clipboard buffers
-        r'+silent! /_[A-Z0-9_]\+_/',# matches user modifiable template fields
-                                    # fields take the form '_AAA_'
-        '+silent! normal zozt',     # open the fold, position near top of screen
+        'gvim',                       # use gvim -v so that user can access
+        '-v',                         # the X clipboard buffers
+        r'+silent! /_[A-Z0-9_]\+_/',  # matches user modifiable template fields
+                                      # fields take the form '_AAA_'
+        '+silent! normal zozt',       # open the fold, position near top of screen
         '{filepath}'
     ),
     'hashes_file': 'hashes',
