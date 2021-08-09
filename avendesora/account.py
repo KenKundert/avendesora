@@ -57,7 +57,7 @@ HighlightColor = Color(
 
 # Utilities {{{1
 def canonicalize(name):
-    return name.replace('-', '_').lower()
+    return name.replace('-', '_').replace(' ', '_').lower()
 
 def is_forbidden_field(name):
     # return true if a field name is intended only for internal use only
@@ -618,12 +618,12 @@ class Account(object):
     def find_field(cls, name, key=None):
         # look up field name while ignoring case and treating - and _ as same
         names = {
-            n.replace('-', '_').lower(): n
+            canonicalize(n): n
             for n in cls.__dict__.keys()
             if not is_forbidden_field(n)
         }
         try:
-            name = names[name.replace('-', '_').lower()]
+            name = names[canonicalize(name)]
         except KeyError:
             raise PasswordError('field not found.', culprit=name)
 
@@ -637,11 +637,11 @@ class Account(object):
         try:
             value = getattr(cls, name)
             keys = {
-                n.replace('-', '_').lower(): n
+                canonicalize(n): n
                 for n in value.keys()
             }
             try:
-                key = keys[key.replace('-', '_').lower()]
+                key = keys[canonicalize(key)]
             except KeyError:
                 raise PasswordError('key not found.', culprit=key)
         except AttributeError:
@@ -871,11 +871,12 @@ class Account(object):
 
     # export() {{{2
     @classmethod
-    def export(cls):
+    def export(cls, fold_level=1):
         # return all account fields along with their values
         """Return all account fields along with their values as a dictionary
 
-        Used when exporting accounts.
+        Used when exporting accounts.  If fold_level is truthy, it should be a
+        positive integer that indicates the fold level for each account.
 
         Returns:
             A string that contains all account fields with all secrets included
@@ -887,10 +888,10 @@ class Account(object):
             if k not in ['master_seed', 'account_seed']
         ]
         return dedent('''
-            class {name}(Account): {fold}
+            class {name}(Account):{fold}
                 {values}
         ''').format(
-            fold = '# {{' + '{1',
+            fold = '  # {' + '{' + '{' + str(fold_level) if fold_level else '',
             name = cls.__name__,
             values = '\n    '.join(values),
         ).strip()

@@ -130,8 +130,8 @@ Account Class
 
 .. autoclass:: avendesora.Account
     :members:
-        get_name, get_value, get_username, get_passcode, get_fields, get_values, 
-        get_scalar, get_composite
+        export, get_name, get_value, get_username, get_passcode, get_fields, 
+        get_values, get_scalar, get_composite
 
 
 AccountValue Class

@@ -7,7 +7,10 @@ Releases
     | Version: 1.20.1
     | Released: 2021-06-04
 
-    - Added *paste* attribute to scripts that can be used to avoid captchas
+
+**1.21 (2021-08-08)**
+    - added *fold_level* to :meth:`Account.export()`.
+    - Added *paste* attribute to scripts that might help avoid captchas.
 
 **1.20 (2021-02-13)**
     - added *hidden_fields* setting.
