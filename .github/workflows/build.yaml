@@ -22,6 +22,7 @@ jobs:
           pip install .
           pip install tox
           pip install coveralls
+          pip install pygobject
       - name: Run tests
         run: tox
       - name: Report test coverage
