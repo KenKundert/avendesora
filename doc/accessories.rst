@@ -10,6 +10,25 @@ A collection companion programs have been developed that work with *Avendesora*
 to provide additional useful capabilities.
 
 
+AddSSHkeys
+----------
+
+An *Avendesora* accessory that allows you to load all of your keys into the SSH 
+agent with one simple command.
+
+`AddSSHkeys <https://github.com/KenKundert/addsshkeys>`_
+
+
+Avendesora Export
+-----------------
+
+An *Avendesora* accessory that exports selected accounts to an *Avendesora* 
+installation on a different host.  In this way you can easily maintain satellite 
+installations that provide only the accounts needed on that host.
+
+`avendesora-export <https://github.com/KenKundert/avendesora-export>`_
+
+
 BitWarden Export
 ----------------
 
@@ -26,16 +45,6 @@ A front-end for `BorgBackup <https://borgbackup.readthedocs.io/en/stable>`_ that
 makes it easy to manage your backups interactively from the command line. 
 
 `Emborg <https://github.com/KenKundert/emborg>`_
-
-
-SpareKeys
----------
-
-Spare Keys makes and distributes encrypted copies of the files that you would 
-need to recover from a catastrophic hard drive failure, e.g. SSH keys, GPG keys, 
-password vaults, encryption keys for backups, etc.
-
-`SpareKeys <https://github.com/kalekundert/sparekeys>`_
 
 
 Networth
@@ -56,10 +65,11 @@ become disabled.
 `PostMortem <https://github.com/KenKundert/postmortem>`_
 
 
-AddSSHkeys
-----------
+SpareKeys
+---------
 
-An *Avendesora* accessory that allows you to load all of your keys into the SSH 
-agent with one simple command.
+Spare Keys makes and distributes encrypted copies of the files that you would 
+need to recover from a catastrophic hard drive failure, e.g. SSH keys, GPG keys, 
+password vaults, encryption keys for backups, etc.
 
-`AddSSHkeys <https://github.com/KenKundert/addsshkeys>`_
+`SpareKeys <https://github.com/kalekundert/sparekeys>`_
