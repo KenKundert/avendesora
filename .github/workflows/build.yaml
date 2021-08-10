@@ -16,13 +16,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install pygobject
+        run: sudo apt-get install python3-gi
       - name: Install packages
         run:
           python -m pip install --upgrade pip
           pip install .
           pip install tox
           pip install coveralls
-          pip install pygobject
       - name: Run tests
         run: tox
       - name: Report test coverage
