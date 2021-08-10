@@ -6,8 +6,8 @@ Avendesora Collaborative Password Manager
 .. image:: https://pepy.tech/badge/avendesora/month
     :target: https://pepy.tech/project/avendesora
 
-.. image:: https://img.shields.io/travis/KenKundert/avendesora/master.svg
-    :target: https://travis-ci.org/KenKundert/avendesora
+..  image:: https://github.com/KenKundert/avendesora/actions/workflows/build.yaml/badge.svg
+    :target: https://github.com/KenKundert/avendesora/actions/workflows/build.yaml
 
 .. image:: https://img.shields.io/coveralls/KenKundert/avendesora.svg
     :target: https://coveralls.io/r/KenKundert/avendesora
@@ -18,13 +18,6 @@ Avendesora Collaborative Password Manager
 .. image:: https://img.shields.io/pypi/pyversions/avendesora.svg
     :target: https://pypi.python.org/pypi/avendesora/
 
-.. IGNORE: pypi statics are broken and unlikely to be fixed
-    .. image:: https://img.shields.io/pypi/dm/avendesora.svg
-        :target: https://pypi.python.org/pypi/avendesora/
-
-    .. image:: https://requires.io/github/KenKundert/avendesora/requirements.svg?branch=master
-        :target: https://requires.io/github/KenKundert/avendesora/requirements/?branch=master
-        :alt: Requirements Status
 
 :Authors: Ken & Kale Kundert
 :Version: 1.20.1
