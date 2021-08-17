@@ -6,6 +6,9 @@ Avendesora Collaborative Password Manager
 .. image:: https://pepy.tech/badge/avendesora/month
     :target: https://pepy.tech/project/avendesora
 
+.. image:: https://img.shields.io/readthedocs/avendesora.svg
+   :target: https://avendesora.readthedocs.io/en/latest/?badge=latest
+
 ..  image:: https://github.com/KenKundert/avendesora/actions/workflows/build.yaml/badge.svg
     :target: https://github.com/KenKundert/avendesora/actions/workflows/build.yaml
 

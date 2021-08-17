@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = "1.2.2"
-__released__ = "2021-05-24"
+__version__ = "1.3.0"
+__released__ = "2021-08-10"
 
 # Imports {{{1
 try:
@@ -1018,12 +1018,12 @@ def render_command(cmd, option_args=None, width=70):
     bux --dux a b -d c d --tux e f g h
 
     >>> print(render_command('bux --dux a b -d c d --tux e f g h', args, width=0))
-    bux \
-        --dux a b \
-        -d c d \
-        --tux e \
-        f \
-        g \
+    bux \\
+        --dux a b \\
+        -d c d \\
+        --tux e \\
+        f \\
+        g \\
         h
 
     """
