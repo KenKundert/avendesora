@@ -4,8 +4,8 @@ Releases
 .. currentmodule:: avendesora
 
 **Latest Development Version**:
-    | Version: 1.21.0
-    | Released: 2021-08-09
+    | Version: 1.21.1
+    | Released: 2021-08-28
 
 
 **1.21 (2021-08-08)**
