@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = "1.3.0"
-__released__ = "2021-08-10"
+__version__ = "1.3.1"
+__released__ = "2021-08-28"
 
 # Imports {{{1
 try:
@@ -222,7 +222,7 @@ def rm(*paths):
     "Remove files or directories (equivalent to rm -rf)"
     for path in to_paths(paths):
         try:
-            if path.is_dir():
+            if path.is_dir() and not path.is_symlink():
                 shutil.rmtree(to_str(path))
             else:
                 path.unlink()

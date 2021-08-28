@@ -25,7 +25,7 @@ from .config import get_setting, override_setting, setting_path
 from .error import PasswordError
 from .shlib import to_path, cp
 from inform import (
-    conjoin, cull, display, log, narrate, os_error, warn, is_str,
+    conjoin, cull, display, fatal, log, narrate, os_error, warn, is_str,
     full_stop
 )
 import gnupg
@@ -79,7 +79,10 @@ class GnuPG(object):
             gpg_args.update({'gpgbinary': str(cls.gpg_path)})
         if cls.gpg_home:
             gpg_args.update({'gnupghome': str(cls.gpg_home)})
-        cls.gpg = gnupg.GPG(**gpg_args)
+        try:
+            cls.gpg = gnupg.GPG(**gpg_args)
+        except ValueError as e:
+            fatal(e)
 
     def save(self, contents, gpg_ids=None):
         path = self.path
@@ -208,6 +211,9 @@ class BufferedFile(GnuPG):
         except PasswordError:
             if not self.ignore_errors_on_close:
                 raise
+        except Exception:
+            # can occur if GPG was never initialized
+            pass
 
 
 # PythonFile class {{{1
