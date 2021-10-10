@@ -302,8 +302,8 @@ class PasswordGenerator(object):
                 There is no account of field that matches the given path.
         """
         name, _, field = path.partition(':')
-        account = self.get_account(name, request_seed, stealth_name)
-        return account.get_value(field)
+        account = self.get_account(name.strip(), request_seed, stealth_name)
+        return account.get_value(field.strip())
 
     # discover_account() {{{2
     def discover_account(self, url=None, title=None, verbose=False):

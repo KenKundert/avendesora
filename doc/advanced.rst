@@ -1045,17 +1045,21 @@ javascript helpers often limit the rate at which you can type characters.  The
 *rate* function allows you to slow down the autotyping to the point where you 
 avoid the problems that stem from exceeding the limit.
 
-The *paste* is useful when websites monitor typing rate to look for automation.  
-The regular rate used by Avendesora can trigger captchas.  Using *paste* can 
-avoid this problem.  The paste occurs where the mouse is placed before the 
-script is triggered. So to use this when you have to enter a username and 
-a password, you would click on the username field, then position the mouse over 
-the password field, then trigger the script.  The script should enter the 
-username normally and paste the password (the paste always occurs at the mouse 
-location, so it only really makes sense to use *paste* once in a script).  For 
-example, this would be a typical script that employs *paste*::
+The *paste* is useful when trying to overcome JavaScript issues. Many websites 
+use JavaScript to interpret the characters as you type them. This can be slow it 
+may not be able to keep up with *Avendesora*'s auto-typing.  There are various 
+ways of overcoming this problem.  You can use the *rate* function, or you can 
+follow the field with the *sleep* function, or you can use the *paste* function 
+to enter the value in one operation.  Using *paste* can be more reliable than 
+*rate* and *sleep*, which both count on timing that can vary with your internet 
+connection. The paste occurs where the mouse is placed before the script is 
+triggered, so it only really makes sense to use *paste* once in a script.  If 
+you are not pasting the first value in your script, then you should click on the 
+first value to select it, then move the mouse without clicking so that hovers 
+over the field to be pasted to, then trigger the script.  A typical example 
+script that employs *paste* is::
 
-    "{username}{paste passcode}{return}"
+    "{paste account}{tab}{passcode}{return}"
 
 The *remind* function is used to remind you of next steps. For example, the 
 following uses *remind* to instruct you to use your YubiKey to provide the 
