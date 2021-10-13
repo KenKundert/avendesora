@@ -563,7 +563,7 @@ class Changed(Command):
                     archive_value = archive_account[field_name]
                     current_value = current_account[field_name]
                     if is_collection(current_value) != is_collection(archive_value):
-                        output(account_name, 'field dimension differs', field_name, sep=': ')
+                        output(account_name, 'number of items in field differs', field_name, sep=': ')
                     elif is_collection(current_value):
                         archive_items = Collection(archive_account[field_name]).items()
                         current_items = Collection(current_account[field_name]).items()
