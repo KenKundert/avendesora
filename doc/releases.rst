@@ -4,8 +4,8 @@ Releases
 .. currentmodule:: avendesora
 
 **Latest Development Version**:
-    | Version: 1.21.1
-    | Released: 2021-08-28
+    | Version: 1.21.2
+    | Released: 2021-11-03
 
     - Allow remind commands in :class:`Script`.
 
