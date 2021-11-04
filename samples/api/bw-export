@@ -21,7 +21,7 @@ format.
 
 # Imports {{{1
 from avendesora import PasswordGenerator, PasswordError, Script
-from inform import conjoin, os_error, terminate
+from inform import conjoin, os_error, terminate, fatal
 from docopt import docopt
 from textwrap import dedent
 import csv
@@ -72,7 +72,7 @@ try:
                 # expand fields
                 for k, v in fields.items():
                     if k not in fieldnames:
-                        warn(
+                        fatal(
                             'field unknown by bitwarden.',
                             culprit=(account_name, k)
                         )

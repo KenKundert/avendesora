@@ -20,6 +20,7 @@
 # Imports {{{1
 from .dialog import show_list_dialog
 from .error import PasswordError
+from inform import notify
 from textwrap import dedent
 import re
 
@@ -99,6 +100,7 @@ class Script:
                 elif cmd.startswith('rate '):
                     val = ''
                 elif cmd.startswith('remind '):
+                    notify(cmd[7:])
                     val = ''
                 else:
                     if cmd.startswith('paste '):
@@ -132,7 +134,13 @@ class Script:
                             value = account.get_scalar(name, key)
                         else:
                             raise
-                    val = dedent(str(value)).strip()
+                    try:
+                        val = dedent(str(value)).strip()
+                    except RecursionError:
+                        raise PasswordError(
+                            'script must not reference itself.', culprit=field
+                        )
+
                     if not cmd:
                         if account.is_secret(name, key):
                             cmd = 'secret'

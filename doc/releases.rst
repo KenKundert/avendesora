@@ -7,9 +7,11 @@ Releases
     | Version: 1.21.1
     | Released: 2021-08-28
 
+    - Allow remind commands in :class:`Script`.
+
 
 **1.21 (2021-08-08)**
-    - added *fold_level* to :meth:`Account.export()`.
+    - Added *fold_level* to :meth:`Account.export()`.
     - Added *paste* attribute to scripts that might help avoid captchas.
 
 **1.20 (2021-02-13)**
