@@ -15,6 +15,10 @@ install_requirements = '''
     arrow!=0.14.*
     cryptography
     docopt
+    docutils!=0.18
+        # not needed directly by Avendesora, instead it a requirement for
+        # Sphinx.  There is some incompatibility between version 0.18 and
+        # the latest versions of Sphinx.
     inform>=1.21
     pygobject
     python-gnupg>=0.4.4
