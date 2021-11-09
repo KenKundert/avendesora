@@ -124,7 +124,7 @@ your needs. For example, your entry for FasTrak might look like this:
             script='{username}{tab}{passcode}{return}'
         )
         questions = [
-            Question('What city were you born in?')
+            Question('City in which you were born?')
             Question('What was the name of you high school?')
         ]
         pin = PIN(length=4)
@@ -151,7 +151,7 @@ will differ)::
     passcode: 0GPD;mc3XC?c
 
     > avendesora value fastrak questions.0
-    questions.0 (What city were you born in?): voyager interview gaudy
+    questions.0 (City in which you were born?): voyager interview gaudy
 
     > avendesora value fastrak pin
     pin: 2728
@@ -258,7 +258,7 @@ account attributes.  The secrets are not printed with this command.
     passcode: <reveal with 'avendesora value fastrak passcode'>
     pin: <reveal with 'avendesora value fastrak pin'>
     questions:
-        0: What city were you born in? <reveal with 'avendesora value fastrak questions.0'>
+        0: City in which you were born? <reveal with 'avendesora value fastrak questions.0'>
         1: What was the name of you high school? <reveal with 'avendesora value fastrak questions.1'>
     username: rand36
 
