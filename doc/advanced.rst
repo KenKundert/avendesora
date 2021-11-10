@@ -145,7 +145,7 @@ not supported. If you give a partial path, by default *Avendesora*
 matches up to what you have given, but you can require an exact
 match of the entire path by specifying ``exact_path=True`` to
 :class:`avendesora.RecognizeURL`.  If you do not give the protocol, the
-default_protocol (https) is assumed.
+:ref:`default_protocol <default_protocol setting>` (https) is assumed.
 
 In general you should use :class:`avendesora.RecognizeURL` rather than
 :class:`avendesora.RecognizeTitle` for websites if you can. Doing so helps
@@ -546,8 +546,8 @@ preferred when the same name is found in both attributes.
 Selecting the Browser
 """""""""""""""""""""
 
-You can configure browsers for use by *Avendesora* using the *browsers* setting.  
-By default, *browsers* contains the following:
+You can configure browsers for use by *Avendesora* using the :ref:`browsers 
+<browsers setting>` setting.  By default, *browsers* contains the following:
 
 .. code-block:: python
 
@@ -565,11 +565,11 @@ Each entry pairs a key with a command. The command will be run with *{url}*
 replaced by the selected URL when the browser is selected. You can choose which 
 browser is used by specifying the *--browser* command line option on the
 :ref:`browse command <browse command>`, by adding the *browser* attribute to the 
-account, or by specifying the *default_browser* setting in the :ref:`config file 
-<configuring_avendesora>`.  If more than one is specified, the command line 
-option dominates over the account attribute, which dominates over the setting.  
-By default, the default browser is *x*, which uses the default browser for your 
-account.
+account, or by specifying the :ref:`default_browser <default_browser setting>` 
+setting in the :ref:`config file <configuring_avendesora>`.  If more than one is 
+specified, the command line option dominates over the account attribute, which 
+dominates over the setting.  By default, the default browser is *x*, which uses 
+the default browser for your account.
 
 
 .. index::
@@ -605,8 +605,9 @@ empty selection.
 As a short cut, you can use *q* as the name of the command rather than
 *questions*.
 
-By default the *default_vector_field* is queried, which is generally
-*questions*, however you can request any composite field::
+By default the :ref:`default_vector_field <default_vector_field setting>` is 
+queried, which is generally *questions*, however you can request any composite 
+field::
 
     > avendesora q bank accounts
     checking:

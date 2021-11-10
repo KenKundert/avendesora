@@ -19,7 +19,7 @@ Latest Development Version
 
 1.20 (2021-02-13)
 -----------------
-- added *hidden_fields* setting.
+- added :ref:`hidden_fields <hidden_fields setting>` setting.
 
 
 1.19 (2021-01-03)
@@ -57,12 +57,13 @@ Latest Development Version
 
 1.16 (2019-12-25)
 -----------------
-- Added *ms_per_char* setting that allows user to slow autotyping.
+- Added :ref:`ms_per_char <ms_per_char setting>` setting that allows user to 
+  slow autotyping.
 - Added *rate* attribute to scripts that allows user to slow autotyping.
-- Added *command_aliases* setting to allow user to define their own command 
-    short-cuts. As part of this the built-in short cuts were removed. See 
-    description of *command_aliases* in :ref:`configuring_avendesora` to get 
-    them back.
+- Added :ref:`command_aliases <command_aliases setting>` setting to allow user 
+  to define their own command short-cuts. As part of this the built-in short 
+  cuts were removed. See description of *command_aliases* in 
+  :ref:`configuring_avendesora` to get them back.
 - :ref:`interactive command <interactive command>` now accepts '*'.
 
 
@@ -126,7 +127,7 @@ Latest Development Version
 - Improved get_value(), added add get_values(), add get_fields().
 - Canonicalize names.
 - Allow account name to be given even if TTY is not available.
-- Allow default_field to be a list.
+- Allow :ref:`default_field setting <default_field setting>` to be a list.
 - Add render method to AccountValue.
 - Changed the way multiple gpg ids are specified.
 - Improved :ref:`browse command <browse command>`.

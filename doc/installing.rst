@@ -15,20 +15,20 @@ This will place avendesora in ~/.local/bin, which should be added to your path.
 You will also need to install some operating system commands. On Redhat systems 
 (Fedora, Centos, Redhat) use::
 
-   yum install gnupg2 xdotool xsel
+   dnf install gnupg2 xdotool xsel
 
 You should also install python-gobject. Conceivably this could be installed with 
 the above pip command, but gobject appears broken in pypi, so it is better use 
 the operating system's package manager to install it.  See the setup.py file for 
 more information.  On Redhat systms use::
 
-   yum install python3-gobject
+   dnf install python3-gobject
 
 Gobject is only used to provide a user-interactive selection utility. However, 
 if you prefer, you can use *dmenu* for your selection utility, in which case you 
 will need to install it by hand using::
 
-   yum install dmenu
+   dnf install dmenu
 
 If you would like to use scrypt as a way of encrypting fields, you will need to 
 install scrypt by hand using::
@@ -83,20 +83,20 @@ To operate, *Avendesora* needs a collection of configuration and accounts files
 that are stored in ~/.config/avendesora. To create this directory and the 
 initial versions of these files, run::
 
-    avendesora init -g <gpg_id>
+    avendesora initialize -g <gpg_id>
 
 For example::
 
-    avendesora init -g rand@dragon.com
+    avendesora initialize -g rand@dragon.com
 
 or::
 
-    avendesora init -g 1B2AFA1C
+    avendesora initialize -g 1B2AFA1C
 
 If you would like to have more than one person access your passwords, you should 
 give GPG IDs for everyone::
 
-    avendesora init -g rand@dragon.com,lews.therin@dragon.com
+    avendesora initialize -g rand@dragon.com,lews.therin@dragon.com
 
 After initialization, there should be several files in ~/.config/avendesora. In 
 particular, you should see at least an initial accounts files and a config file.
@@ -126,14 +126,15 @@ accounts and secrets.
 During an initial configuration is also a convenient time to determine which of 
 your files should be encrypted with GPG. To assure that a file is encrypted, 
 give it a GPG file suffix (.gpg or .asc). The appropriate settings to adjust 
-are: *archive_file*, *log_file*, both of which are set in the config file, and 
-the accounts files, which are found in ~/.config/avendesora/.accounts_files. For 
-security reasons it is highly recommended that the archive file be encrypted, 
-and any accounts file that contain sensitive accounts. If you change the suffix 
-on an accounts file and you have not yet placed any accounts in that file, you 
-can simply delete the existing file and then regenerate it using::
+are: :ref:`archive_file <archive_file setting>`, :ref:`log_file <log_file 
+setting>`, both of which are set in the config file, and the accounts files, 
+which are found in ~/.config/avendesora/.accounts_files.  For security reasons 
+it is highly recommended that the archive file be encrypted, and any accounts 
+file that contain sensitive accounts. If you change the suffix on an accounts 
+file and you have not yet placed any accounts in that file, you can simply 
+delete the existing file and then regenerate it using::
 
-    avendesora init -g <gpg_id>
+    avendesora initialize -g <gpg_id>
 
 Any files that already exist will not be touched, but any missing files will be 
 recreated, and this time they will be encrypted or not based on the extensions 

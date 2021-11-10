@@ -19,17 +19,10 @@
 # Imports {{{1
 from .config import get_setting
 from .shlib import Run
-from inform import Error, output, is_str, indent, Color
+from inform import Error, output, is_str, indent
 from textwrap import dedent
 import os
 import sys
-
-# Globals {{{1
-HighlightColor = Color(
-    color=get_setting('highlight_color'),
-    scheme=get_setting('color_scheme'),
-    enable=Color.isTTY()
-)
 
 
 # gethostname {{{1
@@ -160,7 +153,9 @@ def error_source():
 
 # query_user {{{1
 def query_user(msg):
-    msg = HighlightColor(msg)
+    highlight_color = get_setting('_highlight_color')
+    msg = highlight_color(msg)
+
     try:
         return input(msg + ' ').strip()
     except EOFError:

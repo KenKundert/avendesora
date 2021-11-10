@@ -74,8 +74,8 @@ collaborator can generate exactly the same passcode.
 Another important thing to notice is that the generated passcode is dependent on 
 the account and secret names. Thus if you rename your account or your secret, 
 the passcode will change.  So you should be careful when you first create your 
-account to name it appropriately so you don't feel the need to change it in the 
-future.
+account to choose names appropriately so you don't feel the need to change them 
+later.
 
 .. index::
     single: entropy
@@ -149,10 +149,10 @@ machines or services that you log into.  Your best defense against the
 notoriously poor security practices of most sites is to always use a unique 
 password for sites where you are not in control of the secrets.  That way the 
 poor security practices of one site would not compromise your other accounts.  
-For example, you might consider using the same passphrase for you login password 
-and the passphrase for an ssh key on a machine that you administer, but never 
-use the same password for two different websites unless you do not care if the 
-content of those sites become public.
+For example, you might consider using the same passphrase for your login 
+password and the passphrase for an ssh key on a machine that you administer, but 
+never use the same password for two different websites unless you do not care if 
+the content of those sites become public.
 
 So, if we return to the question of how much entropy is enough, you can say that 
 for important passwords where you are in control of the password database and it 

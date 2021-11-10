@@ -153,10 +153,11 @@ tool fields (see :ref:`discovery` for more information on discovery).  Other
 tool fields include *NAME*, *default*, *browser*, and *default_url*.  *default* 
 is the name of the default field, which is the field you get if you do not 
 request a particular field. Its value defaults to *password*, *pasphrase*, or 
-*passcode* (as set by *default_field* setting), but it can be set to any account 
-attribute name or it can be a :ref:`script <scripts>`.  *browser* is the default 
-browser to use when opening the account, run the :ref:`browse command <browse 
-command>` to see a list of available browsers.
+*passcode* (as set by :ref:`default_field setting <default_field setting>`), but 
+it can be set to any account attribute name or it can be a :ref:`script 
+<scripts>`.  *browser* is the default browser to use when opening the account, 
+run the :ref:`browse command <browse command>` to see a list of available 
+browsers.
 
 The value of *passcode* is considered sensitive because it is an instance of 
 :class:`PasswordRecipe`, which is a subclass of :class:`GeneratedSecret`.  If 

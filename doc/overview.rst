@@ -102,7 +102,7 @@ template. To do so type 'o' to open a new line and type:
 In general using passphrases is preferred to using passwords, the reason being 
 that they are much easier to remember and type. That is important in this case 
 because you will need to remember and enter your passcode when you login to your 
-account, *Avendesora* cannot help you in that case. The template was configured 
+computer; *Avendesora* cannot help you in that case. The template was configured 
 to use a passphrase for the passcode, so no change is needed here.
 
 Finally replace the titles with 'sudo \*'.  Once you have something that looks 
@@ -164,7 +164,8 @@ show it when displaying all of the values. To see it, use::
     > avendesora value LinuxLogin passcode
     passcode: wigwam mistrust afflict refit
 
-The value command will also write the secret directly to the clipboard::
+The :ref:`value command <value command>`: command will also write the secret 
+directly to the clipboard::
 
     > avendesora value --clipboard LinuxLogin passcode
 
@@ -194,8 +195,9 @@ You can also have *Avendesora* attempt to show you your :ref:`login credentials
 
 To show the login credentials *Avendesora* looks for candidate usernames 
 (username, email) and candidate passcodes (passcode, password, passphrase), 
-though you can specify exactly which fields are used by adding a *credentials* 
-field in the account.
+though you can specify exactly which fields are used by adding 
+a :ref:`credential_ids <credential_ids setting>` and :ref:`credential_secrets 
+<credential_secrets setting>` fields in the account.
 
 
 .. index::
@@ -638,8 +640,8 @@ command>`::
     > avendesora edit bank
 
 This opens the MechanicsBank account in your editor (you can select your editor 
-by modifying the :ref:`edit_account setting <settings>`).  Once you modify your 
-account, you should save the file and exit the editor. The change will be 
+by modifying the :ref:`edit_account <edit_account setting>`).  Once you modify 
+your account, you should save the file and exit the editor.  The change will be 
 checked and if there are any errors, you will be given a chance to reopen the 
 account file and fix the problem.
 

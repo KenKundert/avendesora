@@ -28,12 +28,13 @@ you are using the Vim editor, it is preconfigured to jump to the next
 field when you press 'n'.  If the field is surrounded by '<<' and '>>',
 as in '<<_ACCOUNT_NUMBER_>>', the value you enter will be concealed.
 
-You can create your own templates by adding them to :ref:`account_templates 
-<settings>` in the ~/.config/avendesora/config file.
+You can create your own templates by adding them to
+:ref:`account_templates <account_templates setting>` in the 
+*~/.config/avendesora/config* file.
 
 You can change the editor used when adding account by changing the
-:ref:`edit_template <settings>`, also found in the ~/.config/avendesora/config 
-file.
+:ref:`edit_template <edit_template setting>`, also found in the 
+*~/.config/avendesora/config* file.
 
 The default template is *bank*. The available templates are: *bank*, *shell*, 
 and *website*.
@@ -258,8 +259,8 @@ Usage::
 
 Opens an existing account in your editor.
 
-You can specify the editor by changing the :ref:`edit_account <settings>` 
-setting in the config file (~/.config/avendesora/config).
+You can specify the editor by changing the :ref:`edit_account <edit_account 
+setting>` setting in the config file (~/.config/avendesora/config).
 
 
 .. index::
@@ -409,8 +410,8 @@ Usage::
 
 Opens the logfile in your editor.
 
-You can specify the editor by changing the :ref:`edit_account <settings>` 
-setting in the config file (~/.config/avendesora/config).
+You can specify the editor by changing the :ref:`edit_account <edit_account 
+setting>` setting in the config file (~/.config/avendesora/config).
 
 
 .. index::
@@ -615,7 +616,7 @@ checking account. If the value is an array, you give the index of the
 desired value. For example, questions.0 or questions[0]. If you only
 specify a number, then the name is assumed to be *questions*, as in the
 list of security questions (this can be changed by specifying the
-desired name as the :ref:`default_vector_field setting <settings>`).
+desired name as the :ref:`default_vector_field <default_vector_field setting>`).
 
 The field may be also be a script, with is nothing but a string that it
 output as given except that embedded attributes are replaced by account
@@ -626,8 +627,8 @@ field values. For example::
 If no value is requested the result produced is determined by the value
 of the *default* attribute. If no value is given for *default*, then the
 *passcode*, *password*, or *passphrase* attribute is produced (this can
-be changed by specifying the :ref:`default_field setting <settings>`).
-If *default* is a :ref:`script <scripts>` then the script
+be changed by specifying the :ref:`default_field setting <default_field 
+setting>`).  If *default* is a :ref:`script <scripts>` then the script
 is executed.  A typical script might be 'username: {username}, password:
 {passcode}'.  It is best if the script produces a one line output if it
 contains secrets. If not a script, the value of *default* should be the

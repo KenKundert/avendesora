@@ -36,11 +36,6 @@ import string
 import re
 
 # Globals {{{1
-LabelColor = Color(
-    color=get_setting('label_color'),
-    scheme=get_setting('color_scheme'),
-    enable=Color.isTTY()
-)
 KEYSYMS = {
     '!': 'exclam',
     '"': 'quotedbl',
@@ -162,6 +157,7 @@ class TTY_Writer(Writer):
         value, is_secret, name, desc = tuple(account.get_value(field))
         label = '%s (%s)' % (name, desc) if desc else name
         value = dedent(str(value)).strip()
+        label_color = get_setting('_label_color')
 
         # indent multiline outputs
         sep = ' '
@@ -175,7 +171,7 @@ class TTY_Writer(Writer):
             if label[0] == '_':
                 # hidden field
                 label = '!' + label[1:]
-            text = LabelColor(label.replace('_', ' ') + ':') + sep + value
+            text = label_color(label.replace('_', ' ') + ':') + sep + value
         else:
             text = value
             label = field

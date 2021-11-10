@@ -21,7 +21,7 @@
 # Imports {{{1
 from .error import PasswordError
 from .preferences import CONFIG_DEFAULTS, NONCONFIG_SETTINGS
-from inform import comment, warn, is_str
+from inform import comment, warn, is_str, Color
 from pathlib import Path
 
 # Globals {{{1
@@ -96,6 +96,17 @@ def read_config():
         except PasswordError:
             pass
 
+    # Set the user-selected colors
+    Config['_label_color'] = Color(
+        color = get_setting('label_color'),
+        scheme = get_setting('color_scheme'),
+        enable = Color.isTTY()
+    )
+    Config['_highlight_color'] = Color(
+        color = get_setting('highlight_color'),
+        scheme = get_setting('color_scheme'),
+        enable = Color.isTTY()
+    )
 
 # add_setting() {{{1
 def add_setting(name, default):

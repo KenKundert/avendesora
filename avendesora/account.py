@@ -30,7 +30,7 @@ from .script import Script
 from .secrets import GeneratedSecret
 from difflib import get_close_matches
 from inform import (
-    Color, codicil, conjoin, cull, full_stop, is_collection, is_mapping, is_str,
+    codicil, conjoin, cull, full_stop, is_collection, is_mapping, is_str,
     join, log, notify, output, warn, indent, render
 )
 from textwrap import dedent
@@ -43,16 +43,6 @@ import re
 
 # Globals {{{1
 VECTOR_PATTERN = re.compile(r'\A(\w+)\[(\w+)\]\Z')
-LabelColor = Color(
-    color=get_setting('label_color'),
-    scheme=get_setting('color_scheme'),
-    enable=Color.isTTY()
-)
-HighlightColor = Color(
-    color=get_setting('highlight_color'),
-    scheme=get_setting('color_scheme'),
-    enable=Color.isTTY()
-)
 
 
 # Utilities {{{1
@@ -790,6 +780,8 @@ class Account(object):
     @classmethod
     def write_summary(cls, all=False, sort=False):
         # present all account values that are not explicitly secret to the user
+        label_color = get_setting('_label_color')
+        highlight_color = get_setting('_highlight_color')
 
         def fmt_field(name, value='', key=None, level=0):
             hl = False
@@ -799,7 +791,7 @@ class Account(object):
                 hl = True
                 value = value.script
             elif cls.is_secret(name, key):
-                reveal = "reveal with: {}".format(HighlightColor(join(
+                reveal = "reveal with: {}".format(highlight_color(join(
                     'avendesora',
                     'value',
                     cls.get_name(),
@@ -821,11 +813,11 @@ class Account(object):
             else:
                 sep = ''
             if hl:
-                value = HighlightColor(value)
+                value = highlight_color(value)
             name = str(name).replace('_', ' ')
             leader = level * get_setting('indent')
             return indent(
-                LabelColor((name if key is None else str(key)) + ':') + sep + value,
+                label_color((name if key is None else str(key)) + ':') + sep + value,
                 leader
             )
 
@@ -904,6 +896,8 @@ class Account(object):
         if not browser_name:
             browser_name = cls.get_scalar('browser', default=None)
         browser = StandardBrowser(browser_name)
+        label_color = get_setting('_label_color')
+        highlight_color = get_setting('_highlight_color')
 
         # get the urls from the urls attribute
         # this must be second so it overrides those from recognizers.
@@ -928,12 +922,12 @@ class Account(object):
                 if is_collection(url):
                     url = list(Collection(url))[0]
                 if name == default:
-                    url += HighlightColor(' [default]')
+                    url += highlight_color(' [default]')
                     if not name:
                         name = ''
                 elif not name:
                     continue
-                output(LabelColor('{:>24s}:'.format(name)), url)
+                output(label_color('{:>24s}:'.format(name)), url)
             return
 
         # select the urls
