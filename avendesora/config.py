@@ -108,6 +108,7 @@ def read_config():
         enable = Color.isTTY()
     )
 
+
 # add_setting() {{{1
 def add_setting(name, default):
     CONFIG_DEFAULTS[name] = default
