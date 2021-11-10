@@ -314,7 +314,7 @@ ms_per_char
     discovery :ref:`script <scripts>` to limit the typing rate. Doing so only 
     slows the entry of your credentials on those websites.
 
-    The default is 12:
+    The default is 12.
 
 
 .. index::
@@ -772,7 +772,7 @@ xsel_executable
     Use '/usr/bin/xsel -b' if you wish to use the clipboard buffer (*Ctrl-V* or 
     mouse right click then paste).
 
-    The default is */usr/bin/xsel* (use *xsel* default, which is the primary 
+    The default is */usr/bin/xsel* (uses *xsel* default, which is the primary 
     buffer).
 
 
