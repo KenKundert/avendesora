@@ -8,6 +8,9 @@ Latest Development Version
 | Version: 1.22.0
 | Released: 2021-11-10
 
+
+1.22 (2021-11-10)
+-----------------
 - Allow remind commands in :class:`Script`.
 
 
