@@ -776,9 +776,11 @@ class Cmd(object):
         """
         return self.process.poll()
 
-
     # kill {{{3
     def kill(self):
+        """
+        Kill the process.
+        """
         self.process.kill()
         self.process.wait()
 
