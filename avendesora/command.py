@@ -295,7 +295,6 @@ class Add(Command):
                 e = os_error(e)
             error(e)
             codicil(
-                '',
                 'What you entered can be found in %s.' % tmpfilename,
                 'Delete it when done with it.', sep='\n'
             )

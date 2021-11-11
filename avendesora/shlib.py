@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = "1.3.1"
-__released__ = "2021-08-28"
+__version__ = "1.4.0"
+__released__ = "2021-11-10"
 
 # Imports {{{1
 try:
@@ -766,6 +766,16 @@ class Cmd(object):
             else:
                 raise OSError(None, msg)
         return self.status
+
+    # poll {{{3
+    def poll(self):
+        """
+        Check to see if process has completed.
+
+        Returns exit status if process is done, otherwise it return None.
+        """
+        return self.process.poll()
+
 
     # kill {{{3
     def kill(self):
