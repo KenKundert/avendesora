@@ -13,3 +13,4 @@ rm -f tests/home/.config/avendesora/log tests/home/.gnupg/.gpg-v21-migrated
 rm -rf doc/.build
 rm -rf avendesora/*.{pyc,pyx,c,so}
 rm -f samples/api/bw.csv
+rm -rf .hypothesis .tox
