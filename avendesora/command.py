@@ -1269,7 +1269,7 @@ class Questions(Command):
             avendesora questions [options] <account> [<field>]
 
         Options:
-            -c, --clipboard         Write output to clipboard rather than stdout.
+            -c, --clipboard         Write output to clipboard rather than tty.
             -S, --seed              Interactively request additional seed for
                                     generated secrets.
 
@@ -1425,7 +1425,7 @@ class Value(Command):
             avendesora value [options] [<account> [<field>]]
 
         Options:
-            -c, --clipboard         Write output to clipboard rather than stdout.
+            -c, --clipboard         Write output to clipboard rather than tty.
             -s, --stdout            Write output to the standard output without
                                     any annotation or protections.
             -S, --seed              Interactively request additional seed for
