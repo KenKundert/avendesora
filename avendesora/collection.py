@@ -28,7 +28,9 @@ __version__ = "0.5.0"
 __released__ = "2021-01-27"
 
 
+
 # Utilities {{{1
+# split_lines() {{{2
 def split_lines(text, comment=None, strip=False, cull=False, sep=None):
     """Split lines
 
@@ -53,6 +55,13 @@ def split_lines(text, comment=None, strip=False, cull=False, sep=None):
         if strip:
             lines = {k.strip(): v.strip() for k, v in pairs.items()}
     return lines
+
+
+# Null {{{2
+# class that is used as a default in functions to signal nothing was given
+class Null:
+    def __bool__(self):
+        return False
 
 
 # Collection {{{1
@@ -110,6 +119,15 @@ class Collection(object):
             return [(k, self.collection[k]) for k in self.collection.keys()]
         except AttributeError:
             return list(enumerate(self.collection))
+
+    def get(self, key, default=Null):
+        try:
+            return self.collection[key]
+        except (KeyError, IndexError):
+            if default == Null:
+                raise
+            return default
+
 
     def render(self, fmt=None, sep=None):
         """Convert the collection into a string
