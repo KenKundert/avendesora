@@ -4,7 +4,7 @@
 # shell-script-like things relatively easily in Python.
 
 # License {{{1
-# Copyright (C) 2016-2021 Kenneth S. Kundert
+# Copyright (C) 2016-2022 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -512,17 +512,13 @@ def cartesian_product(*fragments):
 
 
 # brace_expand()  {{{2
-try:
+
+def brace_expand(pattern):
+    """Bash-style brace expansion"""
     from braceexpand import braceexpand
 
-    def brace_expand(pattern):
-        """Bash-style brace expansion"""
-        for path in braceexpand(pattern):
-            yield to_path(path)
-
-
-except ImportError:
-    pass
+    for path in braceexpand(pattern):
+        yield to_path(path)
 
 
 # Execution classes and functions (Cmd, Run, Sh, Start, run, bg, shbg, which) {{{1
