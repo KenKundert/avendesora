@@ -28,7 +28,6 @@ __version__ = "0.5.0"
 __released__ = "2021-01-27"
 
 
-
 # Utilities {{{1
 # split_lines() {{{2
 def split_lines(text, comment=None, strip=False, cull=False, sep=None):
@@ -127,7 +126,6 @@ class Collection(object):
             if default == Null:
                 raise
             return default
-
 
     def render(self, fmt=None, sep=None):
         """Convert the collection into a string
