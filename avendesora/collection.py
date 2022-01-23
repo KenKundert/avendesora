@@ -56,9 +56,9 @@ def split_lines(text, comment=None, strip=False, cull=False, sep=None):
     return lines
 
 
-# Null {{{2
+# Unspecified {{{2
 # class that is used as a default in functions to signal nothing was given
-class Null:
+class Unspecified:
     def __bool__(self):
         return False
 
@@ -119,11 +119,11 @@ class Collection(object):
         except AttributeError:
             return list(enumerate(self.collection))
 
-    def get(self, key, default=Null):
+    def get(self, key, default=Unspecified):
         try:
             return self.collection[key]
         except (KeyError, IndexError):
-            if default == Null:
+            if default == Unspecified:
                 raise
             return default
 

@@ -763,9 +763,9 @@ class Find(Command):
             desc = getattr(acct, 'desc', None)
             to_print.append(
                 join(acct.get_name(), aliases=aliases, desc=desc, template=(
-                    '{} ({aliases:|, }) -- {desc}',
+                    '{} ({aliases:|, }) — {desc}',
                     '{} ({aliases:|, })',
-                    '{} -- {desc}',
+                    '{} — {desc}',
                     '{}'
                 ))
             )
@@ -1403,9 +1403,9 @@ class Search(Command):
             desc = getattr(acct, 'desc', None)
             to_print.append(
                 join(acct.get_name(), aliases=aliases, desc=desc, template=(
-                    '{} ({aliases:|, }) -- {desc}',
+                    '{} ({aliases:|, }) — {desc}',
                     '{} ({aliases:|, })',
-                    '{} -- {desc}',
+                    '{} — {desc}',
                     '{}'
                 ))
             )

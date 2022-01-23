@@ -33,7 +33,7 @@ NONCONFIG_SETTINGS = {
     'charsets_hash': 'a055240c4c498e1470f5f3e80b3ec599',
     'dict_hash': '5dbabd4114eae520c1de8963a8b8d09d',
     'mnemonic_hash': 'cafd522d6627011d78e576f2d0b6ed58',
-    'secrets_hash': 'f76365c3d9a80e5a73a22609d446489f',
+    'secrets_hash': '0826ec53a58a607e65bbfca7eafb4f19',
     'discard_logfile': False,
     'commonly_mistaken_attributes': {
         'url': 'urls',

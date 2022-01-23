@@ -90,11 +90,11 @@ class AccountValue:
                 sequence.  The first one for which all keys are known is used.
                 The possible keys are:
 
-                | n -- name (identifier for the first level of a field)
-                | k -- key (identifier for the second level of a field)
-                | f -- field (name.key)
-                | d -- description
-                | v -- value
+                | n — name (identifier for the first level of a field)
+                | k — key (identifier for the second level of a field)
+                | f — field (name.key)
+                | d — description
+                | v — value
 
                 If none work, the value alone is returned.
         Returns:
