@@ -654,6 +654,7 @@ class Cmd(object):
                 )
             else:
                 raise
+        self.running = True
 
         # store needed information and wait for termination if desired
         self.pid = process.pid
@@ -710,6 +711,7 @@ class Cmd(object):
                 )
             else:
                 raise
+        self.running = True
 
         # store needed information and wait for termination if desired
         self.pid = process.pid
@@ -736,6 +738,7 @@ class Cmd(object):
         self.stdout = None if stdout is None else stdout.decode(self.encoding)
         self.stderr = None if stderr is None else stderr.decode(self.encoding)
         self.status = process.returncode
+        self.running = False
 
         if _use_log(self.log):
             from inform import log
@@ -770,15 +773,31 @@ class Cmd(object):
 
         Returns exit status if process is done, otherwise it return None.
         """
-        return self.process.poll()
+        status = self.process.poll()
+        if status is None:
+            # still running
+            return
+        if self.running:
+            process = self.process
+            stdout, stderr = process.communicate()
+            self.stdout = None if stdout is None else stdout.decode(self.encoding)
+            self.stderr = None if stderr is None else stderr.decode(self.encoding)
+            assert status == process.returncode
+            self.status = status
+            self.running = False
+        return status
 
     # kill {{{3
     def kill(self):
         """
         Kill the process.
         """
-        self.process.kill()
-        self.process.wait()
+        try:
+            self.process.kill()
+            self.process.wait()
+        except AttributeError:
+            # did not get far enough to set self.process
+            pass
 
     # __str__ {{{3
     def __str__(self):

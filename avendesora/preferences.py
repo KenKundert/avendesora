@@ -33,7 +33,7 @@ NONCONFIG_SETTINGS = {
     'charsets_hash': 'a055240c4c498e1470f5f3e80b3ec599',
     'dict_hash': '5dbabd4114eae520c1de8963a8b8d09d',
     'mnemonic_hash': 'cafd522d6627011d78e576f2d0b6ed58',
-    'secrets_hash': '0826ec53a58a607e65bbfca7eafb4f19',
+    'secrets_hash': '269d5bed6b564471b6581bf3309a6209',
     'discard_logfile': False,
     'commonly_mistaken_attributes': {
         'url': 'urls',
@@ -45,50 +45,50 @@ NONCONFIG_SETTINGS = {
 
 # Config Settings {{{1
 # These are the default values for settings that may be found in the config file
-CONFIG_DEFAULTS = {
-    'accounts_files': [
+CONFIG_DEFAULTS = dict(
+    accounts_files = [
         NONCONFIG_SETTINGS['default_accounts_file'],
         NONCONFIG_SETTINGS['default_stealth_accounts_file'],
     ],
-    'account_list_file': 'accounts_files',
-    'archive_file': 'archive.gpg',
-    'archive_stale': 1,
-    'previous_archive_file': 'archive.prev.gpg',
-    'config_dir_mask': 0o077,
-    'account_file_mask': 0o077,
-    'command_aliases': None,
-    'credential_ids': 'username email',
-    'credential_secrets': 'passcode password passphrase',
-    'label_color': 'blue',
-    'highlight_color': 'magenta',
-    'color_scheme': 'dark',
-    'browsers': {
-        'c':  'google-chrome {url}',
-        'ci': 'google-chrome --incognito {url}',
-        'f':  'firefox -new-tab {url}',
-        'fp':  'firefox -private-window {url}',
-        'q':  'qutebrowser {url}',
-        't':  'torbrowser {url}',
-        'x':  'xdg-open {url}',  # system default browser
-    },
-    'help_url': 'https://avendesora.readthedocs.io/en/latest',
-    'default_field': 'passcode password passphrase',
-    'default_vector_field': 'questions',
-    'dynamic_fields': '',
-    'hidden_fields': '',
-    'default_browser': 'x',
-    'display_time': 60,
-    'ms_per_char': None,
-    'dictionary_file': None,
-    'encoding': 'utf-8',
-    'edit_account': (
+    account_list_file = 'accounts_files',
+    archive_file = 'archive.gpg',
+    archive_stale = 1,
+    previous_archive_file = 'archive.prev.gpg',
+    config_dir_mask = 0o077,
+    account_file_mask = 0o077,
+    command_aliases = None,
+    credential_ids = 'username email',
+    credential_secrets = 'passcode password passphrase',
+    label_color = 'blue',
+    highlight_color = 'magenta',
+    color_scheme = 'dark',
+    browsers = dict(
+        c =  'google-chrome {url}',
+        ci = 'google-chrome --incognito {url}',
+        f =  'firefox -new-tab {url}',
+        fp =  'firefox -private-window {url}',
+        q =  'qutebrowser {url}',
+        t =  'torbrowser {url}',
+        x =  'xdg-open {url}',  # system default browser
+    ),
+    help_url = 'https://avendesora.readthedocs.io/en/latest',
+    default_field = 'passcode password passphrase',
+    default_vector_field = 'questions',
+    dynamic_fields = '',
+    hidden_fields = '',
+    default_browser = 'x',
+    display_time = 60,
+    ms_per_char = None,
+    dictionary_file = None,
+    encoding = 'utf-8',
+    edit_account = (
         'gvim',                       # use gvim -v so that user can access
         '-v',                         # the X clipboard buffers
         '+silent! /^class {account}(Account):/',
         '+silent! normal zozt',       # open the fold, position near top of screen
         '{filepath}'
     ),
-    'edit_template': (
+    edit_template = (
         'gvim',                       # use gvim -v so that user can access
         '-v',                         # the X clipboard buffers
         r'+silent! /_[A-Z0-9_]\+_/',  # matches user modifiable template fields
@@ -96,17 +96,17 @@ CONFIG_DEFAULTS = {
         '+silent! normal zozt',       # open the fold, position near top of screen
         '{filepath}'
     ),
-    'hashes_file': 'hashes',
-    'indent': '    ',
-    'log_file': 'log.gpg',
-    'default_protocol': 'https',
-    'user_key_file': 'key.gpg',
-    'use_pager': True,
-    'selection_utility': 'gtk',
-    'verbose': False,
-    'default_account_template': 'bank',
-    'account_templates': {
-        'website': dedent("""
+    hashes_file = 'hashes',
+    indent = '    ',
+    log_file = 'log.gpg',
+    default_protocol = 'https',
+    user_key_file = 'key.gpg',
+    use_pager = True,
+    selection_utility = 'gtk',
+    verbose = False,
+    default_account_template = 'bank',
+    account_templates = dict(
+        website = dedent("""
             class _NAME_(Account): # %s1
                 desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
@@ -141,7 +141,7 @@ CONFIG_DEFAULTS = {
             # Avendesora: Fields surrounded by << and >> will be hidden.
             # Avendesora: All lines that begin with '# Avendesora:' are automatically removed.
         """ % (3*'{')),
-        'shell': dedent("""
+        shell = dedent("""
             class _NAME_(Account): # %s1
                 desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
@@ -160,17 +160,17 @@ CONFIG_DEFAULTS = {
             # Avendesora: Fields surrounded by << and >> will be hidden.
             # Avendesora: All lines that begin with '# Avendesora:' are deleted.
         """ % (3*'{')),
-        'bank': dedent("""
+        bank = dedent("""
             class _NAME_(Account): # %s1
                 desc = '_DESCRIPTION_'
                 aliases = '_ALIAS1_ _ALIAS2_'
                 username = '_NAME_'
                 email = '_EMAIL_'
-                accounts = {
-                    'checking':   <<_ACCOUNT_NUMBER_>>,
-                    'savings':    <<_ACCOUNT_NUMBER_>>,
-                    'creditcard': <<_ACCOUNT_NUMBER_>>,
-                }
+                accounts = dict(
+                    checking =   <<_ACCOUNT_NUMBER_>>,
+                    savings =    <<_ACCOUNT_NUMBER_>>,
+                    creditcard = <<_ACCOUNT_NUMBER_>>,
+                )
                 customer_service = '_PHONE_NUMBER_'
                 passcode = PasswordRecipe('12 2u 2d 2s')
             # Avendesora: length is 12, includes 2 upper, 2 digits and 2 symbols
@@ -199,19 +199,22 @@ CONFIG_DEFAULTS = {
             # Avendesora: Fields surrounded by << and >> will be hidden.
             # Avendesora: All lines that begin with '# Avendesora:' are deleted.
         """ % (3*'{')),
-    },
+    ),
+    additional_account_templates = {},
+        # should be empty dictionary
+        # the user is expected to set this value, which will be added to account templates
 
     # use absolute paths for executables so they cannot be maliciously replaced
     # by changing the path.
-    'gpg_executable': '/usr/bin/gpg2',
-    'gpg_home': '~/.gnupg',
-    'gpg_armor': 'extension',
-    'gpg_ids': None,
-    'xdotool_executable': '/usr/bin/xdotool',
-    'xsel_executable': '/usr/bin/xsel',
-    'dmenu_executable': '/usr/bin/dmenu',
-    'arp_executable': '/sbin/arp',
-}
+    gpg_executable = '/usr/bin/gpg2',
+    gpg_home = '~/.gnupg',
+    gpg_armor = 'extension',
+    gpg_ids = None,
+    xdotool_executable = '/usr/bin/xdotool',
+    xsel_executable = '/usr/bin/xsel',
+    dmenu_executable = '/usr/bin/dmenu',
+    arp_executable = '/sbin/arp',
+)
 
 # The following could be config settings, but they do not seem worth promoting.
 INITIAL_AUTOTYPE_DELAY = 0.25
@@ -303,7 +306,8 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
 
     archive_stale = {archive_stale}
         # The archive file is consider stale if it is this many days older than
-        # the most recently updated account file.
+        # the most recently updated account file, in which case a warning is
+        # given.  Set this to 0 to disable the warning.
 
     default_field = {default_field}
         # The name of the field to use for the value command when one is not
@@ -456,6 +460,9 @@ CONFIG_DOC_FILE_INITIAL_CONTENTS = dedent('''\
     # comments that can contain instructions to the user. They will are removed
     # when the account is created.
     account_templates = {account_templates}
+        # Setting this overrides the Avendesora supplied templates.
+    additional_account_templates = {additional_account_templates}
+        # Settine this adds to the Avendesora supplied templates.
     default_account_template = {default_account_template}
 
     # GPG settings

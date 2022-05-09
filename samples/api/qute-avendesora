@@ -34,7 +34,7 @@ from avendesora import (
 import os
 from time import sleep
 from appdirs import user_data_dir
-Inform(logfile=user_data_dir('qutebrowser') + '/userscripts/log')
+Inform(logfile=user_data_dir('qutebrowser') + '/userscripts/qute-avendesora.log')
 
 if [int(n) for n in avendesora_version.split('.')] < [1, 10, 4]:
     warn(

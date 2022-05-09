@@ -140,9 +140,7 @@ class GeneratedSecret(object):
         if not master_seed:
             try:
                 try:
-                    master_seed = getpass.getpass(
-                        'master seed for %s: ' % account_name
-                    )
+                    master_seed = getpass.getpass('master seed: ')
                     master_source = 'user'
                 except EOFError:
                     output()
@@ -168,9 +166,7 @@ class GeneratedSecret(object):
         interactive_seed = ''
         if request_seed is True:
             try:
-                interactive_seed = getpass.getpass(
-                    'seed for %s: ' % account_name
-                )
+                interactive_seed = getpass.getpass('seed: ')
             except (EOFError, KeyboardInterrupt):
                 terminate()
         elif callable(request_seed):

@@ -267,7 +267,7 @@ def test_stealth():
 def test_alertscc_seed():
     try:
         avendesora = pexpect.spawn('avendesora', 'value -S -s alertscc password'.split())
-        avendesora.expect('seed for alertscc: ', timeout=4)
+        avendesora.expect('seed: ', timeout=4)
         avendesora.sendline('frozen-chaos')
         avendesora.expect(pexpect.EOF)
         avendesora.close()
@@ -277,6 +277,7 @@ def test_alertscc_seed():
     except OSError as err:
         result = os_error(err)
     assert result.strip() == 'tRT7vXLeZrbz'
+
 # test_mybank_otp() {{{1
 #def test_mybank_otp():
 #    otp = pyotp.TOTP('JBSWY3DPEHPK3PXP')

@@ -46,7 +46,7 @@ def test_add():
         as in '<<_ACCOUNT_NUMBER_>>', the value you enter will be concealed.
 
         You can create your own templates by adding them to 'account_templates'
-        in the ~/.config/avendesora/config file.
+        or 'additional_account_templates' in the ~/.config/avendesora/config file.
 
         You can change the editor used when adding account by changing the
         'edit_template', also found in the ~/.config/avendesora/config file.

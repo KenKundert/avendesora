@@ -122,7 +122,7 @@ class AccountFiles:
                     ))
                     # archive_age = time() - archive_updated
                     account_age = time() - most_recently_updated
-                    if account_age > 86400 * stale:
+                    if stale > 0 and account_age > 86400 * stale:
                         warn('stale archive.')
                         codicil(dedent("""\
                             Recommend running 'avendesora changed' to determine
@@ -133,11 +133,13 @@ class AccountFiles:
                 else:
                     log('Avendesora archive is up to date.')
             else:
-                warn('archive missing.')
-                codicil(
-                    "Recommend running 'avendesora archive'",
-                    "to create the archive."
-                )
+                stale = float(get_setting('archive_stale'))
+                if stale > 0:
+                    warn('archive missing.')
+                    codicil(
+                        "Recommend running 'avendesora archive'",
+                        "to create the archive."
+                    )
 
     def load_account_file(self, filename):  # {{{2
         if filename in self.loaded:
@@ -294,7 +296,7 @@ class AccountFiles:
                     titles += t
             title_manifests[filename].extend(titles)
 
-        # trip out the duplicates
+        # strip out the duplicates
         for filename in url_manifests:
             if filename in self.loaded:
                 url_manifests[filename] = set(url_manifests[filename])

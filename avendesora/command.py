@@ -155,7 +155,7 @@ class Add(Command):
         as in '<<_ACCOUNT_NUMBER_>>', the value you enter will be concealed.
 
         You can create your own templates by adding them to 'account_templates'
-        in the ~/.config/avendesora/config file.
+        or 'additional_account_templates' in the ~/.config/avendesora/config file.
 
         You can change the editor used when adding account by changing the
         'edit_template', also found in the ~/.config/avendesora/config file.
@@ -179,11 +179,16 @@ class Add(Command):
             indent = get_setting('indent')
             return indent + ('\n' + indent).join(sorted(l))
 
+        templates = sorted(
+            list(get_setting('account_templates').keys()) +
+            list(get_setting('additional_account_templates').keys())
+        )
+
         return text.format(
-            title=title(cls.DESCRIPTION), usage=cls.USAGE,
-            default=get_setting('default_account_template'),
-            templates=indented_list(get_setting('account_templates').keys()),
-            files=indented_list(get_setting('accounts_files', [])),
+            title = title(cls.DESCRIPTION), usage=cls.USAGE,
+            default = get_setting('default_account_template'),
+            templates = indented_list(templates),
+            files = indented_list(get_setting('accounts_files', [])),
         )
 
     @classmethod
@@ -213,6 +218,7 @@ class Add(Command):
         try:
             # get the specified template
             templates = get_setting('account_templates')
+            templates.update(get_setting('additional_account_templates'))
             if cmdline['<template>']:
                 template_name = cmdline['<template>']
             else:

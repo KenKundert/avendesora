@@ -900,7 +900,6 @@ class Account(object):
         highlight_color = get_setting('_highlight_color')
 
         # get the urls from the urls attribute
-        # this must be second so it overrides those from recognizers.
         primary_urls = getattr(cls, 'urls', [])
         if type(primary_urls) != dict:
             if is_str(primary_urls):
@@ -931,7 +930,7 @@ class Account(object):
             return
 
         # select the urls
-        keys = cull(list(urls.keys()))
+        keys = list(urls.keys())
         if not key:
             key = getattr(cls, 'default_url', None)
         if not key and keys and len(keys) == 1:
