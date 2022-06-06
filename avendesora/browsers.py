@@ -65,4 +65,4 @@ class StandardBrowser(Browser):
             log("running '%s'" % str(browser))
             browser.start()
         else:
-            raise PasswordError('url not available from account.')
+            raise PasswordError('URL not available from account.')

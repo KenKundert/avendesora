@@ -685,6 +685,19 @@ account_templates
 
 
 .. index::
+    single: additional_account_templates setting
+
+.. _additional_account_templates setting:
+
+additional_account_templates
+""""""""""""""""""""""""""""
+
+    Similar to *account_templates*, this settings allows you to add to any 
+    built-in templates whereas you would override the built-in templates if you 
+    used *account_templates* directly.
+
+
+.. index::
     single: default_account_template setting
 
 .. _default_account_template setting:

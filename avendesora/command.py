@@ -1446,6 +1446,10 @@ class Value(Command):
 
             avendesora value bank pin
 
+        If you don't specify the field, you get the value of the default field.
+        For first level fields, you only need to specify enough leading
+        characters of the field name to uniquely identify which field you wish.
+
         If the requested value is composite (an array or dictionary), you should
         also specify a key that indicates which of the composite values you
         want. For example, if the 'accounts' field is a dictionary, you specify
@@ -1528,6 +1532,7 @@ class Value(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         use_clipboard = cmdline['--clipboard']
+        field = cmdline['<field>']
 
         # mute any warnings if using --stdout
         if cmdline['--stdout']:
@@ -1541,10 +1546,30 @@ class Value(Command):
         account_name = cmdline['<account>']
         if account_name:
             account = generator.get_account(account_name, cmdline['--seed'])
+
+            # simply list available fields if field is given as ?
+            if field == "?":
+                display("Available fields:")
+                for field in account.fields(sort=True):
+                    display(f"    {field}")
+                return
+
+            # given field may be just first few letters, find desired field
+            if field and field.isalnum():
+                candidates = [f for f in account.fields() if f.startswith(field)]
+                if candidates:
+                    field = candidates[0]
+                    if len(candidates) > 1:
+                        raise Error(
+                            f"matches multiple fields: {', '.join(candidates)}.",
+                            culprit = cmdline['<field>']
+                        )
+
+            # output desired value
             writer = get_writer(
                 clipboard=use_clipboard, stdout=cmdline['--stdout']
             )
-            writer.display_field(account, cmdline['<field>'])
+            writer.display_field(account, field)
         else:
             # use discovery to determine account
             script = generator.discover_account(

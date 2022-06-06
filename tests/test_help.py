@@ -689,6 +689,10 @@ def test_value():
 
             avendesora value bank pin
 
+        If you don't specify the field, you get the value of the default field.
+        For first level fields, you only need to specify enough leading
+        characters of the field name to uniquely identify which field you wish.
+
         If the requested value is composite (an array or dictionary), you should
         also specify a key that indicates which of the composite values you
         want. For example, if the 'accounts' field is a dictionary, you specify
