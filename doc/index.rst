@@ -273,6 +273,13 @@ Please ask questions or report problems on
 `Github <https://github.com/KenKundert/avendesora/issues>`_.
 
 
+Contributing
+------------
+
+Contributions are welcome.  One thing that Avendesora would really benefit from 
+is a browser plugin that would allow it to interact with websites.
+
+
 Contents
 --------
 
