@@ -5,8 +5,8 @@ Releases
 
 Latest Development Version
 --------------------------
-| Version: 1.22.1
-| Released: 2022-06-05
+| Version: 1.22.2
+| Released: 2022-06-19
 
 - with :ref:`value command <value command>`, only the first few characters of
   the field name need be specified.
