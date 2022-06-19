@@ -314,9 +314,8 @@ previously imported accounts before importing this file to avoid duplicates.
 You should all take care to delete this file after you have completed the import 
 as it contains the passcodes in plain text.
 
-The updated source code for `bw-export
-<https://github.com/KenKundert/avendesora/tree/master/samples/api/bw-export>`_
-can be found on Github.
+More advanced versions of this example script are available as `bw-export
+<https://github.com/KenKundert/bw-export>`_ from both *GitHub* and *PyPI*.
 
 .. code-block:: python
 
