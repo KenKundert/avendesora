@@ -5,18 +5,56 @@
 Generates a CSV file (bw.csv) suitable for uploading to BitWarden.
 
 Usage:
-    bw-export
+    bw-csv-export
 
 Only those accounts with 'bitwarden' field are exported. The "bitwarden' field 
 is expected to be a dictionary that may contain the following fields: folder, 
-favorite, type, name, notes, fields, login_uri, login_username, login_password, 
+type, name, notes, fields, login_uri, login_username, login_password, 
 login_totp. If not given, they are left blank. Each value may be a simple string 
 or it may be a script.
 
+A typical example is:
+
+    bitwarden = dict(
+        type = 'login',
+        name = 'The Economist',
+        login_uri = '{urls}',
+        login_username = '{email}',
+        login_password = '{passcode}',
+    )
+
+You can add arbitrary name-value pairs using *fields*:
+
+    bitwarden = dict(
+        type = 'login',
+        name = 'Visa',
+        fields = '''
+            holder: {name}
+            number: {ccn}
+            exp: {exp}
+            cvv: {cvv}
+            report: {support}
+        ''',
+    )
+
+Running bw-csv-export creates the file: bw.csv.
+
 Once created, it can be imported from the BitWarden website 
-(vault.bitwarden.com).  You should delete existing accounts before re-importing 
-to avoid duplicate accounts. When importing, use 'Bitwarden (csv)' as the file 
+(vault.bitwarden.com).  When importing, use 'Bitwarden (csv)' as the file 
 format.
+
+By policy, BitWarden create duplicates of any imported accounts if they were 
+previously imported.  As such, you should delete existing accounts before 
+re-importing to avoid duplicate accounts.  A convenient way of doing so would be 
+to partition your BitWarden entries into two folders, one dedicated to accounts 
+imported from Avendesora and one dedicated you your BitWarden native entries.  
+Normally you would keep the “No Folder” folder empty.  BitWarden places freshly 
+imported accounts into “No Folder”.  You should then delete any existing 
+accounts in the “Avendesora” folder and move all the new accounts in “No Folder” 
+to the “Avendesora” folder.
+
+You must then delete the bw.csv file as it can include your secrets in plain 
+text.
 """
 
 # Imports {{{1
@@ -28,24 +66,27 @@ import csv
 import os
 
 # Globals {{{1
-fieldnames = '''
+field_names = '''
     folder
-    favorite
     type
     name
     notes
-    fields
     login_uri
     login_username
     login_password
     login_totp
+    fields
 '''.split()
 types = '''
     login
-    card
-    identity
     note
 '''.split()
+key_map = dict(
+    uri = 'login_uri',
+    username = 'login_username',
+    password = 'login_password',
+    totp = 'login_totp',
+)
 output_filename = 'bw.csv'
 
 # Program {{{1
@@ -57,7 +98,7 @@ try:
     pw = PasswordGenerator()
     accounts = {}
     with open(output_filename, 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer = csv.DictWriter(csvfile, fieldnames=field_names)
         writer.writeheader()
 
         # visit each account
@@ -71,15 +112,22 @@ try:
             if fields:
                 # expand fields
                 for k, v in fields.items():
-                    if k not in fieldnames:
+                    mapped_k = key_map.get(k, k)
+                    if mapped_k not in field_names:
                         fatal(
                             'field unknown by bitwarden.',
                             culprit=(account_name, k)
                         )
+                    if k == 'type':
+                        if v not in types:
+                            fatal(
+                                f'unsupported type, choose between {conjoin(types)}.',
+                                culprit=(account_name, k)
+                            )
                     try:
                         value = Script(dedent(v))
                         value.initialize(account)
-                        fields[k] = str(value)
+                        fields[mapped_k] = str(value)
                     except PasswordError as e:
                         e.reraise(culprit=(class_name, k, e.culprit))
                 writer.writerow(fields)

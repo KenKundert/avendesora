@@ -1,0 +1,435 @@
+#!/usr/bin/env python3
+
+# Description {{{1
+"""Export Accounts to BitWarden
+
+Generates a JSON file (bw.json) suitable for uploading to BitWarden.
+
+Usage:
+    bw-csv-export
+
+Only those accounts with 'bitwarden' field are exported. The "bitwarden' field 
+is expected to be a dictionary that contain the fields to be exported.
+The value may be a simple string or it may be a script, and in some cases it may 
+be a dictionary.
+
+A typical example is:
+
+    bitwarden = dict(
+        type = 'login',
+        name = 'The Economist',
+        urls = '{urls}',
+        username = '{email}',
+        password = '{passcode}',
+    )
+
+You can add arbitrary fields using *fields* as represented by a NestedText 
+dictionary:
+
+    bitwarden = dict(
+        type = 'login',
+        name = 'Visa',
+        fields = '''
+            holder: {name}
+            ccn: {ccn}
+            exp: {exp}
+            cvv: {cvv}
+            report: {support}
+        ''',
+    )
+
+You can also use a Python dictionary:
+
+    bitwarden = dict(
+        type = 'login',
+        name = 'Visa',
+        fields = dict(
+            holder = "{name}",
+            ccn = "{ccn}",
+            exp = "{exp}",
+            cvv = "{cvv}",
+            report = "{support}",
+        ),
+    )
+
+
+There are four types of cards supported, and those cards accept the following 
+fields:
+
+    1: login
+        name
+        username
+        password
+        totp
+        urls
+        fields
+        notes
+
+    2: secureNote
+        name
+        notes
+        fields
+
+    3: card
+        name
+        brand
+        holder
+        ccn
+        exp
+        cvv
+        fields
+        notes
+
+    4: identity
+        name
+        title
+        names
+        street
+        city
+        state
+        zip
+        country
+        email
+        phone
+        company
+        ssn
+        username
+        passport
+        license
+        fields
+        notes
+
+Running bw-json-export creates the file: bw.json.
+
+Once created, it can be imported from the BitWarden website 
+(vault.bitwarden.com).  When importing, use 'Bitwarden (json)' as the file 
+format.
+
+By policy, BitWarden create duplicates of any imported accounts if they were 
+previously imported.  As such, you should delete existing accounts before 
+re-importing to avoid duplicate accounts.  A convenient way of doing so would be 
+to partition your BitWarden cards into two folders, one dedicated to accounts 
+imported from Avendesora and one dedicated you your BitWarden native cards.  
+Normally you would keep the “No Folder” folder empty.  Before importing, first 
+delete all the entried in the “Avendesora” folder, and then delete the folder 
+itself  by clicking on it, a pencil icon will appear, click on that, and then 
+click on the trash can icon.  Importing will then create a new “Avendesora” 
+folder.
+
+After first run, a settings file is created in 
+~/.config/bw-json-export/settings.nt.  You can use it to control the name of the 
+“Avendesora” folder.  The default value is “[Avendesora-]YYMMDD”.  The 
+characters within the brackets is output verbatum and the remaining characters 
+are interpreted as an arrow format (see 
+https://arrow.readthedocs.io/en/latest/index.html#supported-tokens).
+
+After importing your bw.json file you must delete it as it contains your secrets 
+in plain text.
+"""
+
+
+# Imports {{{1
+from avendesora import PasswordGenerator, PasswordError, Script
+from appdirs import user_config_dir
+from inform import Error, conjoin, fatal, is_collection, is_mapping, os_error, terminate
+from docopt import docopt
+from textwrap import dedent
+from pathlib import Path
+from collections import defaultdict
+from functools import reduce
+import nestedtext as nt
+import json
+import os
+import uuid
+import pwd
+import arrow
+
+
+# Utilities {{{1
+# getusername {{{2
+def getusername():
+    return pwd.getpwuid(os.getuid()).pw_name
+
+def extract_fields(value):
+    if is_mapping(value):
+        fields = value
+    else:
+        fields = nt.loads(value)
+    return 'fields', [dict(name=k, value=v) for k, v in fields.items()]
+
+def extract_uris(value):
+    urls = value.split()
+    return 'uris', [dict(uri=u, match=2) for u in urls]
+
+def extract_expiration(value):
+    month, _, year = value.partition('/')
+    try:
+        month = int(month)
+        year = int(year)
+        if year < 100:
+            year = 2000 + year
+    except ValueError:
+        raise Error(f'invalid expiration date: {value}.')
+    return 'card', dict(expMonth=str(month), expYear=str(year))
+
+def extract_names(value):
+    names = value.split()
+    name_fields = {}
+    if len(names) >= 3:
+        name_fields["firstName"] = names[0]
+        name_fields["middleName"] = ' '.join(names[1:-1])
+        name_fields["lastName"] = names[-1]
+    elif len(names) == 2:
+        name_fields["firstName"] = names[0]
+        name_fields["lastName"] = names[-1]
+    elif len(names) == 1:
+        name_fields["firstName"] = names[0]
+    return 'identity', name_fields
+
+def extract_street(value):
+    lines = [l.strip() for l in value.splitlines()]
+    address_fields = {}
+    if len(lines) >= 3:
+        address_fields["address1"] = lines[0]
+        address_fields["address2"] = lines[1]
+        address_fields["address3"] = '\n'.join(lines[2:])
+    elif len(lines) == 2:
+        address_fields["address1"] = lines[0]
+        address_fields["address2"] = lines[1]
+    elif len(lines) == 1:
+        address_fields["address1"] = lines[0]
+    return 'identity', address_fields
+
+def get(data, indices):
+    # data: an arbitrarily nested collection of dictionaries and lists
+    # indices: a tuple containing the indices of the desired value.
+    # returns: the desired value
+    return reduce(lambda a,i: a[i], indices, data)
+
+def default_to_empty_dict():
+    return defaultdict(default_to_empty_dict)
+
+def expand_scripts(value):
+    expanded = Script(dedent(str(value)))
+    expanded.initialize(account)
+    return str(expanded).strip()
+
+def add_to_output(keys, value):
+
+    # expand any embedded attributes
+    if is_mapping(value):
+        value = {str(k):expand_scripts(v) for k,v in value.items()}
+    elif is_collection(value):
+        value = [expand_scripts(v) for v in value]
+    else:
+        value = expand_scripts(value)
+
+    # add value to output
+    leading_keys = keys[:-1]
+    last_key = keys[-1]
+    if callable(last_key):
+        last_key, value = last_key(value)
+    if is_mapping(value):
+        get(output, leading_keys)[last_key].update(value)
+    else:
+        get(output, leading_keys)[last_key] = value
+
+
+# Globals {{{1
+entry_types = dict(
+    login = (
+        1,     # type_id
+        dict(  # supported fields
+            name = ('name',),
+            username =  ('login', 'username',),
+            password =  ('login', 'password',),
+            totp =  ('login', 'totp',),
+            urls = ('login', extract_uris,),
+            fields = (extract_fields,),
+            notes = ('notes',),
+        ),
+        dict(  # key map
+            login_username = 'username',
+            login_password = 'password',
+            login_totp = 'totp',
+            login_uri = 'urls',
+        )
+    ),
+    note = (
+        2,  # type_id
+        dict(  # supported fields
+            name = ('name',),
+            fields = (extract_fields,),
+            notes = ('notes',),
+        ),
+        dict(),
+    ),
+    card = (
+        3,  # type_id
+        dict(  # supported fields
+            name = ('name',),
+            holder = ('card', 'cardholderName',),
+            brand = ('card', 'brand',),
+            ccn = ('card', 'number',),
+            exp = (extract_expiration,),
+            cvv = ('card', 'code',),
+            fields = (extract_fields,),
+            notes = ('notes',),
+        ),
+        dict(),
+    ),
+    identity = (
+        4,  # type_id
+        dict(  # supported fields
+            name = ('name',),
+            title =  ('identity', 'title',),
+            names =  (extract_names,),
+            street =  (extract_street,),
+            city =  ('identity', 'city',),
+            state =  ('identity', 'state',),
+            zip =  ('identity', 'postalCode',),
+            country =  ('identity', 'country',),
+            company =  ('identity', 'company',),
+            email =  ('identity', 'email',),
+            phone =  ('identity', 'phone',),
+            ssn =  ('identity', 'ssn',),
+            username =  ('identity', 'username',),
+            passport =  ('identity', 'passportNumber',),
+            license =  ('identity', 'licenseNumber',),
+            fields = (extract_fields,),
+            notes = ('notes',),
+        ),
+        dict(),
+    ),
+)
+field_types = dict(
+    text = 0,
+    hidden = 1,
+    boolean = 2,
+)
+output_filename = Path('bw.json')
+folder_name = '[Avendesora-]YYMMDD'
+
+
+# Program {{{1
+try:
+    # Read command line and process options {{{2
+    cmdline = docopt(__doc__)
+
+    # get base identifier
+    config_dir = Path(user_config_dir('bw-json-export'))
+    settings_path = config_dir / 'settings.nt'
+
+    try:
+        config = nt.load(settings_path)
+        identifier = config['id']
+        base_uuid = uuid.UUID(identifier)
+        folder_name = config['folder']
+    except FileNotFoundError:
+        # config file does not exist, create it
+        base_uuid = uuid.uuid4()
+        config = dict(
+            id = str(base_uuid),
+            folder = folder_name,
+        )
+        config_dir.mkdir(parents=True, exist_ok=True)
+        nt.dump(config, settings_path)
+
+    # Create empty vault {{{2
+    folder_name = arrow.now().format(folder_name)
+    folder_uuid = uuid.uuid5(base_uuid, folder_name)
+    vault = dict(
+        folders = [
+            dict(
+                id = str(folder_uuid),
+                name = folder_name,
+            )
+        ],
+        items = []
+    )
+    items = vault['items']
+
+    # Scan accounts and gather accounts to export {{{2
+    pw = PasswordGenerator()
+    accounts = []
+    # visit each account
+    for account in pw.all_accounts():
+        account_name = account.get_name()
+        class_name = account.__name__
+        description = account.get_scalar('desc', None, None)
+
+        # process bitwarden field if it exists
+        fields = account.get_composite('bitwarden')
+        output = default_to_empty_dict()
+            # output is an initially empty nested collection of dictionaries.
+            # you can access values that at an arbitrary depth in the collection
+            # and the parent dictionaries are created as needed if they do not
+            # already exist.  For example:
+            #     initial value: output = {}
+            #     assign a value: output['a']['b'['c'] = 7
+            #     final value: output = {'a': {'b': {'c': 7}}}
+
+        if fields:
+            if 'name' in fields:
+                name = fields['name']
+                name_uuid = uuid.uuid5(folder_uuid, name)
+                output['id'] = str(name_uuid)
+                output['folderId'] = str(folder_uuid)
+            else:
+                raise Error(
+                    f'name missing',
+                    culprit=(account_name, 'bitwarden')
+                )
+            if 'type' in fields:
+                try:
+                    type = fields.pop('type')
+                    type_id, field_names, key_map = entry_types[type]
+                    output['type'] = type_id
+                    output[type] = default_to_empty_dict()
+                except KeyError:
+                    raise Error(
+                        f'{fields["type"]}: unknown type',
+                        culprit=(account_name, 'bitwarden')
+                    )
+            else:
+                raise Error(
+                    f'type missing',
+                    culprit=(account_name, 'bitwarden')
+                )
+
+            # expand fields
+            for key, value in fields.items():
+                mapped_k = key_map.get(key, key)
+                if mapped_k not in field_names:
+                    fatal(
+                        'field unknown by bitwarden.',
+                        culprit=(account_name, key)
+                    )
+                try:
+                    add_to_output(field_names[mapped_k], value)
+                except (PasswordError, nt.NestedTextError, Error) as e:
+                    e.reraise(culprit=(class_name, key, e.culprit))
+            accounts.append(output)
+    with open(output_filename, 'w') as f:
+        data = dict(
+            encrypted = False,
+            folders = [
+                dict(
+                    name = folder_name,
+                    id = str(folder_uuid),
+                )
+            ],
+            items = accounts,
+        )
+        json.dump(data, f, indent=2)
+    os.chmod(output_filename, 0o600)
+
+# Process exceptions {{{1
+except KeyboardInterrupt:
+    terminate('Killed by user.')
+except PasswordError as e:
+    e.terminate()
+except nt.NestedTextError as e:
+    e.terminate()
+except OSError as e:
+    terminate(os_error(e))
