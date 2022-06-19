@@ -7,11 +7,10 @@ Generates a CSV file (bw.csv) suitable for uploading to BitWarden.
 Usage:
     bw-csv-export
 
-Only those accounts with 'bitwarden' field are exported. The "bitwarden' field 
+Only those accounts with “bitwarden” field are exported. The “bitwarden” field 
 is expected to be a dictionary that may contain the following fields: folder, 
-type, name, notes, fields, login_uri, login_username, login_password, 
-login_totp. If not given, they are left blank. Each value may be a simple string 
-or it may be a script.
+type, name, notes, fields, url, username, password, and totp. If not given, they 
+are left blank. Each value may be a simple string or a script.
 
 A typical example is:
 
@@ -56,6 +55,8 @@ to the “Avendesora” folder.
 You must then delete the bw.csv file as it can include your secrets in plain 
 text.
 """
+__version__ = '0.0.0'
+__released__ = '2022-06-19'
 
 # Imports {{{1
 from avendesora import PasswordGenerator, PasswordError, Script
@@ -82,7 +83,7 @@ types = '''
     note
 '''.split()
 key_map = dict(
-    uri = 'login_uri',
+    url = 'login_uri',
     username = 'login_username',
     password = 'login_password',
     totp = 'login_totp',

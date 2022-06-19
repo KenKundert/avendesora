@@ -6,9 +6,9 @@
 Generates a JSON file (bw.json) suitable for uploading to BitWarden.
 
 Usage:
-    bw-csv-export
+    bw-json-export
 
-Only those accounts with 'bitwarden' field are exported. The "bitwarden' field 
+Only those accounts with “bitwarden” field are exported. The “bitwarden” field 
 is expected to be a dictionary that contain the fields to be exported.
 The value may be a simple string or it may be a script, and in some cases it may 
 be a dictionary.
@@ -51,7 +51,6 @@ You can also use a Python dictionary:
             report = "{support}",
         ),
     )
-
 
 There are four types of cards supported, and those cards accept the following 
 fields:
@@ -110,22 +109,24 @@ previously imported.  As such, you should delete existing accounts before
 re-importing to avoid duplicate accounts.  A convenient way of doing so would be 
 to partition your BitWarden cards into two folders, one dedicated to accounts 
 imported from Avendesora and one dedicated you your BitWarden native cards.  
-Normally you would keep the “No Folder” folder empty.  Before importing, first 
-delete all the entried in the “Avendesora” folder, and then delete the folder 
-itself  by clicking on it, a pencil icon will appear, click on that, and then 
-click on the trash can icon.  Importing will then create a new “Avendesora” 
-folder.
+Before importing, first delete all the entries in the “Avendesora” folder, and 
+then delete the folder itself  by clicking on it, a pencil icon will appear, 
+click on that, and then click on the trash can icon.  Importing will then create 
+a new “Avendesora” folder.
 
 After first run, a settings file is created in 
 ~/.config/bw-json-export/settings.nt.  You can use it to control the name of the 
-“Avendesora” folder.  The default value is “[Avendesora-]YYMMDD”.  The 
-characters within the brackets is output verbatum and the remaining characters 
-are interpreted as an arrow format (see 
+“Avendesora” folder.  The default value is “[Avendesora-]YYMMDD”.  You can 
+eliminate the date using “[Avendesora]” or you can delete the folder completely. 
+The characters within the brackets is output verbatim and the remaining 
+characters are interpreted as an Arrow format (see 
 https://arrow.readthedocs.io/en/latest/index.html#supported-tokens).
 
 After importing your bw.json file you must delete it as it contains your secrets 
 in plain text.
 """
+__version__ = '0.0.0'
+__released__ = '2022-06-19'
 
 
 # Imports {{{1
@@ -322,36 +323,36 @@ try:
 
     try:
         config = nt.load(settings_path)
-        identifier = config['id']
+        identifier = config['uuid']
         base_uuid = uuid.UUID(identifier)
-        folder_name = config['folder']
+        folder_name = config.get('folder')
     except FileNotFoundError:
         # config file does not exist, create it
         base_uuid = uuid.uuid4()
         config = dict(
-            id = str(base_uuid),
+            uuid = str(base_uuid),
             folder = folder_name,
         )
         config_dir.mkdir(parents=True, exist_ok=True)
         nt.dump(config, settings_path)
 
     # Create empty vault {{{2
-    folder_name = arrow.now().format(folder_name)
-    folder_uuid = uuid.uuid5(base_uuid, folder_name)
-    vault = dict(
-        folders = [
-            dict(
-                id = str(folder_uuid),
-                name = folder_name,
-            )
-        ],
-        items = []
-    )
-    items = vault['items']
+    vault = dict(items = [])
+    if folder_name:
+        folder_name = arrow.now().format(folder_name)
+        folder_uuid = uuid.uuid5(base_uuid, folder_name)
+        vault.update(dict(
+            folders = [
+                dict(
+                    id = str(folder_uuid),
+                    name = folder_name,
+                )
+            ],
+        ))
 
     # Scan accounts and gather accounts to export {{{2
     pw = PasswordGenerator()
-    accounts = []
+    accounts = vault['items']
     # visit each account
     for account in pw.all_accounts():
         account_name = account.get_name()
@@ -372,9 +373,10 @@ try:
         if fields:
             if 'name' in fields:
                 name = fields['name']
-                name_uuid = uuid.uuid5(folder_uuid, name)
-                output['id'] = str(name_uuid)
-                output['folderId'] = str(folder_uuid)
+                if folder_name:
+                    name_uuid = uuid.uuid5(folder_uuid, name)
+                    output['id'] = str(name_uuid)
+                    output['folderId'] = str(folder_uuid)
             else:
                 raise Error(
                     f'name missing',
@@ -411,17 +413,7 @@ try:
                     e.reraise(culprit=(class_name, key, e.culprit))
             accounts.append(output)
     with open(output_filename, 'w') as f:
-        data = dict(
-            encrypted = False,
-            folders = [
-                dict(
-                    name = folder_name,
-                    id = str(folder_uuid),
-                )
-            ],
-            items = accounts,
-        )
-        json.dump(data, f, indent=2)
+        json.dump(vault, f, indent=2)
     os.chmod(output_filename, 0o600)
 
 # Process exceptions {{{1

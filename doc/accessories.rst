@@ -35,7 +35,7 @@ BitWarden Export
 Allows you to export select accounts to `BitWarden <https://bitwarden.com>`_, an 
 open source password manager with a GUI, phone apps, and syncing.
 
-`bw-export <https://github.com/KenKundert/avendesora/blob/master/samples/api/bw-export>`_
+`bw-export <https://github.com/KenKundert/bw-export>`_
 
 
 Emborg
