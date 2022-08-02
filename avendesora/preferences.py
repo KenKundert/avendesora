@@ -590,7 +590,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     # email.  If you have encrypted this file with your colloborator's public
     # GPG key, is best to simply send the encrypted file to your
     # collaborator the first time. After than, you can send the account
-    # informaiton in clear text as long as you are careful not to expose the
+    # information in clear text as long as you are careful not to expose the
     # master_seed.
     master_seed = Hidden({master_seed}, secure=True)
     gpg_ids = {gpg_ids}

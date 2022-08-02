@@ -692,6 +692,7 @@ def test_value():
         If you don't specify the field, you get the value of the default field.
         For first level fields, you only need to specify enough leading
         characters of the field name to uniquely identify which field you wish.
+        If you specify ? as the field, the available fields will be listed.
 
         If the requested value is composite (an array or dictionary), you should
         also specify a key that indicates which of the composite values you

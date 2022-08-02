@@ -8,8 +8,11 @@ Latest Development Version
 | Version: 1.22.2
 | Released: 2022-06-19
 
+- enhanced *bw-export* scripts.
 - with :ref:`value command <value command>`, only the first few characters of
   the field name need be specified.
+- when ``?`` is passed as *field* to the :ref:`value command <value command>`, 
+  the list of available fields is displayed.
 - added :ref:`additional_account_templates <additional_account_templates 
   setting>` setting.
 
