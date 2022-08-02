@@ -5,8 +5,8 @@ Releases
 
 Latest Development Version
 --------------------------
-| Version: 1.22.2
-| Released: 2022-06-19
+| Version: 1.22.3
+| Released: 2022-08-01
 
 - enhanced *bw-export* scripts.
 - with :ref:`value command <value command>`, only the first few characters of
