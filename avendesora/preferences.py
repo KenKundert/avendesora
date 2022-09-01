@@ -248,6 +248,8 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
         A = 'archive',
         b = 'browse',
         bc = 'browse --browser c',
+        bf = ["browse", "--browser", "f"],
+        bq = ["browse", "--browser", "q"],
         c = 'conceal',
         C = 'changed',
         e = 'edit',
@@ -267,6 +269,8 @@ CONFIG_FILE_INITIAL_CONTENTS = dedent('''\
         qc = 'questions --clipboard',
         r = 'reveal',
         s = 'search',
+        sum = "values",
+        summary = "values",
         val = 'value',
         v = 'value',
         vc = 'value --clipboard',
@@ -579,7 +583,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     try:
         import Scrypt
     except ImportError:
-        # You need to install scrypt using 'pip install scrypt' to use Scrypt
+        # You need to install scrypt using ‘pip install scrypt’ to use Scrypt
         pass
 
     # Shared Values {section}
@@ -587,7 +591,7 @@ ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
     #
     # Never disclose the master seed to anyone you are not collaborating with.
     # Never give it to your collaborator using an insecure channel, such as
-    # email.  If you have encrypted this file with your colloborator's public
+    # email.  If you have encrypted this file with your collaborator’s public
     # GPG key, is best to simply send the encrypted file to your
     # collaborator the first time. After than, you can send the account
     # information in clear text as long as you are careful not to expose the
