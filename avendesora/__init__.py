@@ -31,5 +31,5 @@ from .secrets import (
 from . import command
 from .account import AccountValue
 
-__version__ = '1.23.0'
-__released__ = '2022-08-31'
+__version__ = '1.23.1'
+__released__ = '2022-09-03'
