@@ -1558,7 +1558,7 @@ class Value(Command):
             # given field may be just first few letters, find desired field
             if field and field.isalnum():
                 candidates = [f for f in account.fields() if f.startswith(field)]
-                if candidates:
+                if candidates and not field in candidates:
                     field = candidates[0]
                     if len(candidates) > 1:
                         raise Error(

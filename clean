@@ -14,3 +14,4 @@ rm -rf doc/.build
 rm -rf avendesora/*.{pyc,pyx,c,so}
 rm -f samples/api/bw.csv
 rm -rf .hypothesis .tox
+rm -rf */.hypothesis
