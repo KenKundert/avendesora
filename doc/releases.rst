@@ -9,6 +9,11 @@ Latest Development Version
 | Released: 2022-11-04
 
 
+1.24 (2022-11-04)
+-----------------
+- minor refinements.
+
+
 1.23 (2022-08-31)
 -----------------
 - enhanced *bw-export* scripts.
