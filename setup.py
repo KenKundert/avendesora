@@ -45,7 +45,7 @@ for line in install_requirements.splitlines():
 # call setup {{{1
 setup(
     name = 'avendesora',
-    version = '1.23.2rc1',
+    version = '1.24',
     author = 'Ken Kundert and Kale Kundert',
     author_email = 'avendesora@nurdletech.com',
     description = 'A password generator and account manager.',

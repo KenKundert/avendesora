@@ -5,7 +5,7 @@ Releases
 
 Latest Development Version
 --------------------------
-| Version: 1.23.2rc1
+| Version: 1.24
 | Released: 2022-11-04
 
 
