@@ -40,7 +40,10 @@ from .collection import Collection
 from .config import get_setting
 from .gpg import PythonFile
 from .shlib import getmod, mkdir, rm, chmod
-from cryptography.fernet import Fernet
+try:
+    from cryptography.fernet import Fernet
+except ImportError:
+    Fernet = None
 from fnmatch import fnmatch
 from inform import Error, comment, codicil, log, os_error, warn
 from hashlib import sha256
@@ -215,6 +218,9 @@ class AccountFiles:
             self.load_account_files()
 
     def read_manifests(self):  # {{{2
+        if not Fernet:
+            log('cannot read manifest; cryptography package is not available.')
+            return
         if self.name_index:
             return
         cache_dir = get_setting('cache_dir')
@@ -249,6 +255,9 @@ class AccountFiles:
             comment(e)
 
     def write_manifests(self):  # {{{2
+        if not Fernet:
+            log('cannot write manifest; cryptography package is not available.')
+            return
         # do not modify existing name_index if no account files were loaded
         if not self.loaded:
             return

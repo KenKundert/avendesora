@@ -14,9 +14,11 @@ install_requirements = '''
     appdirs
     arrow!=0.14.*
     cryptography
+        # cryptography is optional, it provides rapid startup via encrypted manifests
     docopt
     inform>=1.21
     pygobject
+        # pygobject is optional, it provides a secret selection dialog
     python-gnupg>=0.4.4
         # Be careful.  There's a package called 'gnupg' that's an
         # incompatible fork of 'python-gnupg'.  If both are installed, the
