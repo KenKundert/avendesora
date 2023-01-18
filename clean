@@ -11,7 +11,7 @@ rm -rf tests/home/.python-eggs tests/.coverage tests/htmlcov tests/.pytest_cache
 rm -rf .cache tests/.cache tests/home/.cache
 rm -f tests/home/.config/avendesora/log tests/home/.gnupg/.gpg-v21-migrated
 rm -rf doc/.build
-rm -rf avendesora/*.{pyc,pyx,c,so}
+rm -rf avendesora/*.{pyc,pyx,c,so} avendesora/__pycache__
 rm -f samples/api/bw.csv
 rm -rf .hypothesis .tox
 rm -rf */.hypothesis
