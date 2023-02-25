@@ -499,7 +499,10 @@ class Account(object):
                 if is_collection(value):
                     value = value[key]
                 else:
-                    warn('not a composite value, key ignored.', culprit=name)
+                    warn(
+                        'not a composite value, key ignored.',
+                        culprit = (cls.get_name(), name)
+                    )
                     key = None
             except (IndexError, KeyError, TypeError):
                 raise PasswordError(

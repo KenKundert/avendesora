@@ -364,7 +364,7 @@ class PasswordGenerator(object):
         if len(matches) > 1:
             choice = show_list_dialog('Choose Secret', sorted(matches.keys()))
             if choice is None:
-                raise PasswordError('user abort.')
+                raise PasswordError('selection canceled.', urgency='low')
             log('User selects %s' % choice)
             account, script = matches[choice]
         else:

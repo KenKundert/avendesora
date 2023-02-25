@@ -124,11 +124,12 @@ class Script:
                                 )
                                 if choice is None:
                                     raise PasswordError(
-                                        'user abort.',
+                                        'selection canceled.',
                                         culprit = (
                                             account.get_name(),
                                             account.combine_field(name, key)
-                                        )
+                                        ),
+                                        urgency = 'low',
                                     )
                             key = choices[choice]
                             value = account.get_scalar(name, key)
