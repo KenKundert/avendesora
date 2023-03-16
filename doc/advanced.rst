@@ -1047,18 +1047,18 @@ javascript helpers often limit the rate at which you can type characters.  The
 avoid the problems that stem from exceeding the limit.
 
 The *paste* is useful when trying to overcome JavaScript issues. Many websites 
-use JavaScript to interpret the characters as you type them. This can be slow it 
-may not be able to keep up with *Avendesora*'s auto-typing.  There are various 
-ways of overcoming this problem.  You can use the *rate* function, or you can 
-follow the field with the *sleep* function, or you can use the *paste* function 
-to enter the value in one operation.  Using *paste* can be more reliable than 
-*rate* and *sleep*, which both count on timing that can vary with your internet 
-connection. The paste occurs where the mouse is placed before the script is 
-triggered, so it only really makes sense to use *paste* once in a script.  If 
-you are not pasting the first value in your script, then you should click on the 
-first value to select it, then move the mouse without clicking so that hovers 
-over the field to be pasted to, then trigger the script.  A typical example 
-script that employs *paste* is::
+use JavaScript to interpret the characters as you type them. This can be slow 
+and may not be able to keep up with *Avendesora*’s auto-typing.  There are 
+various ways of overcoming this problem.  You can use the *rate* function, or 
+you can follow the field with the *sleep* function, or you can use the *paste* 
+function to enter the value in one operation.  Using *paste* can be more 
+reliable than *rate* and *sleep*, which both count on timing that can vary with 
+your internet connection. The paste occurs where the mouse is placed before the 
+script is triggered, so it only really makes sense to use *paste* once in 
+a script.  If you are not pasting the first value in your script, then you 
+should click on the first value to select it, then move the mouse without 
+clicking so that hovers over the field to be pasted to, then trigger the script.  
+A typical example script that employs *paste* is::
 
     "{paste account}{tab}{passcode}{return}"
 

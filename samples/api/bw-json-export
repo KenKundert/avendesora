@@ -132,7 +132,10 @@ __released__ = '2022-06-19'
 # Imports {{{1
 from avendesora import PasswordGenerator, PasswordError, Script
 from appdirs import user_config_dir
-from inform import Error, conjoin, fatal, is_collection, is_mapping, os_error, terminate
+from inform import (
+    Error, fatal, is_collection, is_mapping, is_str, os_error,
+    terminate
+)
 from docopt import docopt
 from textwrap import dedent
 from pathlib import Path
@@ -158,9 +161,14 @@ def extract_fields(value):
         fields = nt.loads(value)
     return 'fields', [dict(name=k, value=v) for k, v in fields.items()]
 
-def extract_uris(value):
-    urls = value.split()
+
+def extract_uris(urls):
+    if is_str(urls):
+        urls = urls.split()
+    elif is_mapping(urls):
+        urls = urls.values()
     return 'uris', [dict(uri=u, match=2) for u in urls]
+
 
 def extract_expiration(value):
     month, _, year = value.partition('/')
@@ -412,6 +420,7 @@ try:
                 except (PasswordError, nt.NestedTextError, Error) as e:
                     e.reraise(culprit=(class_name, key, e.culprit))
             accounts.append(output)
+
     with open(output_filename, 'w') as f:
         json.dump(vault, f, indent=2)
     os.chmod(output_filename, 0o600)
