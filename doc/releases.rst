@@ -9,6 +9,11 @@ Latest Development Version
 | Released: 2023-02-25
 
 
+1.25 (2023-04-22)
+-----------------
+- minor refinements.
+
+
 1.24 (2022-11-04)
 -----------------
 - minor refinements.
