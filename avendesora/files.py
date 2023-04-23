@@ -128,10 +128,10 @@ class AccountFiles:
                     if stale > 0 and account_age > 86400 * stale:
                         warn('stale archive.')
                         codicil(dedent("""\
-                            Recommend running 'avendesora changed' to determine
-                            which account entries have changed, and if all the
-                            changes are expected, running 'avendesora archive'
-                            to update the archive.
+                            Run ‘avendesora changed’ to determine which account
+                            entries have changed, and if all the changes are
+                            expected, run ‘avendesora archive’ to update the
+                            archive.
                         """), wrap=True)
                 else:
                     log('Avendesora archive is up to date.')
@@ -139,10 +139,7 @@ class AccountFiles:
                 stale = float(get_setting('archive_stale'))
                 if stale > 0:
                     warn('archive missing.')
-                    codicil(
-                        "Recommend running 'avendesora archive'",
-                        "to create the archive."
-                    )
+                    codicil("Run ‘avendesora archive’ to create the archive.")
 
     def load_account_file(self, filename):  # {{{2
         if filename in self.loaded:

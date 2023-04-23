@@ -31,7 +31,7 @@ from textwrap import dedent
 
 # HelpMessage base class {{{1
 class HelpMessage(object):
-    URL = None
+    URL = None  # type: [None, str]
 
     # get_name() {{{2
     @classmethod

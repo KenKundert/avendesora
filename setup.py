@@ -16,7 +16,7 @@ install_requirements = '''
     cryptography
         # cryptography is optional, it provides rapid startup via encrypted manifests
     docopt
-    inform>=1.21
+    inform>=1.28
     pygobject
         # pygobject is optional, it provides a secret selection dialog
     python-gnupg>=0.4.4
