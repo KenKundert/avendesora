@@ -30,7 +30,7 @@ from .shlib import chmod, cp, rm, to_path
 from .utilities import query_user, two_columns, name_completion
 from .writer import get_writer
 from inform import (
-    codicil, columns, conjoin, cull, display, error, Error, indent,
+    Color, codicil, columns, conjoin, cull, display, error, Error, indent,
     is_collection, join, narrate, os_error, output, render, title_case, warn,
 )
 from docopt import docopt
@@ -670,7 +670,8 @@ class Conceal(Command):
                 raise Error('cannot give text in file and on command line.')
             text = to_path(path).read_text()
         if not text:
-            output('Enter text to obscure, type ctrl-d to terminate.')
+            if Color.isTTY(sys.stdin):
+                output('Enter text to obscure, type ctrl-d to terminate.')
             text = sys.stdin.read()[:-1]
 
         # transform and output the string
@@ -1558,7 +1559,7 @@ class Value(Command):
             # given field may be just first few letters, find desired field
             if field and field.isalnum():
                 candidates = [f for f in account.fields() if f.startswith(field)]
-                if candidates and not field in candidates:
+                if candidates and field not in candidates:
                     field = candidates[0]
                     if len(candidates) > 1:
                         raise Error(

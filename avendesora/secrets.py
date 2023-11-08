@@ -187,7 +187,7 @@ class GeneratedSecret(object):
             interactive_seed
         ]
         self.set_seeds(seeds)
-        assert(self.pool)
+        assert self.pool
 
     def set_seeds(self, seeds):
         # Convert the seeds into 512 bit number
@@ -1039,6 +1039,77 @@ class BirthDate(GeneratedSecret):
         day = self._get_symbol(range(days_in_year))
         birthdate = jan1.shift(days=day)
         secret = birthdate.format(self.fmt)
+        self.secret = secret
+        return secret
+
+
+# Base58 {{{1
+class Base58(GeneratedSecret):
+    """Generates an arbitrary binary number encoded in base 58.
+
+        >>> secret = Base58(bytes=4)
+        >>> secret.initialize(account, 'pux')
+        >>> str(secret)
+        '1970-03-22'
+
+    For year, enter the year the account that contains BirthDate was created.
+    Doing so anchors the age range. In this example, the creation date is 2015,
+    the minimum age is 18 and the maximum age is 65, meaning that a birthdate
+    will be chosen such that in 2015 the birth date could correspond to someone
+    that is between 18 and 65 years old.
+
+    You can use the fmt argument to change the way in which the date is
+    formatted::
+
+        >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
+        >>> secret.initialize(account, 'dux')
+        >>> str(secret)
+        '3/22/70'
+
+    Args:
+        bits (int):
+            The number of bits in the number.
+        master (str):
+            Overrides the master seed that is used when generating the password.
+            Generally, there is one master seed shared by all accounts contained
+            in an account file.  This argument overrides that behavior and
+            instead explicitly specifies the master seed for this secret.
+        version (str):
+            An optional seed. Changing this value will change the generated
+            answer.
+        is_secret (bool):
+            Should value be hidden from user unless explicitly requested.
+
+    Raises:
+        :exc:`avendesora.SecretExhausted`:
+            The available entropy has been exhausted.
+            This occurs when the requested length is too long.
+    """
+    def __init__(
+        self,
+        bytes = 32,
+        *,
+        master = None,
+        version = None,
+        is_secret = True,
+    ):
+        self.bytes = bytes
+        self.master = master
+        self.version = version
+        self.is_secret = is_secret
+
+    def render(self):
+        if self.secret:
+            # It is important that this be called only once, because the secret
+            # changes each time it is called.
+            return self.secret
+
+        from base58 import b58encode
+
+        symbols = []
+        for i in range(self.bytes):
+            symbols.append(self._get_index(256))
+        secret = b58encode(bytes(symbols)).decode('ascii')
         self.secret = secret
         return secret
 

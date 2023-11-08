@@ -23,7 +23,7 @@ from .recognize import (
 from .script import Script
 from .secrets import (
     Password, Passphrase, PIN, Question, MixedPassword, PasswordRecipe,
-    BirthDate, SecretExhausted
+    BirthDate, SecretExhausted, Base58
 )
 
 # the following are used when generating the documentation and are not needed
