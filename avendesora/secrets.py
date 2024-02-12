@@ -32,7 +32,7 @@ doctests::
 
 
 # License {{{1
-# Copyright (C) 2016-2023 Kenneth S. Kundert
+# Copyright (C) 2016-2024 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -1047,28 +1047,14 @@ class BirthDate(GeneratedSecret):
 class Base58(GeneratedSecret):
     """Generates an arbitrary binary number encoded in base 58.
 
-        >>> secret = Base58(bytes=4)
+        >>> secret = Base58(bytes=32)
         >>> secret.initialize(account, 'pux')
         >>> str(secret)
-        '1970-03-22'
-
-    For year, enter the year the account that contains BirthDate was created.
-    Doing so anchors the age range. In this example, the creation date is 2015,
-    the minimum age is 18 and the maximum age is 65, meaning that a birthdate
-    will be chosen such that in 2015 the birth date could correspond to someone
-    that is between 18 and 65 years old.
-
-    You can use the fmt argument to change the way in which the date is
-    formatted::
-
-        >>> secret = BirthDate(2015, 18, 65, fmt="M/D/YY")
-        >>> secret.initialize(account, 'dux')
-        >>> str(secret)
-        '3/22/70'
+        'J281UDAU6WJrMDwojcRFg8mfRREgMghBXdFBkXt2W4yU'
 
     Args:
-        bits (int):
-            The number of bits in the number.
+        bytes (int):
+            The number of bytes encoded in the result.
         master (str):
             Overrides the master seed that is used when generating the password.
             Generally, there is one master seed shared by all accounts contained
@@ -1076,7 +1062,7 @@ class Base58(GeneratedSecret):
             instead explicitly specifies the master seed for this secret.
         version (str):
             An optional seed. Changing this value will change the generated
-            answer.
+            result.
         is_secret (bool):
             Should value be hidden from user unless explicitly requested.
 
