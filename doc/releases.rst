@@ -5,8 +5,8 @@ Releases
 
 Latest Development Version
 --------------------------
-| Version: 1.25.1
-| Released: 2023-11-08
+| Version: 1.25.2
+| Released: 2024-05-31
 
 - added :class:`Base58` secrets class.
 - improved error checking
