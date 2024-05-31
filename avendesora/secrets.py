@@ -56,8 +56,7 @@ from .config import get_setting
 from .error import PasswordError
 from .dictionary import Dictionary
 from .obscure import ObscuredSecret
-from .utilities import error_source
-from inform import conjoin, cull, log, output, terminate, warn, is_str
+from inform import Error, conjoin, cull, log, output, terminate, warn, is_str
 import math
 import hashlib
 import getpass
@@ -79,12 +78,40 @@ class SecretExhausted(PasswordError):
 
 # Utilities {{{1
 def shift_sort_join(chars, sep=''):
+    # This sorts the characters so that all characters that require the shift
+    # key to type are bundled together so that the passcode is easier to type
     return sep.join(sorted(chars, key=lambda x: x in SHIFTED))
 
 
 def simple_join(chars, sep=''):
     return sep.join(chars)
 
+def as_string(value, name):
+    if value is None:
+        return value
+    if not is_str(value):
+        raise PasswordError('expected a string.', skip_tb_lvls=3, culprit=name)
+    return value
+
+def as_integer(value, name):
+    if value is None:
+        return value
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        raise PasswordError('expected an integer.', skip_tb_lvls=3, culprit=name)
+    return value
+
+def as_int_or_str(value, name):
+    if value is None:
+        return value
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        pass
+    if not is_str(value):
+        raise PasswordError('expected an integer or a string.', skip_tb_lvls=3, culprit=name)
+    return value
 
 # GeneratedSecret {{{1
 class GeneratedSecret(object):
@@ -432,20 +459,15 @@ class Password(GeneratedSecret):
         suffix = '',
         is_secret = True,
     ):
-        try:
-            self.length = int(length)
-        except ValueError:
-            raise PasswordError(
-                'expecting an integer for length.', culprit=error_source()
-            )
+        self.length = as_integer(length, 'length')
         self.alphabet = alphabet
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
 
         self.shift_sort = shift_sort
-        self.sep = sep
-        self.prefix = prefix
-        self.suffix = suffix
+        self.sep = as_string(sep, 'sep')
+        self.prefix = as_string(prefix, 'prefix')
+        self.suffix = as_string(suffix, 'suffix')
         self.is_secret = is_secret
 
     def render(self):
@@ -528,22 +550,17 @@ class Passphrase(Password):
         suffix = '',
         is_secret = True,
     ):
-        try:
-            self.length = int(length)
-        except ValueError:
-            raise PasswordError(
-                'expecting an integer for length.', culprit=error_source()
-            )
+        self.length = as_integer(length, 'length')
         if not dictionary or is_str(dictionary):
             self.alphabet = Dictionary(dictionary).get_words
         else:
             self.alphabet = dictionary
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
         self.shift_sort = False
-        self.sep = sep
-        self.prefix = prefix
-        self.suffix = suffix
+        self.sep = as_string(sep, 'sep')
+        self.prefix = as_string(prefix, 'prefix')
+        self.suffix = as_string(suffix, 'suffix')
         self.is_secret = is_secret
 
 
@@ -601,15 +618,10 @@ class PIN(Password):
         version = None,
         is_secret = True,
     ):
-        try:
-            self.length = int(length)
-        except ValueError:
-            raise PasswordError(
-                'expecting an integer for length.', culprit=error_source()
-            )
+        self.length = as_integer(length, 'length')
         self.alphabet = alphabet
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
         self.shift_sort = False
         self.sep = ''
         self.prefix = ''
@@ -700,23 +712,18 @@ class Question(Passphrase):
         suffix = '',
         is_secret = True,
     ):
-        self.question = question
-        try:
-            self.length = int(length)
-        except ValueError:
-            raise PasswordError(
-                'expecting an integer for length.', culprit=error_source()
-            )
+        self.question = as_string(question, 'question')
+        self.length = as_integer(length, 'length')
         if not dictionary or is_str(dictionary):
             self.alphabet = Dictionary(dictionary).get_words
         else:
             self.alphabet = dictionary
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
         self.shift_sort = False
-        self.sep = sep
-        self.prefix = prefix
-        self.suffix = suffix
+        self.sep = as_string(sep, 'sep')
+        self.prefix = as_string(prefix, 'prefix')
+        self.suffix = as_string(suffix, 'suffix')
         self.is_secret = is_secret
         if answer:
             # answer allows the user to override the generator and simply
@@ -799,16 +806,11 @@ class MixedPassword(GeneratedSecret):
         shift_sort = False,
         is_secret = True,
     ):
-        try:
-            self.length = int(length)
-        except ValueError:
-            raise PasswordError(
-                'expecting an integer for length.', culprit=error_source()
-            )
+        self.length = as_integer(length, 'length')
         self.def_alphabet = def_alphabet
         self.requirements = requirements
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
         self.shift_sort = shift_sort
         self.is_secret = is_secret
 
@@ -927,8 +929,8 @@ class PasswordRecipe(MixedPassword):
             parts = recipe.split()
         except (ValueError, AttributeError):
             raise PasswordError(
-                'recipe must be a string, found %s.' % recipe,
-                culprit=error_source()
+                f'recipe must be a string, found {recipe}.',
+                skip_tb_lvls = 3
             )
         try:
             each = parts[0]
@@ -942,14 +944,14 @@ class PasswordRecipe(MixedPassword):
             raise PasswordError(
                 each, recipe, conjoin(self.ALPHABETS.keys(), conj=' or '),
                 template="{0}: invalid term in recipe '{1}'. Choose from {2}.",
-                culprit=error_source()
+                skip_tb_lvls = 3
             )
 
         self.length = length
         self.def_alphabet = def_alphabet
         self.requirements = requirements
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
         self.shift_sort = shift_sort
         self.is_secret = is_secret
 
@@ -1021,8 +1023,8 @@ class BirthDate(GeneratedSecret):
         self.fmt = fmt
         self.last_year = year - min_age
         self.first_year = year - max_age
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
         self.is_secret = is_secret
 
     def render(self):
@@ -1047,14 +1049,14 @@ class BirthDate(GeneratedSecret):
 class Base58(GeneratedSecret):
     """Generates an arbitrary binary number encoded in base 58.
 
-        >>> secret = Base58(bytes=32)
+        >>> secret = Base58(bits=32)
         >>> secret.initialize(account, 'pux')
         >>> str(secret)
         'J281UDAU6WJrMDwojcRFg8mfRREgMghBXdFBkXt2W4yU'
 
     Args:
-        bytes (int):
-            The number of bytes encoded in the result.
+        bits (int):
+            The number of bits in the number.
         master (str):
             Overrides the master seed that is used when generating the password.
             Generally, there is one master seed shared by all accounts contained
@@ -1073,16 +1075,19 @@ class Base58(GeneratedSecret):
     """
     def __init__(
         self,
-        bytes = 32,
+        bits = 32,
         *,
+        bytes = None,
         master = None,
         version = None,
         is_secret = True,
     ):
         self.bytes = bytes
-        self.master = master
-        self.version = version
+        self.master = as_string(master, 'master')
+        self.version = as_int_or_str(version, 'version')
         self.is_secret = is_secret
+        if bytes:
+            raise PasswordError('bytes argument is no longer supported. Use ‘bits’.')
 
     def render(self):
         if self.secret:

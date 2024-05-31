@@ -250,7 +250,7 @@ class PythonFile(GnuPG):
             exec(compiled, contents)
         except Exception as e:
             from .utilities import error_source
-            raise PasswordError(full_stop(e), culprit=error_source())
+            raise PasswordError(full_stop(e), culprit=error_source(e))
         ActivePythonFile = None
         return contents
 

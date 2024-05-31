@@ -27,7 +27,6 @@
 # Imports {{{1
 from .error import PasswordError
 from .secrets import GeneratedSecret
-from .utilities import error_source
 from base64 import b32decode
 from binascii import Error as BinasciiError
 
@@ -80,10 +79,10 @@ try:
             try:
                 b32decode(secret, casefold=True)
                 # don't need return value, only checking for errors
-            except BinasciiError:
+            except BinasciiError as e:
                 raise PasswordError(
                     f'invalid value specified to OTP: {shared_secret}.',
-                    culprit = error_source()
+                    skip_tb_lvls=2
                 )
 
             # save results

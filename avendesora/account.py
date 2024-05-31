@@ -512,10 +512,10 @@ class Account(object):
 
         # initialize the value if needed
         try:
-            value.initialize(cls, name, key)
-                # if Secret or Script, initialize otherwise raise exception
-        except AttributeError:
-            pass
+            if hasattr(value, "initialize"):
+                value.initialize(cls, name, key)
+        except PasswordError as e:
+            e.reraise(culprit=e.get_culprit((name, key)))
         return value
 
     # is_secret() {{{2

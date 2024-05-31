@@ -171,7 +171,7 @@ directly to the clipboard::
 
 By default *Avendesora* is configured to use the primary clipboard.  You use the 
 middle mouse button to paste from the primary clipboard. You can also modify the 
-:ref:`xsel_executable setting <settings>` to modify this behavior.
+:ref:`xsel_executable setting <avendesora settings>` to modify this behavior.
 
 You can also write directly to the standard output (normally *Avendesora* writes 
 to the TTY so that it can erase any secrets after a minute has elapsed).  In 

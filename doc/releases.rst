@@ -9,6 +9,7 @@ Latest Development Version
 | Released: 2023-11-08
 
 - added :class:`Base58` secrets class.
+- improved error checking
 
 
 1.25 (2023-04-22)

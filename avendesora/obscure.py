@@ -24,7 +24,6 @@
 from .config import get_setting
 from .error import PasswordError
 from .gpg import GnuPG
-from .utilities import error_source
 from inform import indent, is_str, full_stop, cull
 from binascii import a2b_base64, b2a_base64, Error as BinasciiError
 from textwrap import dedent
@@ -147,7 +146,7 @@ class ObscuredSecret(object):
         for c in cls.obscurers():
             yield c.get_name(), dedent(getattr(c, 'DESC', '')).strip()
 
-    # default encoding() {{{2
+    # default_encoding() {{{2
     @classmethod
     def default_encoding(cls):
         return Hidden.NAME
@@ -236,7 +235,7 @@ class Hidden(ObscuredSecret):
         except BinasciiError as e:
             raise PasswordError(
                 'invalid value specified to Hidden(): %s.' % str(e),
-                culprit=error_source()
+                skip_tb_lvls=2, wrap=True
             )
         self.is_secret = is_secret
 
@@ -317,7 +316,7 @@ class GPG(ObscuredSecret, GnuPG):
                 msg = '%s: %s' % (msg, decrypted.stderr)
             except AttributeError:
                 msg += '.'
-            raise PasswordError(msg, culprit=error_source())
+            raise PasswordError(msg)
         encoding = self.encoding
         if not self.encoding:
             encoding = get_setting('encoding')

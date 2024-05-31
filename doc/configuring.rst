@@ -120,7 +120,7 @@ stealth_accounts
     account information, and so it is best if it is encrypted.
 
 
-.. _settings:
+.. _avendesora settings:
 .. index::
     single: settings
 

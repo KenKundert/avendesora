@@ -18,6 +18,7 @@
 
 # Imports {{{1
 from .config import get_setting
+from .error import PasswordError
 from .shlib import Run
 from inform import Error, output, is_str, indent
 from textwrap import dedent
@@ -125,31 +126,37 @@ def to_python(obj, _level=0):
 
 
 # error_source {{{1
-def error_source():
+def error_source(src):
     """Source of error
-    Reads stack trace to determine filename and line number of error.
+
+    src (int, Exception):
+        If src is an exception is it assumed that a exception was caught and the
+        source of the error should be determined from the exception.  In this
+        case the traceback will be mined for the source of the error.  If the
+        exception contains the attribute 'skip_tb_lvls' it is expected to be an
+        integer and it is taken to be the depth of the traceback where the
+        exception is expected to have originated.  If not found, 1 is assumed.
+
+        If src is assumed that no exception has occurred yet, though the
+        return value if this function will be used in a new exception that
+        is in the process of being created.
+        In this case, src must be an integer represents the stack level where
+        the error has occurred. N represents N levels deep.
     """
     import traceback
-    try:
-        # return filename and lineno
-        # context and content are also available
-        exc_cls, exc, tb = sys.exc_info()
-        trace = traceback.extract_tb(tb)
-        filename, line, context, text = trace[-1]
-    except SyntaxError:
-        # extract_stack() does not work on binary encrypted files. It generates
-        # a syntax error that indicates that the file encoding is missing
-        # because the function tries to read the file and sees binary data.
-        # This is not a problem with ascii encrypted files as we don't actually
-        # show code, which is gibberish, but does not require an encoding. In
-        # this case, extract the line number from the trace.
-        from .gpg import get_active_python_file
-        filename = get_active_python_file()
-        line = tb.tb_next.tb_lineno
-    except IndexError:
-        return None
-    return filename, 'line %s' % line
 
+    if isinstance(src, Exception):
+        skip_lvls = getattr(src, 'skip_tb_lvls', None)
+        tb = src.__traceback__
+        trace = traceback.extract_tb(tb)
+    else:
+        skip_lvls = src
+        trace = traceback.extract_stack()
+    if skip_lvls:
+        frame = trace[-skip_lvls]
+    else:
+        frame = trace[-1]
+    return frame.filename, frame.name, f'line {frame.lineno}'
 
 # query_user {{{1
 def query_user(msg):
