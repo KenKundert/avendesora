@@ -36,6 +36,8 @@ requested, :exc:`avendesora.SecretExhausted` is raised.
 
 .. autoclass:: avendesora.BirthDate
 
+.. autoclass:: avendesora.Base58
+
 .. autoclass:: avendesora.OTP
 
 .. autoexception:: avendesora.SecretExhausted

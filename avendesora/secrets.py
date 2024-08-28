@@ -238,7 +238,7 @@ class GeneratedSecret(object):
         A secret once generated will remember its value. With stealth secrets
         this is undesired because it prevents a new secret from being generated
         when account name changes. Calling this function causes the secret to
-        forget its previously saved value, which will require generate to be
+        forget its previously saved value, which requires generate to be
         called again.
         """
         self.secret = None
@@ -1049,14 +1049,14 @@ class BirthDate(GeneratedSecret):
 class Base58(GeneratedSecret):
     """Generates an arbitrary binary number encoded in base 58.
 
-        >>> secret = Base58(bits=32)
-        >>> secret.initialize(account, 'pux')
+        >>> secret = Base58(bytes=32)
+        >>> secret.initialize(account, 'nutz')
         >>> str(secret)
-        'J281UDAU6WJrMDwojcRFg8mfRREgMghBXdFBkXt2W4yU'
+        '4BccsYuQp2r8B3An4NArYNXwCj9t5FqbYZrcsa4UVqD6'
 
     Args:
-        bits (int):
-            The number of bits in the number.
+        bytes (int):
+            The number of bytes of entropy encodede in the generated result.
         master (str):
             Overrides the master seed that is used when generating the password.
             Generally, there is one master seed shared by all accounts contained
@@ -1075,9 +1075,8 @@ class Base58(GeneratedSecret):
     """
     def __init__(
         self,
-        bits = 32,
+        bytes = 4,
         *,
-        bytes = None,
         master = None,
         version = None,
         is_secret = True,
@@ -1086,8 +1085,6 @@ class Base58(GeneratedSecret):
         self.master = as_string(master, 'master')
         self.version = as_int_or_str(version, 'version')
         self.is_secret = is_secret
-        if bytes:
-            raise PasswordError('bytes argument is no longer supported. Use ‘bits’.')
 
     def render(self):
         if self.secret:

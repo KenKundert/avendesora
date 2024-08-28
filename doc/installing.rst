@@ -22,7 +22,7 @@ the above pip command, but gobject appears broken in pypi, so it is better use
 the operating system's package manager to install it.  See the setup.py file for 
 more information.  On Redhat systms use::
 
-   dnf install python3-gobject
+   sudo dnf install gobject-introspection-devel cairo-gobject-devel
 
 Gobject is only used to provide a user-interactive selection utility. However, 
 if you prefer, you can use *dmenu* for your selection utility, in which case you 

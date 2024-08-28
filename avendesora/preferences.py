@@ -623,7 +623,7 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
         HEXDIGITS, PUNCTUATION, WHITESPACE, PRINTABLE, DISTINGUISHABLE,
 
         # Secrets
-        Password, PasswordRecipe, Passphrase, PIN, Hidden
+        Password, PasswordRecipe, Passphrase, PIN, Hidden, Base58
     )
 
     # Accounts
@@ -877,6 +877,77 @@ STEALTH_ACCOUNTS_FILE_INITIAL_CONTENTS = dedent('''\
 
     class Web64(StealthAccount):
         passcode = PasswordRecipe('64 8u 8d 8s')
+
+    # BIP-39 mnemonic pass phrases {section}
+    class Bip1(StealthAccount):
+        passcode = Passphrase(length=1, dictionary='mnemonic')
+
+    class Bip2(StealthAccount):
+        passcode = Passphrase(length=2, dictionary='mnemonic')
+
+    class Bip3(StealthAccount):
+        passcode = Passphrase(length=3, dictionary='mnemonic')
+
+    class Bip4(StealthAccount):
+        passcode = Passphrase(length=4, dictionary='mnemonic')
+
+    class Bip5(StealthAccount):
+        passcode = Passphrase(length=5, dictionary='mnemonic')
+
+    class Bip6(StealthAccount):
+        passcode = Passphrase(length=6, dictionary='mnemonic')
+
+    class Bip7(StealthAccount):
+        passcode = Passphrase(length=7, dictionary='mnemonic')
+
+    class Bip8(StealthAccount):
+        passcode = Passphrase(length=8, dictionary='mnemonic')
+
+    class Bip10(StealthAccount):
+        passcode = Passphrase(length=10, dictionary='mnemonic')
+
+    class Bip12(StealthAccount):
+        passcode = Passphrase(length=12, dictionary='mnemonic')
+
+    class Bip16(StealthAccount):
+        passcode = Passphrase(length=16, dictionary='mnemonic')
+
+    class Bip20(StealthAccount):
+        passcode = Passphrase(length=20, dictionary='mnemonic')
+
+    class Bip24(StealthAccount):
+        passcode = Passphrase(length=24, dictionary='mnemonic')
+
+    class Bip32(StealthAccount):
+        passcode = Passphrase(length=32, dictionary='mnemonic')
+
+    # Base58 encoded binary numbers {section}
+    class Base58_4(StealthAccount):
+        passcode = Base58(bytes=4)
+
+    class Base58_6(StealthAccount):
+        passcode = Base58(bytes=6)
+
+    class Base58_8(StealthAccount):
+        passcode = Base58(bytes=8)
+
+    class Base58_10(StealthAccount):
+        passcode = Base58(bytes=10)
+
+    class Base58_12(StealthAccount):
+        passcode = Base58(bytes=12)
+
+    class Base58_16(StealthAccount):
+        passcode = Base58(bytes=16)
+
+    class Base58_24(StealthAccount):
+        passcode = Base58(bytes=24)
+
+    class Base58_32(StealthAccount):
+        passcode = Base58(bytes=32)
+
+    class Base58_48(StealthAccount):
+        passcode = Base58(bytes=48)
 ''')
 
 # Initial user key file {{{1

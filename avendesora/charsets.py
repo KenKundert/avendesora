@@ -26,6 +26,7 @@ def exclude(chars, exclusions):
 
     Example::
 
+        >>> from avendesora import exclude
         >>> exclude('ABCDEF', 'AEF')
         'BCD'
 

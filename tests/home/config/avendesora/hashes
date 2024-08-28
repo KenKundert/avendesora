@@ -6,7 +6,7 @@
 # complain if the current contents of these files generate a different
 # hash. Only update these hashes if you know what you are doing.
 
-charsets_hash = 'a055240c4c498e1470f5f3e80b3ec599'
+charsets_hash = 'fc75f33811171bed3daeb264d484bdc0'
 dict_hash     = '5dbabd4114eae520c1de8963a8b8d09d'
 mnemonic_hash = 'cafd522d6627011d78e576f2d0b6ed58'
-secrets_hash  = '00b517fa3fe24b597199452c951b4f0f'
+secrets_hash  = '98fea0c17741fedea26fa2195422fe7b'

@@ -8,6 +8,10 @@ Latest Development Version
 | Version: 1.25.2
 | Released: 2024-05-31
 
+
+
+1.26 (2024-08-28)
+-----------------
 - added :class:`Base58` secrets class.
 - improved error checking
 
