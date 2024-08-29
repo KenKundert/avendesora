@@ -10,8 +10,11 @@ build:
   tools:
     python: "3.12"
   apt_packages:
-    - python3-gi
-    - python3-gi-cairo
+    - libgirepository1.0-dev
+    - gcc
+    - libcairo2-dev
+    - pkg-config
+    - python3-dev
     - gir1.2-gtk-4.0
 
 # Build documentation in the doc/ directory with Sphinx
