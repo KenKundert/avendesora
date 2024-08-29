@@ -9,6 +9,10 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
+  apt_packages:
+    - python3-gi
+    - python3-gi-cairo
+    - gir1.2-gtk-4.0
 
 # Build documentation in the doc/ directory with Sphinx
 sphinx:
@@ -19,10 +23,6 @@ formats: all
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  apt_packages:
-    - python3-gi
-    - python3-gi-cairo
-    - gir1.2-gtk-4.0
   install:
     - requirements: doc/requirements.txt
     - method: pip
