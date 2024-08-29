@@ -15,3 +15,4 @@ rm -rf avendesora/*.{pyc,pyx,c,so} avendesora/__pycache__
 rm -f samples/api/bw.csv
 rm -rf .hypothesis .tox
 rm -rf */.hypothesis
+rm -rf .mypy_cache

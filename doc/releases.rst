@@ -9,7 +9,6 @@ Latest Development Version
 | Released: 2024-08-28
 
 
-
 1.26 (2024-08-28)
 -----------------
 - added :class:`Base58` secrets class.

@@ -1,4 +1,4 @@
-name: NestedText
+name: Avendesora
 on: [push, pull_request]
 jobs:
   check-bats-version:
