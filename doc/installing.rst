@@ -8,7 +8,7 @@ Installing and First Use
 
 Install with::
 
-   pip3 install --user avendesora
+   pip3 install avendesora
 
 This will place avendesora in ~/.local/bin, which should be added to your path.
 
@@ -33,7 +33,7 @@ will need to install it by hand using::
 If you would like to use scrypt as a way of encrypting fields, you will need to 
 install scrypt by hand using::
 
-   pip3 install --user scrypt
+   pip3 install scrypt
 
 
 
@@ -48,8 +48,14 @@ If you do not yet have a GPG key, you can get one using::
 
    $ gpg --gen-key
 
-You should probably choose 4096 RSA keys. Now, edit ~/.gnupg/gpg-conf and add 
-the line::
+If you have backward compatibility concerns, you should probably choose 
+a 2048-bit RSA key, which you can do with the above command.  Otherwise you 
+might consider using the new more secure 25519 elliptic curve.  To do so, run::
+
+   $ gpg --expert --full-gen-key
+
+Then select 9 (ECC and ECC) and then 1 (Curve 25519).  Once you have your key, 
+edit ~/.gnupg/gpg-conf and add the line::
 
    use-agent
 
