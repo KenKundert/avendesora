@@ -1960,7 +1960,7 @@ def test_secrets():
         encryption key is used (contained in ~/.config/avendesora/.key.gpg). As
         such, these secrets cannot be shared. This encryption method is only
         available if you have installed scrypt on your system (pip3 install
-        --user scrypt). Since the Scrypt class only exists if you have installed
+        scrypt). Since the Scrypt class only exists if you have installed
         scrypt, it is not imported into your accounts file. You would need to
         import it yourself before using it.
 
