@@ -558,7 +558,7 @@ class Cmd(object):
         self.merge_stderr_into_stdout = False
         self.status = None
         self.wait_for_termination = True
-        self.encoding = PREFERENCES["encoding"] if encoding is None else encoding
+        self.encoding = encoding or PREFERENCES["encoding"]
         self.log = log
         self.option_args = option_args
         self._interpret_modes(modes)
@@ -595,12 +595,15 @@ class Cmd(object):
         self.accept = _Accept(accept)
 
     # run {{{3
-    def run(self, stdin=None):
+    def run(self, stdin=None, **kwargs):
         """
         Run the command, will wait for it to terminate.
 
         If stdin is given, it should be a string. Otherwise, no connection is
         made to stdin of the command.
+
+        Any other arguments must be keyword arguments and they are passed to
+        subprocess.Popen.
 
         Returns exit status if wait_for_termination is True.
         If wait_for_termination is False, you must call wait(), otherwise stdin
@@ -616,9 +619,8 @@ class Cmd(object):
             # this is particularly problematic the duplicity arguments in embalm
             cmd = [str(c) for c in self.cmd]
         if _use_log(self.log):
-            from inform import log
-
-            log("running:", render_command(cmd, option_args=self.option_args))
+            from inform import indent, log
+            log(f"running:\n{indent(render_command(cmd, option_args=self.option_args))}")
 
         # indicate streams to intercept
         streams = {}
@@ -634,7 +636,7 @@ class Cmd(object):
         # run the command
         try:
             process = subprocess.Popen(
-                cmd, shell=self.use_shell, env=self.env, **streams
+                cmd, shell=self.use_shell, env=self.env, **streams, **kwargs
             )
         except OSError as e:
             if PREFERENCES["use_inform"]:
@@ -669,9 +671,8 @@ class Cmd(object):
         else:
             cmd = self.cmd
         if _use_log(self.log):
-            from inform import log
-
-            log("running:", render_command(cmd, option_args=self.option_args))
+            from inform import indent, log
+            log(f"running:\n{indent(render_command(cmd, option_args=self.option_args))}")
 
         if self.save_stdout or self.save_stderr:
             try:
@@ -823,6 +824,7 @@ class Run(Cmd):
         encoding=None,
         log=None,
         option_args=None,
+        **kwargs,
     ):
         self.cmd = cmd
         self.stdin = None
@@ -833,11 +835,11 @@ class Run(Cmd):
         self.wait_for_termination = True
         self.accept = (0,)
         self.env = env
-        self.encoding = PREFERENCES["encoding"] if not encoding else encoding
+        self.encoding = encoding or PREFERENCES["encoding"]
         self.log = log
         self.option_args = option_args
         self._interpret_modes(modes)
-        self.run(stdin)
+        self.run(stdin, **kwargs)
 
 
 # Sh class (deprecated) {{{2

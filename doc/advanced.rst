@@ -808,7 +808,7 @@ VIP* authenticator application.  Download and install *vipaccess* using::
 
     git clone https://github.com/dlenski/python-vipaccess.git
     cd python-vipaccess
-    pip3 install --user .
+    pip3 install .
 
 Once installed, you generate the credentials using:
 

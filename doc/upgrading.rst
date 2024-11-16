@@ -26,7 +26,7 @@ information, including the secrets. Be sure to keep it safe.
 
 Once you have created/updated your archive, you can upgrade Avendesora with::
 
-   pip install -upgrade --user avendesora
+   pip install -upgrade avendesora
 
 Finally, run::
 
