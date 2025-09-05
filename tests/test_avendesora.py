@@ -1,10 +1,8 @@
-import pytest
 from inform import os_error
 from textwrap import dedent
 import subprocess
 import os
 import pexpect
-import pyotp
 
 # set various environment variables so avendesora uses local gpg key and config
 # directory rather than the users.

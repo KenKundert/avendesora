@@ -56,7 +56,7 @@ from .config import get_setting
 from .error import PasswordError
 from .dictionary import Dictionary
 from .obscure import ObscuredSecret
-from inform import Error, conjoin, cull, log, output, terminate, warn, is_str
+from inform import conjoin, cull, log, output, terminate, warn, is_str
 import math
 import hashlib
 import getpass

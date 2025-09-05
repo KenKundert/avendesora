@@ -79,7 +79,7 @@ try:
             try:
                 b32decode(secret, casefold=True)
                 # don't need return value, only checking for errors
-            except BinasciiError as e:
+            except BinasciiError:
                 raise PasswordError(
                     f'invalid value specified to OTP: {shared_secret}.',
                     skip_tb_lvls=2

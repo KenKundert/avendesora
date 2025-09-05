@@ -1,5 +1,4 @@
 from textwrap import dedent
-import pytest
 import os
 from inform import Inform
 
@@ -176,7 +175,7 @@ def test_mybank_accounts():
 def test_unknown_account():
     try:
         pw = PasswordGenerator()
-        account = pw.get_account('alertsdd')
+        pw.get_account('alertsdd')
     except PasswordError as err:
         assert str(err) == 'alertsdd: account not found, did you mean:\n    alertscc (scc)?'
 
@@ -279,7 +278,7 @@ def test_composite(capsys):
         assert nada == None
 
 def test_archive(capsys):
-    from avendesora import Hidden, OTP, Question, RecognizeTitle, Script
+    from avendesora import Hidden, Question, RecognizeTitle, Script
     from inform import render
     with Inform(prog_name=False):
         pw = PasswordGenerator()

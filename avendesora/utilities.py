@@ -18,12 +18,10 @@
 
 # Imports {{{1
 from .config import get_setting
-from .error import PasswordError
 from .shlib import Run
 from inform import Error, output, is_str, indent
 from textwrap import dedent
 import os
-import sys
 
 
 # gethostname {{{1

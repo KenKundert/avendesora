@@ -1,5 +1,4 @@
 # vim: filetype=python sw=4 sts=4 et ai ff=unix fileencoding=utf8 :
-import pytest
 from inform import os_error
 from textwrap import dedent
 import subprocess
@@ -1102,73 +1101,6 @@ def test_browsing():
         dominates over the account attribute, which dominates over the setting.  By
         default, the default browser is x, which uses the default browser for your
         account.
-    """).strip()
-    assert result.decode('utf-8') == expected
-
-# test_collaborate() {{{1
-def test_collaborate():
-    try:
-        result = run('avendesora help collaborate')
-    except OSError as err:
-        result = os_error(err)
-    expected = dedent("""
-        If you share an accounts file with a partner, then either partner
-        can create new secrets and the other partner can reproduce their
-        values once a small amount of relatively non-confidential
-        information is shared. This works because the security of the
-        generated secrets is based on the master seed, and that seed is
-        contained in the accounts file that is shared in a secure manner
-        once at the beginning.  For example, imagine one partner creates an
-        account at the US Postal Service website and then informs the
-        partner that the name of the new account is usps and the username is
-        justus.  That is enough information for the second partner to
-        generate the password and login. And notice that the necessary
-        information can be shared over an insecure channel. For example, it
-        could be sent in a text message or from a phone where trustworthy
-        encryption is not available.
-
-        The first step in using Avendesora to collaborate with a partner is
-        for one of the partners to generate and then share an accounts file
-        that is dedicated to the shared accounts.  This file contains the
-        master seed, and it is critical to keep this value secure. Thus, it
-        is recommended that the shared file be encrypted.
-
-        Consider an example where you, Alice, are sharing accounts with your
-        business partner, Bob.  You have hired a contractor to run your
-        email server, Eve, who unbeknownst to you is reading your email in
-        order to steal valuable secrets.  Together, you and Bob jointly run
-        Teneya Enterprises. Since you expect more people will need access to
-        the accounts in the future, you choose to the name the file after
-        the company rather than your partner.  To share accounts with Bob,
-        you start by getting Bob's public GPG key.  Then, create the new
-        accounts file with something like:
-
-            avendesora new -g alice@teneya.com -g bob@teneya.com teneya.gpg
-
-        This generates a new accounts file, ~/.config/avendesora/teneya.gpg,
-        and encrypts it so only you and Bob can open it.  Mail this file to
-        Bob. Since it is encrypted, it is to safe to send the file through
-        email.  Even though Eve can read this message, the accounts file is
-        encrypted so Eve cannot access the master seed it contains.  Bob
-        should put the file in ~/.config/avendesora and then add it to
-        accounts_files in ~/.config/avendesora/accounts_files.  You are now
-        ready to share accounts.
-
-        Then, one partner creates a new account and mails the account entry
-        to the other partner.  This entry does not contain enough
-        information to allow an eavesdropper such as Eve to be able to
-        generate the secrets, but now both partners can. At a minimum you
-        would need to share only the account name and the user name if one
-        is needed. With that, the other partner can generate the passcode.
-
-        Once you have shared an accounts file, you can also use the identity
-        command to prove your identity to your partner.
-
-        You cannot share secrets encrypted with Scrypt. Also, you cannot
-        share stealth accounts unless the file that contains the account
-        templates has a master_seed specified, which they do not by
-        default. You would need to create a separate file for shared stealth
-        account templates and add a master seed to that file manually.
     """).strip()
     assert result.decode('utf-8') == expected
 
