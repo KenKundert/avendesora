@@ -17,7 +17,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install pygobject
-        run: sudo apt install libgirepository1.0-dev python3-gi libxcb1-dev
+        run: sudo apt install libgirepository1.0-dev python3-gi
+      - name: Install cairo
+        run: sudo apt install libcairo2-dev pkg-config python3-dev
       - name: Install packages
         run: |
           python -m pip install --upgrade pip
