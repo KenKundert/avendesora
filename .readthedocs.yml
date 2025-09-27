@@ -10,7 +10,7 @@ build:
   tools:
     python: "3.12"
   apt_packages:
-    - libgirepository1.0-dev
+    - libgirepository-2.0-dev
     - gcc
     - libcairo2-dev
     - pkg-config
