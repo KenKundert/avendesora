@@ -193,7 +193,7 @@ class PasswordGenerator(object):
 
     # _validate_components() (private) {{{2
     def _validate_components(self):
-        from pkg_resources import resource_filename
+        from importlib.resources import files
 
         # check permissions on the settings directory
         path = get_setting('settings_dir')
@@ -211,8 +211,8 @@ class PasswordGenerator(object):
         # Check that files that are critical to the integrity of the generated
         # secrets have not changed
         for path, kind in [
-            (to_path(resource_filename(__name__, 'secrets.py')), 'secrets_hash'),
-            (to_path(resource_filename(__name__, 'charsets.py')), 'charsets_hash'),
+            (files(__name__).joinpath('secrets.py'), 'secrets_hash'),
+            (files(__name__).joinpath('charsets.py'), 'charsets_hash'),
             ('default', 'dict_hash'),
             ('mnemonic', 'mnemonic_hash'),
         ]:

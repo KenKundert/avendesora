@@ -30,10 +30,10 @@ NONCONFIG_SETTINGS = {
     'cache_dir': user_cache_dir('avendesora'),
     'default_accounts_file': 'accounts.gpg',
     'default_stealth_accounts_file': 'stealth_accounts',
-    'charsets_hash': 'a055240c4c498e1470f5f3e80b3ec599',
+    'charsets_hash': 'fc75f33811171bed3daeb264d484bdc0',
     'dict_hash': '5dbabd4114eae520c1de8963a8b8d09d',
     'mnemonic_hash': 'cafd522d6627011d78e576f2d0b6ed58',
-    'secrets_hash': 'e78b2a9043ac5557d40b0adbab99c32e',
+    'secrets_hash': 'b597fa99e98f9658790816d714e66563',
     'discard_logfile': False,
     'commonly_mistaken_attributes': {
         'url': 'urls',

@@ -26,7 +26,7 @@ from .config import get_setting
 from .error import PasswordError
 from .shlib import to_path, Run
 from .utilities import gethostname, getusername
-from inform import Error, cull, log, notify, warn, os_error, render
+from inform import Error, cull, is_str, log, notify, warn, os_error, render
 from fnmatch import fnmatch
 try:
     from urllib.parse import urlparse
@@ -317,6 +317,13 @@ class RecognizeURL(Recognizer):
     """
 
     def __init__(self, *urls, **kwargs):
+        if not is_str(urls[0]):
+            if len(urls) > 1:
+                raise PasswordError(
+                    "may have only one url argument if first is a collection.",
+                    skip_tb_lvls = 2
+                )
+            urls = urls[0]
         self.urls = Collection(urls, splitter=True)
         self.script = kwargs.pop('script', True)
         self.name = kwargs.pop('name', None)
