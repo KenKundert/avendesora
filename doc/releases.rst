@@ -9,6 +9,12 @@ Latest Development Version
 | Released: 2024-08-28
 
 
+1.27 (2025-09-27)
+-----------------
+- allow *urls* attribute to :class:`Account` to be passed directly to
+  :class:`RecogniseURL`
+
+
 1.26 (2024-08-28)
 -----------------
 - added :class:`Base58` secrets class.

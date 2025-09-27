@@ -23,10 +23,12 @@ requires-python = ">=3.6"
 dependencies = [
     "appdirs",
     "arrow!=0.14.*",
+    # "base58",
+        # base58 is optional, is needed for Base58 encoded secrets
     "cryptography",
         # cryptography is optional, it provides rapid startup via encrypted manifests
     "docopt",
-    "inform",
+    "inform>=1.34",
     "pygobject",
         # pygobject is optional, it provides a secret selection dialog
     "python-gnupg>=0.4.4",
