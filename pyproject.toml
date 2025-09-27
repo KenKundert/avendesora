@@ -1,6 +1,6 @@
 [project]
 name = "avendesora"
-version = "1.26"
+version = "1.27"
 description = "A password generator and account manager."
 readme = "README.rst"
 keywords = ["avendesora", "password", "password vault", "XKCD"]
