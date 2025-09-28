@@ -204,7 +204,7 @@ def test_collaborate():
         business partner, Bob.  You have hired a contractor to run your
         email server, Eve, who unbeknownst to you is reading your email in
         order to steal valuable secrets.  Together, you and Bob jointly run
-        Teneya Enterprises. Since you expect more people will need access to
+        Tenaya Enterprises. Since you expect more people will need access to
         the accounts in the future, you choose to the name the file after
         the company rather than your partner.  To share accounts with Bob,
         you start by getting Bob's public GPG key.  Then, create the new

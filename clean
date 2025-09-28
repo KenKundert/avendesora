@@ -5,7 +5,7 @@ set nonomatch
 # the rest is common to all python directories
 rm -f .test*.sum expected result install.out .*.log
 rm -rf build *.egg-info dist __pycache__ **/{__pycache__,*.pyc,*.pyo} .eggs
-rm -rf .coverage .coverage-html htmlcov
+rm -rf .coverage .coverage-html htmlcov .ruff_cache
 rm -rf .pytest_cache .cache dist .build avendesora.egg.info
 rm -rf tests/home/.python-eggs tests/.coverage tests/htmlcov tests/.pytest_cache
 rm -rf .cache tests/.cache tests/home/.cache
