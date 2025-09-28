@@ -498,9 +498,9 @@ class Collaborate(HelpMessage):
             you start by getting Bob's public GPG key.  Then, create the new
             accounts file with something like:
 
-                avendesora new -g alice@teneya.com -g bob@teneya.com teneya.gpg
+                avendesora new -g alice@tenaya.com -g bob@tenaya.com tenaya.gpg
 
-            This generates a new accounts file, ~/.config/avendesora/teneya.gpg,
+            This generates a new accounts file, ~/.config/avendesora/tenaya.gpg,
             and encrypts it so only you and Bob can open it.  Mail this file to
             Bob. Since it is encrypted, it is to safe to send the file through
             email.  Even though Eve can read this message, the accounts file is
