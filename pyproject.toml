@@ -29,15 +29,21 @@ dependencies = [
         # cryptography is optional, it provides rapid startup via encrypted manifests
     "docopt",
     "inform>=1.34",
-    "pygobject",
-        # pygobject is optional, it provides a secret selection dialog
     "python-gnupg>=0.4.4",
         # Be careful.  There's a package called 'gnupg' that's an
         # incompatible fork of 'python-gnupg'.  If both are installed, the
         # user will probably have compatibility issues.
     "pyotp",
         # pyotp is optional, it provides one-time-password (OTP) secrets.
-    #scrypt",
+]
+
+[project.optional-dependencies]
+select = [
+    "pygobject",
+        # pygobject is optional, it provides the secret selection dialog
+]
+scrypt = [
+    "scrypt",
         # scrypt is optional. If you install it then Avendesora will offer
         # it. It is not required because it is little used and installing it
         # involves compiling C code and so significant additional

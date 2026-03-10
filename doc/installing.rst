@@ -8,7 +8,7 @@ Installing and First Use
 
 Install with::
 
-   pip3 install avendesora
+   pip3 install avendesora[select]
 
 This will place avendesora in ~/.local/bin, which should be added to your path.
 
@@ -36,6 +36,21 @@ install scrypt by hand using::
    pip3 install scrypt
 
 
+Installing on a Mac
+===================
+
+Use homebrew to install the following packages::
+
+    brew install cairo pkg-config
+    brew install xdotool
+    brew install xsel
+    brew install dmenu
+
+Before installing, edit ``avendesora/preferences.py`` and replace the paths to 
+*xdotool*, *xsel*, and *dmenu* with the correct path for the mac.  Confirm the 
+paths by running *which <name>*.  The each path is expected to be 
+``/opt/homebrew/bin/<name>``.
+
 
 GPG Key
 -------
@@ -55,7 +70,7 @@ might consider using the new more secure 25519 elliptic curve.  To do so, run::
    $ gpg --expert --full-gen-key
 
 Then select 9 (ECC and ECC) and then 1 (Curve 25519).  Once you have your key, 
-edit ~/.gnupg/gpg-conf and add the line::
+edit ~/.gnupg/gpg.conf and add the line::
 
    use-agent
 
