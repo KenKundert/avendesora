@@ -9,6 +9,11 @@ Latest Development Version
 | Released: 2025-09-27
 
 
+1.28 (2026-03-10)
+-----------------
+- Make pygobject and scrypt optional dependencies.
+
+
 1.27 (2025-09-27)
 -----------------
 - allow *urls* attribute to :class:`Account` to be passed directly to
